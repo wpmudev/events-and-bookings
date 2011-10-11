@@ -117,24 +117,26 @@ function event_rsvp_form() {
     <div class="eab_booking_form">
         <h3><?php _e('RSVP', Booking::$_translation_domain); ?></h3>
         <?php
-        if (is_user_logged_in()) {
-            $booking = intval($wpdb->get_var($wpdb->prepare("SELECT id FROM ".Booking::tablename('bookings')." WHERE event_id = %d AND user_id = %d;", $post->ID, $current_user->ID)));
-            $booking_status = $wpdb->get_var($wpdb->prepare("SELECT status FROM ".Booking::tablename('bookings')." WHERE event_id = %d AND user_id = %d;", $post->ID, $current_user->ID));
-        ?>
-            <form action="" method="post" id="eab_booking_form">
-                <input type="hidden" name="event_id" value="<?php print $post->ID; ?>" />
-                <input type="hidden" name="user_id" value="<?php print $booking; ?>" />
-                <input class="<?php echo ($booking && $booking_status == 'yes')?'current':''; ?>" type="submit" name="action_yes" value="<?php _e('I\'m attending', Booking::$_translation_domain); ?>" />
-                <input class="<?php echo ($booking && $booking_status == 'maybe')?'current':''; ?>" type="submit" name="action_maybe" value="<?php _e('May be', Booking::$_translation_domain); ?>" />
-                <input class="<?php echo ($booking && $booking_status == 'no')?'current':''; ?>" type="submit" name="action_no" value="<?php _e('No', Booking::$_translation_domain); ?>" />
-            </form>
-        <?php
-        } else {
-        ?>
-            <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('I\'m attending', Booking::$_translation_domain); ?></a>
-            <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('May be', Booking::$_translation_domain); ?></a>
-            <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('No', Booking::$_translation_domain); ?></a>
-        <?php
+        if (accepting_bookings()) {
+            if (is_user_logged_in()) {
+                $booking = intval($wpdb->get_var($wpdb->prepare("SELECT id FROM ".Booking::tablename('bookings')." WHERE event_id = %d AND user_id = %d;", $post->ID, $current_user->ID)));
+                $booking_status = $wpdb->get_var($wpdb->prepare("SELECT status FROM ".Booking::tablename('bookings')." WHERE event_id = %d AND user_id = %d;", $post->ID, $current_user->ID));
+            ?>
+                <form action="" method="post" id="eab_booking_form">
+                    <input type="hidden" name="event_id" value="<?php print $post->ID; ?>" />
+                    <input type="hidden" name="user_id" value="<?php print $booking; ?>" />
+                    <input class="<?php echo ($booking && $booking_status == 'yes')?'current':''; ?>" type="submit" name="action_yes" value="<?php _e('I\'m attending', Booking::$_translation_domain); ?>" />
+                    <input class="<?php echo ($booking && $booking_status == 'maybe')?'current':''; ?>" type="submit" name="action_maybe" value="<?php _e('May be', Booking::$_translation_domain); ?>" />
+                    <input class="<?php echo ($booking && $booking_status == 'no')?'current':''; ?>" type="submit" name="action_no" value="<?php _e('No', Booking::$_translation_domain); ?>" />
+                </form>
+            <?php
+            } else {
+            ?>
+                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('I\'m attending', Booking::$_translation_domain); ?></a>
+                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('May be', Booking::$_translation_domain); ?></a>
+                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('No', Booking::$_translation_domain); ?></a>
+            <?php
+            }
         }
         ?>
     </div>
@@ -201,4 +203,48 @@ function event_bookings($status = 'yes', $echo = true, $admin = false) {
     }
     
     return $content;
+}
+
+function accepting_bookings() {
+    global $post;
+    
+    if (get_post_meta($post->ID, 'incsub_event_status', true) == 'open') {
+        return true;
+    }
+    return false;
+}
+
+function event_details($echo = true, $archive = false) {
+    global $post;
+    
+    if (!$archive) {
+        $content .= '<h3>' . __('Event Details', Booking::$_translation_domain) . '</h3>';
+    }
+    $content .= '<ul>';
+    
+    if (date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_start', true))) ==
+        date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_end', true)))) {
+        $end_date = '';
+    } else {
+        $end_date = date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_end', true))) . ' ';
+    }
+    
+    $content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_start', true))) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime(get_post_meta($post->ID, 'incsub_event_start', true))) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime(get_post_meta($post->ID, 'incsub_event_end', true))) . '</li>';
+    $content .= '<li><b>' . __('Location', Booking::$_translation_domain) . '</b>: ' . get_post_meta($post->ID, 'incsub_event_venue', true) . '</li>';
+    $content .= '<li><b>' . __('Created By', Booking::$_translation_domain) . '</b>: <a href="'.get_the_author_link().'" title="'.get_the_author().'">' . get_the_author() . '</a></li>';
+    $content .= '</ul>';
+    
+    if ($echo) {
+        echo $content;
+    }
+    
+    return $content;
+}
+
+function event_booking_count($status) {
+    global $wpdb, $post;
+    
+    $booking_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(user_id) FROM ".Booking::tablename('bookings')." WHERE event_id = %d AND status = %s;", $post->ID, $status));
+
+    return $booking_count;
 }

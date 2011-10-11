@@ -151,25 +151,37 @@ class Booking {
 	wp_register_style('eab_front', plugins_url('events-and-bookings/css/front.css'), null, $this->current_version);
 	
 	if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
+	    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
+	    
+	    $event_id = intval($_POST['event_id']);
+	    $booking_action = $booking_actions[$_POST['action_yes']];
+	    
+	    do_action( 'incsub_event_booking', $event_id, $current_user->ID, $booking_action );
 	    if (isset($_POST['action_yes'])) {
 		$wpdb->query(
-		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = 'yes';", $_POST['event_id'], $current_user->ID)
+		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = 'yes';", $event_id, $current_user->ID)
 		);
+		// TODO: Add to BP activity stream
 		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		do_action( 'incsub_event_booking_yes', $event_id, $current_user->ID );
 		exit();
 	    }
 	    if (isset($_POST['action_maybe'])) {
 		$wpdb->query(
-		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'maybe') ON DUPLICATE KEY UPDATE `status` = 'maybe';", $_POST['event_id'], $current_user->ID)
+		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'maybe') ON DUPLICATE KEY UPDATE `status` = 'maybe';", $event_id, $current_user->ID)
 		);
+		// TODO: Add to BP activity stream
 		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		do_action( 'incsub_event_booking_maybe', $event_id, $current_user->ID );
 		exit();
 	    }
 	    if (isset($_POST['action_no'])) {
 		$wpdb->query(
-		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'no') ON DUPLICATE KEY UPDATE `status` = 'no';", $_POST['event_id'], $current_user->ID)
+		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'no') ON DUPLICATE KEY UPDATE `status` = 'no';", $event_id, $current_user->ID)
 		);
+		// TODO: Remove from BP activity stream
 		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		do_action( 'incsub_event_booking_no', $event_id, $current_user->ID );
 		exit();
 	    }
 	}

@@ -1,4 +1,14 @@
 
+#eab-page-wrapper h1 {
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+#eab-page-wrapper h2 {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
 #eab-page-wrapper h3 {
     font-size: 1.2em;
     font-weight: bold;
@@ -16,4 +26,52 @@ ul.eab-guest-list {
 ul.eab-guest-list li {
     float: left;
     padding: 2px;
+}
+
+div.clear {
+    clear: both;
+}
+
+div.event-pagination a,
+div.event-pagination span {
+    margin: 2px;
+}
+
+div.event {
+    border: 1px solid #EAEAEA;
+    margin-bottom: 5px;
+    padding: 10px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+div.event-digest {
+    float: right;
+}
+
+div.event-digest-widget {
+    text-align: center;
+    font-size: 0.9em;
+    margin: 0px 2px 5px;
+    padding: 5px;
+    width: 50px;
+    border: 1px solid;
+    vertical-align: middle;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+div.event-status-yes {
+    background-color: #C9FFC6;
+    border-color: #0CD000;
+    margin-top: -5px;
+}
+
+div.event-status-maybe {
+    background-color: #FFFA42;
+    border-color: #FFBD42;
+}
+
+div.booking-count {
+    font-size: 2em;
 }

@@ -13,6 +13,10 @@
                 <?php the_content(); ?>
             </div>
             
+            <div id="event-details">
+                <?php event_details(); ?>
+            </div>
+            
             <div id="event-rsvp">
                 <?php event_rsvp_form(); ?>
             </div>
@@ -24,7 +28,7 @@
                 <div id="event-booking-yes">
                     <?php event_bookings('yes'); ?>
                 </div>
-                
+                <div class="clear"></div>
                 <div id="event-booking-maybe">
                     <?php event_bookings('maybe'); ?>
                 </div>
