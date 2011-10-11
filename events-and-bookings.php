@@ -31,9 +31,9 @@ class Booking {
     var $_current_version = '1.0.0';
     
     /**
-     * @var		string	$_translation_domain	Translation domain
+     * @static		string	$_translation_domain	Translation domain
      */
-    var $_translation_domain = 'eab';
+    static $_translation_domain = 'eab';
     
     /**
      * @var		array	$_options		Consolidated options
@@ -83,7 +83,6 @@ class Booking {
 	
 	add_filter('rewrite_rules_array', array(&$this, 'add_rewrite_rules'));
 	add_filter('post_type_link', array(&$this, 'post_type_link'), 10, 3);
-	add_filter('the_content', array(&$this, 'the_content') );
 	
 	add_filter('manage_incsub_event_posts_columns', array(&$this, 'manage_posts_columns') );
 	
@@ -146,6 +145,30 @@ class Booking {
 	//wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), null, $this->current_version);
 	
 	wp_register_style('eab_jquery_ui', plugins_url('events-and-bookings/css/smoothness/jquery-ui-1.8.16.custom.css'), null, $this->current_version);
+	
+	if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
+	    if (isset($_POST['action_yes'])) {
+		$wpdb->query(
+		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = 'yes';", $_POST['event_id'], $current_user->ID)
+		);
+		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		exit();
+	    }
+	    if (isset($_POST['action_maybe'])) {
+		$wpdb->query(
+		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'maybe') ON DUPLICATE KEY UPDATE `status` = 'maybe';", $_POST['event_id'], $current_user->ID)
+		);
+		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		exit();
+	    }
+	    if (isset($_POST['action_no'])) {
+		$wpdb->query(
+		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'no') ON DUPLICATE KEY UPDATE `status` = 'no';", $_POST['event_id'], $current_user->ID)
+		);
+		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		exit();
+	    }
+	}
     }
     
     function handle_template( $path ) {
@@ -284,7 +307,22 @@ class Booking {
 	
 	$content .= '<input type="hidden" name="incsub_event_bookings_meta" value="1" />';
 	$content .= '<div class="bookings-list-left">';
-	$content .= __('No bookings', $this->_translation_domain);
+	
+	if (has_bookings(false)) {
+	    $content .= '<div id="event-booking-yes">';
+            $content .= event_bookings('yes', false, true);
+            $content .= '</div>';
+                
+            $content .= '<div id="event-booking-maybe">';
+            $content .= event_bookings('maybe', false, true);
+            $content .= '</div>';
+	    
+	    $content .= '<div id="event-booking-no">';
+            $content .= event_bookings('no', false, true);
+            $content .= '</div>';
+        }  else {
+            $content .= __('No bookings', $this->_translation_domain);
+        }
 	$content .= '</div>';
 	$content .= '<div class="clear"></div>';
 	
@@ -423,21 +461,6 @@ class Booking {
 	}
     }
     
-    function the_content($content) {
-	global $post;
-	
-	$content .= '<div class="eab_booking_form">';
-	$content .= '	<h3>'.__('RSVP', $this->_translation_domain).'</h3>';
-	$content .= '	<form action="" method="post" id="eab_booking_form">';
-	$content .= '		<input type="submit" name="action_yes" value="'.__('I\'m Attending', $this->_translation_domain).'" />';
-	$content .= '		<input type="submit" name="action_maybe" value="'.__('May be', $this->_translation_domain).'" />';
-	$content .= '		<input type="submit" name="action_no" value="'.__('No', $this->_translation_domain).'" />';
-	$content .= '	</form>';
-	$content .= '</div>';
-	
-	return $content;
-    }
-    
     /**
      * Activation hook
      * 
@@ -485,6 +508,7 @@ class Booking {
 			`timestamp` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' ,
 			`status` ENUM( 'paid', 'yes', 'maybe', 'no' ) NOT NULL DEFAULT 'no' ,
 	    		PRIMARY KEY (`id`),
+			UNIQUE KEY `event_id_2` (`event_id`,`user_id`),
 			KEY `event_id` (`event_id`),
 			KEY `user_id` (`user_id`),
 			KEY `timestamp` (`timestamp`),
@@ -562,113 +586,7 @@ class Booking {
     }
 }
 
-function the_event_pagination( $query = null ) {
-    if ( is_null( $query ) )
-	$query = $GLOBALS['wp_query'];
-    
-    if ( $query->max_num_pages <= 1 )
-	return;
-    
-    $current_page = max( 1, $query->get( 'paged' ) );
-    $total_pages = $query->max_num_pages;
-    
-    $padding = 2;
-    $range_start = max( 1, $current_page - $padding );
-    $range_finish = min( $total_pages, $current_page + $padding );
-
-    echo '<div class="event-pagination">';
-
-    if ( $current_page > 1 )
-	_event_single_page_link( $query, $current_page - 1, __( 'prev', 'eab' ), 'prev' );
-
-    if ( $range_start > 1 )
-	_event_single_page_link( $query, 1 );
-
-    if ( $range_start > $padding )
-	echo '<span class="dots">...</span>';
-
-    foreach ( range( $range_start, $range_finish ) as $num ) {
-	if ( $num == $current_page )
-	    echo _event_html( 'span', array( 'class' => 'current' ), number_format_i18n( $num ) );
-	else
-	    _event_single_page_link( $query, $num );
-    }
-
-    if ( $range_finish + $padding <= $total_pages )
-	echo '<span class="dots">...</span>';
-
-    if ( $range_finish < $total_pages )
-	_event_single_page_link( $query, $total_pages );
-
-    if ( $current_page < $total_pages )
-	_event_single_page_link( $query, $current_page + 1, __( 'next', 'eab' ), 'next' );
-
-    echo '</div>';
-}
-
-function the_event_link( $question_id = 0 ) {
-    if ( !$event_id )
-    	$event_id = get_the_ID();
-
-    echo get_event_link( $event_id );
-}
-
-function get_event_link( $question_id ) {
-	return _event_html( 'a', array( 'class' => 'question-link', 'href' => event_get_url( 'single', $question_id ) ), get_the_title( $question_id ) );
-}
-
-function _event_html( $tag ) {
-    $args = func_get_args();
-
-    $tag = array_shift( $args );
-
-    if ( is_array( $args[0] ) ) {
-    	$closing = $tag;
-    	$attributes = array_shift( $args );
-    	foreach ( $attributes as $key => $value ) {
-    		$tag .= ' ' . $key . '="' . htmlspecialchars( $value, ENT_QUOTES ) . '"';
-    	}
-    } else {
-    	list( $closing ) = explode( ' ', $tag, 2 );
-    }
-
-    if ( in_array( $closing, array( 'area', 'base', 'basefont', 'br', 'hr', 'input', 'img', 'link', 'meta' ) ) ) {
-    	return "<{$tag} />";
-    }
-
-    $content = implode( '', $args );
-
-    return "<{$tag}>{$content}</{$closing}>";
-}
-
-function event_get_url( $type, $id = 0 ) {
-    $base = get_post_type_archive_link( 'event' );
-
-    switch ( $type ) {
-	case 'single':
-	    $result = get_permalink( $id );
-	    break;
-	case 'archive':
-	    $result = get_post_type_archive_link( 'question' );
-	    break;
-	default:
-	    return '';
-    }
-
-    return apply_filters( 'qa_get_url', $result, $type, $id );
-}
-
-function _event_single_page_link( $query, $num, $title = '', $class = '' ) {
-    if ( !$title )
-	$title = number_format_i18n( $num );
-
-    $args = array( 'href' => get_pagenum_link( $num ) );
-
-    if ( $class )
-	$args['class'] = $class;
-
-    echo _event_html( 'a', $args, $title );
-}
+include_once 'template-tags.php';
 
 define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . basename( dirname( __FILE__ ) ) . '/');
 
