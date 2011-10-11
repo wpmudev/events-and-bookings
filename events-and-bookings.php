@@ -71,6 +71,8 @@ class Booking {
 	add_action('admin_menu', array(&$this, 'admin_menu'));
 	add_action('option_rewrite_rules', array(&$this, 'check_rewrite_rules'));
 	
+	add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
+	
 	add_action( 'manage_incsub_event_posts_custom_column', array(&$this, 'manage_posts_custom_column') );
 	//add_action( 'restrict_manage_posts', array(&$this, 'restrict_manage_posts') );
 	
@@ -85,7 +87,6 @@ class Booking {
 	add_filter('post_type_link', array(&$this, 'post_type_link'), 10, 3);
 	
 	add_filter('manage_incsub_event_posts_columns', array(&$this, 'manage_posts_columns') );
-	
     }
     
     /**
@@ -145,6 +146,9 @@ class Booking {
 	//wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), null, $this->current_version);
 	
 	wp_register_style('eab_jquery_ui', plugins_url('events-and-bookings/css/smoothness/jquery-ui-1.8.16.custom.css'), null, $this->current_version);
+	wp_register_style('eab_admin', plugins_url('events-and-bookings/css/admin.css'), null, $this->current_version);
+	
+	wp_register_style('eab_front', plugins_url('events-and-bookings/css/front.css'), null, $this->current_version);
 	
 	if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
 	    if (isset($_POST['action_yes'])) {
@@ -206,6 +210,11 @@ class Booking {
     
     function admin_print_styles() {	
 	wp_enqueue_style('eab_jquery_ui');
+	wp_enqueue_style('eab_admin');
+    }
+    
+    function wp_print_styles() {
+	wp_enqueue_style('eab_front');
     }
     
     function where_meta_box($echo = true) {

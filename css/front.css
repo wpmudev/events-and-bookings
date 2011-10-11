@@ -1,0 +1,19 @@
+
+#eab-page-wrapper h3 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#eab-page-wrapper h4 {
+    font-weight: bold;
+}
+
+ul.eab-guest-list {
+    list-style: none;
+    margin-left: 0px;
+}
+
+ul.eab-guest-list li {
+    float: left;
+    padding: 2px;
+}
