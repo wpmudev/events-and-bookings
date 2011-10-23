@@ -75,3 +75,13 @@ div.event-status-maybe {
 div.booking-count {
     font-size: 2em;
 }
+
+div#event-bread-crumbs {
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+div#event-bread-crumbs a.parent {
+    text-decoration: none;
+}
+

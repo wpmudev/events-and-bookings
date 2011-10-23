@@ -8,6 +8,11 @@
             the_post();
             ?>
             
+            <div id="event-bread-crumbs">
+                <a href="<?php echo event_link('event_or_calendar');?>" class="parent"><?php _e("Events", Booking::$_translation_domain); ?></a> &gt;
+                <span class="current"><?php the_title(); ?></span>
+            </div>
+            
             <div id="single-event">
                 <h1><?php the_title(); ?></h1>
                 <?php the_content(); ?>

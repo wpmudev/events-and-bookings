@@ -248,3 +248,19 @@ function event_booking_count($status) {
 
     return $booking_count;
 }
+
+function event_link($page) {
+    global $blog_id;
+    switch ($page) {
+	case 'calendar':
+	    return apply_filters('event_link', get_site_url($blog_id, 'events/'.date('Y/m').'/'), $page);
+	case 'event':
+	    return apply_filters('event_link', get_site_url($blog_id, 'events/'), $page);
+	default:
+	    if (isset($_COOKIE['eab_default_view']) && $_COOKIE['eab_default_view'] == 'calendar') {
+		return event_link('calendar');
+	    } else {
+		return event_link('event');
+	    }
+    }
+}

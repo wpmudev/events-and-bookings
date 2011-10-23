@@ -87,6 +87,9 @@ class Booking {
 	add_filter('post_type_link', array(&$this, 'post_type_link'), 10, 3);
 	
 	add_filter('manage_incsub_event_posts_columns', array(&$this, 'manage_posts_columns') );
+	add_filter('cron_schedules', array(&$this, 'cron_schedules') );
+	
+	add_filter('views_edit-incsub_event', array(&$this, 'views_list') );
     }
     
     /**
@@ -136,9 +139,18 @@ class Booking {
 	    )
 	);
 	
-	$event_structure = '/events/%event%';
+	register_post_status( 'expire', array(
+  		'label'       => __('Expired', $this->_translation_domain),
+  		'label_count' => array( __('Expired <span class="count">(%s)</span>', $this->_translation_domain), __('Expired <span class="count">(%s)</span>', $this->_translation_domain) ),
+  		'post_type'   => 'incsub_event',
+  		'protected'      => true
+  	) );
 	
-	$wp_rewrite->add_rewrite_tag("%event%", '(.+?)', "incsub_event=");
+	$event_structure = '/events/%incsub_event_year%/%incsub_event_monthnum%/%incsub_event%';
+	
+	$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
+	$wp_rewrite->add_rewrite_tag("%incsub_event_year%", '([0-9]{4})', "incsub_event_year=");
+	$wp_rewrite->add_rewrite_tag("%incsub_event_monthnum%", '([0-9]{2})', "incsub_event_monthnum=");
 	$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 	
 	wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), $this->current_version);
@@ -149,6 +161,11 @@ class Booking {
 	wp_register_style('eab_admin', plugins_url('events-and-bookings/css/admin.css'), null, $this->current_version);
 	
 	wp_register_style('eab_front', plugins_url('events-and-bookings/css/front.css'), null, $this->current_version);
+	
+	if (get_option('eab_expiring_scheduled', false) == false) {
+	    wp_schedule_event(time()+10, 'thirtyminutes', 'eab_expire_events');
+	    update_option('eab_expiring_scheduled', true);
+	}
 	
 	if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
 	    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
@@ -409,15 +426,30 @@ class Booking {
 	$post = get_post($post_id);
 	
 	$rewritecode = array(
-	    '%event%',
+	    '%incsub_event%',
+	    '%incsub_event_year%',
+	    '%incsub_event_monthnum%'
 	);
 	
 	if ($post->post_type == 'incsub_event' && '' != $permalink) {
 	    
 	    $ptype = get_post_type_object($post->post_type);
 	    
+	    $start = time();
+	    $end = time();
+	    
+	    $meta = get_post_custom($post->ID);
+	    if (isset($meta["incsub_event_start"]) && isset($meta["incsub_event_start"][0])) {
+		$start = strtotime($meta["incsub_event_start"][0]);
+	    }
+	    
+	    $year = date('Y', $start);
+	    $month = date('m', $end);
+	    
 	    $rewritereplace = array(
-	    	($post->post_name == "")?$post->id:$post->post_name
+	    	($post->post_name == "")?$post->id:$post->post_name,
+		$year,
+		$month,
 	    );
 	    $permalink = str_replace($rewritecode, $rewritereplace, $permalink);
 	} else {
@@ -430,7 +462,9 @@ class Booking {
     function add_rewrite_rules($rules){
 	$new_rules = array();
 	
-	$new_rules['event/(.+?)/?$'] = 'index.php?incsub_event=$matches[1]';
+	$new_rules['events/([0-9]{4})/$'] = 'index.php?incsub_event_year=$matches[1]';
+	$new_rules['events/([0-9]{4})/([0-9]{2})/$'] = 'index.php?incsub_event_year=$matches[1]&incsub_event_month=$matches[2]';
+	$new_rules['events/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?incsub_event_year=$matches[1]&incsub_event_month=$matches[2]&incsub_event=$matches[3]';
 	
 	return array_merge($new_rules, $rules);
     }
@@ -443,7 +477,15 @@ class Booking {
 	if (!is_array($value))
 	    $value = array();
 	
-	$array_key = 'events/(.+?)/?$';
+	$array_key = 'events/([0-9]{4})/$';
+	if ( !array_key_exists($array_key, $value) ) {
+	    $this->flush_rewrite();
+	}
+	$array_key = 'events/([0-9]{4})/([0-9]{2})/$';
+	if ( !array_key_exists($array_key, $value) ) {
+	    $this->flush_rewrite();
+	}
+	$array_key = 'events/([0-9]{4})/([0-9]{2})/(.+?)/?$';
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
@@ -584,29 +626,50 @@ class Booking {
 	*/
     }
     
-    function event_list() {
-	switch ($_REQUEST['action']) {
-	    case 'add':
-	    case 'edit':
-		include 'views/admin/event_edit.php';
-		break;
-	    default:
-		if (!isset($_REQUEST['month'])) {
-		    $_REQUEST['month'] = date('Y-m');
-		}
-		include 'views/admin/event_list.php';
+    function cron_schedules($schedules) {
+	$schedules['thirtyminutes'] = array( 'interval' => 1800, 'display' => __('Once every half an hour', INCSUB_SUPPORT_LANG_DOMAIN) );
+	
+	return $schedules;
+    }
+    
+    function views_list($views) {
+	global $wp_query;
+	
+	$avail_post_stati = wp_edit_posts_query();
+	$num_posts = wp_count_posts( 'incsub_event', 'readable' );
+	
+	foreach ( get_post_stati(array('post_type' => 'incsub_event'), 'objects') as $status ) {
+	    $class = '';
+	    $status_name = $status->name;
+	    if ( !in_array( $status_name, $avail_post_stati ) )
+	        continue;
+	    
+	    if ( empty( $num_posts->$status_name ) )
+	        continue;
+	    
+	    if ( isset($_GET['post_status']) && $status_name == $_GET['post_status'] )
+	        $class = ' class="current"';
+	    
+	    $views[$status_name] = "<li><a href='edit.php?post_type=incsub_event&amp;post_status=$status_name'$class>" . sprintf( _n( $status->label_count[0], $status->label_count[1], $num_posts->$status_name ), number_format_i18n( $num_posts->$status_name ) ) . '</a>';
 	}
-    }
-    
-    function new_event() {
-	include 'views/admin/add_event.php';
-    }
-    
-    function settings_page() {
-	include 'views/admin/settings.php';
+	
+	return $views;
     }
 }
 
+function eab_expire_events() {
+    global $wpdb;
+    
+    $query = "SELECT a.ID FROM {$wpdb->prefix}posts a LEFT JOIN {$wpdb->prefix}postmeta b ON (a.ID = b.post_id) WHERE a.post_status = 'publish' AND a.post_type = 'incsub_event' AND b.meta_key = 'incsub_event_start' AND b.meta_value < NOW();";
+    $posts = $wpdb->get_results($query, ARRAY_A);
+    
+    foreach ($posts as $post) {
+        $post['post_status'] = 'expire';
+        wp_update_post( $post );
+        wp_transition_post_status('expire', 'publish', $post);
+    }
+}
+    
 include_once 'template-tags.php';
 
 define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . basename( dirname( __FILE__ ) ) . '/');

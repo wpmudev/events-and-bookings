@@ -3,6 +3,12 @@
 <div id="content">
     <div class="padder">
         <div id="eab-page-wrapper">
+            <div id="eab-archive-view">
+                <?php _e("View", Booking::$_translation_domain); ?>:
+                <span class="current"><?php _e("Agenda", Booking::$_translation_domain); ?></span> |
+                <a href="<?php echo event_link('calendar');?>" class="parent"><?php _e("Calendar", Booking::$_translation_domain); ?></a>
+            </div>
+            
             <h2><?php _e('Events', 'eab'); ?></h2>
             
             <?php if ( !have_posts() ) : ?>
