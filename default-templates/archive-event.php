@@ -17,7 +17,7 @@
             if (is_year()) {
                 global $post, $wpdb, $wp_query;
                 
-                $end = date('Y-m-d',strtotime('-1 second',strtotime('+1 year',strtotime($wp_query->query_vars['year'].'-01-01 00:00:00'))));
+                $end = date('Y-m-d',strtotime('-1 second',strtotime('+1 year',strtotime($wp_query->query_vars['year'].'-01-01'))));
                 $querystr = "SELECT $wpdb->posts.* FROM $wpdb->posts, $wpdb->postmeta WHERE $wpdb->posts.ID = $wpdb->postmeta.post_id 
                 AND $wpdb->postmeta.meta_key = 'incsub_event_start' 
                 AND DATE($wpdb->postmeta.meta_value) >= DATE('{$wp_query->query_vars['year']}-01-01')
@@ -29,7 +29,11 @@
                 
                 $pageposts = $wpdb->get_results($querystr, OBJECT);
             ?>
-                <h2><?php printf(__('Events in %s', 'eab'), date_i18n('Y')); ?></h2>
+                <div id="event-bread-crumbs">
+                    <a href="<?php echo event_link('event_or_calendar'); ?>" class="parent"><?php _e("Events", Booking::$_translation_domain); ?></a> &gt;
+                    <span class="current"><?php echo date_i18n('Y', strtotime($wp_query->query_vars['year'].'-01-01')); ?></span>
+                </div>
+                <h2><?php printf(__('Events in %s', 'eab'), date_i18n('Y', strtotime($wp_query->query_vars['year'].'-01-01'))); ?></h2>
                 
                 <?php if ( is_array($pageposts) && count($pageposts) > 0 ) : ?>
                 <div id="event-list">
@@ -74,11 +78,15 @@
                 <?php else: ?>
                 <p><?php $event_ptype = get_post_type_object( 'incsub_event' ); echo $event_ptype->labels->not_found; ?></p>
                 <?php endif; ?>
+                <div class="event-pagination">
+                    <a href="<?php echo get_site_url($blog_id, 'events/'.(date('Y', strtotime($wp_query->query_vars['year'].'-01-01'))-1).'/'); ?>"><?php _e( 'prev', 'eab' ); ?></a>
+                    <a href="<?php echo get_site_url($blog_id, 'events/'.(date('Y', strtotime($wp_query->query_vars['year'].'-01-01'))+1).'/'); ?>"><?php _e( 'next', 'eab' ); ?></a>
+                </div>
             <?php
             } else if (is_month()) {
                 global $post, $wpdb, $wp_query;
                 
-                $end = date('Y-m-d',strtotime('-1 second',strtotime('+1 month',strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01 00:00:00'))));
+                $end = date('Y-m-d',strtotime('-1 second',strtotime('+1 month',strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01'))));
                 $querystr = "SELECT $wpdb->posts.* FROM $wpdb->posts, $wpdb->postmeta WHERE $wpdb->posts.ID = $wpdb->postmeta.post_id 
                 AND $wpdb->postmeta.meta_key = 'incsub_event_start' 
                 AND DATE($wpdb->postmeta.meta_value) >= DATE('{$wp_query->query_vars['year']}-{$wp_query->query_vars['monthnum']}-01')
@@ -90,7 +98,12 @@
                 
                 $pageposts = $wpdb->get_results($querystr, OBJECT);
             ?>
-                <h2><?php printf(__('Events in %s, %s', 'eab'), date_i18n('F'), date_i18n('Y')); ?></h2>
+                <div id="event-bread-crumbs">
+                    <a href="<?php echo event_link('event_or_calendar'); ?>" class="parent"><?php _e("Events", Booking::$_translation_domain); ?></a> &gt;
+                    <a href="<?php echo get_site_url($blog_id, 'events/'.date('Y', strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01')).'/'); ?>" class="parent"><?php echo date_i18n('Y', strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01')); ?></a> &gt;
+                    <span class="current"><?php echo date_i18n('F', strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01')); ?></span>
+                </div>
+                <h2><?php printf(__('Events in %s, %s', 'eab'), date_i18n('F', strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01')), date_i18n('Y', strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01'))); ?></h2>
                 <?php if ( is_array($pageposts) && count($pageposts) > 0 ) : ?>
                 <div id="eab-calendar-month">
                     <?php
@@ -133,7 +146,7 @@
                 <?php
                     }
                     
-                    $new_day = date('d',strtotime('-1 second',strtotime('+1 month',strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01 00:00:00'))));
+                    $new_day = date('d',strtotime('-1 second',strtotime('+1 month',strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01'))));
                     if ($new_day != $day) {
                         if (($new_day-$day) > 1) {
                             for ($c=$day+1; $c<$new_day; $c++) {
@@ -168,6 +181,11 @@
                 <?php else: ?>
                 <p><?php $event_ptype = get_post_type_object( 'incsub_event' ); echo $event_ptype->labels->not_found; ?></p>
                 <?php endif; ?>
+                
+                <div class="event-pagination">
+                    <a href="<?php echo get_site_url($blog_id, 'events/'.date('Y/m', (strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01')-10)).'/'); ?>"><?php _e( 'prev', 'eab' ); ?></a>
+                    <a href="<?php echo get_site_url($blog_id, 'events/'.date('Y/m', (strtotime('+1 month',strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01'))+10)).'/'); ?>"><?php _e( 'next', 'eab' ); ?></a>
+                </div>
             <?php
             } else {
             ?>
