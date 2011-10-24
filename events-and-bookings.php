@@ -82,6 +82,7 @@ class Booking {
 	add_action('admin_print_styles', array(&$this, 'admin_print_styles') );
 	add_filter('single_template', array( &$this, 'handle_template' ) );
 	add_filter('archive_template', array( &$this, 'handle_template' ) );
+	add_filter('template_include', array( &$this, 'handle_template' ) );
 	
 	add_filter('rewrite_rules_array', array(&$this, 'add_rewrite_rules'));
 	add_filter('post_type_link', array(&$this, 'post_type_link'), 10, 3);
@@ -146,11 +147,11 @@ class Booking {
   		'protected'      => true
   	) );
 	
-	$event_structure = '/events/%incsub_event_year%/%incsub_event_monthnum%/%incsub_event%';
+	$event_structure = '/events/%year%/%monthnum%/%incsub_event%';
 	
 	$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
-	$wp_rewrite->add_rewrite_tag("%incsub_event_year%", '([0-9]{4})', "incsub_event_year=");
-	$wp_rewrite->add_rewrite_tag("%incsub_event_monthnum%", '([0-9]{2})', "incsub_event_monthnum=");
+	//$wp_rewrite->add_rewrite_tag("%year%", '([0-9]{4})', "year=");
+	//$wp_rewrite->add_rewrite_tag("%monthnum%", '([0-9]{2})', "monthnum=");
 	$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 	
 	wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), $this->current_version);
@@ -427,8 +428,8 @@ class Booking {
 	
 	$rewritecode = array(
 	    '%incsub_event%',
-	    '%incsub_event_year%',
-	    '%incsub_event_monthnum%'
+	    '%year%',
+	    '%monthnum%'
 	);
 	
 	if ($post->post_type == 'incsub_event' && '' != $permalink) {
@@ -462,9 +463,11 @@ class Booking {
     function add_rewrite_rules($rules){
 	$new_rules = array();
 	
-	$new_rules['events/([0-9]{4})/$'] = 'index.php?incsub_event_year=$matches[1]';
-	$new_rules['events/([0-9]{4})/([0-9]{2})/$'] = 'index.php?incsub_event_year=$matches[1]&incsub_event_month=$matches[2]';
-	$new_rules['events/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?incsub_event_year=$matches[1]&incsub_event_month=$matches[2]&incsub_event=$matches[3]';
+	unset($rules['events/([0-9]{4})/([0-9]{1,2})/?$']);
+	unset($rules['events/([0-9]{4})/?$']);
+	$new_rules['events/([0-9]{4})/?$'] = 'index.php?year=$matches[1]&post_type=incsub_event';
+	$new_rules['events/([0-9]{4})/([0-9]{1,2})/?$'] = 'index.php?year=$matches[1]&monthnum=$matches[2]&post_type=incsub_event';
+	$new_rules['events/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?year=$matches[1]&monthnum=$matches[2]&incsub_event=$matches[3]';
 	
 	return array_merge($new_rules, $rules);
     }
@@ -477,15 +480,15 @@ class Booking {
 	if (!is_array($value))
 	    $value = array();
 	
-	$array_key = 'events/([0-9]{4})/$';
+	$array_key = 'events/([0-9]{4})/?$';
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
-	$array_key = 'events/([0-9]{4})/([0-9]{2})/$';
+	$array_key = 'events/([0-9]{4})/([0-9]{1,2})/?$';
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
-	$array_key = 'events/([0-9]{4})/([0-9]{2})/(.+?)/?$';
+	$array_key = 'events/([0-9]{4})/([0-9]{1,2})/(.+?)/?$';
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
@@ -599,6 +602,7 @@ class Booking {
     
     function flush_rewrite() {
 	global $wp_rewrite;
+	
 	$wp_rewrite->flush_rules();
     }
     

@@ -85,3 +85,37 @@ div#event-bread-crumbs a.parent {
     text-decoration: none;
 }
 
+div.eab-header {
+    float: left;
+    width: 13%;
+    margin: 2px;
+    padding: 3px 3px 3px 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+div.eab-day {
+    width: 13%;
+    height: 128px;
+    margin: 2px;
+    border: 1px solid #EAEAEA;
+    float: left;
+    padding: 3px;
+    overflow: hidden;
+}
+
+div.eab-day-text {
+    font-weight: bold;
+    width: 100%;
+    text-align: right;
+}
+
+div.eab-calendar-event {
+    margin: 0;
+    padding: 0;
+}
+
+div.eab-premonth {
+    height: 128px;
+    float: left;
+}
