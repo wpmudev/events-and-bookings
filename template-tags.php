@@ -166,7 +166,7 @@ function has_bookings($coming = true) {
 }
 
 function event_bookings($status = 'yes', $echo = true, $admin = false) {
-    global $wpdb, $post;
+    global $wpdb, $post, $eab_user_logins;
     $statuses = array('yes' => 'Attending', 'maybe' => 'May be', 'no' => 'No');
     
     $status_name = $statuses[$status];
@@ -178,15 +178,17 @@ function event_bookings($status = 'yes', $echo = true, $admin = false) {
     if (count($bookings) > 0) {
         $content .= '<h4>'. __($status_name, Booking::$_translation_domain). '</h4>';
         $content .= '<ul class="eab-guest-list">';
+	$eab_user_logins[$status] = array();
         foreach ($bookings as $booking) {
             $user_data = get_userdata( $booking->user_id );
+	    $eab_user_logins[$status][] = $user_data->user_login;
             
             $content .= '<li>';
             if ($admin) {
                 $content .= '<span>';
-                $content .= '<a href="user-edit.php?user_id='.$booking->user_id .'" title="'.$user_data->display_name.'">';
+		$content .= '<a href="user-edit.php?user_id='.$booking->user_id .'" title="'.$user_data->display_name.'">';
                 $content .= $user_data->display_name;
-                $content .= '</a> ';
+                $content .= '</a>';
                 $content .= '</span>';
             } else {
                 $content .= '<a href="'.get_author_posts_url( $booking->user_id ).'" title="'.$user_data->display_name.'">';
@@ -196,6 +198,7 @@ function event_bookings($status = 'yes', $echo = true, $admin = false) {
             $content .= '</li>';
         }
         $content .= '</ul>';
+	$content .= '<div class="clear"></div>';
     }
     
     if ($echo) {

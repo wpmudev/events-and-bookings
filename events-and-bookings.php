@@ -91,6 +91,7 @@ class Booking {
 	add_filter('cron_schedules', array(&$this, 'cron_schedules') );
 	
 	add_filter('views_edit-incsub_event', array(&$this, 'views_list') );
+	add_filter('agm_google_maps-post_meta-address', array(&$this, 'agm_google_maps_post_meta_address'));
     }
     
     /**
@@ -122,7 +123,7 @@ class Booking {
 	    'menu_name' => __('Events', $this->_translation_domain)
 	);
 	
-	$supports = array( 'title', 'editor', 'author', 'venue');
+	$supports = array( 'title', 'editor', 'author', 'venue', 'thumbnail');
 	
 	register_post_type( 'incsub_event',
 	    array(
@@ -205,6 +206,22 @@ class Booking {
 	}
     }
     
+    function agm_google_maps_post_meta_address($location) {
+	global $post;
+	
+	if (!$location && $post->post_type == 'incsub_event') {
+	    $meta = get_post_custom($post->ID);
+	    
+	    $venue = '';
+	    if (isset($meta["incsub_event_venue"]) && isset($meta["incsub_event_venue"][0])) {
+		$venue = stripslashes($meta["incsub_event_venue"][0]);
+	    }
+	    
+	    return $venue;
+	}
+	return $location;
+    }
+    
     function handle_template( $path ) {
 	global $wp_query;
 	
@@ -226,11 +243,11 @@ class Booking {
     function meta_boxes() {
 	global $post, $current_user;
 	
-	add_meta_box('incsub-event-where', __('Where', $this->_translation_domain), array(&$this, 'where_meta_box'), 'incsub_event', 'side');
-	add_meta_box('incsub-event-when', __('When', $this->_translation_domain), array(&$this, 'when_meta_box'), 'incsub_event', 'side');
-	add_meta_box('incsub-event-status', __('Status', $this->_translation_domain), array(&$this, 'status_meta_box'), 'incsub_event', 'side');
+	add_meta_box('incsub-event-where-s', __('Where', $this->_translation_domain), array(&$this, 'where_meta_box'), 'incsub_event', 'side', 'high');
+	add_meta_box('incsub-event-when-s', __('When', $this->_translation_domain), array(&$this, 'when_meta_box'), 'incsub_event', 'side', 'high');
+	add_meta_box('incsub-event-status-s', __('Status', $this->_translation_domain), array(&$this, 'status_meta_box'), 'incsub_event', 'side', 'high');
 	// add_meta_box('incsub-event-chain', __('Next Event', $this->_translation_domain), array(&$this, 'chain_meta_box'), 'incsub_event', 'side');
-	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal');
+	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
     }
     
     function admin_enqueue_scripts() {
@@ -259,10 +276,10 @@ class Booking {
 	$content  = '';
 	
 	$content .= '<input type="hidden" name="incsub_event_where_meta" value="1" />';
-	$content .= '<div class="misc-pub-section ">';
+	$content .= '<div class="misc-eab-section" ><label>';
 	$content .= __('Venue', $this->_translation_domain).':&nbsp;';
-	$content .= '<input type="text" name="incsub_event_venue" value="'.$venue.'" size="20" />';
-	$content .= '</div>';
+	$content .= '<textarea type="text" name="incsub_event_venue" size="20" >'.$venue.'</textarea>';
+	$content .= '</label></div>';
 	$content .= '<div class="clear"></div>';
 	
 	if ($echo) {
@@ -281,6 +298,7 @@ class Booking {
 	if (isset($meta["incsub_event_start"]) && isset($meta["incsub_event_start"][0])) {
 	    $start = strtotime($meta["incsub_event_start"][0]);
 	}
+	
 	if (isset($meta["incsub_event_end"]) && isset($meta["incsub_event_end"][0])) {
 	    $end = strtotime($meta["incsub_event_end"][0]);
 	}
@@ -289,17 +307,17 @@ class Booking {
 	
 	$content .= '<input type="hidden" name="incsub_event_when_meta" value="1" />';
 	
-	$content .= '<div class="misc-pub-section">';
+	$content .= '<div class="misc-eab-section"><label>';
 	$content .= __('Start', $this->_translation_domain).':&nbsp;';
 	$content .= '<input type="text" name="incsub_event_start" id="incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" /> ';
 	$content .= '<input type="text" name="incsub_event_start_time" id="incsub_event_start_time" value="'.date('H:i', $start).'" size="5" />';
-	$content .= '</div>';
+	$content .= '</label></div>';
 	
-	$content .= '<div class="misc-pub-section">';
-	$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;&nbsp;';
+	$content .= '<div class="misc-eab-section"><label>';
+	$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
 	$content .= '<input type="text" name="incsub_event_end" id="incsub_event_end" value="'.date('Y-m-d', $end).'" size="10" /> ';
 	$content .= '<input type="text" name="incsub_event_end_time" id="incsub_event_end_time" value="'.date('H:i', $end).'" size="5" />';
-	$content .= '</div>';
+	$content .= '</label></div>';
 	
 	$content .= '<div class="clear"></div>';
 	
@@ -310,7 +328,7 @@ class Booking {
     }
     
     function status_meta_box($echo = true) {
-	global $post;
+	global $post, $eab_user_logins;
 	$meta = get_post_custom($post->ID);
 	
 	$status = 'open';
@@ -321,7 +339,7 @@ class Booking {
 	$content  = '';
 	
 	$content .= '<input type="hidden" name="incsub_event_status_meta" value="1" />';
-	$content .= '<div class="misc-pub-section">';
+	$content .= '<div class="misc-eab-section"><label>';
 	$content .= __('Status', $this->_translation_domain).':&nbsp;';
 	$content .= '<select name="incsub_event_status" >';
 	$content .= '	<option value="open" '.(($status == 'open')?'selected="selected"':'').' >'.__('Open', $this->_translation_domain).'</option>';
@@ -329,7 +347,7 @@ class Booking {
 	$content .= '	<option value="expired" '.(($status == 'expired')?'selected="selected"':'').' >'.__('Expired', $this->_translation_domain).'</option>';
 	$content .= '	<option value="archived" '.(($status == 'archived')?'selected="selected"':'').' >'.__('Archived', $this->_translation_domain).'</option>';
 	$content .= '</select>';
-	$content .= '</div>';
+	$content .= '</label></div>';
 	$content .= '<div class="clear"></div>';
 	
 	if ($echo) {
@@ -339,7 +357,7 @@ class Booking {
     }
     
     function bookings_meta_box($echo = true) {
-	global $post;
+	global $post, $eab_user_logins;
 	$meta = get_post_custom($post->ID);
 	
 	$content  = '';
@@ -359,6 +377,23 @@ class Booking {
 	    $content .= '<div id="event-booking-no">';
             $content .= event_bookings('no', false, true);
             $content .= '</div>';
+	    
+	    $content .= '<div class="misc-eab-section"><a class="eab_notify_only eab_notify_all" target="_blank" href="'.admin_url('admin.php?page=messaging_new').'">';
+	    $content .= __("Message All", Booking::$_translation_domain).'</a>';
+	    
+	    if (count($eab_user_logins['yes']) > 0) {
+		$content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_yes" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['yes'])).'">';
+		$content .= __("Message Yes", Booking::$_translation_domain).'</a>';
+	    }
+	    if (count($eab_user_logins['maybe']) > 0) {
+		$content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_maybe" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['maybe'])).'">';
+		$content .= __("Message Maybe", Booking::$_translation_domain).'</a>';
+	    }
+	    if (count($eab_user_logins['no']) > 0) {
+		$content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_no" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['no'])).'">';
+		$content .= __("Message No", Booking::$_translation_domain).'</a>';
+	    }
+	    $content .= '</div>';
         }  else {
             $content .= __('No bookings', $this->_translation_domain);
         }

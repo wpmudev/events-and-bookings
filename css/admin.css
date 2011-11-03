@@ -3,3 +3,8 @@ ul.eab-guest-list li {
     float: left;
     padding: 2px;
 }
+
+.misc-eab-section label {
+    vertical-align: top;
+}
+
