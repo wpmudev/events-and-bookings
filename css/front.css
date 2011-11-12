@@ -135,3 +135,12 @@ div#primary.primary-event {
     float: left;
     margin: 0 -26.4% 0 0;
 }
+
+#eab-primary h4 {
+    font-size: 1.1em;
+}
+
+#eab-primary {
+    width: 100%;
+    float: left;
+}

@@ -2,8 +2,8 @@
 global $blog_id;
 get_header( 'event' );
 ?>
-<div id="primary" class="primary-event">
-    <div id="content">
+<div id="eab-primary" class="eab-primary-event">
+    <div id="eab-content">
         <div class="padder">
             <div id="eab-page-wrapper">
                 
@@ -23,35 +23,22 @@ get_header( 'event' );
                 
                 <div id="single-event">
                     <h1><?php the_title(); ?></h1>
+                    
+                    <div id="event-rsvp">
+                        <?php if (!has_bookings()) {?>
+                        <?php event_rsvp_form(); ?>
+                        <div id="event-first-booking">
+                            <?php _e("Be the first to RSVP", Booking::$_translation_domain); ?>
+                        </div>
+                        <?php } ?>
+                    </div>
+                    
+                    <div id="event-details">
+                        <?php event_details(); ?>
+                    </div>
+                    
                     <?php the_content(); ?>
                 </div>
-                
-                <div id="event-details">
-                    <?php event_details(); ?>
-                </div>
-                
-                <div id="event-rsvp">
-                    <?php event_rsvp_form(); ?>
-                </div>
-                
-                <?php if (is_user_logged_in()) {?>
-                <div id="event-bookings">
-                <?php if (has_bookings()) {?>
-                    <h3><?php _e("Attendees", Booking::$_translation_domain); ?></h3>
-                    <div id="event-booking-yes">
-                        <?php event_bookings('yes'); ?>
-                    </div>
-                    <div class="clear"></div>
-                    <div id="event-booking-maybe">
-                        <?php event_bookings('maybe'); ?>
-                    </div>
-                <?php }  else { ?>
-                    <div id="event-first-booking">
-                        <?php _e("Be the first to RSVP", Booking::$_translation_domain); ?>
-                    </div>
-                <?php } ?>
-                </div>
-                <?php } ?>
             </div>
         </div>
     </div>

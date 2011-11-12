@@ -87,7 +87,7 @@ function event_get_url( $type, $id = 0 ) {
 	    $result = get_permalink( $id );
 	    break;
 	case 'archive':
-	    $result = get_post_type_archive_link( 'question' );
+	    $result = get_post_type_archive_link( 'event' );
 	    break;
 	default:
 	    return '';
@@ -115,7 +115,6 @@ function event_rsvp_form() {
         input.current { font-weight: bold; }
     </style>
     <div class="eab_booking_form">
-        <h3><?php _e('RSVP', Booking::$_translation_domain); ?></h3>
         <?php
         if (accepting_bookings()) {
             if (is_user_logged_in()) {
@@ -132,8 +131,8 @@ function event_rsvp_form() {
             <?php
             } else {
             ?>
-                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('I\'m attending', Booking::$_translation_domain); ?></a>
-                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('May be', Booking::$_translation_domain); ?></a>
+                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('I\'m Attending', Booking::$_translation_domain); ?></a>
+                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('Maybe', Booking::$_translation_domain); ?></a>
                 <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('No', Booking::$_translation_domain); ?></a>
             <?php
             }

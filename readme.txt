@@ -11,6 +11,8 @@ Allow your readers to register for events you organize
 
 Allow your readers to register for events you organize
 
+* Please note we will be automatically changing WPMU DEV Google Maps Plugin Settings if installed *
+
 == ChangeLog ==
 
 = 1.0.0 =

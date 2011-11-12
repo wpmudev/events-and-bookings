@@ -80,6 +80,8 @@ class Booking {
 	add_action('wp_insert_post', array(&$this, 'save_event_meta'), 10, 2 );
 	add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts') );
 	add_action('admin_print_styles', array(&$this, 'admin_print_styles') );
+	add_action('widgets_init', array(&$this, 'widgets_init'));
+	
 	add_filter('single_template', array( &$this, 'handle_template' ) );
 	add_filter('archive_template', array( &$this, 'handle_template' ) );
 	add_filter('template_include', array( &$this, 'handle_template' ) );
@@ -92,6 +94,7 @@ class Booking {
 	
 	add_filter('views_edit-incsub_event', array(&$this, 'views_list') );
 	add_filter('agm_google_maps-post_meta-address', array(&$this, 'agm_google_maps_post_meta_address'));
+	add_filter('agm_google_maps-options', array(&$this, 'agm_google_maps_options'));
     }
     
     /**
@@ -222,6 +225,13 @@ class Booking {
 	return $location;
     }
     
+    function agm_google_maps_options($opts) {
+	$opts['use_custom_fields'] = 1;
+	$opts['custom_fields_options']['associate_map'] = 1;
+	$opts['custom_fields_options']['autoshow_map'] = 1;
+	return $opts;
+    }
+    
     function handle_template( $path ) {
 	global $wp_query;
 	
@@ -234,7 +244,7 @@ class Booking {
 	
 	if ( empty( $path ) || "$type.php" == $file ) {
 	    // A more specific template was not found, so load the default one
-	    $path = EAB_PLUGIN_DIR . "default-templates/$type-event.php";
+	    $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
 	}
 	
 	return $path;
@@ -378,22 +388,24 @@ class Booking {
             $content .= event_bookings('no', false, true);
             $content .= '</div>';
 	    
-	    $content .= '<div class="misc-eab-section"><a class="eab_notify_only eab_notify_all" target="_blank" href="'.admin_url('admin.php?page=messaging_new').'">';
-	    $content .= __("Message All", Booking::$_translation_domain).'</a>';
-	    
-	    if (count($eab_user_logins['yes']) > 0) {
-		$content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_yes" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['yes'])).'">';
-		$content .= __("Message Yes", Booking::$_translation_domain).'</a>';
+	    if (function_exists('messaging_init')) {
+		$content .= '<div class="misc-eab-section"><a class="eab_notify_only eab_notify_all" target="_blank" href="'.admin_url('admin.php?page=messaging_new').'">';
+		$content .= __("Message All", Booking::$_translation_domain).'</a>';
+		
+		if (count($eab_user_logins['yes']) > 0) {
+		    $content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_yes" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['yes'])).'">';
+		    $content .= __("Message Yes", Booking::$_translation_domain).'</a>';
+		}
+		if (count($eab_user_logins['maybe']) > 0) {
+		    $content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_maybe" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['maybe'])).'">';
+		    $content .= __("Message Maybe", Booking::$_translation_domain).'</a>';
+		}
+		if (count($eab_user_logins['no']) > 0) {
+		    $content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_no" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['no'])).'">';
+		    $content .= __("Message No", Booking::$_translation_domain).'</a>';
+		}
+		$content .= '</div>';
 	    }
-	    if (count($eab_user_logins['maybe']) > 0) {
-		$content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_maybe" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['maybe'])).'">';
-		$content .= __("Message Maybe", Booking::$_translation_domain).'</a>';
-	    }
-	    if (count($eab_user_logins['no']) > 0) {
-		$content .= '&nbsp;|&nbsp;<a class="eab_notify_only eab_notify_no" target="_blank" href="'.admin_url('admin.php?page=messaging_new&message_to='.join(',',$eab_user_logins['no'])).'">';
-		$content .= __("Message No", Booking::$_translation_domain).'</a>';
-	    }
-	    $content .= '</div>';
         }  else {
             $content .= __('No bookings', $this->_translation_domain);
         }
@@ -693,6 +705,13 @@ class Booking {
 	}
 	
 	return $views;
+    }
+    
+    function widgets_init() {
+	require_once 'widgets/Widget.class.php';
+	require_once 'widgets/Attendees_Widget.class.php';
+	
+	register_widget('Eab_Attendees_Widget');
     }
 }
 
