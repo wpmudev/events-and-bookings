@@ -2,8 +2,8 @@
 global $blog_id;
 get_header( 'event' );
 ?>
-<div id="eab-primary" class="eab-primary-event">
-    <div id="eab-content">
+<div id="primary" class="eab-primary-event">
+    <div id="content">
         <div class="padder">
             <div id="eab-page-wrapper">
                 
@@ -26,11 +26,11 @@ get_header( 'event' );
                     
                     <div id="event-rsvp">
                         <?php if (!has_bookings()) {?>
-                        <?php event_rsvp_form(); ?>
                         <div id="event-first-booking">
                             <?php _e("Be the first to RSVP", Booking::$_translation_domain); ?>
                         </div>
                         <?php } ?>
+                        <?php event_rsvp_form(); ?>
                     </div>
                     
                     <div id="event-details">

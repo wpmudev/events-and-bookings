@@ -1,14 +1,12 @@
 <?php
 
-
-
 class Eab_Attendees_Widget extends Eab_Widget {
     
     function __construct() {
 	$widget_ops = array( 'description' => __('Display Attendees of an event', $this->translation_domain) );
         $control_ops = array( 'title' => __('Attendees', $this->translation_domain));
         
-	parent::WP_Widget( 'incsub_event', __('Attendees', $this->translation_domain), $widget_ops, $control_ops );
+	parent::WP_Widget( 'incsub_event_attendees', __('Event Attendees', $this->translation_domain), $widget_ops, $control_ops );
     }
     
     function widget($args, $instance) {
@@ -16,17 +14,19 @@ class Eab_Attendees_Widget extends Eab_Widget {
 	
 	extract($args);
 	
+	if ($post->post_type != 'incsub_event') {
+	    return;
+	}
+	
 	$options = $instance;
 	
 	$title = apply_filters('widget_title', empty($instance['title']) ? __('Attendees', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
 	
 	?>
+        <?php if (has_bookings()) {?>
 	<?php echo $before_widget; ?>
 	<?php echo $before_title . $title . $after_title; ?>
-	<?php if (is_user_logged_in()) {?>
-            <?php if (has_bookings()) {?>
             <div id="event-bookings">
-                <h3><?php _e("Attendees", Booking::$_translation_domain); ?></h3>
                 <div id="event-booking-yes">
                     <?php event_bookings('yes'); ?>
                 </div>
@@ -35,29 +35,9 @@ class Eab_Attendees_Widget extends Eab_Widget {
                     <?php event_bookings('maybe'); ?>
                 </div>
             </div>
-	    <?php } ?>
-        <?php } ?>
         <br />
         <?php echo $after_widget; ?>
-	<?php
-    }
-    
-    function _print_sub_wikis($wiki) {
-	global $post;
-	
-	$sub_wikis = get_posts('post_parent='.$wiki->ID.'&post_type=incsub_wiki&order_by=menu_order&numberposts=100000');
-	?>
-	<ul>
-	    <?php
-		foreach ($sub_wikis as $sub_wiki) {
-	    ?>
-	        <li><a href="<?php print get_permalink($sub_wiki->ID); ?>" class="<?php print ($sub_wiki->ID == $post->ID)?'current':''; ?>" ><?php print $sub_wiki->post_title; ?></a>
-		    <?php print $this->_print_sub_wikis($sub_wiki); ?>
-	        </li>
-	    <?php
-		}
-	    ?>
-	</ul>
+        <?php } ?>
 	<?php
     }
     
@@ -78,7 +58,7 @@ class Eab_Attendees_Widget extends Eab_Widget {
             <label for="<?php echo $this->get_field_id('title'); ?>" style="line-height:35px;display:block;"><?php _e('Title', $this->translation_domain); ?>:<br />
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo $options['title']; ?>" type="text" style="width:95%;" />
             </label>
-	    <input type="hidden" name="eab-submit" id="eab-submit" value="1" />
+	    <input type="hidden" name="eab-submit" id="eab-submit" value="attendees" />
 	</div>
 	<?php
     }

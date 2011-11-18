@@ -1,21 +1,21 @@
 
-#eab-page-wrapper h1 {
+#eab-page-wrapper h1, #eab-archive-wrapper h1 {
     font-size: 1.4em;
     font-weight: bold;
 }
 
-#eab-page-wrapper h2 {
+#eab-page-wrapper h2, #eab-archive-wrapper h2 {
     font-size: 1.3em;
     font-weight: bold;
 }
 
-#eab-page-wrapper h3 {
+#eab-page-wrapper h3, #eab-archive-wrapper h3 {
     font-size: 1.2em;
     font-weight: bold;
     clear: none;
 }
 
-#eab-page-wrapper h4 {
+#eab-page-wrapper h4, #eab-archive-wrapper h4 {
     font-weight: bold;
 }
 
@@ -136,11 +136,7 @@ div#primary.primary-event {
     margin: 0 -26.4% 0 0;
 }
 
-#eab-primary h4 {
-    font-size: 1.1em;
-}
-
-#eab-primary {
-    width: 100%;
+div.single-event div.wpmu_dev_map {
     float: left;
+    width: 300px;
 }

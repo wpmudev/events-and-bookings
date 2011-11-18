@@ -1,8 +1,7 @@
 <?php get_header( 'event' ); ?>
-<div id="primary" class="primary-event">
     <div id="content">
         <div class="padder">
-            <div id="eab-page-wrapper">
+            <div id="eab-archive-wrapper">
                 <div id="eab-archive-view">
                     <?php _e("View", Booking::$_translation_domain); ?>:
                     <?php if (is_date()) { ?>
@@ -228,6 +227,5 @@
             </div>
         </div>
     </div>
-</div>
 <?php get_sidebar( 'event' ); ?>
 <?php get_footer( 'event' ); ?>

@@ -95,6 +95,8 @@ class Booking {
 	add_filter('views_edit-incsub_event', array(&$this, 'views_list') );
 	add_filter('agm_google_maps-post_meta-address', array(&$this, 'agm_google_maps_post_meta_address'));
 	add_filter('agm_google_maps-options', array(&$this, 'agm_google_maps_options'));
+	
+	add_filter('user_has_cap', array(&$this, 'user_has_cap'), 10, 3);
     }
     
     /**
@@ -184,8 +186,9 @@ class Booking {
 		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = 'yes';", $event_id, $current_user->ID)
 		);
 		// TODO: Add to BP activity stream
-		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
 		do_action( 'incsub_event_booking_yes', $event_id, $current_user->ID );
+		$this->recount_bookings($event_id);
+		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
 		exit();
 	    }
 	    if (isset($_POST['action_maybe'])) {
@@ -193,8 +196,9 @@ class Booking {
 		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'maybe') ON DUPLICATE KEY UPDATE `status` = 'maybe';", $event_id, $current_user->ID)
 		);
 		// TODO: Add to BP activity stream
-		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
 		do_action( 'incsub_event_booking_maybe', $event_id, $current_user->ID );
+		$this->recount_bookings($event_id);
+		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
 		exit();
 	    }
 	    if (isset($_POST['action_no'])) {
@@ -202,11 +206,29 @@ class Booking {
 		    $wpdb->prepare("INSERT INTO ".Booking::tablename('bookings')." VALUES(null, %d, %d, NOW(), 'no') ON DUPLICATE KEY UPDATE `status` = 'no';", $event_id, $current_user->ID)
 		);
 		// TODO: Remove from BP activity stream
-		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
 		do_action( 'incsub_event_booking_no', $event_id, $current_user->ID );
+		$this->recount_bookings($event_id);
+		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
 		exit();
 	    }
 	}
+    }
+    
+    function recount_bookings($event_id) {
+	global $wpdb;
+	
+	// Yes
+	$yes_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".Booking::tablename('bookings')." WHERE `status` = 'yes' AND event_id = %d;", $event_id));
+    	update_post_meta($event_id, 'incsub_event_yes_count', $yes_count);
+	
+	// Maybe
+	$maybe_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".Booking::tablename('bookings')." WHERE `status` = 'maybe' AND event_id = %d;", $event_id));
+    	update_post_meta($event_id, 'incsub_event_maybe_count', $maybe_count);
+	update_post_meta($event_id, 'incsub_event_attending_count', $maybe_count+$yes_count);
+	
+	// No
+	$no_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".Booking::tablename('bookings')." WHERE `status` = 'no' AND event_id = %d;", $event_id));
+	update_post_meta($event_id, 'incsub_event_no_count', $no_count);
     }
     
     function agm_google_maps_post_meta_address($location) {
@@ -597,23 +619,6 @@ class Booking {
 	if ( ! empty($wpdb->collate) )
 	    $charset_collate .= " COLLATE $wpdb->collate";
 	
-        $sql_main = "CREATE TABLE IF NOT EXISTS ".Booking::tablename('events')." (
-			`id` BIGINT NOT NULL AUTO_INCREMENT,
-                        `user_id` BIGINT NOT NULL,
-                        `venue` TEXT NOT NULL DEFAULT '',
-			`title` TEXT NOT NULL DEFAULT '',
-                        `start` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' ,
-                        `end` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' ,
-                        `next_event_id` BIGINT NOT NULL DEFAULT 0,
-			`status` ENUM( 'open', 'closed', 'expired', 'archived' ) NOT NULL DEFAULT 'open' ,
-	    		PRIMARY KEY (`id`),
-			KEY `user_id` (`user_id`),
-			KEY `start` (`start`),
-			KEY `end` (`end`),
-			KEY `status` (`status`)
-		    ) ENGINE = InnoDB {$charset_collate};";
-	dbDelta($sql_main);
-	
 	$sql_main = "CREATE TABLE IF NOT EXISTS ".Booking::tablename('bookings')." (
 			`id` BIGINT NOT NULL AUTO_INCREMENT,
                         `event_id` BIGINT NOT NULL ,
@@ -645,6 +650,48 @@ class Booking {
 	$this->_options['default'] = array();
 	
         add_option('event_default', $this->_options['default']);
+    }
+    
+    function user_has_cap($allcaps, $caps = null, $args = null) {
+	global $current_user, $blog_id, $post;
+	
+	$capable = false;
+	
+	if (preg_match('/(_event|_events)/i', join($caps, ',')) > 0) {
+	    if (in_array('administrator', $current_user->roles)) {
+		foreach ($caps as $cap) {
+		    $allcaps[$cap] = 1;
+		}
+		return $allcaps;
+	    }
+	    foreach ($caps as $cap) {
+		$capable = false;
+		switch ($cap) {
+		    case 'read_events':
+			print 1;
+			$capable = true;
+			break;
+		    default:
+			if (isset($args[1]) && isset($args[2])) {
+			    if (current_user_can(preg_replace('/_event/i', '_post', $cap), $args[1], $args[2])) {
+				$capable = true;
+			    }
+			} else if (isset($args[1])) {
+			    if (current_user_can(preg_replace('/_event/i', '_post', $cap), $args[1])) {
+				$capable = true;
+			    }
+			} else if (current_user_can(preg_replace('/_event/i', '_post', $cap))) {
+			    $capable = true;
+			}
+			break;
+		}
+		
+		if ($capable) {
+		    $allcaps[$cap] = 1;
+		}
+	    }
+	}
+	return $allcaps;
     }
     
     function flush_rewrite() {
@@ -710,8 +757,12 @@ class Booking {
     function widgets_init() {
 	require_once 'widgets/Widget.class.php';
 	require_once 'widgets/Attendees_Widget.class.php';
+	require_once 'widgets/Popular_Widget.class.php';
+	require_once 'widgets/Upcoming_Widget.class.php';
 	
 	register_widget('Eab_Attendees_Widget');
+	register_widget('Eab_Popular_Widget');
+	register_widget('Eab_Upcoming_Widget');
     }
 }
 
