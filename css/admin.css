@@ -8,3 +8,12 @@ ul.eab-guest-list li {
     vertical-align: top;
 }
 
+.misc-eab-section label textarea {
+    width: 255px;
+    margin-top: 5px;
+}
+
+#eab-add-more-bank, #eab-add-more {
+    display: none;
+}
+

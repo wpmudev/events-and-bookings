@@ -90,6 +90,7 @@ class Booking {
 	add_filter('post_type_link', array(&$this, 'post_type_link'), 10, 3);
 	
 	add_filter('manage_incsub_event_posts_columns', array(&$this, 'manage_posts_columns') );
+	add_filter('query_vars', array(&$this, 'query_vars') );
 	add_filter('cron_schedules', array(&$this, 'cron_schedules') );
 	
 	add_filter('views_edit-incsub_event', array(&$this, 'views_list') );
@@ -153,11 +154,11 @@ class Booking {
   		'protected'      => true
   	) );
 	
-	$event_structure = '/events/%year%/%monthnum%/%incsub_event%';
+	$event_structure = '/events/%event_year%/%event_monthnum%/%incsub_event%';
 	
 	$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
-	//$wp_rewrite->add_rewrite_tag("%year%", '([0-9]{4})', "year=");
-	//$wp_rewrite->add_rewrite_tag("%monthnum%", '([0-9]{2})', "monthnum=");
+	$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
+	$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
 	$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 	
 	wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), $this->current_version);
@@ -309,7 +310,7 @@ class Booking {
 	
 	$content .= '<input type="hidden" name="incsub_event_where_meta" value="1" />';
 	$content .= '<div class="misc-eab-section" ><label>';
-	$content .= __('Venue', $this->_translation_domain).':&nbsp;';
+	$content .= __('Venue', $this->_translation_domain).':<br/>';
 	$content .= '<textarea type="text" name="incsub_event_venue" size="20" >'.$venue.'</textarea>';
 	$content .= '</label></div>';
 	$content .= '<div class="clear"></div>';
@@ -324,33 +325,53 @@ class Booking {
 	global $post;
 	$meta = get_post_custom($post->ID);
 	
-	$start = time();
-	$end = time();
-	
-	if (isset($meta["incsub_event_start"]) && isset($meta["incsub_event_start"][0])) {
-	    $start = strtotime($meta["incsub_event_start"][0]);
-	}
-	
-	if (isset($meta["incsub_event_end"]) && isset($meta["incsub_event_end"][0])) {
-	    $end = strtotime($meta["incsub_event_end"][0]);
-	}
-	
 	$content  = '';
 	
 	$content .= '<input type="hidden" name="incsub_event_when_meta" value="1" />';
 	
-	$content .= '<div class="misc-eab-section"><label>';
+	$start = time();
+	$end = time();
+	
+	if (isset($meta["incsub_event_start"])) {
+	    for ($i=0; $i<count($meta["incsub_event_start"]); $i++) {
+		if (isset($meta["incsub_event_start"]) && isset($meta["incsub_event_start"][$i])) {
+		    $start = strtotime($meta["incsub_event_start"][$i]);
+		}
+		
+		if (isset($meta["incsub_event_end"]) && isset($meta["incsub_event_end"][$i])) {
+		    $end = strtotime($meta["incsub_event_end"][$i]);
+		}
+		
+		$content .= '<div class="misc-eab-section eab-start-section"><label>';
+		$content .= __('Start', $this->_translation_domain).':&nbsp;';
+		$content .= '<input type="text" name="incsub_event_start[]" id="incsub_event_start_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $start).'" size="10" /> ';
+		$content .= '<input type="text" name="incsub_event_start_time[]" id="incsub_event_start_time_'.$i.'" value="'.date('H:i', $start).'" size="5" />';
+		$content .= '</label></div>';
+		
+		$content .= '<div class="misc-eab-section"><label>';
+		$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
+		$content .= '<input type="text" name="incsub_event_end[]" id="incsub_event_end_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $end).'" size="10" /> ';
+		$content .= '<input type="text" name="incsub_event_end_time[]" id="incsub_event_end_time_'.$i.'" class="incsub_event_picker" value="'.date('H:i', $end).'" size="5" />';
+		$content .= '</label></div>';
+	    }
+	}
+	
+	$content .= '<div id="eab-add-more-bank">';
+	$content .= '<div class="misc-eab-section eab-start-section"><label>';
 	$content .= __('Start', $this->_translation_domain).':&nbsp;';
-	$content .= '<input type="text" name="incsub_event_start" id="incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" /> ';
-	$content .= '<input type="text" name="incsub_event_start_time" id="incsub_event_start_time" value="'.date('H:i', $start).'" size="5" />';
+	$content .= '<input type="text" name="incsub_event_start_b[]" id="incsub_event_start_bank" class="incsub_event_picker" value="" size="10" /> ';
+	$content .= '<input type="text" name="incsub_event_start_time_b[]" id="incsub_event_start_time_bank" value="" size="5" />';
 	$content .= '</label></div>';
 	
 	$content .= '<div class="misc-eab-section"><label>';
 	$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-	$content .= '<input type="text" name="incsub_event_end" id="incsub_event_end" value="'.date('Y-m-d', $end).'" size="10" /> ';
-	$content .= '<input type="text" name="incsub_event_end_time" id="incsub_event_end_time" value="'.date('H:i', $end).'" size="5" />';
-	$content .= '</label></div>';
+	$content .= '<input type="text" name="incsub_event_end_b[]" id="incsub_event_end_bank" class="incsub_event_picker" value="" size="10" /> ';
+	$content .= '<input type="text" name="incsub_event_end_time_b[]" id="incsub_event_end_time_bank" class="incsub_event_picker" value="" size="5" />';
+	$content .= '</label></div></div>';
 	
+	$content .= '<div id="eab-add-more-rows"></div>';
+	
+	$content .= '<div id="eab-add-more"><input type="button" name="eab-add-more-button" id="eab-add-more-button" value="+"/></div>';
 	$content .= '<div class="clear"></div>';
 	
 	if ($echo) {
@@ -459,8 +480,30 @@ class Booking {
 	if ( $post->post_type == "incsub_event" && isset( $_POST['incsub_event_when_meta'] ) ) {
 	    $meta = get_post_custom($post_id);
 	    
-	    update_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start']} {$_POST['incsub_event_start_time']}")));
-	    update_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end']} {$_POST['incsub_event_end_time']}")));
+	    foreach ($_POST['incsub_event_start'] as $i => $event_start) {
+		if (isset($meta['incsub_event_start'][$i])) {
+		    if (!empty($_POST['incsub_event_start'][$i])) {
+			update_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$_POST['incsub_event_start_time'][$i]}")), $meta['incsub_event_start'][$i]);
+		    } else {
+			delete_post_meta($post_id, 'incsub_event_start', $meta['incsub_event_start'][$i]);
+		    }
+		} else {
+		    if (!empty($_POST['incsub_event_start'][$i])) {
+			add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$_POST['incsub_event_start_time'][$i]}")));
+		    }
+		}
+		if (isset($meta['incsub_event_end'][$i])) {
+		    if (!empty($_POST['incsub_event_end'][$i])) {
+			update_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$_POST['incsub_event_end_time'][$i]}")), $meta['incsub_event_end'][$i]);
+		    } else {
+			delete_post_meta($post_id, 'incsub_event_end', $meta['incsub_event_end'][$i]);
+		    }
+		} else {
+		    if (!empty($_POST['incsub_event_end'][$i])) {
+			add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$_POST['incsub_event_end_time'][$i]}")));
+		    }
+		}
+	    }
 	    
 	    //for any other plugin to hook into
 	    do_action( 'incsub_event_save_when_meta', $post_id, $meta );
@@ -493,12 +536,14 @@ class Booking {
     }
     
     function post_type_link($permalink, $post_id, $leavename) {
+	global $event_variation;
+	
 	$post = get_post($post_id);
 	
 	$rewritecode = array(
 	    '%incsub_event%',
-	    '%year%',
-	    '%monthnum%'
+	    '%event_year%',
+	    '%event_monthnum%'
 	);
 	
 	if ($post->post_type == 'incsub_event' && '' != $permalink) {
@@ -509,12 +554,12 @@ class Booking {
 	    $end = time();
 	    
 	    $meta = get_post_custom($post->ID);
-	    if (isset($meta["incsub_event_start"]) && isset($meta["incsub_event_start"][0])) {
-		$start = strtotime($meta["incsub_event_start"][0]);
+	    if (isset($meta["incsub_event_start"]) && isset($meta["incsub_event_start"][$event_variation[$post->ID]])) {
+		$start = strtotime($meta["incsub_event_start"][$event_variation[$post->ID]]);
 	    }
 	    
 	    $year = date('Y', $start);
-	    $month = date('m', $end);
+	    $month = date('m', $start);
 	    
 	    $rewritereplace = array(
 	    	($post->post_name == "")?$post->id:$post->post_name,
@@ -536,7 +581,7 @@ class Booking {
 	unset($rules['events/([0-9]{4})/?$']);
 	$new_rules['events/([0-9]{4})/?$'] = 'index.php?year=$matches[1]&post_type=incsub_event';
 	$new_rules['events/([0-9]{4})/([0-9]{1,2})/?$'] = 'index.php?year=$matches[1]&monthnum=$matches[2]&post_type=incsub_event';
-	$new_rules['events/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?year=$matches[1]&monthnum=$matches[2]&incsub_event=$matches[3]';
+	$new_rules['events/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]';
 	
 	return array_merge($new_rules, $rules);
     }
@@ -561,6 +606,12 @@ class Booking {
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
+    }
+    
+    function query_vars($vars) {
+	array_push($vars, 'event_year');
+	array_push($vars, 'event_monthnum');
+	return $vars;
     }
     
     function manage_posts_columns($old_columns)	{

@@ -17,7 +17,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 	$options = $instance;
 	
 	$title = apply_filters('widget_title', empty($instance['title']) ? __('Upcoming', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
-	$_events = get_posts('post_type=incsub_event&meta_key=incsub_event_start&orderby=meta_value&order=DESC&post_status=publish&numberposts=10');
+	$_events = get_posts('post_type=incsub_event&meta_key=incsub_event_start&orderby=meta_value&order=ASC&post_status=publish&numberposts=10');
 	
 	if (is_array($_events) && count($_events) > 0) {
 	?>

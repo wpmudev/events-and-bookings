@@ -217,21 +217,22 @@ function accepting_bookings() {
 }
 
 function event_details($echo = true, $archive = false) {
-    global $post;
+    global $post, $event_variation;
     
     if (!$archive) {
         $content .= '<h3>' . __('Event Details', Booking::$_translation_domain) . '</h3>';
     }
     $content .= '<ul>';
     
-    if (date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_start', true))) ==
-        date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_end', true)))) {
+    $meta = get_post_custom($post->ID);
+    if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) ==
+        date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]]))) {
         $end_date = '';
     } else {
-        $end_date = date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_end', true))) . ' ';
+        $end_date = date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . ' ';
     }
     
-    $content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime(get_post_meta($post->ID, 'incsub_event_start', true))) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime(get_post_meta($post->ID, 'incsub_event_start', true))) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime(get_post_meta($post->ID, 'incsub_event_end', true))) . '</li>';
+    $content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . '</li>';
     $content .= '<li><b>' . __('Location', Booking::$_translation_domain) . '</b>: ' . get_post_meta($post->ID, 'incsub_event_venue', true) . '</li>';
     $content .= '<li><b>' . __('Created By', Booking::$_translation_domain) . '</b>: <a href="'.get_the_author_link().'" title="'.get_the_author().'">' . get_the_author() . '</a></li>';
     $content .= '</ul>';

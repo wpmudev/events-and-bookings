@@ -14,7 +14,7 @@
                 </div>
                 <?php
                 if (is_year()) {
-                    global $post, $wpdb, $wp_query;
+                    global $post, $wpdb, $wp_query, $event_variation;
                     
                     $end = date('Y-m-d',strtotime('-1 second',strtotime('+1 year',strtotime($wp_query->query_vars['year'].'-01-01'))));
                     $querystr = "SELECT $wpdb->posts.* FROM $wpdb->posts, $wpdb->postmeta WHERE $wpdb->posts.ID = $wpdb->postmeta.post_id 
@@ -27,6 +27,7 @@
                     ORDER BY $wpdb->postmeta.meta_value ASC";
                     
                     $pageposts = $wpdb->get_results($querystr, OBJECT);
+                    $event_variation = array();
                 ?>
                     <div id="event-bread-crumbs">
                         <a href="<?php echo event_link('event_or_calendar'); ?>" class="parent"><?php _e("Events", Booking::$_translation_domain); ?></a> &gt;
@@ -40,7 +41,13 @@
                         $month = "";
                         foreach ($pageposts as $post) {
                             setup_postdata($post);
-                            $new_month = date_i18n('F', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
+                            if (isset($event_variation[$post->ID])) {
+                                $event_variation[$post->ID]++;
+                            } else {
+                                $event_variation[$post->ID] = 0;
+                            }
+                            $meta = get_post_meta($post->ID, 'incsub_event_start', false);
+                            $new_month = date_i18n('F', strtotime($meta[$event_variation[$post->ID]]));
                             if ($month != $new_month) {
                                 $month = $new_month;
                                 ?>
@@ -83,7 +90,7 @@
                     </div>
                 <?php
                 } else if (is_month()) {
-                    global $post, $wpdb, $wp_query;
+                    global $post, $wpdb, $wp_query, $event_variation;
                     
                     $end = date('Y-m-d',strtotime('-1 second',strtotime('+1 month',strtotime($wp_query->query_vars['year'].'-'.$wp_query->query_vars['monthnum'].'-01'))));
                     $querystr = "SELECT $wpdb->posts.* FROM $wpdb->posts, $wpdb->postmeta WHERE $wpdb->posts.ID = $wpdb->postmeta.post_id 
@@ -96,6 +103,7 @@
                     ORDER BY $wpdb->postmeta.meta_value ASC";
                     
                     $pageposts = $wpdb->get_results($querystr, OBJECT);
+                    $event_variation = array();
                 ?>
                     <div id="event-bread-crumbs">
                         <a href="<?php echo event_link('event_or_calendar'); ?>" class="parent"><?php _e("Events", Booking::$_translation_domain); ?></a> &gt;
@@ -116,8 +124,14 @@
                         $day = 0;
                         foreach ($pageposts as $post) {
                             setup_postdata($post);
+                            if (isset($event_variation[$post->ID])) {
+                                $event_variation[$post->ID]++;
+                            } else {
+                                $event_variation[$post->ID] = 0;
+                            }
+                            $meta = get_post_meta($post->ID, 'incsub_event_start', false);
+                            $new_day = date_i18n('d', strtotime($meta[$event_variation[$post->ID]]));
                             
-                            $new_day = date_i18n('d', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
                             if ($new_day != $day) {
                                 if (($new_day-$day) > 1) {
                                     for ($c=$day+1; $c<$new_day; $c++) {
@@ -133,7 +147,7 @@
                             ?>
                                 </div>
                                 <div class="eab-day" id="eab-day-<?php echo $day; ?>">
-                                    <div class="eab-day-text"><?php echo $c; ?></div>
+                                    <div class="eab-day-text"><?php echo $day; ?></div>
                             <?php
                             }
                     ?>
