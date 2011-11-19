@@ -128,7 +128,7 @@ class Booking {
 	    'menu_name' => __('Events', $this->_translation_domain)
 	);
 	
-	$supports = array( 'title', 'editor', 'author', 'venue', 'thumbnail');
+	$supports = array( 'title', 'editor', 'author', 'venue', 'thumbnail', 'comments');
 	
 	register_post_type( 'incsub_event',
 	    array(

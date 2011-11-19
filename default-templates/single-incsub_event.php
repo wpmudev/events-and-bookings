@@ -38,6 +38,8 @@ get_header( 'event' );
                     </div>
                     
                     <?php the_content(); ?>
+                    
+                    <?php comments_template( '', true ); ?>
                 </div>
             </div>
         </div>
