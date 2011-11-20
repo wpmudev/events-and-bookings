@@ -342,6 +342,7 @@ class Booking {
 		    $end = strtotime($meta["incsub_event_end"][$i]);
 		}
 		
+		$content .= '<div class="eab-section-heading"><b>'.sprintf(__('Part %d', $this->_translation_domain), $i+1).'</b></div>';
 		$content .= '<div class="misc-eab-section eab-start-section"><label>';
 		$content .= __('Start', $this->_translation_domain).':&nbsp;';
 		$content .= '<input type="text" name="incsub_event_start[]" id="incsub_event_start_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $start).'" size="10" /> ';
@@ -357,6 +358,7 @@ class Booking {
 	}
 	
 	$content .= '<div id="eab-add-more-bank">';
+	$content .= '<div class="eab-section-heading"><b>'.__('Part bank', $this->_translation_domain).'</b></div>';
 	$content .= '<div class="misc-eab-section eab-start-section"><label>';
 	$content .= __('Start', $this->_translation_domain).':&nbsp;';
 	$content .= '<input type="text" name="incsub_event_start_b[]" id="incsub_event_start_bank" class="incsub_event_picker" value="" size="10" /> ';
@@ -769,10 +771,7 @@ class Booking {
      * @see		http://codex.wordpress.org/Adding_Administration_Menus
      */
     function admin_menu() {
-	/*add_menu_page(__('Events &amp; Booking', $this->_translation_domain), __('Events', $this->_translation_domain), 'edit_posts', 'eab', array(&$this, 'event_list'), '', 30);
-        add_submenu_page('eab', __("Add New", $this->_translation_domain), __("New Event", $this->_translation_domain), 'edit_posts', 'eab_new_event', array(&$this,'new_event'));
-        add_submenu_page('eab', __("Settings", $this->_translation_domain), __("Settings", $this->_translation_domain), 'manage_options', 'eab_settings', array(&$this,'settings_page'));
-	*/
+	add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", $this->_translation_domain), __("Settings", $this->_translation_domain), 'manage_options', 'eab_settings', array(&$this,'settings_render'));
     }
     
     function cron_schedules($schedules) {
@@ -803,6 +802,20 @@ class Booking {
 	}
 	
 	return $views;
+    }
+    
+    function settings_render() {
+	$content = '';
+	
+	$content .= '<div class="wrap">';
+	$content .= '<div id="icon-options-general" class="icon32"><br/></div>';
+	$content .= '<h2>'.__('Wiki Settings', $this->_translation_domain).'</h2>';
+	$content .= '<form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">';
+	$content .= '';
+	$content .= '</form>';
+	$content .= '</div>';
+	
+	echo $content;
     }
     
     function widgets_init() {

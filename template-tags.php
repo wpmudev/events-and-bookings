@@ -225,6 +225,10 @@ function event_details($echo = true, $archive = false) {
     $content .= '<ul>';
     
     $meta = get_post_custom($post->ID);
+    
+    if (!isset($event_variation) || !isset($event_variation[$post->ID])) {
+	$event_variation[$post->ID] = 0;
+    }
     if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) ==
         date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]]))) {
         $end_date = '';
