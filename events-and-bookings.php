@@ -98,6 +98,8 @@ class Booking {
 	add_filter('agm_google_maps-options', array(&$this, 'agm_google_maps_options'));
 	
 	add_filter('user_has_cap', array(&$this, 'user_has_cap'), 10, 3);
+	
+	$this->_options['default'] = get_option('incsub_event_default', array('currency' => 'USD', 'slug' => 'events', 'accept_payments' => 1, 'paypal_email' => ''));
     }
     
     /**
@@ -142,7 +144,7 @@ class Booking {
 		'map_meta_cap' => true,
 		'query_var' => true,
 		'supports' => $supports,
-		'rewrite' => array( 'slug' => 'events', 'with_front' => false ),
+		'rewrite' => array( 'slug' => $this->_options['default']['slug'], 'with_front' => false ),
 		'has_archive' => true,
 	    )
 	);
@@ -154,7 +156,7 @@ class Booking {
   		'protected'      => true
   	) );
 	
-	$event_structure = '/events/%event_year%/%event_monthnum%/%incsub_event%';
+	$event_structure = '/'.$this->_options['default']['slug'].'/%event_year%/%event_monthnum%/%incsub_event%';
 	
 	$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
 	$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
@@ -212,6 +214,17 @@ class Booking {
 		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
 		exit();
 	    }
+	}
+	
+	
+	if (wp_verify_nonce($_POST['_wpnonce'], 'incsub_event-update-options')) {
+	    $this->_options['default']['slug'] = $_POST['event_default']['slug'];
+	    $this->_options['default']['accept_payments'] = $_POST['event_default']['accept_payments'];
+	    $this->_options['default']['currency'] = $_POST['event_default']['currency'];
+	    $this->_options['default']['paypal_email'] = $_POST['event_default']['paypal_email'];
+	    update_option('incsub_event_default', $this->_options['default']);
+	    wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
+	    exit();
 	}
     }
     
@@ -279,7 +292,9 @@ class Booking {
 	add_meta_box('incsub-event-where-s', __('Where', $this->_translation_domain), array(&$this, 'where_meta_box'), 'incsub_event', 'side', 'high');
 	add_meta_box('incsub-event-when-s', __('When', $this->_translation_domain), array(&$this, 'when_meta_box'), 'incsub_event', 'side', 'high');
 	add_meta_box('incsub-event-status-s', __('Status', $this->_translation_domain), array(&$this, 'status_meta_box'), 'incsub_event', 'side', 'high');
-	// add_meta_box('incsub-event-chain', __('Next Event', $this->_translation_domain), array(&$this, 'chain_meta_box'), 'incsub_event', 'side');
+	if ($this->_options['default']['accept_payments']) {
+	    add_meta_box('incsub-event-payments', __('Fees', $this->_translation_domain), array(&$this, 'payments_meta_box'), 'incsub_event', 'side');
+	}
 	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
     }
     
@@ -411,6 +426,27 @@ class Booking {
 	return $content;
     }
     
+    function payments_meta_box($echo = true) {
+	global $post, $eab_user_logins;
+	$meta = get_post_custom($post->ID);
+	
+	$content  = '<input type="hidden" name="incsub_event_payments_meta" value="1" />';
+	$content .= '<div class="misc-eab-section">';
+	$content .= '<label>'.__('Paid Event', $this->_translation_domain).':&nbsp;';
+	$content .= '<input type="checkbox" name="incsub_event_paid" id="incsub_event_paid" class="incsub_event_paid" value="1" '.(($meta['incsub_event_paid'][0] == 1)?'checked="checked"':'').'/> ';
+	$content .= '</label><br/>';
+	$content .= '<label class="incsub_event-fee_row"">'.__('Fee', $this->_translation_domain).':&nbsp;';
+	$content .= $this->_options['default']['currency'].'&nbsp;<input type="text" name="incsub_event_fee" id="incsub_event_fee" class="incsub_event_fee" value="'.$meta['incsub_event_fee'][0].'" size="6" /> ';
+	$content .= '</label>';
+	$content .= '</div>';
+	$content .= '<div class="clear"></div>';
+	
+	if ($echo) {
+	    echo $content;
+	}
+	return $content;
+    }
+    
     function bookings_meta_box($echo = true) {
 	global $post, $eab_user_logins;
 	$meta = get_post_custom($post->ID);
@@ -520,6 +556,16 @@ class Booking {
 	    do_action( 'incsub_event_save_status_meta', $post_id, $meta );
 	}
 	
+	if ( $post->post_type == "incsub_event" && isset( $_POST['incsub_event_payments_meta'] ) ) {
+	    $meta = get_post_custom($post_id);
+	    
+	    update_post_meta($post_id, 'incsub_event_paid', $_POST['incsub_event_paid']);
+	    update_post_meta($post_id, 'incsub_event_fee', $_POST['incsub_event_fee']);
+	    
+	    //for any other plugin to hook into
+	    do_action( 'incsub_event_save_payments_meta', $post_id, $meta );
+	}
+	
 	$bid = $wpdb->get_var("SELECT id FROM ".Booking::tablename('events')." WHERE id = {$post->ID};");
 	if ($bid) {
 	    $wpdb->query(
@@ -579,11 +625,11 @@ class Booking {
     function add_rewrite_rules($rules){
 	$new_rules = array();
 	
-	unset($rules['events/([0-9]{4})/([0-9]{1,2})/?$']);
-	unset($rules['events/([0-9]{4})/?$']);
-	$new_rules['events/([0-9]{4})/?$'] = 'index.php?year=$matches[1]&post_type=incsub_event';
-	$new_rules['events/([0-9]{4})/([0-9]{1,2})/?$'] = 'index.php?year=$matches[1]&monthnum=$matches[2]&post_type=incsub_event';
-	$new_rules['events/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]';
+	unset($rules[$this->_options['default']['slug'].'/([0-9]{4})/([0-9]{1,2})/?$']);
+	unset($rules[$this->_options['default']['slug'].'/([0-9]{4})/?$']);
+	$new_rules[$this->_options['default']['slug'].'/([0-9]{4})/?$'] = 'index.php?year=$matches[1]&post_type=incsub_event';
+	$new_rules[$this->_options['default']['slug'].'/([0-9]{4})/([0-9]{1,2})/?$'] = 'index.php?year=$matches[1]&monthnum=$matches[2]&post_type=incsub_event';
+	$new_rules[$this->_options['default']['slug'].'/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]';
 	
 	return array_merge($new_rules, $rules);
     }
@@ -596,15 +642,15 @@ class Booking {
 	if (!is_array($value))
 	    $value = array();
 	
-	$array_key = 'events/([0-9]{4})/?$';
+	$array_key = $this->_options['default']['slug'].'/([0-9]{4})/?$';
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
-	$array_key = 'events/([0-9]{4})/([0-9]{1,2})/?$';
+	$array_key = $this->_options['default']['slug'].'/([0-9]{4})/([0-9]{1,2})/?$';
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
-	$array_key = 'events/([0-9]{4})/([0-9]{1,2})/(.+?)/?$';
+	$array_key = $this->_options['default']['slug'].'/([0-9]{4})/([0-9]{1,2})/(.+?)/?$';
 	if ( !array_key_exists($array_key, $value) ) {
 	    $this->flush_rewrite();
 	}
@@ -805,17 +851,44 @@ class Booking {
     }
     
     function settings_render() {
-	$content = '';
-	
-	$content .= '<div class="wrap">';
-	$content .= '<div id="icon-options-general" class="icon32"><br/></div>';
-	$content .= '<h2>'.__('Wiki Settings', $this->_translation_domain).'</h2>';
-	$content .= '<form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">';
-	$content .= '';
-	$content .= '</form>';
-	$content .= '</div>';
-	
-	echo $content;
+	if(!current_user_can('manage_options')) {
+  		echo "<p>" . __('Nice Try...', $this->translation_domain) . "</p>";  //If accessed properly, this message doesn't appear.
+  		return;
+  	}
+	if ($_GET['incsub_event_settings_saved'] == 1) {
+	    echo '<div class="updated fade"><p>'.__('Settings saved.', $this->translation_domain).'</p></div>';
+        }
+	?>
+	<div class="wrap">
+	    <div id="icon-options-general" class="icon32"><br/></div>
+	    <h2><?php _e('Event Settings', $this->_translation_domain); ?></h2>
+	    <form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">
+		<?php wp_nonce_field('incsub_event-update-options'); ?>
+		<table>
+		    <tr valign="top">
+			<td><label for="incsub_event-slug"><?php _e('Event Slug', $this->translation_domain); ?></label> </td>
+			<td>/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_options['default']['slug']; ?>" /></td>
+		    </tr>
+		    <tr valign="top">
+			<td><label for="incsub_event-accept_payments"><?php _e('Accept Payments', $this->translation_domain); ?></label> </td>
+			<td><input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_options['default']['accept_payments'] == 1)?'checked="checked"':''; ?> /></td>
+		    </tr>
+		    <tr valign="top" class="incsub_event-payment_method_row">
+			<td><label for="incsub_event-currency"><?php _e('Currency', $this->translation_domain); ?></label> </td>
+			<td><input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_options['default']['currency']; ?>" /></td>
+		    </tr>
+		    <tr valign="top" class="incsub_event-payment_method_row">
+			<td><label for="incsub_event-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?></label> </td>
+			<td><input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_options['default']['paypal_email']; ?>" /></td>
+		    </tr>
+		</table>
+		
+		<p class="submit">
+		    <input type="submit" name="submit_settings" value="<?php _e('Save Changes', $this->translation_domain) ?>" />
+		</p>
+	    </form>
+	</div>
+	<?php
     }
     
     function widgets_init() {

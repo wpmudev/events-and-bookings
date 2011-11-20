@@ -1,5 +1,5 @@
 <?php
-global $blog_id, $wp_query;
+global $blog_id, $wp_query, $booking;
 get_header( 'event' );
 ?>
 <div id="primary" class="eab-primary-event">
@@ -16,8 +16,8 @@ get_header( 'event' );
                 
                 <div id="event-bread-crumbs">
                     <a href="<?php echo event_link('event_or_calendar'); ?>" class="parent"><?php _e("Events", Booking::$_translation_domain); ?></a> &gt;
-                    <a href="<?php echo get_site_url($blog_id, 'events/'.date('Y', strtotime("{$wp_query->query_vars['event_year']}-01-01")).'/'); ?>" class="parent"><?php echo date_i18n('Y', strtotime("{$wp_query->query_vars['event_year']}-01-01")); ?></a> &gt;
-                    <a href="<?php echo get_site_url($blog_id, 'events/'.date('Y/m', strtotime("{$wp_query->query_vars['event_year']}-{$wp_query->query_vars['event_monthnum']}-01")).'/'); ?>" class="parent"><?php echo date_i18n('F', strtotime("{$wp_query->query_vars['event_year']}-{$wp_query->query_vars['event_monthnum']}-01")); ?></a> &gt;
+                    <a href="<?php echo get_site_url($blog_id, $booking->_options['default']['slug'].'/'.date('Y', strtotime("{$wp_query->query_vars['event_year']}-01-01")).'/'); ?>" class="parent"><?php echo date_i18n('Y', strtotime("{$wp_query->query_vars['event_year']}-01-01")); ?></a> &gt;
+                    <a href="<?php echo get_site_url($blog_id, $booking->_options['default']['slug'].'/'.date('Y/m', strtotime("{$wp_query->query_vars['event_year']}-{$wp_query->query_vars['event_monthnum']}-01")).'/'); ?>" class="parent"><?php echo date_i18n('F', strtotime("{$wp_query->query_vars['event_year']}-{$wp_query->query_vars['event_monthnum']}-01")); ?></a> &gt;
                     <span class="current"><?php the_title(); ?></span>
                 </div>
                 

@@ -257,12 +257,12 @@ function event_booking_count($status) {
 }
 
 function event_link($page) {
-    global $blog_id;
+    global $blog_id, $booking;
     switch ($page) {
 	case 'calendar':
-	    return apply_filters('event_link', get_site_url($blog_id, 'events/'.date('Y/m').'/'), $page);
+	    return apply_filters('event_link', get_site_url($blog_id, $booking->_options['default']['slug'].'/'.date('Y/m').'/'), $page);
 	case 'event':
-	    return apply_filters('event_link', get_site_url($blog_id, 'events/'), $page);
+	    return apply_filters('event_link', get_site_url($blog_id, $booking->_options['default']['slug'].'/'), $page);
 	default:
 	    if (isset($_COOKIE['eab_default_view']) && $_COOKIE['eab_default_view'] == 'calendar') {
 		return event_link('calendar');
