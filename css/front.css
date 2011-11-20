@@ -140,3 +140,7 @@ div.single-event div.wpmu_dev_map {
     float: left;
     width: 300px;
 }
+
+div.event-notice {
+    margin: 5px 0;
+}

@@ -1,5 +1,5 @@
 <?php
-global $blog_id, $wp_query, $booking;
+global $blog_id, $wp_query, $booking, $post, $current_user;
 get_header( 'event' );
 ?>
 <div id="primary" class="eab-primary-event">
@@ -32,6 +32,30 @@ get_header( 'event' );
                         <?php } ?>
                         <?php event_rsvp_form(); ?>
                     </div>
+                    
+                    <?php
+                    $booking_id = get_booking_id($post->ID, $current_user->ID);
+                    
+                    if ($booking_id && in_array(get_booking_status($booking_id), array('yes', 'maybe')) &&
+                              !get_booking_paid($booking_id)) { ?>
+                    <div class="event-notice">
+                        <b><?php _e('You haven\'t paid for this event.', Booking::$_translation_domain); ?></b>
+                        
+                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                            <input type="hidden" name="business" value="<?php print $booking->_options['default']['paypal_email']; ?>" />
+                            <input type="hidden" name="item_name" value="<?php print get_the_title(); ?>" />  
+                            <input type="hidden" name="item_number" value="<?php print $post->ID; ?>" />
+                            <input type="hidden" name="booking_id" value="<?php print $booking_id; ?>" />
+                            <input type="hidden" name="notify_url" value="<?php print admin_url('admin-ajax.php?action=eab_paypal_ipn'); ?>" />
+                            <input type="hidden" name="amount" value="<?php print get_post_meta($post->ID, 'incsub_event_fee', true); ?>" />  
+                            <input type="hidden" name="return" value="<?php print get_permalink(); ?>" />
+                            <input type="hidden" name="currency_code" value="<?php print $booking->_options['default']['currency']; ?>">
+                            <input type="hidden" name="cmd" value="_xclick" />
+                            <input type="image" name="submit" border="0" src="https://www.paypal.com/en_US/i/btn/btn_paynow_SM.gif" alt="PayPal - The safer, easier way to pay online" />  
+                            <img alt="" border="0" width="1" height="1" src="https://www.paypal.com/en_US/i/scr/pixel.gif" />  
+                        </form> 
+                    </div>
+                    <?php } ?>
                     
                     <div id="event-details">
                         <?php event_details(); ?>

@@ -82,6 +82,8 @@ class Booking {
 	add_action('admin_print_styles', array(&$this, 'admin_print_styles') );
 	add_action('widgets_init', array(&$this, 'widgets_init'));
 	
+	add_action('wp_ajax_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
+	
 	add_filter('single_template', array( &$this, 'handle_template' ) );
 	add_filter('archive_template', array( &$this, 'handle_template' ) );
 	add_filter('template_include', array( &$this, 'handle_template' ) );
@@ -99,7 +101,8 @@ class Booking {
 	
 	add_filter('user_has_cap', array(&$this, 'user_has_cap'), 10, 3);
 	
-	$this->_options['default'] = get_option('incsub_event_default', array('currency' => 'USD', 'slug' => 'events', 'accept_payments' => 1, 'paypal_email' => ''));
+	$this->_options['default'] = get_option('incsub_event_default',
+	    array('currency' => 'USD', 'slug' => 'events', 'accept_payments' => 1, 'paypal_email' => '', 'paypal_sandbox' => 0));
     }
     
     /**
@@ -243,6 +246,121 @@ class Booking {
 	// No
 	$no_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".Booking::tablename('bookings')." WHERE `status` = 'no' AND event_id = %d;", $event_id));
 	update_post_meta($event_id, 'incsub_event_no_count', $no_count);
+    }
+    
+    function process_paypal_ipn() {
+	$req = 'cmd=_notify-validate';
+	
+	$request = $_REQUEST;
+	
+	$post_values = "";
+	$cart = array();
+	foreach ($request as $key => $value) {
+	    $value = urlencode(stripslashes($value));
+	    $req .= "&$key=$value";
+	    $post_values .= " $key : $value\n";
+	}
+	
+	$header = "";
+	// post back to PayPal system to validate
+	$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n";
+	$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+	$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
+	
+	if ($this->_options['default']['paypal_sandbox'] == 1) {
+	    $fp = fsockopen ('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
+	} else {
+	    $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
+	}
+	
+	$ip = $ip;
+	
+	$pay_to_email = $request['receiver_email'];
+	$pay_from_email = $request['payer_email'];
+	$transaction_id = $request['txn_id'];
+	
+    	$status = $request['payment_status'];
+	$amount = $request['mc_gross'];
+	$currency = $request['mc_currency'];
+	$test_ipn = $request['test_ipn'];
+	$event_id = $request['item_number'];
+	
+	$booking_id = $request['booking_id'];
+	$booking_obj = get_booking($booking_id);
+	
+	if (!$booking_obj || !$booking_obj->id) {
+	    header('HTTP/1.0 404 Not Found');
+	    header('Content-type: text/plain; charset=UTF-8');
+	    print 'Booking not found';
+	    exit(0);
+    	}
+	
+	if ($booking_obj->event_id != $event_id) {
+	    header('HTTP/1.0 404 Not Found');
+	    header('Content-type: text/plain; charset=UTF-8');
+	    print 'Fake event id. REF: PP0';
+	    exit(0);
+	}
+	
+	if ($this->_options['default']['currency'] != $currency) {
+	    header('HTTP/1.0 400 Bad Request');
+	    header('Content-type: text/plain; charset=UTF-8');
+	    print 'We were not expecting you. REF: PP1';
+	    exit(0);
+	}
+	
+	if ($amount != get_post_meta($event_id, 'incsub_event_fee', true)) {	    
+	    header('HTTP/1.0 400 Bad Request');
+	    header('Content-type: text/plain; charset=UTF-8');
+	    print 'We were not expecting you. REF: PP2';
+    	    exit(0);
+	}
+	
+	if ($pay_to_email != $this->_options['default']['paypal_address']) {
+	    header('HTTP/1.0 400 Bad Request');
+	    header('Content-type: text/plain; charset=UTF-8');
+	    print 'We were not expecting you. REF: PP3';
+	    exit(0);
+	}
+	
+	if (!$fp) {
+	    header('HTTP/1.0 400 Bad Request');
+	    header('Content-type: text/plain; charset=UTF-8');
+	    print 'We were not expecting you. REF: PP4';
+	    exit(0);
+	} else {
+	    fputs ($fp, $header . $req);
+	    while (!feof($fp)) {
+		$res = fgets ($fp, 1024);
+		
+		if (strcmp ($res, "VERIFIED") == 0) {
+		    if ($this->status == "Completed") {
+			if ($this->test_ipn == 1) {
+			    if ($this->_options['default']['paypal_sandbox'] == 1) {
+				// Sandbox
+			    }
+			} else {
+			    // Paid
+			    update_booking_meta($booking_id, 'booking_transaction_key', $txn_id);
+			}
+			header('HTTP/1.0 200 OK');
+			header('Content-type: text/plain; charset=UTF-8');
+			print 'Success';
+		        exit(0);
+	    	    } else {
+			$message = "Corrupted PayPal IPN $txn_id, $count, $receiver_email";
+		    }
+		} else if (strcmp ($res, "INVALID") == 0) {
+		    $message = "Invalid PayPal IPN $txn_id";
+		}
+	    }
+	    fclose ($fp);
+    	}
+	
+	header('HTTP/1.0 200 OK');
+	header('Content-type: text/plain; charset=UTF-8');
+	print 'Thank you very much for letting us know. REF: '.$message;
+	exit(0);
     }
     
     function agm_google_maps_post_meta_address($location) {
