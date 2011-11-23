@@ -407,12 +407,11 @@ class Booking {
     function meta_boxes() {
 	global $post, $current_user;
 	
-	add_meta_box('incsub-event-where-s', __('Where', $this->_translation_domain), array(&$this, 'where_meta_box'), 'incsub_event', 'side', 'high');
+	/*add_meta_box('incsub-event-where-s', __('Where', $this->_translation_domain), array(&$this, 'where_meta_box'), 'incsub_event', 'side', 'high');
 	add_meta_box('incsub-event-when-s', __('When', $this->_translation_domain), array(&$this, 'when_meta_box'), 'incsub_event', 'side', 'high');
 	add_meta_box('incsub-event-status-s', __('Status', $this->_translation_domain), array(&$this, 'status_meta_box'), 'incsub_event', 'side', 'high');
-	if ($this->_options['default']['accept_payments']) {
-	    add_meta_box('incsub-event-payments', __('Fees', $this->_translation_domain), array(&$this, 'payments_meta_box'), 'incsub_event', 'side');
-	}
+	*/
+	add_meta_box('incsub-event', __('Event Details', $this->_translation_domain), array(&$this, 'event_meta_box'), 'incsub_event', 'normal', 'high');
 	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
     }
     
@@ -430,6 +429,25 @@ class Booking {
 	wp_enqueue_style('eab_front');
     }
     
+    function event_meta_box($echo = true) {
+	global $post, $eab_user_logins;
+	
+	$content = '';
+	$content .= $this->where_meta_box(false);
+	$content .= $this->status_meta_box(false);
+	if ($this->_options['default']['accept_payments']) {
+	    $content .= $this->payments_meta_box(false);
+	}
+	$content .= '<div class="clear"></div>';
+	$content .= $this->when_meta_box(false);
+	$content .= '<div class="clear"></div>';
+	
+	if ($echo) {
+	    echo $content;
+	}
+	return $content;
+    }
+    
     function where_meta_box($echo = true) {
 	global $post;
 	$meta = get_post_custom($post->ID);
@@ -441,12 +459,13 @@ class Booking {
 	
 	$content  = '';
 	
+	$content .= '<div class="eab_meta_box">';
 	$content .= '<input type="hidden" name="incsub_event_where_meta" value="1" />';
 	$content .= '<div class="misc-eab-section" ><label>';
-	$content .= __('Venue', $this->_translation_domain).':<br/>';
+	$content .= __('Where', $this->_translation_domain).':<br/>';
 	$content .= '<textarea type="text" name="incsub_event_venue" size="20" >'.$venue.'</textarea>';
 	$content .= '</label></div>';
-	$content .= '<div class="clear"></div>';
+	$content .= '</div>';
 	
 	if ($echo) {
 	    echo $content;
@@ -458,13 +477,17 @@ class Booking {
 	global $post;
 	$meta = get_post_custom($post->ID);
 	
-	$content  = '';
+	$content = '';
+	
+	$content .= '<div class="eab_meta_box">';
+	$content .= '<div class="eab_meta_column_box">'.__('When', $this->_translation_domain).'</div>';
 	
 	$content .= '<input type="hidden" name="incsub_event_when_meta" value="1" />';
 	
 	$start = time();
 	$end = time();
 	
+	$content .= '<div id="eab-add-more-rows">';
 	if (isset($meta["incsub_event_start"])) {
 	    for ($i=0; $i<count($meta["incsub_event_start"]); $i++) {
 		if (isset($meta["incsub_event_start"]) && isset($meta["incsub_event_start"][$i])) {
@@ -475,39 +498,42 @@ class Booking {
 		    $end = strtotime($meta["incsub_event_end"][$i]);
 		}
 		
-		$content .= '<div class="eab-section-heading"><b>'.sprintf(__('Part %d', $this->_translation_domain), $i+1).'</b></div>';
+		$content .= '<div class="eab-section-block">';
+		$content .= '<div class="eab-section-heading">'.sprintf(__('Part %d', $this->_translation_domain), $i+1).'</div>';
 		$content .= '<div class="misc-eab-section eab-start-section"><label>';
 		$content .= __('Start', $this->_translation_domain).':&nbsp;';
-		$content .= '<input type="text" name="incsub_event_start[]" id="incsub_event_start_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $start).'" size="10" /> ';
-		$content .= '<input type="text" name="incsub_event_start_time[]" id="incsub_event_start_time_'.$i.'" value="'.date('H:i', $start).'" size="5" />';
+		$content .= '<input type="text" name="incsub_event_start[]" id="incsub_event_start_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $start).'" size="7" /> ';
+		$content .= '<input type="text" name="incsub_event_start_time[]" id="incsub_event_start_time_'.$i.'" value="'.date('H:i', $start).'" size="3" />';
 		$content .= '</label></div>';
 		
 		$content .= '<div class="misc-eab-section"><label>';
 		$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-		$content .= '<input type="text" name="incsub_event_end[]" id="incsub_event_end_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $end).'" size="10" /> ';
-		$content .= '<input type="text" name="incsub_event_end_time[]" id="incsub_event_end_time_'.$i.'" class="incsub_event_picker" value="'.date('H:i', $end).'" size="5" />';
+		$content .= '<input type="text" name="incsub_event_end[]" id="incsub_event_end_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $end).'" size="7" /> ';
+		$content .= '<input type="text" name="incsub_event_end_time[]" id="incsub_event_end_time_'.$i.'" class="incsub_event_picker" value="'.date('H:i', $end).'" size="3" />';
 		$content .= '</label></div>';
+		$content .= '</div>';
 	    }
 	}
+	$content .= '</div>';
 	
 	$content .= '<div id="eab-add-more-bank">';
-	$content .= '<div class="eab-section-heading"><b>'.__('Part bank', $this->_translation_domain).'</b></div>';
+	$content .= '<div class="eab-section-block">';
+	$content .= '<div class="eab-section-heading">'.__('Part bank', $this->_translation_domain).'</div>';
 	$content .= '<div class="misc-eab-section eab-start-section"><label>';
 	$content .= __('Start', $this->_translation_domain).':&nbsp;';
-	$content .= '<input type="text" name="incsub_event_start_b[]" id="incsub_event_start_bank" class="incsub_event_picker" value="" size="10" /> ';
-	$content .= '<input type="text" name="incsub_event_start_time_b[]" id="incsub_event_start_time_bank" value="" size="5" />';
+	$content .= '<input type="text" name="incsub_event_start_b[]" id="incsub_event_start_bank" class="incsub_event_picker_b" value="" size="7" /> ';
+	$content .= '<input type="text" name="incsub_event_start_time_b[]" id="incsub_event_start_time_bank" value="" size="3" />';
 	$content .= '</label></div>';
 	
-	$content .= '<div class="misc-eab-section"><label>';
+	$content .= '<div class="misc-eab-section eab-end-section"><label>';
 	$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-	$content .= '<input type="text" name="incsub_event_end_b[]" id="incsub_event_end_bank" class="incsub_event_picker" value="" size="10" /> ';
-	$content .= '<input type="text" name="incsub_event_end_time_b[]" id="incsub_event_end_time_bank" class="incsub_event_picker" value="" size="5" />';
+	$content .= '<input type="text" name="incsub_event_end_b[]" id="incsub_event_end_bank" class="incsub_event_picker_b" value="" size="7" /> ';
+	$content .= '<input type="text" name="incsub_event_end_time_b[]" id="incsub_event_end_time_bank" class="incsub_event_picker" value="" size="3" />';
 	$content .= '</label></div></div>';
-	
-	$content .= '<div id="eab-add-more-rows"></div>';
+	$content .= '</div>';
 	
 	$content .= '<div id="eab-add-more"><input type="button" name="eab-add-more-button" id="eab-add-more-button" value="+"/></div>';
-	$content .= '<div class="clear"></div>';
+	$content .= '</div>';
 	
 	if ($echo) {
 	    echo $content;
@@ -526,6 +552,8 @@ class Booking {
 	
 	$content  = '';
 	
+	$content .= '<div class="eab_meta_box">';
+	
 	$content .= '<input type="hidden" name="incsub_event_status_meta" value="1" />';
 	$content .= '<div class="misc-eab-section"><label>';
 	$content .= __('Status', $this->_translation_domain).':&nbsp;';
@@ -537,6 +565,7 @@ class Booking {
 	$content .= '</select>';
 	$content .= '</label></div>';
 	$content .= '<div class="clear"></div>';
+	$content .= '</div>';
 	
 	if ($echo) {
 	    echo $content;
@@ -548,16 +577,18 @@ class Booking {
 	global $post, $eab_user_logins;
 	$meta = get_post_custom($post->ID);
 	
-	$content  = '<input type="hidden" name="incsub_event_payments_meta" value="1" />';
+	$content  = '';
+	$content .= '<div class="eab_meta_box">';
+	$content .= '<input type="hidden" name="incsub_event_payments_meta" value="1" />';
 	$content .= '<div class="misc-eab-section">';
 	$content .= '<label>'.__('Paid Event', $this->_translation_domain).':&nbsp;';
 	$content .= '<input type="checkbox" name="incsub_event_paid" id="incsub_event_paid" class="incsub_event_paid" value="1" '.(($meta['incsub_event_paid'][0] == 1)?'checked="checked"':'').'/> ';
-	$content .= '</label><br/>';
+	$content .= '</label>';
 	$content .= '<label class="incsub_event-fee_row"">'.__('Fee', $this->_translation_domain).':&nbsp;';
 	$content .= $this->_options['default']['currency'].'&nbsp;<input type="text" name="incsub_event_fee" id="incsub_event_fee" class="incsub_event_fee" value="'.$meta['incsub_event_fee'][0].'" size="6" /> ';
 	$content .= '</label>';
 	$content .= '</div>';
-	$content .= '<div class="clear"></div>';
+	$content .= '</div>';
 	
 	if ($echo) {
 	    echo $content;
@@ -636,27 +667,29 @@ class Booking {
 	if ( $post->post_type == "incsub_event" && isset( $_POST['incsub_event_when_meta'] ) ) {
 	    $meta = get_post_custom($post_id);
 	    
-	    foreach ($_POST['incsub_event_start'] as $i => $event_start) {
-		if (isset($meta['incsub_event_start'][$i])) {
-		    if (!empty($_POST['incsub_event_start'][$i])) {
-			update_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$_POST['incsub_event_start_time'][$i]}")), $meta['incsub_event_start'][$i]);
+	    if (isset($_POST['incsub_event_start']) && count($_POST['incsub_event_start']) > 0) {
+		foreach ($_POST['incsub_event_start'] as $i => $event_start) {
+		    if (isset($meta['incsub_event_start'][$i])) {
+			if (!empty($_POST['incsub_event_start'][$i])) {
+			    update_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$_POST['incsub_event_start_time'][$i]}")), $meta['incsub_event_start'][$i]);
+			} else {
+			    delete_post_meta($post_id, 'incsub_event_start', $meta['incsub_event_start'][$i]);
+			}
 		    } else {
-			delete_post_meta($post_id, 'incsub_event_start', $meta['incsub_event_start'][$i]);
+			if (!empty($_POST['incsub_event_start'][$i])) {
+			    add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$_POST['incsub_event_start_time'][$i]}")));
+			}
 		    }
-		} else {
-		    if (!empty($_POST['incsub_event_start'][$i])) {
-			add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$_POST['incsub_event_start_time'][$i]}")));
-		    }
-		}
-		if (isset($meta['incsub_event_end'][$i])) {
-		    if (!empty($_POST['incsub_event_end'][$i])) {
-			update_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$_POST['incsub_event_end_time'][$i]}")), $meta['incsub_event_end'][$i]);
+		    if (isset($meta['incsub_event_end'][$i])) {
+			if (!empty($_POST['incsub_event_end'][$i])) {
+			    update_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$_POST['incsub_event_end_time'][$i]}")), $meta['incsub_event_end'][$i]);
+			} else {
+			    delete_post_meta($post_id, 'incsub_event_end', $meta['incsub_event_end'][$i]);
+			}
 		    } else {
-			delete_post_meta($post_id, 'incsub_event_end', $meta['incsub_event_end'][$i]);
-		    }
-		} else {
-		    if (!empty($_POST['incsub_event_end'][$i])) {
-			add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$_POST['incsub_event_end_time'][$i]}")));
+			if (!empty($_POST['incsub_event_end'][$i])) {
+			    add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$_POST['incsub_event_end_time'][$i]}")));
+			}
 		    }
 		}
 	    }

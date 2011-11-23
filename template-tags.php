@@ -125,7 +125,7 @@ function event_rsvp_form() {
                     <input type="hidden" name="event_id" value="<?php print $post->ID; ?>" />
                     <input type="hidden" name="user_id" value="<?php print $booking_id; ?>" />
                     <input class="<?php echo ($booking_id && $booking_status == 'yes')?'current':''; ?>" type="submit" name="action_yes" value="<?php _e('I\'m attending', Booking::$_translation_domain); ?>" />
-                    <input class="<?php echo ($booking_id && $booking_status == 'maybe')?'current':''; ?>" type="submit" name="action_maybe" value="<?php _e('May be', Booking::$_translation_domain); ?>" />
+                    <input class="<?php echo ($booking_id && $booking_status == 'maybe')?'current':''; ?>" type="submit" name="action_maybe" value="<?php _e('Maybe', Booking::$_translation_domain); ?>" />
                     <input class="<?php echo ($booking_id && $booking_status == 'no')?'current':''; ?>" type="submit" name="action_no" value="<?php _e('No', Booking::$_translation_domain); ?>" />
                 </form>
             <?php
@@ -212,7 +212,7 @@ function has_bookings($coming = true) {
 
 function event_bookings($status = 'yes', $echo = true, $admin = false) {
     global $wpdb, $post, $eab_user_logins;
-    $statuses = array('yes' => 'Attending', 'maybe' => 'May be', 'no' => 'No');
+    $statuses = array('yes' => 'Attending', 'maybe' => 'Maybe', 'no' => 'No');
     
     $status_name = $statuses[$status];
     
@@ -271,18 +271,34 @@ function event_details($echo = true, $archive = false) {
     $content .= '<ul>';
     
     $meta = get_post_custom($post->ID);
+    $maybe_single = false;
     
     if (!isset($event_variation) || !isset($event_variation[$post->ID])) {
+	$maybe_single = true;
 	$event_variation[$post->ID] = 0;
     }
-    if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) ==
-        date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]]))) {
-        $end_date = '';
-    } else {
-        $end_date = date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . ' ';
-    }
     
-    $content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . '</li>';
+    if ($maybe_single) {
+	$content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ';
+	foreach ($meta['incsub_event_start'] as $_variation => $_start) {
+	    if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) ==
+		date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$_variation]))) {
+		$end_date = '';
+	    } else {
+		$end_date = date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$_variation])) . ' ';
+	    }
+	    $content .= __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$_variation])) . ' and <br/>';
+	}
+	$content .= '</li>';
+    } else {
+	if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) ==
+	    date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]]))) {
+	    $end_date = '';
+	} else {
+	    $end_date = date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . ' ';
+	}
+	$content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . '</li>';
+    }
     $content .= '<li><b>' . __('Location', Booking::$_translation_domain) . '</b>: ' . get_post_meta($post->ID, 'incsub_event_venue', true) . '</li>';
     if (get_post_meta($post->ID, 'incsub_event_paid', true) == 1) {
 	$content .= '<li><b>' . __('Fee', Booking::$_translation_domain) . '</b>: ' . $booking->_options['default']['currency'].' '. number_format(get_post_meta($post->ID, 'incsub_event_fee', true), 2) . '</li>';

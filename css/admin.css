@@ -5,7 +5,7 @@ ul.eab-guest-list li {
 }
 
 .misc-eab-section label {
-    vertical-align: top;
+    vertical-align: text-top;
 }
 
 .misc-eab-section label textarea {
@@ -15,5 +15,35 @@ ul.eab-guest-list li {
 
 #eab-add-more-bank, #eab-add-more {
     display: none;
+}
+
+.eab_meta_box {
+    float: left;
+    margin-top: 5px;
+}
+
+.misc-eab-section {
+    float: left;
+    margin-right: 5px;
+}
+
+.eab-section-heading {
+    font-style: italic;
+}
+
+.eab-section-block {
+    float: left;
+}
+
+#eab-add-more {
+    clear: both;
+}
+
+#eab-add-more-rows {
+    float: left;
+}
+
+.eab-section-heading {
+    margin: 3px 0px;
 }
 

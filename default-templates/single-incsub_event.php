@@ -37,7 +37,7 @@ get_header( 'event' );
                     $booking_id = get_booking_id($post->ID, $current_user->ID);
                     
                     if ($booking_id && in_array(get_booking_status($booking_id), array('yes', 'maybe')) &&
-                              !get_booking_paid($booking_id)) { ?>
+                        get_post_meta($post->ID, 'incsub_event_paid', true) && !get_booking_paid($booking_id)) { ?>
                     <div class="event-notice">
                         <b><?php _e('You haven\'t paid for this event.', Booking::$_translation_domain); ?></b>
                         
