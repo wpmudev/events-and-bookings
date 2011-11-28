@@ -104,3 +104,41 @@ fieldset.eab-settings-section legend {
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
 }
+
+.eab-expand-metabox {
+    float: right;
+    display: none;
+}
+
+div.postbox.closed span.eab-expand-metabox {
+    display: inline;
+}
+
+div.eab-metaboxcol-two {
+    width: 50%;
+    float: left;
+}
+
+div.eab-metabox {
+    margin: 5px;
+}
+
+div.eab-minimetabox {
+    margin: 5px;
+}
+
+.eab-dashboard-footer {
+    margin-top: 5px;
+}
+
+.eab-dev-logo a {
+    background: url("http://premium.wpmudev.org/forums/bb-templates/bb-wpmudev/images/new_logo.png") no-repeat scroll 0 0 transparent;
+    color: #2C2D2D;
+    display: block;
+    float: right;
+    font-size: 16px;
+    height: 90px;
+    margin: 0;
+    text-decoration: none;
+    width: 300px;
+}

@@ -1047,6 +1047,46 @@ class Booking {
 	<div class="wrap">
 	    <div id="icon-events-general" class="icon32"><br/></div>
 	    <h2><?php _e('Getting started', $this->_translation_domain); ?></h2>
+	    
+	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
+		<div id="eab-actionlist" class="eab-metabox postbox">
+		    <h3 class="eab-hndle"><?php _e('Getting Started: Follow our simple steps', $this->_translation_domain); ?></h3>
+		    <div class="eab-inside">
+			<ol>
+			    <li><?php _e('If you accept payments for your events, configure payment settings', $this->_translation_domain); ?></li>
+			    <li><?php _e('Add your first event', $this->_translation_domain); ?></li>
+			    <li><?php _e('Tell the world about your event', $this->_translation_domain); ?></li>
+			    <li><?php _e('View who RSVPed', $this->_translation_domain); ?></li>			
+			</ol>
+		    </div>
+		</div>
+	    </div>
+	    
+	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-two eab-metaboxcol-left">
+		<div id="eab-helpbox" class="eab-minimetabox postbox">
+		    <h3 class="eab-hndle"><?php _e('Need help?', $this->_translation_domain); ?></h3>
+		    <div class="eab-inside">
+			&nbsp;
+		    </div>
+		</div>
+	    </div>
+	    
+	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-two eab-metaboxcol-right">
+		<div id="eab-devbox" class="eab-minimetabox postbox">
+		    <h3 class="hndle"><?php _e('Delve deeper', $this->_translation_domain); ?></h3>
+		    <div class="inside">
+			&nbsp;
+		    </div>
+		</div>
+	    </div>
+	    
+	    <div class="clear"></div>
+	    
+	    <div class="eab-dashboard-footer">
+		<div class="eab-dev-logo">
+		    <a href="http://premium.wpmudev.org"></a>
+		</div>
+	    </div>
 	</div>
 	<?php
     }

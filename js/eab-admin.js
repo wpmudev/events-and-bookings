@@ -47,4 +47,9 @@ jQuery(function() {
 	jQuery(jQuery(this).attr('href')).toggle();
 	return false;
     });
+    
+    if (!jQuery('#incsub-event-bookings').hasClass('closed')) {
+	jQuery('#incsub-event-bookings').addClass('closed');
+    }
+    jQuery('#incsub-event-bookings .hndle').append('<span class="eab-expand-metabox">View all bookings</span>');
 });
