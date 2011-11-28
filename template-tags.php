@@ -108,38 +108,37 @@ function _event_single_page_link( $query, $num, $title = '', $class = '' ) {
     echo _event_html( 'a', $args, $title );
 }
 
-function event_rsvp_form() {
+function event_rsvp_form($echo = true) {
     global $post, $wpdb, $current_user;
-    ?>
-    <style type="text/css">
-        input.current { font-weight: bold; }
-    </style>
-    <div class="eab_booking_form">
-        <?php
-        if (accepting_bookings()) {
-            if (is_user_logged_in()) {
-                $booking_id = get_booking_id($post->ID, $current_user->ID);
-                $booking_status = get_booking_status($booking_id);
-            ?>
-                <form action="" method="post" id="eab_booking_form">
-                    <input type="hidden" name="event_id" value="<?php print $post->ID; ?>" />
-                    <input type="hidden" name="user_id" value="<?php print $booking_id; ?>" />
-                    <input class="<?php echo ($booking_id && $booking_status == 'yes')?'current':''; ?>" type="submit" name="action_yes" value="<?php _e('I\'m attending', Booking::$_translation_domain); ?>" />
-                    <input class="<?php echo ($booking_id && $booking_status == 'maybe')?'current':''; ?>" type="submit" name="action_maybe" value="<?php _e('Maybe', Booking::$_translation_domain); ?>" />
-                    <input class="<?php echo ($booking_id && $booking_status == 'no')?'current':''; ?>" type="submit" name="action_no" value="<?php _e('No', Booking::$_translation_domain); ?>" />
-                </form>
-            <?php
-            } else {
-            ?>
-                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('I\'m Attending', Booking::$_translation_domain); ?></a>
-                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('Maybe', Booking::$_translation_domain); ?></a>
-                <a href="<?php print wp_login_url(get_permalink()); ?>" ><?php _e('No', Booking::$_translation_domain); ?></a>
-            <?php
-            }
+    
+    $content = '';
+    $content .= '<div class="eab_booking_form">';    
+    
+    if (accepting_bookings()) {
+        if (is_user_logged_in()) {
+            $booking_id = get_booking_id($post->ID, $current_user->ID);
+            $booking_status = get_booking_status($booking_id);
+            $content .= '<form action="" method="post" id="eab_booking_form">';
+            $content .= '<input type="hidden" name="event_id" value="'.$post->ID.'" />';
+            $content .= '<input type="hidden" name="user_id" value="'.$booking_id.'" />';
+            $content .= '<input class="'.(($booking_id && $booking_status == 'yes')?'current':'').'" type="submit" name="action_yes" value="'.__('I\'m attending', Booking::$_translation_domain).'" />';
+            $content .= '<input class="'.(($booking_id && $booking_status == 'maybe')?'current':'').'" type="submit" name="action_maybe" value="'.__('Maybe', Booking::$_translation_domain).'" />';
+            $content .= '<input class="'.(($booking_id && $booking_status == 'no')?'current':'').'" type="submit" name="action_no" value="'.__('No', Booking::$_translation_domain).'" />';
+            $content .= '</form>';
+        } else {
+	    $content .= '<a href="'.wp_login_url(get_permalink()).'" >'.__('I\'m Attending', Booking::$_translation_domain).'</a>';
+            $content .= '<a href="'.wp_login_url(get_permalink()).'" >'.__('Maybe', Booking::$_translation_domain).'</a>';
+            $content .= '<a href="'.wp_login_url(get_permalink()).'" >'.__('No', Booking::$_translation_domain).'</a>';
         }
-        ?>
-    </div>
-<?php
+    }
+    
+    $content .= '</div>';
+    
+    if ($echo) {
+        echo $content;
+    }
+    
+    return $content;
 }
 
 function get_booking_id($event_id, $user_id) {
@@ -188,14 +187,23 @@ function update_booking_meta($booking_id, $meta_key, $meta_value) {
     }
 }
 
-function the_eab_error_notice() {
-    if ( !isset( $_GET['eab_msg'] ) )
+function the_eab_error_notice($echo = true) {
+    if ( !isset( $_GET['eab_success_msg'] ) && !isset( $_GET['eab_error_msg'] ) )
 	return;
-?>
-    <div id="eab-error-notice">
-	<?php _e($_GET['eab_msg'], Booking::$_translation_domain); ?>
-    </div>
-<?php
+    $content = '';
+    if (isset($_GET['eab_success_msg'])) {
+	$content .= '<div id="eab-success-notice" class="message success">'. __($_GET['eab_success_msg'], Booking::$_translation_domain).'</div>';
+    }
+    
+    if (isset($_GET['eab_error_msg'])) {
+	$content .= '<div id="eab-error-notice" class="message error">'.__($_GET['eab_error_msg'], Booking::$_translation_domain).'</div>';
+    }
+    
+    if ($echo) {
+	echo $content;
+    }
+    
+    return $content;
 }
 
 function has_bookings($coming = true) {
@@ -280,6 +288,7 @@ function event_details($echo = true, $archive = false) {
     
     if ($maybe_single) {
 	$content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ';
+	$_dc = 0;
 	foreach ($meta['incsub_event_start'] as $_variation => $_start) {
 	    if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) ==
 		date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$_variation]))) {
@@ -287,7 +296,11 @@ function event_details($echo = true, $archive = false) {
 	    } else {
 		$end_date = date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$_variation])) . ' ';
 	    }
-	    $content .= __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$_variation])) . ' and <br/>';
+	    if ($_dc > 0) {
+		$content .= 'and ';
+	    }
+	    $content .= __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$_variation])) . ' <br/>';
+	    $_dc++;
 	}
 	$content .= '</li>';
     } else {
@@ -305,6 +318,49 @@ function event_details($echo = true, $archive = false) {
     }
     $content .= '<li><b>' . __('Created By', Booking::$_translation_domain) . '</b>: <a href="'.get_the_author_link().'" title="'.get_the_author().'">' . get_the_author() . '</a></li>';
     $content .= '</ul>';
+    
+    if ($echo) {
+        echo $content;
+    }
+    
+    return $content;
+}
+
+function eab_payment_forms($echo = true) {
+    global $booking, $post;
+    
+    $content = '';
+    
+    $content .= '<form action="https://www.paypal.com/cgi-bin/webscr" method="post">';
+    $content .= '<input type="hidden" name="business" value="'.$booking->_options['default']['paypal_email'].'" />';
+    $content .= '<input type="hidden" name="item_name" value="'.get_the_title().'" />';
+    $content .= '<input type="hidden" name="item_number" value="'.$post->ID.'" />';
+    $content .= '<input type="hidden" name="booking_id" value="'.$booking_id.'" />';
+    $content .= '<input type="hidden" name="notify_url" value="'.admin_url('admin-ajax.php?action=eab_paypal_ipn').'" />';
+    $content .= '<input type="hidden" name="amount" value="'.get_post_meta($post->ID, 'incsub_event_fee', true).'" />';
+    $content .= '<input type="hidden" name="return" value="'.get_permalink().'" />';
+    $content .= '<input type="hidden" name="currency_code" value="'.$booking->_options['default']['currency'].'">';
+    $content .= '<input type="hidden" name="cmd" value="_xclick" />';
+    $content .= '<input type="image" name="submit" border="0" src="https://www.paypal.com/en_US/i/btn/btn_paynow_SM.gif" alt="PayPal - The safer, easier way to pay online" />';
+    $content .= '<img alt="" border="0" width="1" height="1" src="https://www.paypal.com/en_US/i/scr/pixel.gif" />';
+    $content .= '</form>';
+    
+    if ($echo) {
+        echo $content;
+    }
+    
+    return $content;
+}
+
+function event_breadcrumbs($echo = true) {
+    global $wp_query;
+    
+    $content = '';
+    
+    $content .= '<a href="'.event_link('event_or_calendar').'" class="parent">'.__("Events", Booking::$_translation_domain).'</a> &gt; ';
+    $content .= '<a href="'.get_site_url($blog_id, $booking->_options['default']['slug'].'/'.date('Y', strtotime("{$wp_query->query_vars['event_year']}-01-01")).'/').'" class="parent">'.date_i18n('Y', strtotime("{$wp_query->query_vars['event_year']}-01-01")).'</a> &gt; ';
+    $content .= '<a href="'.get_site_url($blog_id, $booking->_options['default']['slug'].'/'.date('Y/m', strtotime("{$wp_query->query_vars['event_year']}-{$wp_query->query_vars['event_monthnum']}-01")).'/').'" class="parent">'.date_i18n('F', strtotime("{$wp_query->query_vars['event_year']}-{$wp_query->query_vars['event_monthnum']}-01")).'</a> &gt; ';
+    $content .= '<span class="current">'.get_the_title().'</span>';
     
     if ($echo) {
         echo $content;

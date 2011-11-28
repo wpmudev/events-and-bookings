@@ -72,9 +72,9 @@ class Booking {
 	add_action('option_rewrite_rules', array(&$this, 'check_rewrite_rules'));
 	
 	add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
+	add_action('wp_enqueue_scripts', array(&$this, 'wp_enqueue_scripts'));
 	
 	add_action( 'manage_incsub_event_posts_custom_column', array(&$this, 'manage_posts_custom_column') );
-	//add_action( 'restrict_manage_posts', array(&$this, 'restrict_manage_posts') );
 	
 	add_action('add_meta_boxes_incsub_event', array(&$this, 'meta_boxes') );
 	add_action('wp_insert_post', array(&$this, 'save_event_meta'), 10, 2 );
@@ -84,7 +84,7 @@ class Booking {
 	
 	add_action('wp_ajax_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
 	
-	add_filter('single_template', array( &$this, 'handle_template' ) );
+	add_filter('single_template', array( &$this, 'handle_single_template' ) );
 	add_filter('archive_template', array( &$this, 'handle_template' ) );
 	add_filter('template_include', array( &$this, 'handle_template' ) );
 	
@@ -149,6 +149,7 @@ class Booking {
 		'supports' => $supports,
 		'rewrite' => array( 'slug' => $this->_options['default']['slug'], 'with_front' => false ),
 		'has_archive' => true,
+		'menu_icon' => plugins_url('events-and-bookings/img/small-greyscale.png'),
 	    )
 	);
 	
@@ -168,7 +169,7 @@ class Booking {
 	
 	wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), $this->current_version);
 	wp_register_script('eab_admin_js', plugins_url('events-and-bookings/js/eab-admin.js'), array('jquery'), $this->current_version);
-	//wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), null, $this->current_version);
+	wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), array('jquery'), $this->current_version);
 	
 	wp_register_style('eab_jquery_ui', plugins_url('events-and-bookings/css/smoothness/jquery-ui-1.8.16.custom.css'), null, $this->current_version);
 	wp_register_style('eab_admin', plugins_url('events-and-bookings/css/admin.css'), null, $this->current_version);
@@ -194,7 +195,7 @@ class Booking {
 		// TODO: Add to BP activity stream
 		do_action( 'incsub_event_booking_yes', $event_id, $current_user->ID );
 		$this->recount_bookings($event_id);
-		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		wp_redirect('?eab_success_msg='.urlencode('Your response recorded'));
 		exit();
 	    }
 	    if (isset($_POST['action_maybe'])) {
@@ -204,7 +205,7 @@ class Booking {
 		// TODO: Add to BP activity stream
 		do_action( 'incsub_event_booking_maybe', $event_id, $current_user->ID );
 		$this->recount_bookings($event_id);
-		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		wp_redirect('?eab_success_msg='.urlencode('Your response recorded'));
 		exit();
 	    }
 	    if (isset($_POST['action_no'])) {
@@ -214,7 +215,7 @@ class Booking {
 		// TODO: Remove from BP activity stream
 		do_action( 'incsub_event_booking_no', $event_id, $current_user->ID );
 		$this->recount_bookings($event_id);
-		wp_redirect('?eab_msg='.urlencode('Your response recorded'));
+		wp_redirect('?eab_success_msg='.urlencode('Your response recorded'));
 		exit();
 	    }
 	}
@@ -387,9 +388,9 @@ class Booking {
     }
     
     function handle_template( $path ) {
-	global $wp_query;
+	global $wp_query, $post;
 	
-	if ( 'incsub_event' != get_query_var( 'post_type' ) )
+	if ( 'incsub_event' != $post->post_type )
 	    return $path;
 	
 	$type = reset( explode( '_', current_filter() ) );
@@ -400,17 +401,66 @@ class Booking {
 	    // A more specific template was not found, so load the default one
 	    $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
 	}
-	
 	return $path;
+    }
+    
+    function handle_single_template( $path ) {
+	global $wp_query, $post;
+	
+	if ( 'incsub_event' != $post->post_type )
+	    return $path;
+	
+	$type = reset( explode( '_', current_filter() ) );
+	
+	$file = basename( $path );
+	
+	if ( empty( $path ) || "$type.php" == $file ) {
+	    // A more specific template was not found, so load the default one
+	    add_filter('the_content', array(&$this, 'single_content'));
+	    if (file_exists(get_stylesheet_directory().'/page.php')) {
+		$path = get_stylesheet_directory().'/page.php';
+	    } else {
+		$path = get_template_directory().'/page.php';
+	    }
+	}
+	return $path;
+    }
+    
+    function single_content($content) {
+	global $post, $current_user;
+	
+	$start_day = date_i18n('m', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
+        
+	$new_content  = '';
+	$new_content .= '<div class="eab-needtomove"><div id="event-bread-crumbs" >'.event_breadcrumbs(false).'</div></div>';
+        
+        $new_content .= '<div id="event-rsvp">'.the_eab_error_notice(false);
+        if (!has_bookings()) {
+	    $new_content .= '<div id="event-first-booking">'.__("Be the first to RSVP", Booking::$_translation_domain).'</div>';
+        }
+	$new_content .= event_rsvp_form(false);
+        
+        $new_content .= '</div>';
+        
+        $booking_id = get_booking_id($post->ID, $current_user->ID);
+        
+	if ($booking_id && in_array(get_booking_status($booking_id), array('yes', 'maybe')) &&
+            get_post_meta($post->ID, 'incsub_event_paid', true) && !get_booking_paid($booking_id)) {
+            $new_content .= '<div class="event-notice">';
+            $new_content .= '<b>'.__('You haven\'t paid for this event.', Booking::$_translation_domain).'</b>';
+            $new_content .= eab_payment_forms(false);
+            $new_content .= '</div>';
+        }
+	
+	$new_content .= '<div id="event-details">'.event_details(false).'</div>';
+        $new_content .= $content;
+	
+	return $new_content;
     }
     
     function meta_boxes() {
 	global $post, $current_user;
 	
-	/*add_meta_box('incsub-event-where-s', __('Where', $this->_translation_domain), array(&$this, 'where_meta_box'), 'incsub_event', 'side', 'high');
-	add_meta_box('incsub-event-when-s', __('When', $this->_translation_domain), array(&$this, 'when_meta_box'), 'incsub_event', 'side', 'high');
-	add_meta_box('incsub-event-status-s', __('Status', $this->_translation_domain), array(&$this, 'status_meta_box'), 'incsub_event', 'side', 'high');
-	*/
 	add_meta_box('incsub-event', __('Event Details', $this->_translation_domain), array(&$this, 'event_meta_box'), 'incsub_event', 'normal', 'high');
 	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
     }
@@ -426,7 +476,19 @@ class Booking {
     }
     
     function wp_print_styles() {
-	wp_enqueue_style('eab_front');
+	global $wp_query;
+	
+	if ($wp_query->query_vars['post_type'] == 'incsub_event') {
+	    wp_enqueue_style('eab_front');
+	}
+    }
+    
+    function wp_enqueue_scripts() {
+	global $wp_query;
+	
+	if ($wp_query->query_vars['post_type'] == 'incsub_event') {
+	    wp_enqueue_script('eab_event_js');
+	}
     }
     
     function event_meta_box($echo = true) {
@@ -968,6 +1030,9 @@ class Booking {
      * @see		http://codex.wordpress.org/Adding_Administration_Menus
      */
     function admin_menu() {
+	if (get_option('eab_setup', false) == false) {
+	    add_submenu_page('edit.php?post_type=incsub_event', __("Get Started", $this->_translation_domain), __("Get started", $this->_translation_domain), 'manage_options', 'eab_welcome', array(&$this,'welcome_render'));
+	}
 	add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", $this->_translation_domain), __("Settings", $this->_translation_domain), 'manage_options', 'eab_settings', array(&$this,'settings_render'));
     }
     
@@ -977,6 +1042,14 @@ class Booking {
 	return $schedules;
     }
     
+    function welcome_render() {
+	?>
+	<div class="wrap">
+	    <div id="icon-events-general" class="icon32"><br/></div>
+	    <h2><?php _e('Getting started', $this->_translation_domain); ?></h2>
+	</div>
+	<?php
+    }
     function views_list($views) {
 	global $wp_query;
 	
@@ -1011,28 +1084,47 @@ class Booking {
         }
 	?>
 	<div class="wrap">
-	    <div id="icon-options-general" class="icon32"><br/></div>
-	    <h2><?php _e('Event Settings', $this->_translation_domain); ?></h2>
+	    <div id="icon-events-general" class="icon32"><br/></div>
+	    <h2><?php _e('Events Settings', $this->_translation_domain); ?></h2>
+	    <p><?php _e('Welcome to settings page for the Events plugin', $this->_translation_domain); ?></p>
 	    <form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">
 		<?php wp_nonce_field('incsub_event-update-options'); ?>
-		<table>
-		    <tr valign="top">
-			<td><label for="incsub_event-slug"><?php _e('Event Slug', $this->translation_domain); ?></label> </td>
-			<td>/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_options['default']['slug']; ?>" /></td>
-		    </tr>
-		    <tr valign="top">
-			<td><label for="incsub_event-accept_payments"><?php _e('Accept Payments', $this->translation_domain); ?></label> </td>
-			<td><input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_options['default']['accept_payments'] == 1)?'checked="checked"':''; ?> /></td>
-		    </tr>
-		    <tr valign="top" class="incsub_event-payment_method_row">
-			<td><label for="incsub_event-currency"><?php _e('Currency', $this->translation_domain); ?></label> </td>
-			<td><input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_options['default']['currency']; ?>" /></td>
-		    </tr>
-		    <tr valign="top" class="incsub_event-payment_method_row">
-			<td><label for="incsub_event-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?></label> </td>
-			<td><input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_options['default']['paypal_email']; ?>" /></td>
-		    </tr>
-		</table>
+		<fieldset id="eab-settings-general" class="eab-settings-section">
+		    <legend><?php _e('Setup', $this->_translation_domain); ?></legend>
+		    <label for="incsub_event-slug"><?php _e('Set the event root slug', $this->translation_domain); ?>
+			/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_options['default']['slug']; ?>" />
+		    </label> <a href="#eab-help-slug" class="eab-info" >&nbsp;</a>
+		    <div class="clear"></div>
+		    <div id="eab-help-slug" class="eab-help-content">
+			<?php _e('Change the root slug for events', $this->_translation_domain); ?>
+		    </div>
+		    
+		    <label for="incsub_event-accept_payments"><?php _e('Will you be using payments for your events?', $this->translation_domain); ?>
+			<input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_options['default']['accept_payments'] == 1)?'checked="checked"':''; ?> />
+		    </label> <a href="#eab-help-accept-payment" class="eab-info" >&nbsp;</a>
+		    <div class="clear"></div>
+		    <div id="eab-help-accept-payment" class="eab-help-content">
+			<?php _e('Check this to accept payments for your events', $this->_translation_domain); ?>
+		    </div>
+		</fieldset>
+		<fieldset id="eab-settings-paypal" class="eab-settings-section">
+		    <legend><?php _e('Payment', $this->_translation_domain); ?></legend>
+		    <label for="incsub_event-currency"><?php _e('Currency', $this->translation_domain); ?>
+			<input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_options['default']['currency']; ?>" />
+		    </label> <a href="#eab-help-paypal-currency" class="eab-info" >&nbsp;</a>
+		    <div class="clear"></div>
+		    <div id="eab-help-paypal-currency" class="eab-help-content">
+			<?php _e('Which currency will you be accepting payment in?', $this->_translation_domain); ?>
+		    </div>
+		    
+		    <label for="incsub_event-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?>
+			<input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_options['default']['paypal_email']; ?>" />
+		    </label> <a href="#eab-help-paypal-email" class="eab-info" >&nbsp;</a>
+		    <div class="clear"></div>
+		    <div id="eab-help-paypal-email" class="eab-help-content">
+			<?php _e('PayPal e-mail address payments should be made to', $this->_translation_domain); ?>
+		    </div>
+		</fieldset>
 		
 		<p class="submit">
 		    <input type="submit" name="submit_settings" value="<?php _e('Save Changes', $this->translation_domain) ?>" />

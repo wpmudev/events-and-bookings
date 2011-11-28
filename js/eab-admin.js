@@ -26,9 +26,9 @@ jQuery(function() {
     
     jQuery("#incsub_event-accept_payments").change(function () {
 	if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
-	    jQuery(".incsub_event-payment_method_row").hide();
+	    jQuery("#eab-settings-paypal").hide();
 	} else {
-	    jQuery(".incsub_event-payment_method_row").show();
+	    jQuery("#eab-settings-paypal").show();
 	}
     });
     
@@ -41,5 +41,10 @@ jQuery(function() {
 	} else {
 	    jQuery(".incsub_event-fee_row").show();
 	}
+    });
+    
+    jQuery('a.eab-info').click(function () {
+	jQuery(jQuery(this).attr('href')).toggle();
+	return false;
     });
 });

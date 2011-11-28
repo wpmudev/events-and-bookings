@@ -47,3 +47,60 @@ ul.eab-guest-list li {
     margin: 3px 0px;
 }
 
+#icon-events-general {
+    background-image: url(../img/mid-greyscale.png);
+}
+
+#icon-edit.icon32-posts-incsub_event, #icon-post.icon32-posts-incsub_event {
+    background: url(../img/mid-greyscale.png) no-repeat;
+}
+
+li.menu-icon-incsub_event div.wp-menu-image {
+    background: url(../img/small-menu.png) no-repeat bottom;
+}
+
+li.menu-icon-incsub_event:hover div.wp-menu-image, li.menu-icon-incsub_event.wp-has-current-submenu div.wp-menu-image {
+    background-position: top;
+}
+
+li.menu-icon-incsub_event div.wp-menu-image img {
+    display: none;
+}
+
+a.eab-info {
+    width: 16px;
+    height: 16px;
+    background: url(../img/information.png) no-repeat;
+    text-decoration: none;
+    display: inline-block;
+}
+
+div.eab-help-content {
+    display: none;
+    border: 1px dotted #C2E655;
+    background: #FFFFE0;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    padding: 5px;
+}
+
+fieldset.eab-settings-section label {
+    margin: 3px 0px;
+    display: inline-block;
+}
+
+fieldset.eab-settings-section {
+    border: 1px solid #DFDFDF;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    padding: 5px;
+    margin: 5px 0px;
+}
+
+fieldset.eab-settings-section legend {
+    background-color: #DFDFDF;
+    width: 100%;
+    padding: 5px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
