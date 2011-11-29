@@ -52,4 +52,8 @@ jQuery(function() {
 	jQuery('#incsub-event-bookings').addClass('closed');
     }
     jQuery('#incsub-event-bookings .hndle').append('<span class="eab-expand-metabox">View all bookings</span>');
+    if (!jQuery('#incsub-event-wizard').hasClass('closed')) {
+	jQuery('#incsub-event-wizard').addClass('closed');
+    }
+    jQuery('#incsub-event-wizard .hndle').append('<a href="edit.php?post_type=incsub_event&page=eab_welcome" class="eab-expand-metabox">Back to getting started</a>');
 });

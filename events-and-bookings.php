@@ -67,6 +67,7 @@ class Booking {
 	
 	// Actions
 	add_action('init', array(&$this, 'init'), 0);
+	add_action('admin_init', array(&$this, 'admin_init'), 0);
 	
 	add_action('admin_menu', array(&$this, 'admin_menu'));
 	add_action('option_rewrite_rules', array(&$this, 'check_rewrite_rules'));
@@ -229,6 +230,15 @@ class Booking {
 	    update_option('incsub_event_default', $this->_options['default']);
 	    wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
 	    exit();
+	}
+    }
+    
+    function admin_init() {
+	if (get_option('eab_activation_redirect', false)) {
+	    delete_option('eab_activation_redirect');
+	    if (!(is_multisite() && is_super_admin()) || !is_network_admin()) {
+		wp_redirect('edit.php?post_type=incsub_event&page=eab_welcome');
+	    }
 	}
     }
     
@@ -463,6 +473,9 @@ class Booking {
 	
 	add_meta_box('incsub-event', __('Event Details', $this->_translation_domain), array(&$this, 'event_meta_box'), 'incsub_event', 'normal', 'high');
 	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
+	if (isset($_REQUEST['eab_step'])) {
+	    add_meta_box('incsub-event-wizard', __('Are you following the step by step guide?', $this->_translation_domain), function () {return '';}, 'incsub_event', 'normal', 'low');
+	}
     }
     
     function admin_enqueue_scripts() {
@@ -962,6 +975,7 @@ class Booking {
 	$this->_options['default'] = array();
 	
         add_option('event_default', $this->_options['default']);
+	add_option('eab_activation_redirect', true);
     }
     
     function user_has_cap($allcaps, $caps = null, $args = null) {
@@ -1030,10 +1044,14 @@ class Booking {
      * @see		http://codex.wordpress.org/Adding_Administration_Menus
      */
     function admin_menu() {
+	global $submenu;
+        global $menu;
+	
 	if (get_option('eab_setup', false) == false) {
 	    add_submenu_page('edit.php?post_type=incsub_event', __("Get Started", $this->_translation_domain), __("Get started", $this->_translation_domain), 'manage_options', 'eab_welcome', array(&$this,'welcome_render'));
 	}
 	add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", $this->_translation_domain), __("Settings", $this->_translation_domain), 'manage_options', 'eab_settings', array(&$this,'settings_render'));
+	
     }
     
     function cron_schedules($schedules) {
@@ -1053,10 +1071,14 @@ class Booking {
 		    <h3 class="eab-hndle"><?php _e('Getting Started: Follow our simple steps', $this->_translation_domain); ?></h3>
 		    <div class="eab-inside">
 			<ol>
-			    <li><?php _e('If you accept payments for your events, configure payment settings', $this->_translation_domain); ?></li>
-			    <li><?php _e('Add your first event', $this->_translation_domain); ?></li>
-			    <li><?php _e('Tell the world about your event', $this->_translation_domain); ?></li>
-			    <li><?php _e('View who RSVPed', $this->_translation_domain); ?></li>			
+			    <li>
+				<?php _e('If you accept payments for your events, configure payment settings', $this->_translation_domain); ?>
+				<a href="edit.php?post_type=incsub_event&page=eab_settings&eab_step=1" class="eab-goto-step button"><?php _e('Do this action', $this->_translation_domain); ?></a>
+			    </li>
+			    <li>
+				<?php _e('Add your first event', $this->_translation_domain); ?>
+				<a href="post-new.php?post_type=incsub_event&eab_step=2" class="eab-goto-step button"><?php _e('Do this action', $this->_translation_domain); ?></a>
+			    </li>		
 			</ol>
 		    </div>
 		</div>
@@ -1073,8 +1095,8 @@ class Booking {
 	    
 	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-two eab-metaboxcol-right">
 		<div id="eab-devbox" class="eab-minimetabox postbox">
-		    <h3 class="hndle"><?php _e('Delve deeper', $this->_translation_domain); ?></h3>
-		    <div class="inside">
+		    <h3 class="eab-hndle"><?php _e('Delve deeper', $this->_translation_domain); ?></h3>
+		    <div class="eab-inside">
 			&nbsp;
 		    </div>
 		</div>
@@ -1167,7 +1189,10 @@ class Booking {
 		</fieldset>
 		
 		<p class="submit">
-		    <input type="submit" name="submit_settings" value="<?php _e('Save Changes', $this->translation_domain) ?>" />
+		    <input type="submit" class="button-primary" name="submit_settings" value="<?php _e('Save Changes', $this->translation_domain) ?>" />
+		    <?php if (isset($_REQUEST['eab_step'])) { ?>
+		    <a href="edit.php?post_type=incsub_event&page=eab_welcome" class="button"><?php _e('Back', $this->translation_domain) ?></a>
+		    <?php } ?>
 		</p>
 	    </form>
 	</div>

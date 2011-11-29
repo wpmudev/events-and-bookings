@@ -110,7 +110,7 @@ fieldset.eab-settings-section legend {
     display: none;
 }
 
-div.postbox.closed span.eab-expand-metabox {
+div.postbox.closed .eab-expand-metabox {
     display: inline;
 }
 
@@ -127,6 +127,10 @@ div.eab-minimetabox {
     margin: 5px;
 }
 
+div.eab-inside {
+    margin: 7px 5px 5px;
+}
+
 .eab-dashboard-footer {
     margin-top: 5px;
 }
@@ -141,4 +145,25 @@ div.eab-minimetabox {
     margin: 0;
     text-decoration: none;
     width: 300px;
+}
+
+.eab-inside li {
+    height: 2em;
+}
+
+a.eab-goto-step {
+    float: right;
+}
+
+#incsub-event-wizard .inside, #incsub-event-wizard .handlediv {
+    display: none;
+}
+
+#incsub-event-wizard .hndle {
+    cursor: default !important;
+}
+
+#incsub-event-wizard .eab-expand-metabox {
+    display: inline;
+    font-size: 1em;
 }
