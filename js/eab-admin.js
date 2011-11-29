@@ -64,4 +64,50 @@ jQuery(function() {
     if (jQuery('.eab-section-block').length == 2) {
 	jQuery('.eab-section-heading').hide();
     }
+    
+    jQuery('input.incsub_event').blur(function () {
+	
+	_c = jQuery(this).attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
+	
+	_start = new Date();
+	if (jQuery('#incsub_event_start_'+_c).val() != '') {
+	    _start = new Date(jQuery('#incsub_event_start_'+_c).val());
+	}
+	if (jQuery('#incsub_event_start_time_'+_c).val() != '') {
+	    _start_time = jQuery('#incsub_event_start_time_'+_c).val();
+	    _start_time_parts = _start_time.split(/:/gi);
+	    
+	    _start.setHours(_start_time_parts[0]);
+	    _start.setMinutes(_start_time_parts[1]);
+	}
+	
+	_end = new Date();
+	if (jQuery('#incsub_event_end_'+_c).val() != '') {
+	    _end = new Date(jQuery('#incsub_event_end_'+_c).val());
+	}
+	
+	if (jQuery('#incsub_event_end_time_'+_c).val() != '') {
+	    _end_time = jQuery('#incsub_event_end_time_'+_c).val();
+	    _end_time_parts = _end_time.split(/:/gi);
+	    
+	    _end.setHours(_end_time_parts[0]);
+	    _end.setMinutes(_end_time_parts[1]);
+	}
+	    
+	if (_start > _end) {
+	    jQuery('#incsub_event_start_'+_c).addClass('error');
+	    jQuery('#incsub_event_start_time_'+_c).addClass('error');
+	    jQuery('#incsub_event_end_'+_c).addClass('error');
+	    jQuery('#incsub_event_end_time_'+_c).addClass('error');
+	    jQuery('input.button-primary').attr('disabled', true);
+	} else {
+	    jQuery('#incsub_event_start_'+_c).removeClass('error');
+	    jQuery('#incsub_event_start_time_'+_c).removeClass('error');
+	    jQuery('#incsub_event_end_'+_c).removeClass('error');
+	    jQuery('#incsub_event_end_time_'+_c).removeClass('error');
+	    jQuery('input.button-primary').removeAttr('disabled');
+	}
+    });
+    
+    _eab_location = window.location;
 });

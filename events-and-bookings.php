@@ -578,14 +578,14 @@ class Booking {
 		$content .= '<div class="eab-section-heading">'.sprintf(__('Part %d', $this->_translation_domain), $i+1).'</div>';
 		$content .= '<div class="misc-eab-section eab-start-section"><label>';
 		$content .= __('Start', $this->_translation_domain).':&nbsp;';
-		$content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $start).'" size="7" /></label> ';
-		$content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" value="'.date('H:i', $start).'" size="3" />';
+		$content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="'.date('Y-m-d', $start).'" size="7" /></label> ';
+		$content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_start_time" value="'.date('H:i', $start).'" size="3" />';
 		$content .= '</div>';
 		
 		$content .= '<div class="misc-eab-section"><label>';
 		$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-		$content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker" value="'.date('Y-m-d', $end).'" size="7" /></label> ';
-		$content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" value="'.date('H:i', $end).'" size="3" />';
+		$content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="'.date('Y-m-d', $end).'" size="7" /></label> ';
+		$content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_end_time" value="'.date('H:i', $end).'" size="3" />';
 		$content .= '</div>';
 		$content .= '</div>';
 	    }
@@ -595,14 +595,14 @@ class Booking {
 	    $content .= '<div class="eab-section-heading">'.sprintf(__('Part %d', $this->_translation_domain), $i+1).'</div>';
 	    $content .= '<div class="misc-eab-section eab-start-section"><label>';
 	    $content .= __('Start', $this->_translation_domain).':&nbsp;';
-	    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker" value="" size="7" /></label> ';
-	    $content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" value="" size="3" />';
+	    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="" size="7" /></label> ';
+	    $content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_start_time" value="" size="3" />';
 	    $content .= '</div>';
 	    
 	    $content .= '<div class="misc-eab-section"><label>';
 	    $content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-	    $content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker" value="" size="7" /></label> ';
-	    $content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" value="" size="3" />';
+	    $content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="" size="7" /></label> ';
+	    $content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_end_time" value="" size="3" />';
 	    $content .= '</div>';
 	    $content .= '</div>';
 	}
@@ -615,14 +615,14 @@ class Booking {
 	$content .= '<div class="eab-section-heading">'.__('Part bank', $this->_translation_domain).'</div>';
 	$content .= '<div class="misc-eab-section eab-start-section"><label>';
 	$content .= __('Start', $this->_translation_domain).':&nbsp;';
-	$content .= '<input type="text" name="incsub_event_start_b[bank]" id="incsub_event_start_bank" class="incsub_event_picker_b" value="" size="7" /></label> ';
-	$content .= '<input type="text" name="incsub_event_start_time_b[bank]" id="incsub_event_start_time_bank" value="" size="3" />';
+	$content .= '<input type="text" name="incsub_event_start_b[bank]" id="incsub_event_start_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_start_b" value="" size="7" /></label> ';
+	$content .= '<input type="text" name="incsub_event_start_time_b[bank]" id="incsub_event_start_time_bank" class="incsub_event incsub_event_time incsub_event_start_time_b" value="" size="3" />';
 	$content .= '</div>';
 	
 	$content .= '<div class="misc-eab-section eab-end-section"><label>';
 	$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-	$content .= '<input type="text" name="incsub_event_end_b[bank]" id="incsub_event_end_bank" class="incsub_event_picker_b" value="" size="7" /></label> ';
-	$content .= '<input type="text" name="incsub_event_end_time_b[bank]" id="incsub_event_end_time_bank" value="" size="3" />';
+	$content .= '<input type="text" name="incsub_event_end_b[bank]" id="incsub_event_end_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_end_b" value="" size="7" /></label> ';
+	$content .= '<input type="text" name="incsub_event_end_time_b[bank]" id="incsub_event_end_time_bank" class="incsub_event incsub_event_time incsub_event_end_time_b" value="" size="3" />';
 	$content .= '</div></div>';
 	$content .= '</div>';
 	
