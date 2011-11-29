@@ -18,6 +18,10 @@ jQuery(function() {
 	    changeMonth: true,
 	    changeYear: true
 	});
+	
+	if (jQuery('.eab-section-block').length > 2) {
+	    jQuery('.eab-section-heading').show();
+	}
     });
     
     if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
@@ -32,11 +36,11 @@ jQuery(function() {
 	}
     });
     
-    if (jQuery("#incsub_event_paid:checked") && jQuery("#incsub_event_paid:checked").length == 0) {
+    if (jQuery("#incsub_event_paid").val() == 0) {
 	jQuery(".incsub_event-fee_row").hide();
     }
     jQuery("#incsub_event_paid").change(function () {
-	if (jQuery("#incsub_event_paid:checked") && jQuery("#incsub_event_paid:checked").length == 0) {
+	if (jQuery("#incsub_event_paid").val() == 0) {
 	    jQuery(".incsub_event-fee_row").hide();
 	} else {
 	    jQuery(".incsub_event-fee_row").show();
@@ -56,4 +60,8 @@ jQuery(function() {
 	jQuery('#incsub-event-wizard').addClass('closed');
     }
     jQuery('#incsub-event-wizard .hndle').append('<a href="edit.php?post_type=incsub_event&page=eab_welcome" class="eab-expand-metabox">Back to getting started</a>');
+
+    if (jQuery('.eab-section-block').length == 2) {
+	jQuery('.eab-section-heading').hide();
+    }
 });

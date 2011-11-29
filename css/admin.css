@@ -36,7 +36,7 @@ ul.eab-guest-list li {
 }
 
 #eab-add-more {
-    clear: both;
+    float: left;
 }
 
 #eab-add-more-rows {
