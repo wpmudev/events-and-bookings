@@ -5,7 +5,7 @@
  Description: 
  Author: S H Mohanjith (Incsub)
  WDP ID: 
- Version: 1.0.0
+ Version: 1.0.0b3
  Author URI: http://premium.wpmudev.org
 */
 /**
@@ -28,7 +28,7 @@ class Booking {
      * 
      * @var		string	$_current_version	Current version
      */
-    var $_current_version = '1.0.0';
+    var $_current_version = '1.0.0b3';
     
     /**
      * @static		string	$_translation_domain	Translation domain
