@@ -70,6 +70,7 @@ class Booking {
 	add_action('admin_init', array(&$this, 'admin_init'), 0);
 	
 	add_action('admin_menu', array(&$this, 'admin_menu'));
+
 	add_action('option_rewrite_rules', array(&$this, 'check_rewrite_rules'));
 	
 	add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
