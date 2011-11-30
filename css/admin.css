@@ -112,6 +112,9 @@ fieldset.eab-settings-section legend {
 
 div.postbox.closed .eab-expand-metabox {
     display: inline;
+    color: #21759B;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 div.eab-metaboxcol-two {

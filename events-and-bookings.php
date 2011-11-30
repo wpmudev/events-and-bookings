@@ -608,7 +608,7 @@ class Booking {
 	}
 	$content .= '</div>';
 	
-	$content .= '<div id="eab-add-more"><input type="button" name="eab-add-more-button" id="eab-add-more-button" value="+"/></div>';
+	$content .= '<div id="eab-add-more"><input type="button" name="eab-add-more-button" id="eab-add-more-button" class="eab_add_more" value="'.__('Add More', $this->_translation_domain).'"/></div>';
 	
 	$content .= '<div id="eab-add-more-bank">';
 	$content .= '<div class="eab-section-block">';
@@ -1172,42 +1172,48 @@ class Booking {
 	    <p><?php _e('Welcome to settings page for the Events plugin', $this->_translation_domain); ?></p>
 	    <form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">
 		<?php wp_nonce_field('incsub_event-update-options'); ?>
-		<fieldset id="eab-settings-general" class="eab-settings-section">
-		    <legend><?php _e('Setup', $this->_translation_domain); ?></legend>
-		    <label for="incsub_event-slug"><?php _e('Set the event root slug', $this->translation_domain); ?>
-			/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_options['default']['slug']; ?>" />
-		    </label> <a href="#eab-help-slug" class="eab-info" >&nbsp;</a>
-		    <div class="clear"></div>
-		    <div id="eab-help-slug" class="eab-help-content">
-			<?php _e('Change the root slug for events', $this->_translation_domain); ?>
+		<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
+		    <div id="eab-settings-general" class="eab-metabox postbox">
+			<h3 class="eab-hndle"><?php _e('Setup', $this->_translation_domain); ?></h3>
+			<div class="eab-inside">
+			    <label for="incsub_event-slug"><?php _e('Set the event root slug', $this->translation_domain); ?>
+				/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_options['default']['slug']; ?>" />
+			    </label> <a href="#eab-help-slug" class="eab-info" >&nbsp;</a>
+			    <div class="clear"></div>
+			    <div id="eab-help-slug" class="eab-help-content">
+				<?php _e('Change the root slug for events', $this->_translation_domain); ?>
+			    </div>
+			    
+			    <label for="incsub_event-accept_payments"><?php _e('Will you be using payments for your events?', $this->translation_domain); ?>
+				<input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_options['default']['accept_payments'] == 1)?'checked="checked"':''; ?> />
+			    </label> <a href="#eab-help-accept-payment" class="eab-info" >&nbsp;</a>
+			    <div class="clear"></div>
+			    <div id="eab-help-accept-payment" class="eab-help-content">
+				<?php _e('Check this to accept payments for your events', $this->_translation_domain); ?>
+			    </div>
+			</div>
 		    </div>
-		    
-		    <label for="incsub_event-accept_payments"><?php _e('Will you be using payments for your events?', $this->translation_domain); ?>
-			<input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_options['default']['accept_payments'] == 1)?'checked="checked"':''; ?> />
-		    </label> <a href="#eab-help-accept-payment" class="eab-info" >&nbsp;</a>
-		    <div class="clear"></div>
-		    <div id="eab-help-accept-payment" class="eab-help-content">
-			<?php _e('Check this to accept payments for your events', $this->_translation_domain); ?>
+		    <div id="eab-settings-paypal" class="eab-metabox postbox">
+			<h3 class="eab-hndle"><?php _e('Payment', $this->_translation_domain); ?></h3>
+			<div class="eab-inside">
+			    <label for="incsub_event-currency"><?php _e('Currency', $this->translation_domain); ?>
+				<input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_options['default']['currency']; ?>" />
+			    </label> <a href="#eab-help-paypal-currency" class="eab-info" >&nbsp;</a>
+			    <div class="clear"></div>
+			    <div id="eab-help-paypal-currency" class="eab-help-content">
+				<?php _e('Which currency will you be accepting payment in?', $this->_translation_domain); ?>
+			    </div>
+			    
+			    <label for="incsub_event-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?>
+				<input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_options['default']['paypal_email']; ?>" />
+			    </label> <a href="#eab-help-paypal-email" class="eab-info" >&nbsp;</a>
+			    <div class="clear"></div>
+			    <div id="eab-help-paypal-email" class="eab-help-content">
+				<?php _e('PayPal e-mail address payments should be made to', $this->_translation_domain); ?>
+			    </div>
+			</div>
 		    </div>
-		</fieldset>
-		<fieldset id="eab-settings-paypal" class="eab-settings-section">
-		    <legend><?php _e('Payment', $this->_translation_domain); ?></legend>
-		    <label for="incsub_event-currency"><?php _e('Currency', $this->translation_domain); ?>
-			<input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_options['default']['currency']; ?>" />
-		    </label> <a href="#eab-help-paypal-currency" class="eab-info" >&nbsp;</a>
-		    <div class="clear"></div>
-		    <div id="eab-help-paypal-currency" class="eab-help-content">
-			<?php _e('Which currency will you be accepting payment in?', $this->_translation_domain); ?>
-		    </div>
-		    
-		    <label for="incsub_event-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?>
-			<input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_options['default']['paypal_email']; ?>" />
-		    </label> <a href="#eab-help-paypal-email" class="eab-info" >&nbsp;</a>
-		    <div class="clear"></div>
-		    <div id="eab-help-paypal-email" class="eab-help-content">
-			<?php _e('PayPal e-mail address payments should be made to', $this->_translation_domain); ?>
-		    </div>
-		</fieldset>
+		</div>
 		
 		<p class="submit">
 		    <input type="submit" class="button-primary" name="submit_settings" value="<?php _e('Save Changes', $this->translation_domain) ?>" />
