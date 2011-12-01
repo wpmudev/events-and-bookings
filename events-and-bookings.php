@@ -68,7 +68,7 @@ class Booking {
 	// Actions
 	add_action('init', array(&$this, 'init'), 0);
 	add_action('admin_init', array(&$this, 'admin_init'), 0);
-	add_action( 'admin_init', array(&$this, 'tutorial') );
+	// add_action( 'admin_init', array(&$this, 'tutorial') );
 	
 	add_action('admin_menu', array(&$this, 'admin_menu'));
 
