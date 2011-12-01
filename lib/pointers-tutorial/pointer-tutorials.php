@@ -279,7 +279,6 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 		 * Print the pointer javascript data in the footer.
 		 */
 		function print_footer_list() {
-                    print 1;
 			?>
 			<script type="text/javascript">
 			//<![CDATA[
