@@ -1228,10 +1228,10 @@ class Booking {
     }
     
     function widgets_init() {
-	require_once 'widgets/Widget.class.php';
-	require_once 'widgets/Attendees_Widget.class.php';
-	require_once 'widgets/Popular_Widget.class.php';
-	require_once 'widgets/Upcoming_Widget.class.php';
+	require_once 'lib/widgets/Widget.class.php';
+	require_once 'lib/widgets/Attendees_Widget.class.php';
+	require_once 'lib/widgets/Popular_Widget.class.php';
+	require_once 'lib/widgets/Upcoming_Widget.class.php';
 	
 	register_widget('Eab_Attendees_Widget');
 	register_widget('Eab_Popular_Widget');
