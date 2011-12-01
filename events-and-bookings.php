@@ -476,8 +476,12 @@ class Booking {
 	add_meta_box('incsub-event', __('Event Details', $this->_translation_domain), array(&$this, 'event_meta_box'), 'incsub_event', 'side', 'high');
 	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
 	if (isset($_REQUEST['eab_step'])) {
-	    add_meta_box('incsub-event-wizard', __('Are you following the step by step guide?', $this->_translation_domain), function () {return '';}, 'incsub_event', 'normal', 'low');
+	    add_meta_box('incsub-event-wizard', __('Are you following the step by step guide?', $this->_translation_domain), array(&$this, 'wizard_meta_box'), 'incsub_event', 'normal', 'low');
 	}
+    }
+    
+    function wizard_meta_box() {
+	return '';
     }
     
     function admin_enqueue_scripts() {
