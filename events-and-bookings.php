@@ -68,6 +68,7 @@ class Booking {
 	// Actions
 	add_action('init', array(&$this, 'init'), 0);
 	add_action('admin_init', array(&$this, 'admin_init'), 0);
+	add_action( 'admin_init', array(&$this, 'tutorial') );
 	
 	add_action('admin_menu', array(&$this, 'admin_menu'));
 
@@ -1228,14 +1229,43 @@ class Booking {
     }
     
     function widgets_init() {
-	require_once 'lib/widgets/Widget.class.php';
-	require_once 'lib/widgets/Attendees_Widget.class.php';
-	require_once 'lib/widgets/Popular_Widget.class.php';
-	require_once 'lib/widgets/Upcoming_Widget.class.php';
+	require_once dirname(__FILE__) . '/lib/widgets/Widget.class.php';
+	require_once dirname(__FILE__) . '/lib/widgets/Attendees_Widget.class.php';
+	require_once dirname(__FILE__) . '/lib/widgets/Popular_Widget.class.php';
+	require_once dirname(__FILE__) . '/lib/widgets/Upcoming_Widget.class.php';
 	
 	register_widget('Eab_Attendees_Widget');
 	register_widget('Eab_Popular_Widget');
 	register_widget('Eab_Upcoming_Widget');
+    }
+    
+    function tutorial() {
+	//load the file
+	require_once( dirname(__FILE__) . '/lib/pointers-tutorial/pointer-tutorials.php' );
+	
+	//create our tutorial, with default redirect prefs
+	$tutorial = new Pointer_Tutorial('eab_tutorial', true, false);
+	
+	//add our textdomain that matches the current plugin
+	$tutorial->set_textdomain = self::$_translation_domain;
+	
+	//add the capability a user must have to view the tutorial
+	$tutorial->set_capability = 'manage_options';
+	
+	//optional shortcut to add a custom icon, just pass a url
+	$tutorial->add_icon( plugins_url( 'img/large-greyscale.png' , __FILE__ ) );
+	
+	//start registering steps. Note the 'content' argument is very important, and should be escaped with esc_js() as it will go in JSON
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#wpmudev_widget', __('Add first event', self::$_translation_domain), array(
+	    'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
+	    'position' => array( 'edge' => 'bottom', 'align' => 'left' ),
+	));
+	
+	//start the tutorial
+	$tutorial->initialize();
+	
+	$step = 0; //Note that steps start at 0, then 1,2,3 etc.
+	$link = $tutorial->start_link($step);
     }
 }
 

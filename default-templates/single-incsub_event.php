@@ -5,54 +5,59 @@ get_header( 'event' );
 <div id="primary" class="eab-primary-event">
     <div id="content">
         <div class="padder">
-            <div id="eab-page-wrapper">
+            <div id="wpmudevevents-wrapper">
+		<div id="wpmudevents-single">
                 
-                <?php
-                the_post();
-                
-                $start_day = date_i18n('m', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
-                ?>
-                
-                <div id="event-bread-crumbs">
-                    <?php event_breadcrumbs(); ?>
-                </div>
-                
-                <div id="single-event">
-                    <h1><?php the_title(); ?></h1>
+                    <?php
+                    the_post();
                     
-                    <div id="event-rsvp">
-                        <?php the_eab_error_notice(); ?>
-                        <?php if (!has_bookings()) {?>
-                        <div id="event-first-booking">
-                            <?php _e("Be the first to RSVP", Booking::$_translation_domain); ?>
-                        </div>
-                        <?php } ?>
-                        
+                    $start_day = date_i18n('m', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
+                    ?>
+                
+                    <div id="event-bread-crumbs">
+                        <?php event_breadcrumbs(); ?>
+                    </div>
+                    
+                    <?php the_eab_error_notice(); ?>
+                
+                    <div class="wpmudevevents-header">
+                        <h1><?php the_title(); ?></h1>
                         <?php
                         event_rsvp_form();
                         ?>
                     </div>
                     
+                    <hr />
                     <?php
                     $booking_id = get_booking_id($post->ID, $current_user->ID);
                     
                     if ($booking_id && in_array(get_booking_status($booking_id), array('yes', 'maybe')) &&
                         get_post_meta($post->ID, 'incsub_event_paid', true) && !get_booking_paid($booking_id)) { ?>
-                    <div class="event-notice">
-                        <b><?php _e('You haven\'t paid for this event.', Booking::$_translation_domain); ?></b>
-                        
+		    <div id="wpmudevevents-payment">
+			You haven't paid for this event
                         <?php eab_payment_forms(); ?>
-                        
-                    </div>
+		    </div>
                     <?php } ?>
                     
-                    <div id="event-details">
-                        <?php event_details(); ?>
+                    <div class="wpmudevevents-content">
+			<div id="wpmudevevents-contentheader">
+                            <h3>About this event :</h3>
+                            
+			    <div id="wpmudevevents-user">Created by admin</div>
+			</div>
+                        
+                        <hr />
+			<div class="wpmudevevents-contentmeta">
+			    <div class="wpmudevevents-date">12th January 2011</div>
+			    <div class="wpmudevevents-location">The old barn pub</div>
+			    <div class="wpmudevevents-price">£20.00</div>
+                            <?php event_details(); ?>
+			</div>
+			<div id="wpmudevevents-contentbody">
+			    <?php the_content(); ?>
+                        </div>
+                        <?php comments_template( '', true ); ?>
                     </div>
-                    
-                    <?php the_content(); ?>
-                    
-                    <?php comments_template( '', true ); ?>
                 </div>
             </div>
         </div>
