@@ -3,8 +3,7 @@ global $blog_id, $wp_query, $booking, $post, $current_user;
 get_header( 'event' );
 ?>
 <div id="primary" class="eab-primary-event">
-    <div id="content">
-        <div class="padder">
+    <div id="content" role="main">
             <div id="wpmudevevents-wrapper">
 		<div id="wpmudevents-single">
                 
@@ -13,10 +12,6 @@ get_header( 'event' );
                     
                     $start_day = date_i18n('m', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
                     ?>
-                
-                    <div id="event-bread-crumbs">
-                        <?php event_breadcrumbs(); ?>
-                    </div>
                     
                     <div class="wpmudevevents-header">
                         <h2><?php the_title(); ?></h2>
@@ -56,9 +51,7 @@ get_header( 'event' );
                         <?php comments_template( '', true ); ?>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 </div>
-<?php get_sidebar('event'); ?>
 <?php get_footer('event'); ?>
