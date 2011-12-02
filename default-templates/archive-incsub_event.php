@@ -1,5 +1,5 @@
 <?php
-global $booking;
+global $booking, $wpdb, $wp_query;
 get_header( 'event' );
 ?>
     <div id="primary">
@@ -11,22 +11,25 @@ get_header( 'event' );
                     <p><?php $event_ptype = get_post_type_object( 'incsub_event' ); echo $event_ptype->labels->not_found; ?></p>
                 <?php else: ?>
                     <div class="wpmudevevents-list">
+                    <?php
+                        $end = date('Y-m-d',strtotime('-1 second',strtotime('+1 year',strtotime($wp_query->query_vars['year'].'-01-01'))));
+                        /*$querystr = "SELECT $wpdb->posts.* FROM $wpdb->posts, $wpdb->postmeta WHERE $wpdb->posts.ID = $wpdb->postmeta.post_id 
+                        AND $wpdb->postmeta.meta_key = 'incsub_event_start' 
+                        AND DATE($wpdb->postmeta.meta_value) >= DATE('{$wp_query->query_vars['year']}-01-01')
+                        AND DATE($wpdb->postmeta.meta_value) <= DATE('{$end}')
+                        AND $wpdb->posts.post_status = 'publish' 
+                        AND $wpdb->posts.post_type = 'incsub_event'
+                        AND $wpdb->posts.post_date < NOW()
+                        ORDER BY $wpdb->postmeta.meta_value ASC";
+                        
+                        $pageposts = $wpdb->get_results($querystr, OBJECT);*/
+                        
+                        $args = array_merge($wp_query->query, array('suppress_filters' => false, 'meta_key' => 'incsub_event_start'));
+                        query_posts( $args );
+                        print_r($wp_query);
+                    ?>
                     <?php while ( have_posts() ) : the_post(); ?>
                         <div class="event">
-                            <!-- div class="event-digest">
-                                <?php if (event_booking_count('yes') > 0) { ?>
-                                <div class="event-digest-widget event-status-yes">
-                                    <div class="booking-count"><?php echo event_booking_count('yes'); ?></div>
-                                    <?php _e('attending', Booking::$_translation_domain); ?>
-                                </div>
-                                <?php } ?>
-                                <?php if (event_booking_count('maybe') > 0) { ?>
-                                <div class="event-digest-widget event-status-maybe">
-                                    <div class="booking-count"><?php echo event_booking_count('maybe'); ?></div>
-                                    <?php _e('may be', Booking::$_translation_domain); ?>
-                                </div>
-                                <?php } ?>
-                            </div -->
                             <div class="wpmudevevents-header">
                                 <h3><?php the_event_link(); ?></h3>
                                 <a href="<?php the_permalink(); ?>" class="wpmudevevents-viewevent"><?php _e('View event', Booking::$_translation_domain); ?></a>
