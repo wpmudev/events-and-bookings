@@ -112,23 +112,28 @@ function event_rsvp_form($echo = true) {
     global $post, $wpdb, $current_user;
     
     $content = '';
-    $content .= '<div class="eab_booking_form">';    
+    $content .= '<div class="wpmudevevents-buttons">';
     
     if (accepting_bookings()) {
         if (is_user_logged_in()) {
             $booking_id = get_booking_id($post->ID, $current_user->ID);
             $booking_status = get_booking_status($booking_id);
+	    if ($booking_status) {
+		$default_class="ncurrent";
+	    } else {
+		$default_class="";
+	    }
             $content .= '<form action="" method="post" id="eab_booking_form">';
             $content .= '<input type="hidden" name="event_id" value="'.$post->ID.'" />';
             $content .= '<input type="hidden" name="user_id" value="'.$booking_id.'" />';
-            $content .= '<input class="'.(($booking_id && $booking_status == 'yes')?'current':'').'" type="submit" name="action_yes" value="'.__('I\'m attending', Booking::$_translation_domain).'" />';
-            $content .= '<input class="'.(($booking_id && $booking_status == 'maybe')?'current':'').'" type="submit" name="action_maybe" value="'.__('Maybe', Booking::$_translation_domain).'" />';
-            $content .= '<input class="'.(($booking_id && $booking_status == 'no')?'current':'').'" type="submit" name="action_no" value="'.__('No', Booking::$_translation_domain).'" />';
+            $content .= '<input class="'.(($booking_id && $booking_status == 'no')?'current wpmudevevents-no-submit':'wpmudevevents-no-submit ' . $default_class).'" type="submit" name="action_no" value="'.__('No', Booking::$_translation_domain).'" />';
+            $content .= '<input class="'.(($booking_id && $booking_status == 'maybe')?'current wpmudevevents-maybe-submit':'wpmudevevents-maybe-submit ' . $default_class).'" type="submit" name="action_maybe" value="'.__('Maybe', Booking::$_translation_domain).'" />';
+            $content .= '<input class="'.(($booking_id && $booking_status == 'yes')?'current wpmudevevents-yes-submit':'wpmudevevents-yes-submit ' . $default_class).'" type="submit" name="action_yes" value="'.__('I\'m attending', Booking::$_translation_domain).'" />';
             $content .= '</form>';
         } else {
-	    $content .= '<a href="'.wp_login_url(get_permalink()).'" >'.__('I\'m Attending', Booking::$_translation_domain).'</a>';
-            $content .= '<a href="'.wp_login_url(get_permalink()).'" >'.__('Maybe', Booking::$_translation_domain).'</a>';
-            $content .= '<a href="'.wp_login_url(get_permalink()).'" >'.__('No', Booking::$_translation_domain).'</a>';
+            $content .= '<a class="wpmudevevents-no-submit" href="'.wp_login_url(get_permalink()).'" >'.__('No', Booking::$_translation_domain).'</a>';
+            $content .= '<a class="wpmudevevents-maybe-submit" href="'.wp_login_url(get_permalink()).'" >'.__('Maybe', Booking::$_translation_domain).'</a>';
+	    $content .= '<a class="wpmudevevents-yes-submit" href="'.wp_login_url(get_permalink()).'" >'.__('I\'m Attending', Booking::$_translation_domain).'</a>';
         }
     }
     
@@ -274,9 +279,8 @@ function event_details($echo = true, $archive = false) {
     global $post, $event_variation, $booking;
     
     if (!$archive) {
-        $content .= '<h3>' . __('Event Details', Booking::$_translation_domain) . '</h3>';
+        // $content .= '<h3>' . __('Event Details', Booking::$_translation_domain) . '</h3>';
     }
-    $content .= '<ul>';
     
     $meta = get_post_custom($post->ID);
     $maybe_single = false;
@@ -287,7 +291,7 @@ function event_details($echo = true, $archive = false) {
     }
     
     if ($maybe_single) {
-	$content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ';
+	$content .= '<div class="wpmudevevents-date">';
 	$_dc = 0;
 	foreach ($meta['incsub_event_start'] as $_variation => $_start) {
 	    if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) ==
@@ -302,7 +306,7 @@ function event_details($echo = true, $archive = false) {
 	    $content .= __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$_variation])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$_variation])) . ' <br/>';
 	    $_dc++;
 	}
-	$content .= '</li>';
+	$content .= '</div>';
     } else {
 	if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) ==
 	    date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]]))) {
@@ -310,15 +314,14 @@ function event_details($echo = true, $archive = false) {
 	} else {
 	    $end_date = date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . ' ';
 	}
-	$content .= '<li><b>' . __('Time', Booking::$_translation_domain) . '</b>: ' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . '</li>';
+	$content .= '<div class="wpmudevevents-date">' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . '</div>';
     }
     if (get_post_meta($post->ID, 'incsub_event_venue', true) != '') {
-	$content .= '<li><b>' . __('Location', Booking::$_translation_domain) . '</b>: ' . get_post_meta($post->ID, 'incsub_event_venue', true) . '</li>';
+	$content .= '<div class="wpmudevevents-location">' . get_post_meta($post->ID, 'incsub_event_venue', true) . '</div>';
     }
     if (get_post_meta($post->ID, 'incsub_event_paid', true) == 1 && get_post_meta($post->ID, 'incsub_event_fee', true) != '') {
-	$content .= '<li><b>' . __('Fee', Booking::$_translation_domain) . '</b>: ' . $booking->_options['default']['currency'].' '. number_format(get_post_meta($post->ID, 'incsub_event_fee', true), 2) . '</li>';
+	$content .= '<div class="wpmudevevents-price">' . $booking->_options['default']['currency'].' '. number_format(get_post_meta($post->ID, 'incsub_event_fee', true), 2) . '</div>';
     }
-    $content .= '<li><b>' . __('Created By', Booking::$_translation_domain) . '</b>: <a href="'.get_the_author_link().'" title="'.get_the_author().'">' . get_the_author() . '</a></li>';
     $content .= '</ul>';
     
     if ($echo) {
@@ -355,7 +358,7 @@ function eab_payment_forms($echo = true) {
 }
 
 function event_breadcrumbs($echo = true) {
-    global $wp_query;
+    global $wp_query, $booking;
     
     $content = '';
     

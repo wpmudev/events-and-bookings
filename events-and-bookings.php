@@ -428,12 +428,14 @@ class Booking {
 	
 	if ( empty( $path ) || "$type.php" == $file ) {
 	    // A more specific template was not found, so load the default one
-	    add_filter('the_content', array(&$this, 'single_content'));
-	    if (file_exists(get_stylesheet_directory().'/page.php')) {
-		$path = get_stylesheet_directory().'/page.php';
+	    /*add_filter('the_content', array(&$this, 'single_content'));
+	    if (file_exists(get_stylesheet_directory().'/single.php')) {
+		$path = get_stylesheet_directory().'/single.php';
 	    } else {
-		$path = get_template_directory().'/page.php';
-	    }
+		$path = get_template_directory().'/single.php';
+	    }*/
+	    
+	    $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
 	}
 	return $path;
     }
