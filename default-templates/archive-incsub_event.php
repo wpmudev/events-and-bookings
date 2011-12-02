@@ -26,7 +26,6 @@ get_header( 'event' );
                         
                         $args = array_merge($wp_query->query, array('suppress_filters' => false, 'meta_key' => 'incsub_event_start'));
                         query_posts( $args );
-                        print_r($wp_query);
                     ?>
                     <?php while ( have_posts() ) : the_post(); ?>
                         <div class="event">
