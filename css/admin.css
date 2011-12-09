@@ -18,13 +18,9 @@ ul.eab-guest-list li {
 }
 
 .eab_meta_box {
-    float: left;
-    margin-top: 5px;
 }
 
 .misc-eab-section {
-    float: left;
-    margin-right: 5px;
 }
 
 .eab-section-heading {
@@ -35,8 +31,32 @@ ul.eab-guest-list li {
     float: left;
 }
 
-#eab-add-more {
-    float: right;
+#eab-add-more-button{
+	text-decoration: none;
+	font-size: 12px!important;
+	line-height: 13px;
+	padding: 5px 15px;
+	cursor: pointer;
+	border-width: 1px;
+	border-style: solid;
+	-moz-border-radius: 11px;
+	-khtml-border-radius: 11px;
+	-webkit-border-radius: 11px;
+	border-radius: 11px;
+	font-weight: bold;
+	margin-top: 10px;
+	-moz-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+	-khtml-box-sizing: content-box;
+	box-sizing: content-box;
+	background-color: #f6f6f6;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(246, 246, 246)), to(rgb(240, 239, 239)));
+	background-image: -webkit-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
+	background-image: -moz-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
+	background-image: -o-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
+	background-image: -ms-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
+	background-image: linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
+	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#f6f6f6', EndColorStr='#f0efef');
 }
 
 #eab-add-more-rows {
@@ -68,9 +88,9 @@ li.menu-icon-incsub_event div.wp-menu-image img {
 }
 
 a.eab-info {
-    width: 16px;
-    height: 16px;
-    background: url(../img/information.png) no-repeat;
+    width: 30px;
+	height: 30px;
+	background: url(../img/information.png) 10px 12px no-repeat;
     text-decoration: none;
     display: inline-block;
 }
@@ -115,6 +135,7 @@ div.postbox.closed .eab-expand-metabox {
     color: #21759B;
     text-decoration: underline;
     cursor: pointer;
+	font-size: 12px;
 }
 
 div.eab-metaboxcol-two {
@@ -123,7 +144,7 @@ div.eab-metaboxcol-two {
 }
 
 div.eab-metabox {
-    margin: 5px;
+    margin: 0 0 10px 0;
 }
 
 div.eab-minimetabox {
@@ -131,7 +152,7 @@ div.eab-minimetabox {
 }
 
 div.eab-inside {
-    margin: 7px 5px 5px;
+    margin: 7px 5px 10px 5px;
 }
 
 .eab-dashboard-footer {
@@ -139,19 +160,22 @@ div.eab-inside {
 }
 
 .eab-dev-logo a {
-    background: url("http://premium.wpmudev.org/forums/bb-templates/bb-wpmudev/images/new_logo.png") no-repeat scroll 0 0 transparent;
+    background: url(../img/wpmudev-logo.png) no-repeat scroll 0 0 transparent;
     color: #2C2D2D;
     display: block;
     float: right;
     font-size: 16px;
-    height: 90px;
+    height: 50px;
     margin: 0;
     text-decoration: none;
-    width: 300px;
+    width: 180px;
 }
 
 .eab-inside li {
-    height: 2em;
+    line-height: 30px;
+	border-bottom: 1px solid #DDD;
+	font-weight: bold;
+	text-shadow: -1px -1px 0px white;
 }
 
 a.eab-goto-step {
@@ -175,3 +199,32 @@ input.error {
     background-color: #FFEBE8;
     border-color: #CC0000;
 }
+
+.eab-inside .clear{
+	border-bottom:1px solid #dddddd;
+}
+
+.eab-inside{
+	line-height: 40px;
+}
+
+.eab_meta_column_box{
+	border-bottom: 1px solid #DFDFDF;
+	padding: 10px 0px;
+	margin: 5px 0px;
+	font-weight: bold;
+}
+
+.top{margin: 0 0 5px 0;}
+
+#wpbody-content .metabox-holder{
+	padding-top:0px;
+}
+
+.incsub_event-fee_row{
+	clear:both;
+	margin-top:10px;
+}
+
+.eab-note{background-color: #ffffde;
+border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
