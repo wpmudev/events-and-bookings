@@ -545,10 +545,10 @@ class Booking {
 	
 	$content .= '<div class="eab_meta_box">';
 	$content .= '<input type="hidden" name="incsub_event_where_meta" value="1" />';
-	$content .= '<div class="misc-eab-section" ><label>';
-	$content .= '<div class="eab_meta_column_box top">'.__('Event location', $this->_translation_domain).'</div>';
-	$content .= '<textarea type="text" name="incsub_event_venue" size="20" >'.$venue.'</textarea>';
-	$content .= '</label></div>';
+	$content .= '<div class="misc-eab-section" >';
+	$content .= '<div class="eab_meta_column_box top"><label for="incsub_event_venue">'.__('Event location', $this->_translation_domain).'</label></div>';
+	$content .= '<textarea type="text" name="incsub_event_venue" id="incsub_event_venue" size="20" >'.$venue.'</textarea>';
+	$content .= '</div>';
 	$content .= '</div>';
 	
 	if ($echo) {
@@ -584,15 +584,15 @@ class Booking {
 		
 		$content .= '<div class="eab-section-block">';
 		$content .= '<div class="eab-section-heading">'.sprintf(__('Part %d', $this->_translation_domain), $i+1).'</div>';
-		$content .= '<div class="misc-eab-section eab-start-section"><label>';
-		$content .= __('Start', $this->_translation_domain).':&nbsp;';
-		$content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" /></label> ';
+		$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$i.'">';
+		$content .= __('Start', $this->_translation_domain).':</label>&nbsp;';
+		$content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" /> ';
 		$content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_start_time" value="'.date('H:i', $start).'" size="3" />';
 		$content .= '</div>';
 		
-		$content .= '<div class="misc-eab-section"><label>';
-		$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-		$content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="'.date('Y-m-d', $end).'" size="10" /></label> ';
+		$content .= '<div class="misc-eab-section"><label for="incsub_event_end_'.$i.'">';
+		$content .= __('End', $this->_translation_domain).':</label>&nbsp;&nbsp;';
+		$content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="'.date('Y-m-d', $end).'" size="10" /> ';
 		$content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_end_time" value="'.date('H:i', $end).'" size="3" />';
 		$content .= '</div>';
 		$content .= '</div>';
@@ -601,15 +601,15 @@ class Booking {
 	    $i=0;
 	    $content .= '<div class="eab-section-block">';
 	    $content .= '<div class="eab-section-heading">'.sprintf(__('Part %d', $this->_translation_domain), $i+1).'</div>';
-	    $content .= '<div class="misc-eab-section eab-start-section"><label>';
-	    $content .= __('Start', $this->_translation_domain).':&nbsp;';
-	    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="" size="10" /></label> ';
+	    $content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$i.'">';
+	    $content .= __('Start', $this->_translation_domain).':</label>&nbsp;';
+	    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="" size="10" /> ';
 	    $content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_start_time" value="" size="3" />';
 	    $content .= '</div>';
 	    
-	    $content .= '<div class="misc-eab-section"><label>';
-	    $content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-	    $content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="" size="10" /></label> ';
+	    $content .= '<div class="misc-eab-section"><label for="incsub_event_end_'.$i.'">';
+	    $content .= __('End', $this->_translation_domain).':</label> &nbsp;&nbsp;';
+	    $content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="" size="10" /> ';
 	    $content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_end_time" value="" size="3" />';
 	    $content .= '</div>';
 	    $content .= '</div>';
@@ -621,15 +621,15 @@ class Booking {
 	$content .= '<div id="eab-add-more-bank">';
 	$content .= '<div class="eab-section-block">';
 	$content .= '<div class="eab-section-heading">'.__('Part bank', $this->_translation_domain).'</div>';
-	$content .= '<div class="misc-eab-section eab-start-section"><label>';
-	$content .= __('Start', $this->_translation_domain).':&nbsp;';
-	$content .= '<input type="text" name="incsub_event_start_b[bank]" id="incsub_event_start_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_start_b" value="" size="10" /></label> ';
+	$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_bank" >';
+	$content .= __('Start', $this->_translation_domain).':</label>&nbsp;';
+	$content .= '<input type="text" name="incsub_event_start_b[bank]" id="incsub_event_start_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_start_b" value="" size="10" /> ';
 	$content .= '<input type="text" name="incsub_event_start_time_b[bank]" id="incsub_event_start_time_bank" class="incsub_event incsub_event_time incsub_event_start_time_b" value="" size="3" />';
 	$content .= '</div>';
 	
-	$content .= '<div class="misc-eab-section eab-end-section"><label>';
-	$content .= __('End', $this->_translation_domain).':&nbsp;&nbsp;';
-	$content .= '<input type="text" name="incsub_event_end_b[bank]" id="incsub_event_end_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_end_b" value="" size="10" /></label> ';
+	$content .= '<div class="misc-eab-section eab-end-section"><label for="incsub_event_end_bank">';
+	$content .= __('End', $this->_translation_domain).':</label>&nbsp;&nbsp;';
+	$content .= '<input type="text" name="incsub_event_end_b[bank]" id="incsub_event_end_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_end_b" value="" size="10" /> ';
 	$content .= '<input type="text" name="incsub_event_end_time_b[bank]" id="incsub_event_end_time_bank" class="incsub_event incsub_event_time incsub_event_end_time_b" value="" size="3" />';
 	$content .= '</div></div>';
 	$content .= '</div>';
@@ -656,15 +656,15 @@ class Booking {
 	$content .= '<div class="eab_meta_box">';
 	$content .= '<div class="eab_meta_column_box">'.__('Event status', $this->_translation_domain).'</div>';
 	$content .= '<input type="hidden" name="incsub_event_status_meta" value="1" />';
-	$content .= '<div class="misc-eab-section"><label>';
-	$content .= __('What is the event status? ', $this->_translation_domain).':&nbsp;';
-	$content .= '<select name="incsub_event_status" >';
+	$content .= '<div class="misc-eab-section"><label for="incsub_event_status">';
+	$content .= __('What is the event status? ', $this->_translation_domain).':</label>&nbsp;';
+	$content .= '<select name="incsub_event_status" id="incsub_event_status">';
 	$content .= '	<option value="open" '.(($status == 'open')?'selected="selected"':'').' >'.__('Open', $this->_translation_domain).'</option>';
 	$content .= '	<option value="closed" '.(($status == 'closed')?'selected="selected"':'').' >'.__('Closed', $this->_translation_domain).'</option>';
 	$content .= '	<option value="expired" '.(($status == 'expired')?'selected="selected"':'').' >'.__('Expired', $this->_translation_domain).'</option>';
 	$content .= '	<option value="archived" '.(($status == 'archived')?'selected="selected"':'').' >'.__('Archived', $this->_translation_domain).'</option>';
 	$content .= '</select>';
-	$content .= '</label></div>';
+	$content .= '</div>';
 	$content .= '<div class="clear"></div>';
 	$content .= '</div>';
 	
@@ -683,12 +683,12 @@ class Booking {
 	$content .= '<input type="hidden" name="incsub_event_payments_meta" value="1" />';
 	$content .= '<div class="misc-eab-section">';
 		$content .= '<div class="eab_meta_column_box">'.__('Event type', $this->_translation_domain).'</div>';
-	$content .= '<label>'.__('Is this a paid event? ', $this->_translation_domain).':&nbsp;';
+	$content .= '<label for="incsub_event_paid" >'.__('Is this a paid event? ', $this->_translation_domain).':</label>&nbsp;';
 	$content .= '<select name="incsub_event_paid" id="incsub_event_paid" class="incsub_event_paid" >';
 	$content .= '<option value="1" '.(($meta['incsub_event_paid'][0] == 1)?'selected="selected"':'').'>'.__('Yes', $this->_translation_domain).'</option>';
 	$content .= '<option value="0" '.(($meta['incsub_event_paid'][0] == 0)?'selected="selected"':'').'>'.__('No', $this->_translation_domain).'</option>';
 	$content .= '</select>';
-	$content .= '</label><div class="clear"></div>';
+	$content .= '<div class="clear"></div>';
 	$content .= '<label class="incsub_event-fee_row"">'.__('Fee', $this->_translation_domain).':&nbsp;';
 	$content .= $this->_options['default']['currency'].'&nbsp;<input type="text" name="incsub_event_fee" id="incsub_event_fee" class="incsub_event_fee" value="'.$meta['incsub_event_fee'][0].'" size="6" /> ';
 	$content .= '</label>';
