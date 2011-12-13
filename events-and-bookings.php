@@ -104,6 +104,8 @@ class Booking {
 	
 	add_filter('user_has_cap', array(&$this, 'user_has_cap'), 10, 3);
 	
+	add_filter('login_message', array(&$this, 'login_message'), 10);
+	
 	$this->_options['default'] = get_option('incsub_event_default',
 	    array('currency' => 'USD', 'slug' => 'events', 'accept_payments' => 1, 'paypal_email' => '', 'paypal_sandbox' => 0));
     }
@@ -249,6 +251,23 @@ class Booking {
 		wp_redirect('edit.php?post_type=incsub_event&page=eab_welcome');
 	    }
 	}
+    }
+    
+    function login_message($message) {
+	
+	if (isset($_REQUEST['eab']) && $_REQUEST['eab'] == 'y') {
+	    $message = '<p class="message">'.__("Excellent, few more steps! We need you to login or register to get you marked as coming!", $this->_translation_domain).'</p>';
+	}
+	
+	if (isset($_REQUEST['eab']) && $_REQUEST['eab'] == 'm') {
+	    $message = '<p class="message">'.__("Please login or register to help us let you know any changes about the event and record your response!", $this->_translation_domain).'</p>';
+	}
+	
+	if (isset($_REQUEST['eab']) && $_REQUEST['eab'] == 'n') {
+	    $message = '<p class="message">'.__("That's too bad you won't be able to make it, if you login or register we will be able to record your response", $this->_translation_domain).'</p>';
+	}
+	
+	return $message;
     }
     
     function recount_bookings($event_id) {

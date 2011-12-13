@@ -131,9 +131,9 @@ function event_rsvp_form($echo = true) {
             $content .= '<input class="'.(($booking_id && $booking_status == 'yes')?'current wpmudevevents-yes-submit':'wpmudevevents-yes-submit ' . $default_class).'" type="submit" name="action_yes" value="'.__('I\'m attending', Booking::$_translation_domain).'" />';
             $content .= '</form>';
         } else {
-            $content .= '<a class="wpmudevevents-no-submit" href="'.wp_login_url(get_permalink()).'" >'.__('No', Booking::$_translation_domain).'</a>';
-            $content .= '<a class="wpmudevevents-maybe-submit" href="'.wp_login_url(get_permalink()).'" >'.__('Maybe', Booking::$_translation_domain).'</a>';
-	    $content .= '<a class="wpmudevevents-yes-submit" href="'.wp_login_url(get_permalink()).'" >'.__('I\'m Attending', Booking::$_translation_domain).'</a>';
+            $content .= '<a class="wpmudevevents-no-submit" href="'.wp_login_url(get_permalink()).'&eab=n" >'.__('No', Booking::$_translation_domain).'</a>';
+            $content .= '<a class="wpmudevevents-maybe-submit" href="'.wp_login_url(get_permalink()).'&eab=m" >'.__('Maybe', Booking::$_translation_domain).'</a>';
+	    $content .= '<a class="wpmudevevents-yes-submit" href="'.wp_login_url(get_permalink()).'&eab=y" >'.__('I\'m Attending', Booking::$_translation_domain).'</a>';
         }
     }
     
