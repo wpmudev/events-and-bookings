@@ -2,7 +2,7 @@
 global $booking, $wpdb, $wp_query;
 get_header( 'event' );
 ?>
-    <div id="primary">
+    <div id="primary" class="eab-archive-event">
         <div id="content" role="main">
             <div id="wpmudevevents-wrapper">
                 <h2><?php _e('Events', Booking::$_translation_domain); ?></h2>
@@ -37,7 +37,7 @@ get_header( 'event' );
                                 event_details(true, true);
                             ?>
                             <?php
-                            event_rsvp_form();
+                                event_rsvp_form();
                             ?>
                             <hr />
                         </div>

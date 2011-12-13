@@ -184,6 +184,13 @@ class Booking {
 	    update_option('eab_expiring_scheduled', true);
 	}
 	
+	$event_localized = array(
+	    'view_all_bookings' => __('View all RSVP\'s', $this->_translation_domain),
+	    'back_to_gettting_started' => __('Back to getting started', $this->_translation_domain),
+	);
+	
+	wp_localize_script('eab_admin_js', 'eab_event_localized', $event_localized);
+	
 	if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
 	    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
 	    
@@ -198,7 +205,7 @@ class Booking {
 		// TODO: Add to BP activity stream
 		do_action( 'incsub_event_booking_yes', $event_id, $current_user->ID );
 		$this->recount_bookings($event_id);
-		wp_redirect('?eab_success_msg='.urlencode('Your response recorded'));
+		wp_redirect('?eab_success_msg='.urlencode("Excellent! We've got you marked as coming and we'll see you there!"));
 		exit();
 	    }
 	    if (isset($_POST['action_maybe'])) {
@@ -208,7 +215,7 @@ class Booking {
 		// TODO: Add to BP activity stream
 		do_action( 'incsub_event_booking_maybe', $event_id, $current_user->ID );
 		$this->recount_bookings($event_id);
-		wp_redirect('?eab_success_msg='.urlencode('Your response recorded'));
+		wp_redirect('?eab_success_msg='.urlencode("Thanks for letting us know. Hopefully you'll be able to make it!"));
 		exit();
 	    }
 	    if (isset($_POST['action_no'])) {
@@ -218,7 +225,7 @@ class Booking {
 		// TODO: Remove from BP activity stream
 		do_action( 'incsub_event_booking_no', $event_id, $current_user->ID );
 		$this->recount_bookings($event_id);
-		wp_redirect('?eab_success_msg='.urlencode('Your response recorded'));
+		wp_redirect('?eab_success_msg='.urlencode("That's too bad you won't be able to make it"));
 		exit();
 	    }
 	}
@@ -476,7 +483,7 @@ class Booking {
 	global $post, $current_user;
 	
 	add_meta_box('incsub-event', __('Event Details', $this->_translation_domain), array(&$this, 'event_meta_box'), 'incsub_event', 'side', 'high');
-	add_meta_box('incsub-event-bookings', __('Bookings', $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
+	add_meta_box('incsub-event-bookings', __("Event RSVP's", $this->_translation_domain), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
 	if (isset($_REQUEST['eab_step'])) {
 	    add_meta_box('incsub-event-wizard', __('Are you following the step by step guide?', $this->_translation_domain), array(&$this, 'wizard_meta_box'), 'incsub_event', 'normal', 'low');
 	}
@@ -1079,9 +1086,16 @@ class Booking {
 	
 	if (get_option('eab_setup', false) == false) {
 	    add_submenu_page('edit.php?post_type=incsub_event', __("Get Started", $this->_translation_domain), __("Get started", $this->_translation_domain), 'manage_options', 'eab_welcome', array(&$this,'welcome_render'));
+	    
+	    foreach ($submenu['edit.php?post_type=incsub_event'] as $k=>$item) {
+		if ($item[2] == 'eab_welcome') {
+		    $submenu['edit.php?post_type=incsub_event'][1] = $item;
+		    unset($submenu['edit.php?post_type=incsub_event'][$k]);
+		}
+	    }
 	}
 	add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", $this->_translation_domain), __("Settings", $this->_translation_domain), 'manage_options', 'eab_settings', array(&$this,'settings_render'));
-	
+	ksort($submenu['edit.php?post_type=incsub_event']);
     }
     
     function cron_schedules($schedules) {
@@ -1100,7 +1114,7 @@ class Booking {
 		<div id="eab-actionlist" class="eab-metabox postbox">
 		    <h3 class="eab-hndle"><?php _e('Getting Started Guide', $this->_translation_domain); ?></h3>
 		    <div class="eab-inside">
-				<div class="eab-note">Welcome to the Event plugin getting started guide.  Simply follow these easy steps to get your plugin set up.</div>
+				<div class="eab-note"><?php _e('Welcome to the Event plugin getting started guide. Simply follow these easy steps to get your plugin set up.', $this->_translation_domain); ?></div>
 			<ol>
 			    <li>
 				<?php _e('First up, lets configure your settings.  This is where you set your root slug and payment options.', $this->_translation_domain); ?>
@@ -1112,7 +1126,7 @@ class Booking {
 			    </li>	
 			    <li>
 				<?php _e('Once you have set up an event you can view and edit your events.', $this->_translation_domain); ?>
-				<a href="post-new.php?edit.php?post_type=incsub_event&eab_step=3" class="eab-goto-step button"><?php _e('Edit events', $this->_translation_domain); ?></a>
+				<a href="edit.php?post_type=incsub_event&eab_step=3" class="eab-goto-step button"><?php _e('Edit events', $this->_translation_domain); ?></a>
 			    </li>	
 			</ol>
 		    </div>
@@ -1124,9 +1138,9 @@ class Booking {
 		    <h3 class="eab-hndle"><?php _e('Need help?', $this->_translation_domain); ?></h3>
 		    <div class="eab-inside">
 				<ol>
-					<li><a href="">Event plugin WPMU DEV page.</a></li>
-					<li><a href="">Post a forum question.</a></li>
-					<li><a href="">View the video for this plugin.</a></li>
+				    <li><a href=""><?php _e('Event plugin WPMU DEV page.', $this->_translation_domain); ?></a></li>
+				    <li><a href=""><?php _e('Post a forum question.', $this->_translation_domain); ?></a></li>
+				    <li><a href=""><?php _e('View the video for this plugin.', $this->_translation_domain); ?></a></li>
 				</ol>
 		    </div>
 		</div>
@@ -1177,8 +1191,8 @@ class Booking {
 	    <div id="icon-events-general" class="icon32"><br/></div>
 	    <h2><?php _e('Events Settings', $this->_translation_domain); ?></h2>
 	    <div class="eab-note">
-	<p>In this section you can set all the current available settings.  Click each setting's information icon to find out more information about that setting.</p>
-		</div>
+		<p><?php _e('In this section you can set all the current available settings.  Click each setting\'s information icon to find out more information about that setting', $this->_translation_domain); ?>.</p>
+	    </div>
 	    <form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">
 		<?php wp_nonce_field('incsub_event-update-options'); ?>
 		<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
@@ -1210,7 +1224,7 @@ class Booking {
 			    </label> <a href="#eab-help-paypal-currency" class="eab-info" >&nbsp;</a>
 			    <div class="clear"></div>
 			    <div id="eab-help-paypal-currency" class="eab-help-content">
-				<?php _e('Which currency will you be accepting payment in?', $this->_translation_domain); ?>
+				<?php echo  sprintf(__('Which currency will you be accepting payment in? See <a href="%s" target="_blank">Accepted PayPal Currency Codes</a>', $this->_translation_domain), 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes'); ?>
 			    </div>
 			    
 			    <label for="incsub_event-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?>

@@ -55,11 +55,11 @@ jQuery(function() {
     if (!jQuery('#incsub-event-bookings').hasClass('closed')) {
 	jQuery('#incsub-event-bookings').addClass('closed');
     }
-    jQuery('#incsub-event-bookings .hndle').append('<span class="eab-expand-metabox">View all bookings</span>');
+    jQuery('#incsub-event-bookings .hndle').append('<span class="eab-expand-metabox">'+eab_event_localized["view_all_bookings"]+'</span>');
     if (!jQuery('#incsub-event-wizard').hasClass('closed')) {
 	jQuery('#incsub-event-wizard').addClass('closed');
     }
-    jQuery('#incsub-event-wizard .hndle').append('<a href="edit.php?post_type=incsub_event&page=eab_welcome" class="eab-expand-metabox">Back to getting started</a>');
+    jQuery('#incsub-event-wizard .hndle').append('<a href="edit.php?post_type=incsub_event&page=eab_welcome" class="eab-expand-metabox">'+eab_event_localized["back_to_gettting_started"]+'</a>');
 
     if (jQuery('.eab-section-block').length == 2) {
 	jQuery('.eab-section-heading').hide();

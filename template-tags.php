@@ -197,11 +197,11 @@ function the_eab_error_notice($echo = true) {
 	return;
     $content = '';
     if (isset($_GET['eab_success_msg'])) {
-	$content .= '<div id="eab-success-notice" class="message success">'. __($_GET['eab_success_msg'], Booking::$_translation_domain).'</div>';
+	$content .= '<div id="eab-success-notice" class="message success">'. __(stripslashes($_GET['eab_success_msg']), Booking::$_translation_domain).'</div>';
     }
     
     if (isset($_GET['eab_error_msg'])) {
-	$content .= '<div id="eab-error-notice" class="message error">'.__($_GET['eab_error_msg'], Booking::$_translation_domain).'</div>';
+	$content .= '<div id="eab-error-notice" class="message error">'.__(stripslashes($_GET['eab_error_msg']), Booking::$_translation_domain).'</div>';
     }
     
     if ($echo) {

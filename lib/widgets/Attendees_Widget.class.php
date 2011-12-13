@@ -23,7 +23,7 @@ class Eab_Attendees_Widget extends Eab_Widget {
 	$title = apply_filters('widget_title', empty($instance['title']) ? __('Attendees', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
 	
 	?>
-        <?php if (has_bookings()) {?>
+        <?php if (is_single() && has_bookings()) {?>
 	<?php echo $before_widget; ?>
 	<?php echo $before_title . $title . $after_title; ?>
             <div id="event-bookings">
