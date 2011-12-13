@@ -1143,7 +1143,7 @@ class Booking {
 			<ol>
 			    <li>
 				<?php _e('First up, lets configure your settings.  This is where you set your root slug and payment options.', $this->_translation_domain); ?>
-				<a href="edit.php?post_type=incsub_event&page=eab_settings&eab_step=1" class="eab-goto-step button"><?php _e('Set up your settings', $this->_translation_domain); ?></a>
+				<a href="edit.php?post_type=incsub_event&page=eab_settings&eab_step=1" class="eab-goto-step button" id="eab-goto-step-0" ><?php _e('Set up your settings', $this->_translation_domain); ?></a>
 			    </li>
 			    <li>
 				<?php _e('Next, lets add an event.', $this->_translation_domain); ?>
