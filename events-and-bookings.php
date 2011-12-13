@@ -68,7 +68,7 @@ class Booking {
 	// Actions
 	add_action('init', array(&$this, 'init'), 0);
 	add_action('admin_init', array(&$this, 'admin_init'), 0);
-	// add_action( 'admin_init', array(&$this, 'tutorial') );
+	add_action('admin_init', array(&$this, 'tutorial') );
 	
 	add_action('admin_menu', array(&$this, 'admin_menu'));
 
@@ -241,6 +241,12 @@ class Booking {
 	    update_option('incsub_event_default', $this->_options['default']);
 	    wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
 	    exit();
+	}
+	
+	if (isset($_REQUEST['eab_step'])) {
+	    setcookie('eab_step', $_REQUEST['eab_step'], time()+(3600*24));
+	} else if (isset($_COOKIE['eab_step'])) {
+	    $_REQUEST['eab_step'] = $_COOKIE['eab_step'];
 	}
     }
     
@@ -572,7 +578,7 @@ class Booking {
 	$content .= '<div class="eab_meta_box">';
 	$content .= '<input type="hidden" name="incsub_event_where_meta" value="1" />';
 	$content .= '<div class="misc-eab-section" >';
-	$content .= '<div class="eab_meta_column_box top"><label for="incsub_event_venue">'.__('Event location', $this->_translation_domain).'</label></div>';
+	$content .= '<div class="eab_meta_column_box top"><label for="incsub_event_venue" id="incsub_event_venue_label">'.__('Event location', $this->_translation_domain).'</label></div>';
 	$content .= '<textarea type="text" name="incsub_event_venue" id="incsub_event_venue" size="20" >'.$venue.'</textarea>';
 	$content .= '</div>';
 	$content .= '</div>';
@@ -590,7 +596,7 @@ class Booking {
 	$content = '';
 	
 	$content .= '<div class="eab_meta_box">';
-	$content .= '<div class="eab_meta_column_box">'.__('Event times and dates', $this->_translation_domain).'</div>';
+	$content .= '<div class="eab_meta_column_box" id="incsub_event_times_label">'.__('Event times and dates', $this->_translation_domain).'</div>';
 	
 	$content .= '<input type="hidden" name="incsub_event_when_meta" value="1" />';
 	
@@ -682,7 +688,7 @@ class Booking {
 	$content .= '<div class="eab_meta_box">';
 	$content .= '<div class="eab_meta_column_box">'.__('Event status', $this->_translation_domain).'</div>';
 	$content .= '<input type="hidden" name="incsub_event_status_meta" value="1" />';
-	$content .= '<div class="misc-eab-section"><label for="incsub_event_status">';
+	$content .= '<div class="misc-eab-section"><label for="incsub_event_status" id="incsub_event_status_label">';
 	$content .= __('What is the event status? ', $this->_translation_domain).':</label>&nbsp;';
 	$content .= '<select name="incsub_event_status" id="incsub_event_status">';
 	$content .= '	<option value="open" '.(($status == 'open')?'selected="selected"':'').' >'.__('Open', $this->_translation_domain).'</option>';
@@ -708,14 +714,14 @@ class Booking {
 	$content .= '<div class="eab_meta_box">';
 	$content .= '<input type="hidden" name="incsub_event_payments_meta" value="1" />';
 	$content .= '<div class="misc-eab-section">';
-		$content .= '<div class="eab_meta_column_box">'.__('Event type', $this->_translation_domain).'</div>';
-	$content .= '<label for="incsub_event_paid" >'.__('Is this a paid event? ', $this->_translation_domain).':</label>&nbsp;';
+	$content .= '<div class="eab_meta_column_box">'.__('Event type', $this->_translation_domain).'</div>';
+	$content .= '<label for="incsub_event_paid" id="incsub_event_paid_label">'.__('Is this a paid event? ', $this->_translation_domain).':</label>&nbsp;';
 	$content .= '<select name="incsub_event_paid" id="incsub_event_paid" class="incsub_event_paid" >';
 	$content .= '<option value="1" '.(($meta['incsub_event_paid'][0] == 1)?'selected="selected"':'').'>'.__('Yes', $this->_translation_domain).'</option>';
 	$content .= '<option value="0" '.(($meta['incsub_event_paid'][0] == 0)?'selected="selected"':'').'>'.__('No', $this->_translation_domain).'</option>';
 	$content .= '</select>';
 	$content .= '<div class="clear"></div>';
-	$content .= '<label class="incsub_event-fee_row"">'.__('Fee', $this->_translation_domain).':&nbsp;';
+	$content .= '<label class="incsub_event-fee_row" id="incsub_event-fee_row_label">'.__('Fee', $this->_translation_domain).':&nbsp;';
 	$content .= $this->_options['default']['currency'].'&nbsp;<input type="text" name="incsub_event_fee" id="incsub_event_fee" class="incsub_event_fee" value="'.$meta['incsub_event_fee'][0].'" size="6" /> ';
 	$content .= '</label>';
 	$content .= '</div>';
@@ -1147,6 +1153,10 @@ class Booking {
 				<?php _e('Once you have set up an event you can view and edit your events.', $this->_translation_domain); ?>
 				<a href="edit.php?post_type=incsub_event&eab_step=3" class="eab-goto-step button"><?php _e('Edit events', $this->_translation_domain); ?></a>
 			    </li>	
+			    <li>
+				<?php _e('Once you have set up an event you can let your readers see the list of events.', $this->_translation_domain); ?>
+				<a href="<?php echo site_url($this->_options['default']['slug']); ?>" class="eab-goto-step button"><?php _e('Events Archive', $this->_translation_domain); ?></a>
+			    </li>	
 			</ol>
 		    </div>
 		</div>
@@ -1218,17 +1228,17 @@ class Booking {
 		    <div id="eab-settings-general" class="eab-metabox postbox">
 			<h3 class="eab-hndle"><?php _e('Plugin settings :', $this->_translation_domain); ?></h3>
 			<div class="eab-inside">
-			    <label for="incsub_event-slug"><?php _e('Set the event root slug', $this->translation_domain); ?>
+			    <label for="incsub_event-slug" id="incsub_event_label-slug"><?php _e('Set the event root slug', $this->translation_domain); ?></label>
 				/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_options['default']['slug']; ?>" />
-			    </label> <a href="#eab-help-slug" class="eab-info" >&nbsp;</a>
+			     <a href="#eab-help-slug" class="eab-info" >&nbsp;</a>
 			    <div class="clear"></div>
 			    <div id="eab-help-slug" class="eab-help-content">
 				<?php _e('Change the root slug for events', $this->_translation_domain); ?>
 			    </div>
 			    
-			    <label for="incsub_event-accept_payments"><?php _e('Will you be using payments for your events?', $this->translation_domain); ?>
+			    <label for="incsub_event-accept_payments" id="incsub_event_label-accept_payments"><?php _e('Will you be using payments for your events?', $this->translation_domain); ?></label>
 				<input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_options['default']['accept_payments'] == 1)?'checked="checked"':''; ?> />
-			    </label> <a href="#eab-help-accept-payment" class="eab-info" >&nbsp;</a>
+			     <a href="#eab-help-accept-payment" class="eab-info" >&nbsp;</a>
 			    <div class="clear"></div>
 			    <div id="eab-help-accept-payment" class="eab-help-content">
 				<?php _e('Check this to accept payments for your events', $this->_translation_domain); ?>
@@ -1238,17 +1248,17 @@ class Booking {
 		    <div id="eab-settings-paypal" class="eab-metabox postbox">
 			<h3 class="eab-hndle"><?php _e('Payment settings :', $this->_translation_domain); ?></h3>
 			<div class="eab-inside">
-			    <label for="incsub_event-currency"><?php _e('Currency', $this->translation_domain); ?>
+			    <label for="incsub_event-currency" id="incsub_event_label-currency"><?php _e('Currency', $this->translation_domain); ?></label>
 				<input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_options['default']['currency']; ?>" />
-			    </label> <a href="#eab-help-paypal-currency" class="eab-info" >&nbsp;</a>
+			    <a href="#eab-help-paypal-currency" class="eab-info" >&nbsp;</a>
 			    <div class="clear"></div>
 			    <div id="eab-help-paypal-currency" class="eab-help-content">
 				<?php echo  sprintf(__('Which currency will you be accepting payment in? See <a href="%s" target="_blank">Accepted PayPal Currency Codes</a>', $this->_translation_domain), 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes'); ?>
 			    </div>
 			    
-			    <label for="incsub_event-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?>
+			    <label for="incsub_event-paypal_email" id="incsub_event_label-paypal_email"><?php _e('PayPal E-Mail', $this->translation_domain); ?></label>
 				<input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_options['default']['paypal_email']; ?>" />
-			    </label> <a href="#eab-help-paypal-email" class="eab-info" >&nbsp;</a>
+			     <a href="#eab-help-paypal-email" class="eab-info" >&nbsp;</a>
 			    <div class="clear"></div>
 			    <div id="eab-help-paypal-email" class="eab-help-content">
 				<?php _e('PayPal e-mail address payments should be made to', $this->_translation_domain); ?>
@@ -1259,8 +1269,8 @@ class Booking {
 		
 		<p class="submit">
 		    <input type="submit" class="button-primary" name="submit_settings" value="<?php _e('Save Changes', $this->translation_domain) ?>" />
-		    <?php if (isset($_REQUEST['eab_step'])) { ?>
-		    <a href="edit.php?post_type=incsub_event&page=eab_welcome" class="button"><?php _e('Back', $this->translation_domain) ?></a>
+		    <?php if (isset($_REQUEST['eab_step']) && $_REQUEST['eab_step'] == 1) { ?>
+		    <a href="edit.php?post_type=incsub_event&page=eab_welcome&eab_step=-1" class="button"><?php _e('Back', $this->translation_domain) ?></a>
 		    <?php } ?>
 		</p>
 	    </form>
@@ -1292,13 +1302,66 @@ class Booking {
 	//add the capability a user must have to view the tutorial
 	$tutorial->set_capability = 'manage_options';
 	
-	//optional shortcut to add a custom icon, just pass a url
 	$tutorial->add_icon( plugins_url( 'img/large-greyscale.png' , __FILE__ ) );
 	
-	//start registering steps. Note the 'content' argument is very important, and should be escaped with esc_js() as it will go in JSON
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#wpmudev_widget', __('Add first event', self::$_translation_domain), array(
-	    'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
-	    'position' => array( 'edge' => 'bottom', 'align' => 'left' ),
+	$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'edit.php?post_type=incsub_event&page=eab_settings', '#incsub_event-slug', __('Event Slug', self::$_translation_domain), array(
+	    'content'  => '<p>' . esc_js( __('Change the root slug for events', self::$_translation_domain) ) . '</p>',
+	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
+	));
+	
+	$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'edit.php?post_type=incsub_event&page=eab_settings', '#incsub_event-accept_payments', __('Accept Payments?', self::$_translation_domain), array(
+	    'content'  => '<p>' . esc_js( __('Check this to accept payments for your events', self::$_translation_domain) ) . '</p>',
+	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
+	));
+	
+	$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'edit.php?post_type=incsub_event&page=eab_settings', '#incsub_event-currency', __('Currency', self::$_translation_domain), array(
+	    'content'  => '<p>' . esc_js(__('Which currency will you be accepting payment in? See ', self::$_translation_domain)) . '<a href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes" target="_blank">Accepted PayPal Currency Codes</a></p>',
+	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
+	));
+	
+	$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'edit.php?post_type=incsub_event&page=eab_settings', '#incsub_event-paypal_email', __('PayPal E-Mail', self::$_translation_domain), array(
+	    'content'  => '<p>' . esc_js(__('PayPal e-mail address payments should be made to', self::$_translation_domain)) . '</p>',
+	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#title', __('Event title', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("What's happening?", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'top', 'align' => 'center' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_venue_label', __('Event location', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("Where?", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_times_label', __('Event time and dates', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("When? YYYY-mm-dd HH:mm", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_status_label', __('Event status', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("Is this event still open to RSVP?", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_paid_label', __('Event type', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("Is this a paid event?", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event-fee_row_label', __('Fee', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("How much do you plan to charge?", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#content', __('Event Details', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("More about the event", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ),
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub-event-bookings', __("Event RSVP's", self::$_translation_domain), array(
+	    'content'  => '<p>' . __("See who is attending, who may be attend and who is not", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ),
 	));
 	
 	//start the tutorial

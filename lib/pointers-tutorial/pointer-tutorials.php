@@ -18,6 +18,70 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+----- How to Use ------
+It is best to call this in the admin_init action hook. Here is an example:
+
+	//show the tutorial
+	add_action( 'admin_init', 'tutorial' );
+	
+	function tutorial() {
+		//load the file
+		require_once( dirname(__FILE__) . '/includes/pointer-tutorials.php' );
+		
+		//create our tutorial, with default redirect prefs
+		$tutorial = new Pointer_Tutorial('my_tutorial', true, false);
+		
+		//add our textdomain that matches the current plugin
+		$tutorial->set_textdomain = 'mytextdomain';
+		
+		//add the capability a user must have to view the tutorial
+		$tutorial->set_capability = 'manage_options';
+		
+		//optionally add some custom css. This example give our title a red background and loads up our modified pointer image sprite to the up arrow will be red too
+		$tutorial->add_style('.my_tutorial-pointer .wp-pointer-content h3 {	background-color: #b12c15; }
+													.my_tutorial-pointer .wp-pointer-arrow { background-image: url("'.plugins_url( 'includes/images/arrow-pointer-red.png' , __FILE__ ).'"); }');
+		
+		//optional shortcut to add a custom icon, just pass a url
+		$tutorial->add_icon( plugins_url( 'includes/images/my-logo-white.png' , __FILE__ ) );
+		
+		//start registering steps. Note the 'content' argument is very important, and should be escaped with esc_js() as it will go in JSON
+		$tutorial->add_step(admin_url('index.php'), 'index.php', '#wpmudev_widget', __('Step Number One', 'mytextdomain'), array(
+				'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
+				'position' => array( 'edge' => 'bottom', 'align' => 'left' ),
+			));
+		$tutorial->add_step(admin_url('index.php'), 'index.php', '#toplevel_page_wpmudev', __('Step Number Two', 'mytextdomain'), array(
+				'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
+				'position' => array( 'edge' => 'top', 'align' => 'right' ),
+			));
+		$tutorial->add_step(admin_url('index.php'), 'index.php', '#wdv-release-install', __('Step Number Three', 'mytextdomain'), array(
+				'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
+				'position' => array( 'edge' => 'left', 'align' => 'top' ),
+			));
+		
+		//second page steps
+		$tutorial->add_step(admin_url('admin.php?page=my-plugin'), 'toplevel_page_wpmudev', '.nav-tab-wrapper', __('Step Number Four', 'mytextdomain'), array(
+				'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
+				'position' => array( 'edge' => 'top', 'align' => 'center' ),
+			));
+		$tutorial->add_step(admin_url('admin.php?page=my-plugin'), 'toplevel_page_wpmudev', '.wdv-grid-wrap .themepost:not(.installed):first', __('Step Number Five', 'mytextdomain'), array(
+				'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
+				'position' => array( 'edge' => 'left', 'align' => 'center' ),
+			));
+		$tutorial->add_step(admin_url('admin.php?page=my-plugin'), 'toplevel_page_wpmudev', '.wdv-grid-wrap .themepost:not(.installed):first .themescreens .metainfo a', __('Step Number Six', 'mytextdomain'), array(
+				'content'  => '<p>' . esc_js( __('On each category page, plugins and themes are listed in an easy to read grid format.', 'mytextdomain') ) . '</p>',
+				'position' => array( 'edge' => 'top', 'align' => 'left' ),
+			));
+		
+		//start the tutorial
+		$tutorial->initialize();
+		
+		You may want to later show a link to restart the tutorial, or start at a certain step. You can grab a link for that via start_link($step). 
+		$step = 0; //Note that steps start at 0, then 1,2,3 etc.
+		$link = $tutorial->start_link($step);
+	}
+
+Have fun!
 */
 
 if ( !class_exists( 'Pointer_Tutorial' ) ) {
@@ -27,7 +91,7 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 	*
 	* @author Aaron Edwards (Incsub)
 	* @version 1.0
-	* @requires 3.3
+	* @requires WP 3.3
 	*
 	*	@param string $tutorial_name Required: The name of this tutorial. Used for user settings and css classes.
 	*	@param bool $redirect_first_load Optional: Set to true to redirect and show first step for those who have not completed the tutorial. Default true
@@ -47,7 +111,7 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 		public $force_completion = false;
 		
 		/*
-		 * function add_step
+		 * function __construct
 		 *
 		 *	Create your tutorial using this method. 
 		 * 
@@ -84,7 +148,7 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 			if ( !empty($title) )
 				$args['content'] = '<h3>' . esc_js($title) . '</h3>' . $args['content'];
 			
-			//if urls are incomplete grab them
+			//if urls are incomplete calculate them
 			if ( strpos( $url, '://' ) === false )
 				$url = is_network_admin() ? network_admin_url($url) : admin_url($url);
 			
@@ -134,7 +198,7 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 		 *	@param string $url Url to the icon image file. Should be 32x32 normally
 		 */
 		public function add_icon( $url ) {
-			$this->add_style( '.wpmudev_dashboard-pointer .wp-pointer-content h3:before { background-image: url("' . $url . '"); }' );
+			$this->add_style( '.wp-pointer-content h3:before { background-image: url("' . $url . '") !important; }' );
 		}
 		
 		/*
@@ -217,13 +281,32 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 			// Get current step
 			$current_step = (int) get_user_meta( get_current_user_id(), "current-{$this->tutorial_name}-step", true );
 			
-			$temp_array = array_slice( $this->registered_pointers, $current_step, 1000, true );
-			foreach ($temp_array as $key => $val) {
-				if ( $val['hook'] == $hook_suffix )
-					$this->page_pointers[$key] = $val;
-				else
-					break; //drop out on first pointer on another page
+			//get first step for the current page
+			$first_step = $current_step;
+			$i = $current_step;
+			while ($i >= 0) {
+				if ( $this->registered_pointers[$i]['hook'] != $hook_suffix ) {
+					break; //drop out
+				} else {
+					$first_step = $i;
+				}
+				$i--;
 			}
+			
+			//get last step for the current page
+			$last_step = $current_step;
+			$i = $current_step;
+			while ($i < count($this->registered_pointers)) {
+				if ( $this->registered_pointers[$i]['hook'] != $hook_suffix ) {
+					break; //drop out
+				} else {
+					$last_step = $i;
+				}
+				$i++;
+			}
+			
+			//get the slice of current page pointers
+			$this->page_pointers = array_slice( $this->registered_pointers, $first_step, ($last_step - $first_step) + 1, true );
 
 			//skip if no page pointers for this page
 			if ( !count($this->page_pointers) )
@@ -246,7 +329,9 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 		 */
 		function admin_styles() {
 			if ( !empty( $this->admin_css ) ) {
-				echo '<style type="text/css">';
+				echo '<style type="text/css">
+.wp-pointer-buttons a.prev { float: left; }
+.wp-pointer-buttons a.dismiss {	color: #FFFFFF; font-size: 10px; position: absolute; right: 3px; top: 1px; }';
 				echo $this->admin_css;
 				echo "\n</style>\n";
 			}
@@ -259,8 +344,14 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 		function ajax_dismiss() {
 			if ( !is_numeric($_POST['pointer']) )
 				die( '0' );
-							
-			$pointer = intval($_POST['pointer']) + 1;
+			
+			if ('next' == $_POST['step']) {				
+				$pointer = intval($_POST['pointer']) + 1;
+			} else if ('prev' == $_POST['step']) {
+				$pointer = intval($_POST['pointer']) - 1;
+			} else {
+				$pointer = count($this->registered_pointers);	//dismissing tutorial, so set to last step		
+			}
 		
 			update_user_meta( get_current_user_id(), "current-{$this->tutorial_name}-step", $pointer );
 			die( '1' );
@@ -279,6 +370,8 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 		 * Print the pointer javascript data in the footer.
 		 */
 		function print_footer_list() {
+			// Get current step
+			$current_step = (int) get_user_meta( get_current_user_id(), "current-{$this->tutorial_name}-step", true );
 			?>
 			<script type="text/javascript">
 			//<![CDATA[
@@ -297,15 +390,12 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 					$args['pointerClass'] .= ' ' . $this->tutorial_name . '-pointer';
 				
 				//add our buttons
-				//$args['content'] .= '<div class="wp-pointer-buttons">';
-				//$args['content'] .= '<a class="previous" href="#" style="float:left;">&laquo; Previous</a>';
-				//$args['content'] .= '<a class="next" href="#" style="float:right;">Next &raquo;</a>';
-				//$args['content'] .= '</div>';
 				
 				//get next link thats on a different page
 				$next_link = '';
 				$next_pointer = '';
 				$next_name = __('Next &raquo;', $this->textdomain);
+				$last_step = false;
 				if ( $count >= count($this->page_pointers) && isset($this->registered_pointers[$pointer_id+1]) ) {
 					$next_url = $this->registered_pointers[$pointer_id+1]['url'];
 					$next_link = ", function() { window.location = '$next_url'; }";
@@ -313,34 +403,91 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 				} else if ( isset($this->page_pointers[$pointer_id+1]) ) {
 					$next_pointer = $this->page_pointers[$pointer_id+1]['selector'];
 					$next_pointer_id = $pointer_id + 1;
-					$next_pointer = "$('$next_pointer').pointer( options$next_pointer_id ).pointer('open');";
+					$next_pointer = "$('$next_pointer').pointer( options$next_pointer_id ).pointer('open').focus();";
 					$next_title = $this->page_pointers[$pointer_id+1]['title'];
 				} else {
 					$next_name = __('Dismiss', $this->textdomain);
 					$next_title = __('Dismiss this tutorial', $this->textdomain);
+					$last_step = true;
 				}
 				
+				$prev_link = '';
+				$prev_pointer = '';
+				$prev_name = __('&laquo; Previous', $this->textdomain);
+				if ( $count == 1 && isset($this->registered_pointers[$pointer_id-1]) ) { //if first step for the page and theres a previous page
+					$prev_url = $this->registered_pointers[$pointer_id-1]['url'];
+					$prev_link = ", function() { window.location = '$prev_url'; }";
+					$prev_title = $this->registered_pointers[$pointer_id-1]['title'];
+				} else if ( isset($this->page_pointers[$pointer_id-1]) ) {
+					$prev_pointer = $this->page_pointers[$pointer_id-1]['selector'];
+					$prev_pointer_id = $pointer_id - 1;
+					$prev_pointer = "$('$prev_pointer').pointer( options$prev_pointer_id ).pointer('open').focus();";
+					$prev_title = $this->page_pointers[$pointer_id-1]['title'];
+				}
+				
+				$close_name = __('Dismiss', $this->textdomain);
+				$close_title = __('Dismiss this tutorial', $this->textdomain);
 				?>
+				//step <?php echo $pointer_id; ?> pointer<?php if ($pointer_id == $current_step) { ?> (Current)<?php } ?>				
 				var options<?php echo $pointer_id; ?> = <?php echo json_encode( $args ); ?>;
 	
 				options<?php echo $pointer_id; ?> = $.extend( options<?php echo $pointer_id; ?>, {
-					close: function() {
+					next: function() {
 						$.post( ajaxurl, {
 							pointer: '<?php echo $pointer_id; ?>',
+							step: 'next',
 							action: 'dismiss-<?php echo $this->tutorial_name; ?>-pointer'
 						}<?php echo $next_link; ?>);
 						<?php echo $next_pointer; ?>
 					},
+					prev: function() {
+						$.post( ajaxurl, {
+							pointer: '<?php echo $pointer_id; ?>',
+							step: 'prev',
+							action: 'dismiss-<?php echo $this->tutorial_name; ?>-pointer'
+						}<?php echo $prev_link; ?>);
+						<?php echo $prev_pointer; ?>
+					},
+					close: function() {
+						$.post( ajaxurl, {
+							pointer: '<?php echo $pointer_id; ?>',
+							step: 'close',
+							action: 'dismiss-<?php echo $this->tutorial_name; ?>-pointer'
+						});
+					},
 					buttons: function( event, t ) {
-						var button = $('<a class="next button" href="#" title="<?php echo esc_attr($next_title); ?>"><?php echo $next_name; ?></a>');
-						return button.bind( 'click.pointer', function() {
-							t.element.pointer('close');
+						var $buttons = $(
+							'<div>' +
+							<?php if ($pointer_id > 0) { ?>
+							'<a class="prev button" href="#" title="<?php echo esc_attr($prev_title); ?>"><?php echo $prev_name; ?></a> ' +
+							<?php } ?>
+							<?php if (!$last_step) { ?>
+							'<a class="dismiss" href="#" title="<?php echo esc_attr($close_title); ?>"><?php echo $close_name; ?></a> ' +
+							<?php } ?>
+							'<a class="next button" href="#" title="<?php echo esc_attr($next_title); ?>"><?php echo $next_name; ?></a>' +
+							'</div>'
+						);
+						$buttons.find('.next').bind( 'click.pointer', function() {
+							t.element.pointer('destroy');
+							options<?php echo $pointer_id; ?>.next();
 							return false;
 						});
+						$buttons.find('.dismiss').bind( 'click.pointer', function() {
+							t.element.pointer('destroy');
+							options<?php echo $pointer_id; ?>.close();
+							return false;
+						});
+						<?php if ($pointer_id > 0) { ?>
+						$buttons.find('.prev').bind( 'click.pointer', function() {
+							t.element.pointer('destroy');
+							options<?php echo $pointer_id; ?>.prev();
+							return false;
+						});
+						<?php } ?>
+						return $buttons;
 					}
 				});
-				
-				<?php if ($count == 1) { ?>
+				<?php if ($pointer_id == $current_step) { ?>
 				$('<?php echo $selector; ?>').pointer( options<?php echo $pointer_id; ?> ).pointer('open');
 				<?php
 				}
