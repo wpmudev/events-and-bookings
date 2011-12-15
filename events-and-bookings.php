@@ -1056,7 +1056,6 @@ class Booking {
 		$capable = false;
 		switch ($cap) {
 		    case 'read_events':
-			print 1;
 			$capable = true;
 			break;
 		    default:
