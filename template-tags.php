@@ -282,6 +282,8 @@ function event_details($echo = true, $archive = false) {
         // $content .= '<h3>' . __('Event Details', Booking::$_translation_domain) . '</h3>';
     }
     
+    $content = '';
+    
     $meta = get_post_custom($post->ID);
     $maybe_single = false;
     
