@@ -500,16 +500,32 @@ class Booking {
 	
 	if ( empty( $path ) || "$type.php" == $file ) {
 	    // A more specific template was not found, so load the default one
-	    //add_filter('the_content', array(&$this, 'archive_content'));
-	    /*if (file_exists(get_stylesheet_directory().'/archive.php')) {
+	    add_filter('the_content', array(&$this, 'archive_content'));
+	    if (file_exists(get_stylesheet_directory().'/archive.php')) {
 		$path = get_stylesheet_directory().'/archive.php';
 	    } else {
 		$path = get_template_directory().'/archive.php';
-	    }*/
+	    }
 	    
-	    $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
+	    // $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
 	}
 	return $path;
+    }
+    
+    function archive_content($content) {
+	global $post, $current_user;
+	
+	$start_day = date_i18n('m', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
+        
+	$new_content  = '';
+	
+	$new_content .= '<div class="event">';
+	$new_content .= '<hr />';
+	$new_content .= event_details(false, true);
+        $new_content .= event_rsvp_form(false);
+	$new_content .= '</div>';
+	
+	return $new_content;
     }
     
     function handle_single_template( $path ) {
@@ -525,10 +541,10 @@ class Booking {
 	if ( empty( $path ) || "$type.php" == $file ) {
 	    // A more specific template was not found, so load the default one
 	    add_filter('the_content', array(&$this, 'single_content'));
-	    if (file_exists(get_stylesheet_directory().'/single.php')) {
-		$path = get_stylesheet_directory().'/single.php';
+	    if (file_exists(get_stylesheet_directory().'/archive.php')) {
+		$path = get_stylesheet_directory().'/archive.php';
 	    } else {
-		$path = get_template_directory().'/single.php';
+		$path = get_template_directory().'/archive.php';
 	    }
 	    
 	    // $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
