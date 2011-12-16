@@ -1,9 +1,7 @@
 <?php
 global $blog_id, $wp_query, $booking, $post, $current_user;
-get_header( 'event' );
+get_header( );
 ?>
-<div id="primary" class="eab-primary-event">
-    <div id="content" role="main">
             <div id="wpmudevevents-wrapper">
 		<div id="wpmudevents-single">
                 
@@ -52,6 +50,4 @@ get_header( 'event' );
                     </div>
                 </div>
         </div>
-    </div>
-</div>
 <?php get_footer('event'); ?>

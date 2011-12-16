@@ -2,8 +2,6 @@
 global $booking, $wpdb, $wp_query;
 get_header( 'event' );
 ?>
-    <div id="primary" class="eab-archive-event">
-        <div id="content" role="main">
             <div id="wpmudevevents-wrapper">
                 <h2><?php _e('Events', Booking::$_translation_domain); ?></h2>
                 <hr/>
@@ -46,7 +44,5 @@ get_header( 'event' );
                     <?php the_event_pagination(); ?>
                 <?php endif; ?>
             </div>
-        </div>
-    </div>
 <?php get_sidebar( 'event' ); ?>
 <?php get_footer( 'event' ); ?>
