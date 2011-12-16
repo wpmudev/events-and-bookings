@@ -36,7 +36,7 @@ get_header( );
 			<div id="wpmudevevents-contentheader">
                             <h3><?php _e('About this event:', Booking::$_translation_domain); ?></h3>
                             
-			    <div id="wpmudevevents-user">Created by <a href="<?php the_author_link(); ?>" title="<?php the_author(); ?>"><?php the_author(); ?></a></div>
+			    <div id="wpmudevevents-user"><?php _e('Created by ', Booking::$_translation_domain); ?><a href="<?php the_author_link(); ?>" title="<?php the_author(); ?>"><?php the_author(); ?></a></div>
 			</div>
                         
                         <hr />

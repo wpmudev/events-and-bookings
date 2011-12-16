@@ -59,7 +59,7 @@ class Booking {
      * Plugin register actions, filters and hooks. 
      */
     function Booking() {
-	global $wpdb;
+	global $wpdb, $wp_version;
 	
 	// Activation deactivation hooks
 	register_activation_hook(__FILE__, array(&$this, 'install'));
@@ -68,8 +68,9 @@ class Booking {
 	// Actions
 	add_action('init', array(&$this, 'init'), 0);
 	add_action('admin_init', array(&$this, 'admin_init'), 0);
-	add_action('admin_init', array(&$this, 'tutorial') );
-	
+	if (version_compare($wp_version, "3.3") >= 0) {
+	    // add_action('admin_init', array(&$this, 'tutorial') );
+	}
 	add_action('admin_menu', array(&$this, 'admin_menu'));
 
 	add_action('option_rewrite_rules', array(&$this, 'check_rewrite_rules'));
@@ -77,7 +78,7 @@ class Booking {
 	add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
 	add_action('wp_enqueue_scripts', array(&$this, 'wp_enqueue_scripts'));
 	
-	add_action( 'manage_incsub_event_posts_custom_column', array(&$this, 'manage_posts_custom_column') );
+	add_action('manage_incsub_event_posts_custom_column', array(&$this, 'manage_posts_custom_column') );
 	
 	add_action('add_meta_boxes_incsub_event', array(&$this, 'meta_boxes') );
 	add_action('wp_insert_post', array(&$this, 'save_event_meta'), 10, 2 );
@@ -181,6 +182,12 @@ class Booking {
 	
 	wp_register_style('eab_front', plugins_url('events-and-bookings/css/front.css'), null, $this->_current_version);
 	
+	if (defined('AGM_PLUGIN_URL')) {
+	    add_action('admin_print_scripts-post.php', array($this, 'js_editor_button'));
+	    add_action('admin_print_scripts-post-new.php', array($this, 'js_editor_button'));
+	    add_action('admin_print_scripts-widgets.php', array($this, 'js_widget_editor'));
+	}
+	
 	if (get_option('eab_expiring_scheduled', false) == false) {
 	    wp_schedule_event(time()+10, 'thirtyminutes', 'eab_expire_events');
 	    update_option('eab_expiring_scheduled', true);
@@ -257,6 +264,28 @@ class Booking {
 		wp_redirect('edit.php?post_type=incsub_event&page=eab_welcome');
 	    }
 	}
+    }
+    
+    function js_editor_button() {
+	wp_enqueue_script('thickbox');
+        wp_enqueue_script('eab_editor',  plugins_url('events-and-bookings/js/editor.js'), array('jquery'));
+        wp_localize_script('eab_editor', 'eab_l10nEditor', array(
+            'loading' => __('Loading maps... please wait', 'agm_google_maps'),
+            'use_this_map' => __('Insert this map', 'agm_google_maps'),
+            'preview_or_edit' => __('Preview/Edit', 'agm_google_maps'),
+            'delete_map' => __('Delete', 'agm_google_maps'),
+            'add_map' => __('Add Map', 'agm_google_maps'),
+            'existing_map' => __('Existing map', 'agm_google_maps'),
+            'no_existing_maps' => __('No existing maps', 'agm_google_maps'),
+            'new_map' => __('Create new map', 'agm_google_maps'),
+            'advanced' => __('Advanced mode', 'agm_google_maps'),
+            'advanced_mode_activate_help' => __('Activate Advanced mode to select individual maps to merge into one new map or to batch delete maps', 'agm_google_maps'),
+	    'advanced_mode_help' => __('To create a new map from several maps select the maps you want to use and click Merge locations', 'agm_google_maps'),
+            'advanced_off' => __('Exit advanced mode', 'agm_google_maps'),
+	    'merge_locations' => __('Merge locations', 'agm_google_maps'),
+	    'batch_delete' => __('Batch delete', 'agm_google_maps'),
+            'new_map_intro' => __('Create a new map which can be inserted into this post or page. Once you are done you can manage all maps below', 'agm_google_maps'),
+        ));
     }
     
     function login_message($message) {
@@ -417,6 +446,17 @@ class Booking {
 	    $venue = '';
 	    if (isset($meta["incsub_event_venue"]) && isset($meta["incsub_event_venue"][0])) {
 		$venue = stripslashes($meta["incsub_event_venue"][0]);
+		if (preg_match_all('/map id="([0-9]+)"/', $venue, $matches) > 0) {
+		    if (isset($matches[1]) && isset($matches[1][0])) {
+			$model = new AgmMapModel();
+			$map = $model->get_map($matches[1][0]);
+			$venue = $map['markers'][0]['title'];
+			if ($meta["agm_map_created"][0] != $map['id']) {
+			    update_post_meta($post->ID, 'agm_map_created', $map['id']);
+			    return false;
+			}
+		    }
+		}
 	    }
 	    
 	    return $venue;
@@ -460,14 +500,14 @@ class Booking {
 	
 	if ( empty( $path ) || "$type.php" == $file ) {
 	    // A more specific template was not found, so load the default one
-	    /*add_filter('the_content', array(&$this, 'single_content'));
+	    add_filter('the_content', array(&$this, 'single_content'));
 	    if (file_exists(get_stylesheet_directory().'/single.php')) {
 		$path = get_stylesheet_directory().'/single.php';
 	    } else {
 		$path = get_template_directory().'/single.php';
-	    }*/
+	    }
 	    
-	    $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
+	    // $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
 	}
 	return $path;
     }
@@ -478,28 +518,41 @@ class Booking {
 	$start_day = date_i18n('m', strtotime(get_post_meta($post->ID, 'incsub_event_start', true)));
         
 	$new_content  = '';
-	$new_content .= '<div class="eab-needtomove"><div id="event-bread-crumbs" >'.event_breadcrumbs(false).'</div></div>';
-        
-        $new_content .= '<div id="event-rsvp">'.the_eab_error_notice(false);
-        if (!has_bookings()) {
-	    $new_content .= '<div id="event-first-booking">'.__("Be the first to RSVP", Booking::$_translation_domain).'</div>';
-        }
-	$new_content .= event_rsvp_form(false);
-        
-        $new_content .= '</div>';
-        
+	$new_content .= '<div id="wpmudevevents-wrapper"><div id="wpmudevents-single">';
+	
+	$new_content .= the_eab_error_notice(false);
+	
         $booking_id = get_booking_id($post->ID, $current_user->ID);
-        
+	
 	if ($booking_id && in_array(get_booking_status($booking_id), array('yes', 'maybe')) &&
             get_post_meta($post->ID, 'incsub_event_paid', true) && !get_booking_paid($booking_id)) {
-            $new_content .= '<div class="event-notice">';
-            $new_content .= '<b>'.__('You haven\'t paid for this event.', Booking::$_translation_domain).'</b>';
+	    $new_content .= '<div id="wpmudevevents-payment">';
+	    $new_content .= __('You haven\'t paid for this event', Booking::$_translation_domain).' ';
             $new_content .= eab_payment_forms(false);
-            $new_content .= '</div>';
+	    $new_content .= '</div>';
         }
 	
-	$new_content .= '<div id="event-details">'.event_details(false).'</div>';
-        $new_content .= $content;
+	$new_content .= '<div class="eab-needtomove"><div id="event-bread-crumbs" >'.event_breadcrumbs(false).'</div></div>';
+	
+        $new_content .= '<div id="wpmudevevents-header">';
+	$new_content .= event_rsvp_form(false);
+        $new_content .= '</div>';
+	
+	$new_content .= '<hr/>';
+	
+	$new_content .= '<div class="wpmudevevents-content">';
+	
+	$new_content .= '<div id="wpmudevevents-contentheader">';
+	$new_content .= '<h3>'.__('About this event:', Booking::$_translation_domain).'</h3>';
+        $new_content .= '<div id="wpmudevevents-user">'. __('Created by', Booking::$_translation_domain) .'<a href="'.get_the_author_link().'" title="'.get_the_author().'">'. get_the_author().'</a></div>';
+	$new_content .= '</div>';
+	
+	$new_content .= '<hr/>';
+	
+	$new_content .= '<div id="wpmudevevents-contentmeta">'.event_details(false).'<div style="clear: both;"></div></div>';
+        $new_content .= '<div id="wpmudevevents-contentbody">'.$content.'</div>';
+	$new_content .= '</div>';
+	$new_content .= '</div></div>';
 	
 	return $new_content;
     }
@@ -578,7 +631,7 @@ class Booking {
 	$content .= '<div class="eab_meta_box">';
 	$content .= '<input type="hidden" name="incsub_event_where_meta" value="1" />';
 	$content .= '<div class="misc-eab-section" >';
-	$content .= '<div class="eab_meta_column_box top"><label for="incsub_event_venue" id="incsub_event_venue_label">'.__('Event location', self::$_translation_domain).'</label></div>';
+	$content .= '<div class="eab_meta_column_box top"><label for="incsub_event_venue" id="incsub_event_venue_label">'.__('Event location', self::$_translation_domain).'</label> <span id="eab_insert_map"></span></div>';
 	$content .= '<textarea type="text" name="incsub_event_venue" id="incsub_event_venue" size="20" >'.$venue.'</textarea>';
 	$content .= '</div>';
 	$content .= '</div>';
@@ -1301,7 +1354,7 @@ class Booking {
 	//add the capability a user must have to view the tutorial
 	$tutorial->set_capability = 'manage_options';
 	
-	$tutorial->add_icon( plugins_url( 'img/large-greyscale.png' , __FILE__ ) );
+	$tutorial->add_icon( plugins_url( 'events-and-bookings/img/large-greyscale.png' , __FILE__ ) );
 	
 	$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-slug', __('Event Slug', self::$_translation_domain), array(
 	    'content'  => '<p>' . esc_js( __('Change the root slug for events', self::$_translation_domain) ) . '</p>',
@@ -1323,42 +1376,42 @@ class Booking {
 	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#title', __('Event title', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#title', __('Event title', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("What's happening?", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'top', 'align' => 'center' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#incsub_event_venue_label', __('Event location', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_venue_label', __('Event location', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("Where?", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#incsub_event_times_label', __('Event time and dates', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_times_label', __('Event time and dates', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("When? YYYY-mm-dd HH:mm", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#incsub_event_status_label', __('Event status', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_status_label', __('Event status', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("Is this event still open to RSVP?", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#incsub_event_paid_label', __('Event type', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_paid_label', __('Event type', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("Is this a paid event?", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#incsub_event-fee_row_label', __('Fee', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event-fee_row_label', __('Fee', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("How much do you plan to charge?", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#content', __('Event Details', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#content', __('Event Details', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("More about the event", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'incsub_event', '#incsub-event-bookings', __("Event RSVPs", self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub-event-bookings', __("Event RSVPs", self::$_translation_domain), array(
 	    'content'  => '<p>' . __("See who is attending, who may be attend and who is not", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ),
 	));

@@ -318,8 +318,8 @@ function event_details($echo = true, $archive = false) {
 	}
 	$content .= '<div class="wpmudevevents-date">' . __('On', Booking::$_translation_domain) . ' ' . date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('from', Booking::$_translation_domain) . ' ' . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_start'][$event_variation[$post->ID]])) . ' ' . __('to', Booking::$_translation_domain) . ' ' . $end_date . date_i18n(get_option('time_format'), strtotime($meta['incsub_event_end'][$event_variation[$post->ID]])) . '</div>';
     }
-    if (get_post_meta($post->ID, 'incsub_event_venue', true) != '') {
-	$content .= '<div class="wpmudevevents-location">' . get_post_meta($post->ID, 'incsub_event_venue', true) . '</div>';
+    if (get_eab_event_venue($post->ID) != '') {
+	$content .= '<div class="wpmudevevents-location">' . get_eab_event_venue($post->ID) . '</div>';
     }
     if (get_post_meta($post->ID, 'incsub_event_paid', true) == 1 && get_post_meta($post->ID, 'incsub_event_fee', true) != '') {
 	$content .= '<div class="wpmudevevents-price">' . $booking->_options['default']['currency'].' '. number_format(get_post_meta($post->ID, 'incsub_event_fee', true), 2) . '</div>';
@@ -331,6 +331,22 @@ function event_details($echo = true, $archive = false) {
     }
     
     return $content;
+}
+
+function get_eab_event_venue($post_id) {
+    $venue = get_post_meta($post_id, 'incsub_event_venue', true);
+    
+    if ($venue) {
+	if (preg_match_all('/map id="([0-9]+)"/', $venue, $matches) > 0) {
+	    if (isset($matches[1]) && isset($matches[1][0]) && class_exists('AgmMapModel')) {
+		$model = new AgmMapModel();
+		$map = $model->get_map($matches[1][0]);
+		$venue = $map['markers'][0]['title'];
+	    }
+	}
+	return $venue;
+    }
+    return $venue;
 }
 
 function eab_payment_forms($echo = true) {
