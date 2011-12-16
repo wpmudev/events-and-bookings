@@ -89,7 +89,7 @@ class Booking {
 	add_action('wp_ajax_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
 	
 	add_filter('single_template', array( &$this, 'handle_single_template' ) );
-	add_filter('archive_template', array( &$this, 'handle_template' ) );
+	add_filter('archive_template', array( &$this, 'handle_archive_template' ) );
 	add_filter('template_include', array( &$this, 'handle_template' ) );
 	
 	add_filter('rewrite_rules_array', array(&$this, 'add_rewrite_rules'));
@@ -483,6 +483,30 @@ class Booking {
 	
 	if ( empty( $path ) || "$type.php" == $file ) {
 	    // A more specific template was not found, so load the default one
+	    $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
+	}
+	return $path;
+    }
+    
+    function handle_archive_template( $path ) {
+	global $wp_query, $post;
+	
+	if ( 'incsub_event' != $post->post_type )
+	    return $path;
+	
+	$type = reset( explode( '_', current_filter() ) );
+	
+	$file = basename( $path );
+	
+	if ( empty( $path ) || "$type.php" == $file ) {
+	    // A more specific template was not found, so load the default one
+	    //add_filter('the_content', array(&$this, 'archive_content'));
+	    /*if (file_exists(get_stylesheet_directory().'/archive.php')) {
+		$path = get_stylesheet_directory().'/archive.php';
+	    } else {
+		$path = get_template_directory().'/archive.php';
+	    }*/
+	    
 	    $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
 	}
 	return $path;
