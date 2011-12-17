@@ -69,7 +69,7 @@ class Booking {
 	add_action('init', array(&$this, 'init'), 0);
 	add_action('admin_init', array(&$this, 'admin_init'), 0);
 	if (version_compare($wp_version, "3.3") >= 0) {
-	    // add_action('admin_init', array(&$this, 'tutorial') );
+	    add_action('admin_init', array(&$this, 'tutorial') );
 	}
 	add_action('admin_menu', array(&$this, 'admin_menu'));
 
@@ -1444,50 +1444,57 @@ class Booking {
 	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#title', __('Event title', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#title', __('Event title', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("What's happening?", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'top', 'align' => 'center' ),
+	    'position' => array( 'edge' => 'top', 'align' => 'center' ), 'post_type' => 'incsub_event',
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_venue_label', __('Event location', self::$_translation_domain), array(
-	    'content'  => '<p>' . __("Where?", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
-	));
+	if (defined('AGM_PLUGIN_URL')) {
+	    $tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_venue_label', __('Event location', self::$_translation_domain), array(
+		'content'  => '<p>' . __("Where? Enter the address or insert a map by clicking the globe icon", self::$_translation_domain) . '</p>',
+		'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
+	    ));
+	} else {
+	    $tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_venue_label', __('Event location', self::$_translation_domain), array(
+		'content'  => '<p>' . __("Where? Enter the address", self::$_translation_domain) . '</p>',
+		'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
+	    ));
+	}
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_times_label', __('Event time and dates', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_times_label', __('Event time and dates', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("When? YYYY-mm-dd HH:mm", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_status_label', __('Event status', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_status_label', __('Event status', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("Is this event still open to RSVP?", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event_paid_label', __('Event type', self::$_translation_domain), array(
-	    'content'  => '<p>' . __("Is this a paid event?", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_paid_label', __('Event type', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("Is this a paid event? Select 'Yes' and enter how much do you plan to charge in the text box that will appear", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub_event-fee_row_label', __('Fee', self::$_translation_domain), array(
-	    'content'  => '<p>' . __("How much do you plan to charge?", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'right', 'align' => 'left' ),
-	));
-	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#content', __('Event Details', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#content_parent', __('Event Details', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("More about the event", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ),
+	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ), 'post_type' => 'incsub_event',
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php?post_type=incsub_event', '#incsub-event-bookings', __("Event RSVPs", self::$_translation_domain), array(
-	    'content'  => '<p>' . __("See who is attending, who may be attend and who is not", self::$_translation_domain) . '</p>',
-	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ),
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub-event-bookings', __("Event RSVPs", self::$_translation_domain), array(
+	    'content'  => '<p>' . __("See who is attending, who may be attend and who is not after you publish the event", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ), 'post_type' => 'incsub_event',
+	));
+	
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#publish', __('Publish', self::$_translation_domain), array(
+	    'content'  => '<p>' . __("Now it's time to publish the event", self::$_translation_domain) . '</p>',
+	    'position' => array( 'edge' => 'right', 'align' => 'center' ), 'post_type' => 'incsub_event',
 	));
 	
 	//start the tutorial
 	$tutorial->initialize();
 	
-	//$tutorial->restart(0);
+	// $tutorial->restart(6);
     }
 }
 
