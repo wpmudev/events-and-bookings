@@ -146,6 +146,50 @@ function event_rsvp_form($echo = true) {
     return $content;
 }
 
+function event_display_rsvps_inline($echo =  true) {
+    global $booking, $post;
+    
+    $content = '';
+    if (has_bookings() && $booking->_options['default']['display_attendees'] == 1) {
+	$content .= '<div id="wpmudevevents-rsvps">';
+        $content .= '<a href="'.admin_url('admin-ajax.php?action=eab_list_rsvps&pid='.$post->ID).'" id="wpmudevevents-load-rsvps" class="hide-if-no-js wpmudevevents-viewrsvps wpmudevevents-loadrsvps">'.__('See who has RSVPed', Booking::$_translation_domain).'</a>';
+        $content .= '<a href="#" id="wpmudevevents-hide-rsvps" class="hide-if-no-js wpmudevevents-viewrsvps wpmudevevents-hidersvps">'.__('Hide who has RSVPed', Booking::$_translation_domain).'</a>';
+        $content .= '<div id="wpmudevevents-rsvps-response"></div>';
+	$content .= '</div>';
+    }
+
+    if ($echo) {
+        echo $content;
+    }
+    
+    return $content;
+}
+
+function event_rsvps($echo = true) {
+    global $post, $wpdb, $current_user, $booking;
+    
+    $content = '';
+    if ($booking->_options['default']['display_attendees'] == 1) {
+	$content .= '<div class="wpmudevevents-attendees">';
+	$content .= '<div id="event-bookings">';
+        $content .= '<div id="event-booking-yes">';
+        $content .= event_bookings('yes', false);
+        $content .= '</div>';
+        $content .= '<div class="clear"></div>';
+        $content .= '<div id="event-booking-maybe">';
+        $content .= event_bookings('maybe', false);
+        $content .= '</div>';
+        $content .= '</div>';
+	$content .= '</div>';
+    }
+    
+    if ($echo) {
+        echo $content;
+    }
+    
+    return $content;
+}
+
 function get_booking_id($event_id, $user_id) {
     global $wpdb;
     

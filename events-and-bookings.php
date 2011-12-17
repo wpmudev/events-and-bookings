@@ -86,7 +86,9 @@ class Booking {
 	add_action('admin_print_styles', array(&$this, 'admin_print_styles') );
 	add_action('widgets_init', array(&$this, 'widgets_init'));
 	
-	add_action('wp_ajax_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
+	add_action('wp_ajax_nopriv_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
+	add_action('wp_ajax_nopriv_eab_list_rsvps', array(&$this, 'process_list_rsvps'));
+	add_action('wp_ajax_eab_list_rsvps', array(&$this, 'process_list_rsvps'));
 	
 	add_filter('single_template', array( &$this, 'handle_single_template' ) );
 	add_filter('archive_template', array( &$this, 'handle_archive_template' ) );
@@ -108,7 +110,7 @@ class Booking {
 	add_filter('login_message', array(&$this, 'login_message'), 10);
 	
 	$this->_options['default'] = get_option('incsub_event_default',
-	    array('currency' => 'USD', 'slug' => 'events', 'accept_payments' => 1, 'paypal_email' => '', 'paypal_sandbox' => 0));
+	    array('currency' => 'USD', 'slug' => 'events', 'accept_payments' => 1, 'display_attendees' => 1, 'paypal_email' => '', 'paypal_sandbox' => 0));
     }
     
     /**
@@ -243,6 +245,7 @@ class Booking {
 	if (isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'incsub_event-update-options')) {
 	    $this->_options['default']['slug'] = $_POST['event_default']['slug'];
 	    $this->_options['default']['accept_payments'] = $_POST['event_default']['accept_payments'];
+	    $this->_options['default']['display_attendees'] = $_POST['event_default']['display_attendees'];
 	    $this->_options['default']['currency'] = $_POST['event_default']['currency'];
 	    $this->_options['default']['paypal_email'] = $_POST['event_default']['paypal_email'];
 	    update_option('incsub_event_default', $this->_options['default']);
@@ -520,6 +523,8 @@ class Booking {
 	$new_content  = '';
 	
 	$new_content .= '<div class="event">';
+	$new_content .= '<a href="'.get_permalink().'" class="wpmudevevents-viewevent">'.__('View event', Booking::$_translation_domain).'</a>';
+	$new_content .= '<div style="clear: both;"></div>';
 	$new_content .= '<hr />';
 	$new_content .= event_details(false, true);
         $new_content .= event_rsvp_form(false);
@@ -541,10 +546,10 @@ class Booking {
 	if ( empty( $path ) || "$type.php" == $file ) {
 	    // A more specific template was not found, so load the default one
 	    add_filter('the_content', array(&$this, 'single_content'));
-	    if (file_exists(get_stylesheet_directory().'/archive.php')) {
-		$path = get_stylesheet_directory().'/archive.php';
+	    if (file_exists(get_stylesheet_directory().'/single.php')) {
+		$path = get_stylesheet_directory().'/single.php';
 	    } else {
-		$path = get_template_directory().'/archive.php';
+		$path = get_template_directory().'/single.php';
 	    }
 	    
 	    // $path = EAB_PLUGIN_DIR . "default-templates/$type-incsub_event.php";
@@ -576,6 +581,7 @@ class Booking {
 	
         $new_content .= '<div id="wpmudevevents-header">';
 	$new_content .= event_rsvp_form(false);
+	$new_content .= event_display_rsvps_inline(false);
         $new_content .= '</div>';
 	
 	$new_content .= '<hr/>';
@@ -595,6 +601,15 @@ class Booking {
 	$new_content .= '</div></div>';
 	
 	return $new_content;
+    }
+    
+    function process_list_rsvps() {
+	global $post;
+	
+	$post = get_post($_REQUEST['pid']);
+	echo event_rsvps(false);
+	
+	exit(0);
     }
     
     function meta_boxes() {
@@ -1335,6 +1350,14 @@ class Booking {
 			    <div id="eab-help-accept-payment" class="eab-help-content">
 				<?php _e('Check this to accept payments for your events', self::$_translation_domain); ?>
 			    </div>
+			    
+			    <label for="incsub_event-display_attendees" id="incsub_event_label-display_attendees"><?php _e('Display RSVP\'s in the event?', self::$_translation_domain); ?></label>
+				<input type="checkbox" size="20" id="incsub_event-display_attendees" name="event_default[display_attendees]" value="1" <?php print ($this->_options['default']['display_attendees'] == 1)?'checked="checked"':''; ?> />
+			     <a href="#eab-help-display-attendees" class="eab-info" >&nbsp;</a>
+			    <div class="clear"></div>
+			    <div id="eab-help-display-attendees" class="eab-help-content">
+				<?php _e('Check this to display RSVP\'s in the event details', self::$_translation_domain); ?>
+			    </div>
 			</div>
 		    </div>
 		    <div id="eab-settings-paypal" class="eab-metabox postbox">
@@ -1403,6 +1426,11 @@ class Booking {
 	
 	$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-accept_payments', __('Accept Payments?', self::$_translation_domain), array(
 	    'content'  => '<p>' . esc_js( __('Check this to accept payments for your events', self::$_translation_domain) ) . '</p>',
+	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
+	));
+	
+	$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-display_attendees', __('Display RSVP\'s?', self::$_translation_domain), array(
+	    'content'  => '<p>' . esc_js( __('Check this to display RSVP\'s in the event details', self::$_translation_domain) ) . '</p>',
 	    'position' => array( 'edge' => 'left', 'align' => 'center' ),
 	));
 	
