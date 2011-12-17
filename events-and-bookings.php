@@ -1476,7 +1476,7 @@ class Booking {
 	    'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
 	));
 	
-	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#content_parent', __('Event Details', self::$_translation_domain), array(
+	$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#wp-content-editor-container', __('Event Details', self::$_translation_domain), array(
 	    'content'  => '<p>' . __("More about the event", self::$_translation_domain) . '</p>',
 	    'position' => array( 'edge' => 'bottom', 'align' => 'center' ), 'post_type' => 'incsub_event',
 	));
