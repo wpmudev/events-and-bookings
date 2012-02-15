@@ -147,6 +147,10 @@ div.eab-metabox {
     margin: 0 0 10px 0;
 }
 
+.eab-metabox h3.eab-hndle {
+	cursor: default;
+}
+
 div.eab-minimetabox {
     margin: 5px;
 }

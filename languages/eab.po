@@ -1,0 +1,306 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Events and Bookings\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-02-15 14:53+0100\n"
+"PO-Revision-Date: 2012-02-15 14:54+0100\n"
+"Last-Translator: \n"
+"Language-Team: Incsub\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: D:\\xampp\\htdocs\\3.3-dev-1\\wp-content\\plugins\\events-and-bookings\n"
+"X-Poedit-SearchPath-0: default-templates\n"
+"X-Poedit-SearchPath-1: default-templates/calendar\n"
+"X-Poedit-SearchPath-2: default-templates/default\n"
+"X-Poedit-SearchPath-3: lib\n"
+"X-Poedit-SearchPath-4: lib/contextual_help\n"
+"X-Poedit-SearchPath-5: lib/pointers-tutorial\n"
+"X-Poedit-SearchPath-6: lib/widgets\n"
+"X-Poedit-SearchPath-7: default-templates/full-width\n"
+
+#: default-templates/calendar/archive-incsub_event.php:14
+#, php-format
+msgid "Events for %s"
+msgstr ""
+
+#: default-templates/default/archive-incsub_event.php:8
+#: default-templates/full-width/archive-incsub_event.php:8
+msgid "Events"
+msgstr ""
+
+#: default-templates/default/archive-incsub_event.php:34
+#: default-templates/full-width/archive-incsub_event.php:23
+msgid "View event"
+msgstr ""
+
+#: default-templates/default/single-incsub_event.php:32
+msgid "You haven't paid for this event"
+msgstr ""
+
+#: default-templates/default/single-incsub_event.php:41
+msgid "About this event:"
+msgstr ""
+
+#: default-templates/default/single-incsub_event.php:43
+msgid "Created by "
+msgstr ""
+
+#: default-templates/full-width/single-incsub_event.php:52
+msgid "Premium"
+msgstr ""
+
+#: default-templates/full-width/single-incsub_event.php:52
+msgid "Free"
+msgstr ""
+
+#: lib/class_wd_help_tooltips.php:296
+msgid "Help"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:35
+msgid "Events and Bookings"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:37
+msgid "Events and Bookings gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:40
+msgid "Project page"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:41
+msgid "Installation and instructions page"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:42
+msgid "Support forum"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:54
+#: lib/contextual_help/class_eab_admin_help.php:88
+#: lib/contextual_help/class_eab_admin_help.php:132
+msgid "Intro"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:57
+msgid "This is where you can see all your Events."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:63
+#: lib/contextual_help/class_eab_admin_help.php:112
+#: lib/contextual_help/class_eab_admin_help.php:180
+#: lib/contextual_help/class_eab_admin_help.php:209
+#: lib/pointers-tutorial/pointer-tutorials.php:134
+msgid "Tutorial"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:66
+#: lib/contextual_help/class_eab_admin_help.php:115
+#: lib/contextual_help/class_eab_admin_help.php:183
+#: lib/contextual_help/class_eab_admin_help.php:212
+msgid "Tutorial dialogs will guide you through the important bits."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:68
+#: lib/contextual_help/class_eab_admin_help.php:117
+#: lib/contextual_help/class_eab_admin_help.php:185
+#: lib/contextual_help/class_eab_admin_help.php:214
+msgid "Restart the tutorial"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:80
+msgid "If you have the <a href=\"http://premium.wpmudev.org/project/wordpress-google-maps-plugin\">Google Maps</a> plugin installed, you'll be able to use full Google Maps integration with your events"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:81
+msgid "Your location will be automatically mapped on a Google Map. You can also create a map yourself and associate it with your event using the globe icon above the field"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:91
+msgid "This is where you create and edit your Events"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:97
+msgid "Event Details"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:99
+msgid "Event Location"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:101
+msgid "You can enter your event address in this box."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:104
+msgid "Event times and dates"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:106
+msgid "You can add multiple start and ending times to your event. You can add as many of those as you'd like."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:135
+msgid "This is where you set up your plugin."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:141
+msgid "Appearance settings"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:143
+msgid "This is where you determine how will your events be presented."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:144
+msgid "If you check the \"Override default appearance\" option, you will be able to select among various predefined templates to change the way your Events appear."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:145
+msgid "To go back to default plugin output, just uncheck the \"Override default appearance\" option at any time"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:146
+msgid "If you're looking to further customize the templates, you can copy a set you like from the plugin directory to your current theme directory and edit away."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:147
+msgid "<b>Note:</b> these settings will not be available if you copy the templates to your themes directory for customization"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:152
+msgid "API Settings"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:155
+msgid "This section becomes available if you allow logins with Twitter and Facebook, by checking the corresponding box in Plugin settings."
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:158
+msgid "Facebook API settings"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:159
+msgid "<p>Before we begin, you need to <a target=\"_blank\" href=\"http://www.facebook.com/developers/createapp.php\">create a Facebook Application</a>.</p><p>To do so, follow these steps:</p><ol><li><a target=\"_blank\" href=\"http://www.facebook.com/developers/createapp.php\">Create your application</a></li><li>After this, go to the <a target=\"_blank\" href=\"http://www.facebook.com/developers/apps.php\">Facebook Application List page</a> and select your newly created application</li><li>Copy the value from the <strong>App ID</strong>/<strong>API key</strong> field, and enter them in the box titled \"Facebook App ID\"</li></ol>"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:167
+msgid "Twitter API settings"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:168
+#, php-format
+msgid "<p>You will also need to <a target=\"_blank\" href=\"https://dev.twitter.com/apps/new\">create a Twitter Application</a>.</p><p>To do so, follow these steps:</p><ol><li><a target=\"_blank\" href=\"https://dev.twitter.com/apps/new\">Create your application</a></li><li>Look for <strong>Callback URL</strong> field and enter your site URL in this field: <code>%s</code></li><li>After this, go to the <a target=\"_blank\" href=\"https://dev.twitter.com/apps\">Twitter Application List page</a> and select your newly created application</li><li>Copy the values from these fields: <strong>Consumer Key</strong> and <strong>Consumer Secret</strong>, and enter them in plugin settings.</li></ol>"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:200
+msgid "Welcome"
+msgstr ""
+
+#: lib/contextual_help/class_eab_admin_help.php:203
+msgid "Welcome to Events and Booking! This page will guide through setting up your plugin and posting your first events."
+msgstr ""
+
+#: lib/pointers-tutorial/pointer-tutorials.php:417
+msgid "Next &raquo;"
+msgstr ""
+
+#: lib/pointers-tutorial/pointer-tutorials.php:429
+#: lib/pointers-tutorial/pointer-tutorials.php:448
+msgid "Dismiss"
+msgstr ""
+
+#: lib/pointers-tutorial/pointer-tutorials.php:430
+#: lib/pointers-tutorial/pointer-tutorials.php:449
+#, php-format
+msgid "Dismiss %s"
+msgstr ""
+
+#: lib/pointers-tutorial/pointer-tutorials.php:436
+msgid "&laquo; Previous"
+msgstr ""
+
+#: lib/pointers-tutorial/pointer-tutorials.php:488
+#, php-format
+msgid "%s: Step %d of %d"
+msgstr ""
+
+#: lib/widgets/Attendees_Widget.class.php:6
+msgid "Display Attendees of an event"
+msgstr ""
+
+#: lib/widgets/Attendees_Widget.class.php:7
+#: lib/widgets/Attendees_Widget.class.php:23
+#: lib/widgets/Attendees_Widget.class.php:46
+#: lib/widgets/Attendees_Widget.class.php:53
+msgid "Attendees"
+msgstr ""
+
+#: lib/widgets/Attendees_Widget.class.php:9
+msgid "Event Attendees"
+msgstr ""
+
+#: lib/widgets/Attendees_Widget.class.php:58
+msgid "Title"
+msgstr ""
+
+#: lib/widgets/NetworkUpcoming_Widget.class.php:6
+#: lib/widgets/UpcomingCalendar_Widget.class.php:6
+msgid "Displays List of Upcoming Events from your entire network"
+msgstr ""
+
+#: lib/widgets/NetworkUpcoming_Widget.class.php:7
+msgid "Network Upcoming"
+msgstr ""
+
+#: lib/widgets/NetworkUpcoming_Widget.class.php:15
+#: lib/widgets/UpcomingCalendar_Widget.class.php:27
+msgid "Title:"
+msgstr ""
+
+#: lib/widgets/NetworkUpcoming_Widget.class.php:20
+msgid "Display only this many events:"
+msgstr ""
+
+#: lib/widgets/NetworkUpcoming_Widget.class.php:57
+#: lib/widgets/UpcomingCalendar_Widget.class.php:148
+msgid "No upcoming events on network"
+msgstr ""
+
+#: lib/widgets/Popular_Widget.class.php:6
+msgid "Display List of Popular events"
+msgstr ""
+
+#: lib/widgets/Popular_Widget.class.php:7
+#: lib/widgets/Popular_Widget.class.php:19
+#: lib/widgets/Popular_Widget.class.php:47
+#: lib/widgets/Popular_Widget.class.php:54
+msgid "Most Popular"
+msgstr ""
+
+#: lib/widgets/Popular_Widget.class.php:9
+msgid "Most Popular Events"
+msgstr ""
+
+#: lib/widgets/UpcomingCalendar_Widget.class.php:11
+msgid "Calendar Upcoming"
+msgstr ""
+
+#: lib/widgets/Upcoming_Widget.class.php:6
+msgid "Display List of Upcoming Events"
+msgstr ""
+
+#: lib/widgets/Upcoming_Widget.class.php:7
+#: lib/widgets/Upcoming_Widget.class.php:19
+#: lib/widgets/Upcoming_Widget.class.php:46
+#: lib/widgets/Upcoming_Widget.class.php:53
+msgid "Upcoming"
+msgstr ""
+
+#: lib/widgets/Upcoming_Widget.class.php:9
+msgid "Upcoming Events"
+msgstr ""
+

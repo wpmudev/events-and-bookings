@@ -123,4 +123,46 @@ jQuery(function() {
     }
     
     _eab_location = window.location;
+    
+(function ($) {
+// API toggling
+function toggle_api_settings () {
+	if ($("#incsub_event-accept_api_logins").is(":checked")) $("#eab-settings-apis").show();
+	else $("#eab-settings-apis").hide();
+}
+
+// Appearance toggling
+function toggle_appearance_settings () {
+	if ($("#incsub_event-override_appearance_defaults").is(":checked")) {
+		$("#incsub_event-archive_template").attr("disabled", false);
+		$("#incsub_event-single_template").attr("disabled", false);
+	} else {
+		$("#incsub_event-archive_template").attr("disabled", true);
+		$("#incsub_event-single_template").attr("disabled", true);		
+	}
+}
+
+$(function () {
+	// Init API toggle
+	$("#incsub_event-accept_api_logins").change(toggle_api_settings);
+	toggle_api_settings();
+	
+	// Init Appearance toggle
+	$("#incsub_event-override_appearance_defaults").change(toggle_appearance_settings);
+	toggle_appearance_settings();
+	
+	// Tutorial restart
+	$(".eab-restart_tutorial").click(function () {
+		var $me = $(this);
+		$.post(ajaxurl, {
+			"action": "eab_restart_tutorial",
+			"step": $me.attr("data-eab_tutorial")
+		}, function () {
+			window.location.reload();
+		})
+		return false;
+	});
+});
+})(jQuery);
+    
 });

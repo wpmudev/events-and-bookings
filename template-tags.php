@@ -131,9 +131,10 @@ function event_rsvp_form($echo = true) {
             $content .= '<input class="'.(($booking_id && $booking_status == 'yes')?'current wpmudevevents-yes-submit':'wpmudevevents-yes-submit ' . $default_class).'" type="submit" name="action_yes" value="'.__('I\'m attending', Booking::$_translation_domain).'" />';
             $content .= '</form>';
         } else {
+        	$content .= '<input type="hidden" name="event_id" value="'.$post->ID.'" />';
             $content .= '<a class="wpmudevevents-no-submit" href="'.wp_login_url(get_permalink()).'&eab=n" >'.__('No', Booking::$_translation_domain).'</a>';
             $content .= '<a class="wpmudevevents-maybe-submit" href="'.wp_login_url(get_permalink()).'&eab=m" >'.__('Maybe', Booking::$_translation_domain).'</a>';
-	    $content .= '<a class="wpmudevevents-yes-submit" href="'.wp_login_url(get_permalink()).'&eab=y" >'.__('I\'m Attending', Booking::$_translation_domain).'</a>';
+	    	$content .= '<a class="wpmudevevents-yes-submit" href="'.wp_login_url(get_permalink()).'&eab=y" >'.__('I\'m Attending', Booking::$_translation_domain).'</a>';
         }
     }
     
@@ -179,6 +180,9 @@ function event_rsvps($echo = true) {
         $content .= '<div id="event-booking-maybe">';
         $content .= event_bookings('maybe', false);
         $content .= '</div>';
+        $content .= '<div id="event-booking-no">';
+        $content .= event_bookings('no', false);
+        $content .= '</div>';
         $content .= '</div>';
 	$content .= '</div>';
     }
@@ -216,7 +220,7 @@ function get_booking_paid($booking_id) {
 function get_booking_meta($booking_id, $meta_key, $default = false) {
     global $wpdb;
     
-    $meta_value = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM ".Booking::tablename('bookings_meta')." WHERE booking_id = %d AND meta_key = %s;", $booking_id, $meta_key));
+    $meta_value = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM ".Booking::tablename('booking_meta')." WHERE booking_id = %d AND meta_key = %s;", $booking_id, $meta_key));
     
     if (!$meta_value) {
 	$meta_value = $default;
@@ -227,12 +231,11 @@ function get_booking_meta($booking_id, $meta_key, $default = false) {
 function update_booking_meta($booking_id, $meta_key, $meta_value) {
     global $wpdb;
     
-    $meta_id = $wpdb->get_var($wpdb->prepare("SELECT id FROM ".Booking::tablename('bookings_meta')." WHERE booking_id = %d AND meta_key = %s;", $booking_id, $meta_key));
-    
+    $meta_id = $wpdb->get_var($wpdb->prepare("SELECT id FROM ".Booking::tablename('booking_meta')." WHERE booking_id = %d AND meta_key = %s;", $booking_id, $meta_key));
     if (!$meta_id) {
-	return $wpdb->query($wpdb->prepare("INSERT INTO ".Booking::tablename('bookings_meta')." VALUES (null, %d, %s, %s);", $booking_id, $meta_key, $meta_value));
+		return $wpdb->query($wpdb->prepare("INSERT INTO ".Booking::tablename('booking_meta')." VALUES (null, %d, %s, %s);", $booking_id, $meta_key, $meta_value));
     } else {
-	return $wpdb->query($wpdb->prepare("UPDATE ".Booking::tablename('bookings_meta')." SET meta_value = %s WHERE id = %d;", $meta_value, $meta_id));
+		return $wpdb->query($wpdb->prepare("UPDATE ".Booking::tablename('booking_meta')." SET meta_value = %s WHERE id = %d;", $meta_value, $meta_id));
     }
 }
 
@@ -339,7 +342,7 @@ function event_details($echo = true, $archive = false) {
     if ($maybe_single) {
 	$content .= '<div class="wpmudevevents-date">';
 	$_dc = 0;
-	foreach ($meta['incsub_event_start'] as $_variation => $_start) {
+	foreach (@$meta['incsub_event_start'] as $_variation => $_start) {
 	    if (date_i18n(get_option('date_format'), strtotime($meta['incsub_event_start'][$_variation])) ==
 		date_i18n(get_option('date_format'), strtotime($meta['incsub_event_end'][$_variation]))) {
 		$end_date = '';
@@ -393,17 +396,44 @@ function get_eab_event_venue($post_id) {
     return $venue;
 }
 
+function get_event_venue_map ($post_id, $overrides=array()) {
+	if (!class_exists('AgmMapModel')) return false;
+	$venue = get_post_meta($post_id, 'incsub_event_venue', true);
+	if (!$venue) return false;
+	
+	if (preg_match_all('/map id="([0-9]+)"/', $venue, $matches) > 0) {
+		$model = new AgmMapModel();
+		$map = $model->get_map($matches[1][0]);
+		$codec = new AgmMarkerReplacer;
+		return $codec->create_tag($map, $overrides);
+	}
+	return false;
+}
+
+function event_has_map ($post_id) {
+	if (!class_exists('AgmMapModel')) return false;
+	$venue = get_post_meta($post_id, 'incsub_event_venue', true);
+	if (!$venue) return false;
+	if (preg_match_all('/map id="([0-9]+)"/', $venue, $matches) > 0) return true;
+	return false;
+}
+
 function eab_payment_forms($echo = true) {
-    global $booking, $post;
+    global $booking, $post, $blog_id, $current_user;
+	
+	$booking_id = get_booking_id($post->ID, $current_user->id);
+	$eab_options = get_option('incsub_event_default'); 
     
     $content = '';
     
-    $content .= '<form action="https://www.paypal.com/cgi-bin/webscr" method="post">';
+    $content .= @$eab_options['paypal_sandbox'] 
+    	? '<form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">'
+    	: '<form action="https://www.paypal.com/cgi-bin/webscr" method="post">'
+    ;
     $content .= '<input type="hidden" name="business" value="'.$booking->_options['default']['paypal_email'].'" />';
     $content .= '<input type="hidden" name="item_name" value="'.get_the_title().'" />';
     $content .= '<input type="hidden" name="item_number" value="'.$post->ID.'" />';
-    $content .= '<input type="hidden" name="booking_id" value="'.$booking_id.'" />';
-    $content .= '<input type="hidden" name="notify_url" value="'.admin_url('admin-ajax.php?action=eab_paypal_ipn').'" />';
+    $content .= '<input type="hidden" name="notify_url" value="'.admin_url('admin-ajax.php?action=eab_paypal_ipn&blog_id=' . $blog_id . '&booking_id=' . $booking_id).'" />';
     $content .= '<input type="hidden" name="amount" value="'.get_post_meta($post->ID, 'incsub_event_fee', true).'" />';
     $content .= '<input type="hidden" name="return" value="'.get_permalink().'" />';
     $content .= '<input type="hidden" name="currency_code" value="'.$booking->_options['default']['currency'].'">';
@@ -458,4 +488,19 @@ function event_link($page) {
 		return event_link('event');
 	    }
     }
+}
+
+function eab_event_is_expired ($event_id, $tstamp=false) {
+	$event_id = (int)$event_id;
+	if (!$event_id) return false;
+	
+	$time = (int)$time ? (int)$time : time();
+	$event_ends = get_post_meta($event_id, 'incsub_event_end');
+	if (!$event_ends) return false;
+	
+	foreach ($event_ends as $end_str) {
+		$end = strtotime($end_str);
+		if ($end < $time) return true;
+	}
+	return false;
 }
