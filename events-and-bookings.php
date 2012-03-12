@@ -1160,7 +1160,7 @@ class Booking {
     function check_rewrite_rules($value) {
 		//prevent an infinite loop
 		if ( ! post_type_exists( 'incsub_event' ) )
-		    return;
+		    return $value;
 		
 		if (!is_array($value))
 		    $value = array();
@@ -1177,6 +1177,7 @@ class Booking {
 		if ( !array_key_exists($array_key, $value) ) {
 		    $this->flush_rewrite();
 		}
+		return $value;
     }
     
     function query_vars($vars) {
