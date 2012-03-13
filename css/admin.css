@@ -204,8 +204,12 @@ input.error {
     border-color: #CC0000;
 }
 
-.eab-inside .clear{
+.eab-settings-settings_item {
+	overflow: hidden;
 	border-bottom:1px solid #dddddd;
+}
+.eab-settings-settings_item:hover {
+	background-color: #f2f2f2;
 }
 
 .eab-inside{
@@ -232,3 +236,7 @@ input.error {
 
 .eab-note{background-color: #ffffde;
 border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
+
+#eab_addons_hub {
+	line-height: 1.6em;
+}

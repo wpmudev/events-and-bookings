@@ -44,6 +44,7 @@ class Eab_Network {
 	 * Only the events that are not yet over will be returned.
 	 */
 	public static function get_upcoming_events ($limit=5) {
+		if (!function_exists('post_indexer_make_current')) return false;
 		$limit = (int)$limit ? (int)$limit : 5;
 		
 		global $wpdb;
@@ -56,7 +57,8 @@ class Eab_Network {
 			if ($count == $limit) break;
 			switch_to_blog($event->blog_id);
 			$post = get_post($event->post_id);
-			if (eab_event_is_expired($event->post_id)) continue;
+			$event = new Eab_EventModel($post);
+			if ($event->is_expired()) continue;
 			$post->blog_id = $event->blog_id;
 			$result[] = $post;
 			$count++;

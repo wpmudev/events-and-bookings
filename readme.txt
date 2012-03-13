@@ -1,9 +1,9 @@
-=== Events and Booking ===
+=== Events ===
 Contributors: mohanjith
 Tags: events, booking
-Requires at least: 3.0.0
+Requires at least: 3.3
 Stable tag: trunk
-Tested up to: 3.2.1
+Tested up to: 3.3.1
 
 Allow your readers to register for events you organize
 
@@ -14,6 +14,10 @@ Allow your readers to register for events you organize
 * Please note we will be automatically changing WPMU DEV Google Maps Plugin Settings if installed *
 
 == ChangeLog ==
+
+= 1.0.1 =
+
+* Initial release
 
 = 1.0.0 =
 

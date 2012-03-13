@@ -1,14 +1,30 @@
-Plugin Name: Events and Booking
+Plugin Name: Events
 Author: Incsub
 
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.1 - 2012-03-13
+----------------------------------------------------------------------
+- Fix for templates assumptions.
+- Improved Google Maps integration.
+- Improved widgets.
+- Improved BuddyPress integration.
+- Added recurring events.
+- Added new auto-scheduler.
+- Added limited capacity events add-on.
+- Added "My Events" add-on.
+- Added BuddyPress groups support add-on.
+- Added e-Newsletter integration add-on.
+- Added front pages editing add-on.
+- Added "Guest lists options" add-on.
+- Added capabilities editing add-on.
+
 1.0.1 - 2012-02-15
 ----------------------------------------------------------------------
 - Fix for spacing and clearing issues.
-- Fix for author link for singualr events.
+- Fix for author link for singular events.
 - Fix for singular event rewrites.
 - Fix for additional table checks.
 - Fix for custom loops. 

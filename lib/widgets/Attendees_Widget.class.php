@@ -19,20 +19,21 @@ class Eab_Attendees_Widget extends Eab_Widget {
 	}
 	
 	$options = $instance;
+	$event = new Eab_EventModel($post);
 	
 	$title = apply_filters('widget_title', empty($instance['title']) ? __('Attendees', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
 	
 	?>
-        <?php if (is_single() && has_bookings()) {?>
+        <?php if (is_single() && $event->has_bookings()) {?>
 	<?php echo $before_widget; ?>
 	<?php echo $before_title . $title . $after_title; ?>
             <div id="event-bookings">
                 <div id="event-booking-yes">
-                    <?php event_bookings('yes'); ?>
+                    <?php echo Eab_Template::get_bookings(Eab_EventModel::BOOKING_YES, $event); ?>
                 </div>
                 <div class="clear"></div>
                 <div id="event-booking-maybe">
-                    <?php event_bookings('maybe'); ?>
+                    <?php echo Eab_Template::get_bookings(Eab_EventModel::BOOKING_MAYBE, $event); ?>
                 </div>
             </div>
         <br />
