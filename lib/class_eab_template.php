@@ -27,6 +27,7 @@ class Eab_Template {
 	public static function get_single_content ($post, $content=false) {
 		global $current_user;
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
+		
 		if ('incsub_event' != $event->get_type()) return $content;
 		
 		$start_day = date_i18n('m', $event->get_start_timestamp());
@@ -36,18 +37,20 @@ class Eab_Template {
 		
 		$new_content .= self::get_error_notice();
 		
-		if (
-			$event->is_premium() &&
-			$event->user_is_coming() &&
-			!$event->user_paid()
-		) {
+		// Added by Hakan
+		$show_pay_note = $event->is_premium() && $event->user_is_coming() && !$event->user_paid();
+		$show_pay_note = apply_filters('eab-event-show_pay_note', $show_pay_note, $event->get_id () ); 
+		
+		if ( $show_pay_note	) {
 			$new_content .= '<div id="wpmudevevents-payment">';
 			$new_content .= __('You haven\'t paid for this event', Eab_EventsHub::TEXT_DOMAIN).' ';
 			$new_content .= self::get_payment_forms($event);
 			$new_content .= '</div>';
 		}
+		
+		// Added by Hakan
+		$new_content = apply_filters('eab-event-after_payment_forms', $new_content, $event->get_id());
 	
-		// @TODO: FIX THIS!!!
 		$new_content .= '<div class="eab-needtomove"><div id="event-bread-crumbs" >' . self::get_breadcrumbs($event) . '</div></div>';
 		
 		$new_content .= '<div id="wpmudevevents-header">';
@@ -243,6 +246,8 @@ class Eab_Template {
 					? '<span class="eab-guest-payment_info-paid">' . __('Paid', Eab_EventsHub::TEXT_DOMAIN) . '</span>'
 					: '<span class="eab-guest-payment_info-not_paid">' . __('Not paid', Eab_EventsHub::TEXT_DOMAIN) . '</span>'
 				;
+				// Added by Hakan
+				$payment_status = apply_filters('eab-event-payment_status', $payment_status, $booking->user_id ); 
 				$content .= "<div class='eab-guest-payment_info'>{$payment_status}</div>";
 			}
 			if (in_array($status, array(Eab_EventModel::BOOKING_YES, Eab_EventModel::BOOKING_MAYBE))) {
@@ -250,6 +255,7 @@ class Eab_Template {
 					__('Cancel attendance', Eab_EventsHub::TEXT_DOMAIN) .
 				'</a></div>';
 			}
+			$content = apply_filters('eab-event-booking_metabox_content', $content, $booking->user_id );
 			$content .= '</div>'; // .eab-guest
 			$content .= '</li>';
 		}
@@ -322,6 +328,8 @@ class Eab_Template {
 		$content .= '<input type="image" name="submit" border="0" src="https://www.paypal.com/en_US/i/btn/btn_paynow_SM.gif" alt="PayPal - The safer, easier way to pay online" />';
 		$content .= '<img alt="" border="0" width="1" height="1" src="https://www.paypal.com/en_US/i/scr/pixel.gif" />';
 		$content .= '</form>';
+		// Added by Hakan
+		$content = apply_filters('eab-event-payment_forms', $content, $event->get_id());
 		
 		return $content;
 	}

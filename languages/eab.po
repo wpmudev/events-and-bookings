@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Events and Bookings\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-05 15:40+0100\n"
-"PO-Revision-Date: 2012-03-05 15:40+0100\n"
+"POT-Creation-Date: 2012-03-21 14:59+0100\n"
+"PO-Revision-Date: 2012-03-21 14:59+0100\n"
 "Last-Translator: \n"
 "Language-Team: Incsub\n"
 "MIME-Version: 1.0\n"
@@ -140,69 +140,70 @@ msgstr ""
 msgid "Year"
 msgstr ""
 
-#: lib/class_eab_template.php:91
+#: lib/class_eab_template.php:94
 msgid "See who has RSVPed"
 msgstr ""
 
-#: lib/class_eab_template.php:95
+#: lib/class_eab_template.php:98
 msgid "Hide who has RSVPed"
 msgstr ""
 
-#: lib/class_eab_template.php:132
-#: lib/class_eab_template.php:172
-#: lib/class_eab_template.php:219
+#: lib/class_eab_template.php:135
+#: lib/class_eab_template.php:175
+#: lib/class_eab_template.php:222
 #: lib/plugins/eab-buddypres-my_events.php:60
 msgid "Attending"
 msgstr ""
 
-#: lib/class_eab_template.php:133
-#: lib/class_eab_template.php:173
-#: lib/class_eab_template.php:220
-#: lib/class_eab_template.php:400
-#: lib/class_eab_template.php:413
+#: lib/class_eab_template.php:136
+#: lib/class_eab_template.php:176
+#: lib/class_eab_template.php:223
+#: lib/class_eab_template.php:408
+#: lib/class_eab_template.php:421
 #: lib/plugins/eab-buddypres-my_events.php:67
 msgid "Maybe"
 msgstr ""
 
-#: lib/class_eab_template.php:134
-#: lib/class_eab_template.php:174
-#: lib/class_eab_template.php:221
-#: lib/class_eab_template.php:397
-#: lib/class_eab_template.php:410
+#: lib/class_eab_template.php:137
+#: lib/class_eab_template.php:177
+#: lib/class_eab_template.php:224
+#: lib/class_eab_template.php:405
+#: lib/class_eab_template.php:418
 #: lib/plugins/eab-events-front_page_editing.php:387
+#: lib/plugins/eab-events-membership-integration.php:150
 msgid "No"
 msgstr ""
 
-#: lib/class_eab_template.php:243
+#: lib/class_eab_template.php:246
 msgid "Paid"
 msgstr ""
 
-#: lib/class_eab_template.php:244
+#: lib/class_eab_template.php:247
 msgid "Not paid"
 msgstr ""
 
-#: lib/class_eab_template.php:250
+#: lib/class_eab_template.php:255
 msgid "Cancel attendance"
 msgstr ""
 
-#: lib/class_eab_template.php:269
+#: lib/class_eab_template.php:275
 #, php-format
 msgid "Visit %s&#8217;s website"
 msgstr ""
 
-#: lib/class_eab_template.php:403
+#: lib/class_eab_template.php:411
 msgid "I'm attending"
 msgstr ""
 
-#: lib/class_eab_template.php:416
+#: lib/class_eab_template.php:424
 msgid "I'm Attending"
 msgstr ""
 
-#: lib/class_eab_template.php:465
+#: lib/class_eab_template.php:473
 msgid " and "
 msgstr ""
 
-#: lib/class_eab_template.php:467
+#: lib/class_eab_template.php:475
 #, php-format
 msgid "On %s from %s to %s<br />"
 msgstr ""
@@ -380,49 +381,57 @@ msgstr ""
 msgid "Not attending Events"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:57
+#: lib/plugins/eab-buddypress-group_events.php:79
 msgid "You'll need BuddyPress installed and activated for Groups Events add-on to work"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:62
+#: lib/plugins/eab-buddypress-group_events.php:84
 msgid "You'll need to enable BuddyPress Groups component for Groups Events add-on to work"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:73
+#: lib/plugins/eab-buddypress-group_events.php:96
 msgid "Group Events settings :"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:75
+#: lib/plugins/eab-buddypress-group_events.php:99
 msgid "Automatically join the group by RSVPing to events"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:77
+#: lib/plugins/eab-buddypress-group_events.php:101
 msgid "When your users RSVP positively to your group event, they will also automatically join the group the event belongs to."
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:101
-msgid "Group event"
-msgstr ""
-
 #: lib/plugins/eab-buddypress-group_events.php:104
-#: lib/plugins/eab-buddypress-group_events.php:126
-msgid "This is a group event for"
+msgid "Group events are private to groups"
 msgstr ""
 
 #: lib/plugins/eab-buddypress-group_events.php:106
-#: lib/plugins/eab-buddypress-group_events.php:128
+msgid "If you enable this option, users outside your groups will <b>not</b> be able to see your Group Events."
+msgstr ""
+
+#: lib/plugins/eab-buddypress-group_events.php:131
+msgid "Group event"
+msgstr ""
+
+#: lib/plugins/eab-buddypress-group_events.php:134
+#: lib/plugins/eab-buddypress-group_events.php:156
+msgid "This is a group event for"
+msgstr ""
+
+#: lib/plugins/eab-buddypress-group_events.php:136
+#: lib/plugins/eab-buddypress-group_events.php:158
 msgid "Not a group event"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:162
+#: lib/plugins/eab-buddypress-group_events.php:192
 msgid "Group Events"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:216
+#: lib/plugins/eab-buddypress-group_events.php:246
 msgid "Prev"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:219
+#: lib/plugins/eab-buddypress-group_events.php:249
 msgid "Next"
 msgstr ""
 
@@ -481,6 +490,11 @@ msgstr ""
 #: lib/plugins/eab-events-capabilities.php:95
 #, php-format
 msgid "Your <b>%s</b> users can..."
+msgstr ""
+
+#: lib/plugins/eab-events-expire_month_old_events.php:28
+#: lib/plugins/eab-events-expire_past_events.php:28
+msgid "<b>Conflict warning:</b> You'll need to turn off one of the past events expiry add-ons."
 msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:59
@@ -553,7 +567,6 @@ msgid "Back to Event"
 msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:329
-#: lib/widgets/Attendees_Widget.class.php:59
 msgid "Title"
 msgstr ""
 
@@ -590,6 +603,7 @@ msgid "Is this a paid event?"
 msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:386
+#: lib/plugins/eab-events-membership-integration.php:149
 msgid "Yes"
 msgstr ""
 
@@ -653,6 +667,69 @@ msgstr ""
 
 #: lib/plugins/eab-events-limit_capacity.php:119
 msgid "Sorry, the event sold out."
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:121
+msgid ""
+"You do not have MANUALPAYMENTBUTTON keyword in the Instructions field. \n"
+"\t\t\t\tThis means there will be no button and user will not be able to inform you that he/she made a payment, \n"
+"\t\t\t\twhich in turn means that Manual Payment will be practically useless."
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:150
+msgid "Manual Payment settings :"
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:153
+msgid "Select button text"
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:155
+msgid "This is the text that will appear on Select Manual Payment button."
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:159
+msgid "Pay button text"
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:161
+msgid "This is the text that will appear on Pay button. User needs to click this button after he made the payment."
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:165
+msgid "Instructions"
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:166
+msgid "Write the procedure that the user needs to do for a manual payment here. Use MANUALPAYMENTBUTTON to insert the Pay Button to the desired location."
+msgstr ""
+
+#: lib/plugins/eab-events-manual-payments.php:242
+msgid "Approve Payment"
+msgstr ""
+
+#: lib/plugins/eab-events-membership-integration.php:61
+msgid "You'll need <a href='http://premium.wpmudev.org/project/membership'>Membership</a> plugin installed and activated for Membership integration add-on to work"
+msgstr ""
+
+#: lib/plugins/eab-events-membership-integration.php:145
+msgid "Membership Integration"
+msgstr ""
+
+#: lib/plugins/eab-events-membership-integration.php:147
+msgid "Free to members? "
+msgstr ""
+
+#: lib/plugins/eab-events-membership-integration.php:153
+msgid "Free for"
+msgstr ""
+
+#: lib/plugins/eab-events-membership-integration.php:185
+msgid "No level was defined yet"
+msgstr ""
+
+#: lib/plugins/eab-events-membership-integration.php:188
+msgid "Membership plugin is not activated."
 msgstr ""
 
 #: lib/plugins/eab-guest_list-show_additional_info.php:109
@@ -792,6 +869,7 @@ msgid "Event Attendees"
 msgstr ""
 
 #: lib/widgets/NetworkUpcoming_Widget.class.php:6
+#: lib/widgets/UpcomingCalendar_Widget.class.php:6
 msgid "Displays List of Upcoming Events from your entire network"
 msgstr ""
 
@@ -800,6 +878,7 @@ msgid "Network Upcoming"
 msgstr ""
 
 #: lib/widgets/NetworkUpcoming_Widget.class.php:15
+#: lib/widgets/UpcomingCalendar_Widget.class.php:29
 msgid "Title:"
 msgstr ""
 
@@ -826,17 +905,17 @@ msgid "Most Popular Events"
 msgstr ""
 
 #: lib/widgets/Popular_Widget.class.php:99
-#: lib/widgets/Upcoming_Widget.class.php:116
+#: lib/widgets/Upcoming_Widget.class.php:115
 msgid "Show excerpt"
 msgstr ""
 
 #: lib/widgets/Popular_Widget.class.php:107
-#: lib/widgets/Upcoming_Widget.class.php:124
+#: lib/widgets/Upcoming_Widget.class.php:123
 msgid "Show thumbnail"
 msgstr ""
 
 #: lib/widgets/Popular_Widget.class.php:110
-#: lib/widgets/Upcoming_Widget.class.php:127
+#: lib/widgets/Upcoming_Widget.class.php:126
 msgid "Limit"
 msgstr ""
 
@@ -858,7 +937,7 @@ msgstr ""
 msgid "Upcoming Events"
 msgstr ""
 
-#: lib/widgets/Upcoming_Widget.class.php:108
+#: lib/widgets/Upcoming_Widget.class.php:107
 msgid "Show dates"
 msgstr ""
 

@@ -671,7 +671,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return $this->get_booking_meta($booking_id, 'booking_transaction_key');
 	}
 	
-	public static function get_booking_meta ($booking_id, $key, $default=false) {
+	public static function get_booking_meta ($booking_id, $meta_key, $default=false) {
 		$booking_id = (int)$booking_id;
 		if (!$booking_id) return $default;
 		

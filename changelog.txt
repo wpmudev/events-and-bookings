@@ -5,6 +5,15 @@ Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
+1.2 - 2012-03-21
+----------------------------------------------------------------------
+- Fix for upcoming events widget.
+- Fix for events auto-archiving.
+- Added Membership integration add-on.
+- Added events auto-expiry add-ons.
+- Added manual payments add-on.
+- Added private group events option.
+
 1.1 - 2012-03-13
 ----------------------------------------------------------------------
 - Fix for templates assumptions.

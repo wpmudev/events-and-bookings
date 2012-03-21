@@ -25,7 +25,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		$options = wp_parse_args((array)$instance, $this->_defaults);
 		
 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Upcoming', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
-		$_events = Eab_CollectionFactory::get_upcoming_events(time(), array(
+		$_events = Eab_CollectionFactory::get_upcoming_weeks_events(time(), array(
 			'posts_per_page' => $options['limit'],
 		));
 	

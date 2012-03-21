@@ -5,7 +5,7 @@
  Description: Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.
  Author: S H Mohanjith (Incsub)
  WDP ID: 249
- Version: 1.1
+ Version: 1.2
  Author URI: http://premium.wpmudev.org
 */
 

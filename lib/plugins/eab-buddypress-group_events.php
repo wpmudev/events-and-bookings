@@ -30,6 +30,9 @@ class Eab_BuddyPress_GroupEvents {
 			add_action('incsub_event_booking_yes', array($this, 'auto_join_group'), 10, 2);
 			add_action('incsub_event_booking_maybe', array($this, 'auto_join_group'), 10, 2);
 		}
+		if ($this->_data->get_option('bp-group_event-private_events')) {
+			add_filter('wpmudev-query', array($this, 'filter_query'));
+		}
 		
 		add_action('bp_init', array($this, 'add_tab'));
 		add_filter('eab-event_meta-event_meta_box-after', array($this, 'add_meta_box'));
@@ -40,6 +43,25 @@ class Eab_BuddyPress_GroupEvents {
 		add_filter('eab-events-fpe-add_meta', array($this, 'add_fpe_meta_box'), 10, 2);
 		add_action('eab-events-fpe-enqueue_dependencies', array($this, 'enqueue_fpe_dependencies'), 10, 2);
 		add_action('eab-events-fpe-save_meta', array($this, 'save_fpe_meta'), 10, 2);
+	}
+
+	function filter_query ($query) {
+		global $current_user;
+		if (!($query instanceof WP_Query)) return $query;
+		if (Eab_EventModel::POST_TYPE != @$query->query_vars['post_type']) return $query;
+		if (!function_exists('groups_is_user_member')) return $query;
+		
+		$posts = array();
+		foreach ($query->posts as $post) {
+			$group = (int)get_post_meta($post->ID, 'eab_event-bp-group_event', true);
+			if ($group) {
+				if (!groups_is_user_member($current_user->id, $group)) continue; 
+			}
+			$posts[] = $post;
+		}
+		$query->posts = $posts;
+		$query->post_count = count($posts);
+		return $query;
 	}
 	
 	function auto_join_group ($event_id, $user_id) {
@@ -68,14 +90,21 @@ class Eab_BuddyPress_GroupEvents {
 		$tips = new WpmuDev_HelpTooltips();
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 		$checked = $this->_data->get_option('bp-group_event-auto_join_groups') ? 'checked="checked"' : '';
+		$private = $this->_data->get_option('bp-group_event-private_events') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-group_events" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Group Events settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
-	    <label for="eab_event-bp-group_event-auto_join_groups"><?php _e('Automatically join the group by RSVPing to events', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
-		<input type="checkbox" id="eab_event-bp-group_event-auto_join_groups" name="event_default[bp-group_event-auto_join_groups]" value="1" <?php print $checked; ?> />
-		<span><?php echo $tips->add_tip(__('When your users RSVP positively to your group event, they will also automatically join the group the event belongs to.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
-	    <div class="clear"></div>
+		<div class="eab-settings-settings_item">
+	    	<label for="eab_event-bp-group_event-auto_join_groups"><?php _e('Automatically join the group by RSVPing to events', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
+			<input type="checkbox" id="eab_event-bp-group_event-auto_join_groups" name="event_default[bp-group_event-auto_join_groups]" value="1" <?php print $checked; ?> />
+			<span><?php echo $tips->add_tip(__('When your users RSVP positively to your group event, they will also automatically join the group the event belongs to.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+	    </div>
+		<div class="eab-settings-settings_item">
+	    	<label for="eab_event-bp-group_event-private_events"><?php _e('Group events are private to groups', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
+			<input type="checkbox" id="eab_event-bp-group_event-private_events" name="event_default[bp-group_event-private_events]" value="1" <?php print $private; ?> />
+			<span><?php echo $tips->add_tip(__('If you enable this option, users outside your groups will <b>not</b> be able to see your Group Events.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+	    </div>
 	</div>
 </div>
 <?php
@@ -83,6 +112,7 @@ class Eab_BuddyPress_GroupEvents {
 
 	function save_settings ($options) {
 		$options['bp-group_event-auto_join_groups'] = $_POST['event_default']['bp-group_event-auto_join_groups'];
+		$options['bp-group_event-private_events'] = $_POST['event_default']['bp-group_event-private_events'];
 		return $options;
 	}
 

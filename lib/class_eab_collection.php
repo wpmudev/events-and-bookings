@@ -24,7 +24,7 @@ abstract class WpmuDev_Collection {
 	 * Returns a WP_Query instance.
 	 */
 	public function to_query () {
-		return $this->_query;
+		return apply_filters('wpmudev-query', $this->_query);
 	}
 	
 	abstract public function build_query_args ($args);
@@ -47,7 +47,7 @@ abstract class Eab_Collection extends WpmuDev_Collection {
 		foreach ($query->posts as $post) {
 			$events[] = new Eab_EventModel($post);
 		}
-		return $events;
+		return apply_filters('eab-collection', $events);
 	}
 
 }
@@ -136,6 +136,56 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 
 
 /**
+ * Upcoming events time-restricted collection (5 weeks period) implementation.
+ * @author: Hakan Evin
+ */
+class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
+	
+	public function build_query_args ($args) {
+		// Changes by Hakan
+		// Commented lines were not removed intentionally.
+		$time = $this->get_timestamp();
+		
+		$forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
+		if (!isset($args['incsub_event'])) { // If not single
+			$forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
+		}
+		
+		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;		
+		
+		$args = array_merge(
+			$args,
+			array(
+			 	'post_type' => 'incsub_event', 
+			 	'post_status' => array('publish', Eab_EventModel::RECURRENCE_STATUS),
+				'suppress_filters' => false, 
+				'meta_query' => array(
+					array(
+		    			'key' => 'incsub_event_start',
+						'value' => date( "Y-m-d H:i", $time + 5 * 7 * 86400 ), // Events whose starting dates are 5 weeks from now
+		    			'compare' => '<',
+		    			'type' => 'DATETIME'
+					),
+					array(
+		    			'key' => 'incsub_event_end',
+						'value' => date( "Y-m-d H:i", $time ), // Events those already started now
+		    			'compare' => '>=',
+		    			'type' => 'DATETIME'
+					),
+					array(
+						'key' => 'incsub_event_status',
+						'value' => $forbidden_statuses,
+						'compare' => 'NOT IN',
+					),
+				)
+			)
+		);
+		return $args;
+	}
+}
+
+
+/**
  * Popular (most RSVPd) events collection implementation.
  */
 class Eab_PopularCollection extends Eab_Collection {
@@ -182,9 +232,6 @@ class Eab_OrganizerCollection extends Eab_Collection {
 class Eab_OldCollection extends Eab_TimedCollection {
 	
 	public function build_query_args ($args) {
-		$time = $this->get_timestamp();
-		$year = (int)date('Y', $time);
-		$month = date('m', $time);			
 		
 		$args = array_merge(
 			$args,
@@ -199,7 +246,7 @@ class Eab_OldCollection extends Eab_TimedCollection {
 					),
 					array(
 		    			'key' => 'incsub_event_end',
-		    			'value' => "{$year}-{$month}-01 00:00",
+		    			'value' => date("Y-m-d H:i:s", $this->get_timestamp()),
 		    			'compare' => '<',
 		    			'type' => 'DATETIME'
 					),
@@ -210,6 +257,29 @@ class Eab_OldCollection extends Eab_TimedCollection {
 	}
 }
 
+/**
+ * All archived events
+ */
+class Eab_ArchivedCollection extends Eab_Collection {
+	
+	public function build_query_args ($args) {
+		
+		$args = array_merge(
+			$args,
+			array(
+			 	'post_type' => 'incsub_event',
+				'posts_per_page' => -1,
+				'meta_query' => array(
+					array(
+		    			'key' => 'incsub_event_status',
+		    			'value' => Eab_EventModel::STATUS_ARCHIVED,
+					),
+				)
+			)
+		);
+		return $args;
+	}
+}
 
 class Eab_AllRecurringChildrenCollection extends Eab_Collection {
 	
@@ -253,6 +323,15 @@ class Eab_CollectionFactory {
 	 */
 	public static function get_upcoming_events ($timestamp=false, $args=array()) {
 		$me = new Eab_UpcomingCollection($timestamp, $args);
+		return $me->to_collection();
+	}
+
+	/**
+	 * Upcoming events weeks factory method
+	 * @return array Upcoming events list
+	 */
+	public static function get_upcoming_weeks_events ($timestamp=false, $args=array()) {
+		$me = new Eab_UpcomingWeeksCollection($timestamp, $args);
 		return $me->to_collection();
 	}
 	
