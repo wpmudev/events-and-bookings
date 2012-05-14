@@ -1,10 +1,14 @@
 <?php
 /*
 Plugin Name: Immediately expire past events
-Description: By default, your past events will be archived: shown in archives, but visitors won't be able to RSVP. Activating this add-on will immediately expire all your archived events: remove all your past events from archives.
+Description: By default, your past events will be archived. Activating this add-on will immediately expire all your archived events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: Ve Bailovity (Incsub)
+*/
+
+/*
+Detail: Your <em>archived</em> events will be shown in archives, but visitors won't be able to RSVP. <br /> <em>Expired</em> events are removed from your archives.
 */
 
 class Eab_Events_ExpirePastEvents {

@@ -42,36 +42,36 @@ class Eab_GuestList_ShowAdditionalInfo {
 		$size = in_array($size, array_keys($avatar_sizes)) ? (int)$avatar_sizes[$size] : false; 
 		$avatar = $size ? get_avatar($user_id, $size) : false;
 		
-		$name = false;
+		$name = $user_data->user_login;
 		switch ($this->_data->get_option('guest_lists-sai-show_name')) {
 			case "username":
-				$name = $user_data->user_login;
+				$tmp_name = $user_data->user_login;
 				break;
 			case "display_name":
-				$name = $user_data->display_name;
+				$tmp_name = $user_data->display_name;
 				break;
 			case "firstname":
-				$name = get_user_meta($user_id, 'first_name', true);
+				$tmp_name = get_user_meta($user_id, 'first_name', true);
 				break;
 			case "lastname":
-				$name = get_user_meta($user_id, 'last_name', true);
+				$tmp_name = get_user_meta($user_id, 'last_name', true);
 				break;
 			case "fullname_first":
 				$first = get_user_meta($user_id, 'first_name', true);
 				$last = get_user_meta($user_id, 'last_name', true);
-				$name = "{$first} {$last}";
+				$tmp_name = "{$first} {$last}";
 				break;
 			case "fullname_last":
 				$first = get_user_meta($user_id, 'first_name', true);
 				$last = get_user_meta($user_id, 'last_name', true);
-				$name = "{$last} {$first}";
+				$tmp_name = "{$last} {$first}";
 				break;
 			default:
-				$name = false;
+				$tmp_name = false;
 				break;
 			
 		}
-		$name = $name ? "<span class='eab-guest_lists-user_name'>{$name}</span>" : '';
+		$name = sprintf("<span class='eab-guest_lists-user_name'>%s</span>", (trim($tmp_name) ? $tmp_name : $name));
 		$url = defined('BP_VERSION') 
 			? bp_core_get_user_domain($user_id) : 
 			get_author_posts_url($user_id)

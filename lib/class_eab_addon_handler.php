@@ -78,6 +78,7 @@ class Eab_AddonHandler {
 			'Description' => 'Description',
 			'Plugin URI' => 'Plugin URI',
 			'Version' => 'Version',
+			'Detail' => 'Detail'
 		);
 		return get_file_data($path, $default_headers, 'plugin');
 	}
@@ -102,6 +103,12 @@ class Eab_AddonHandler {
 	}
 	
 	public static function create_addon_settings () {
+	
+		if (!class_exists('WpmuDev_HelpTooltips')) 
+			require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
+		$tips = new WpmuDev_HelpTooltips();
+		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		
 		$all = self::get_all_plugins();
 		$active = self::get_active_plugins();
 		$sections = array('thead');
@@ -134,8 +141,10 @@ class Eab_AddonHandler {
 				'<br />' .
 				sprintf(__('Version %s', 'eab'), $plugin_data['Version']) .
 				'&nbsp;|&nbsp;' .
-				sprintf(__('by %s', 'eab'), '<a href="' . $plugin_data['Plugin URI'] . '">' . $plugin_data['Author'] . '</a>') .
-			'</td>';
+				sprintf(__('by %s', 'eab'), '<a href="' . $plugin_data['Plugin URI'] . '">' . $plugin_data['Author'] . '</a>');
+			if ( $plugin_data['Detail'] )
+				echo '&nbsp;' . $tips->add_tip( $plugin_data['Detail'] );
+			echo '</td>';
 			echo "</tr>";
 		}
 		echo "</tbody>";

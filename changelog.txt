@@ -4,6 +4,23 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+1.3 - 2012-05-14
+- Support for blog local time, instead of server local time
+- Support for WP date/time settings
+- Added Event and Next Event Countdown add-ons.
+- Added Next Event Shortcode add-on.
+- Added Event Controlled Redirect add-on.
+- Added Weekly Event Calendar add-on.
+- Avatar replacement for people logging in with Facebook/Twitter.
+- Filling in users first and last name metas from Facebook and Twitter.
+- Recording event metas on posted social messages so we never post twice to Facebook/Twitter for the same event.
+- Added category-like custom taxonomy.
+- Added category filter to upcoming events widget.
+- Defaulting to username if no other names apply for "Guest lists options" add-on.
+- Improvements in Help texts.
+- Support for multiple person attendance for an event
+- Support for registering to website from front end
+- Login with Google account
 
 1.2 - 2012-03-21
 ----------------------------------------------------------------------
@@ -46,4 +63,6 @@ Change Log:
 
 1.0 - 2012-02-13
 ----------------------------------------------------------------------
-- Initial release. 
+- Initial release.
+
+67022-1334033597

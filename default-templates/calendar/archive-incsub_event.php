@@ -1,9 +1,9 @@
 <?php
 global $booking, $wpdb, $wp_query;
 $year = $wp_query->query_vars['event_year'];
-$year = $year ? $year : date('Y');
+$year = $year ? $year : date_i18n('Y'); // date_i18n uses current_time when called like this
 $month = $wp_query->query_vars['event_monthnum'];
-$month = $month ? $month : date('m');
+$month = $month ? $month : date_i18n('m');
 $time = strtotime("{$year}-{$month}-01");
 
 get_header( 'event' );
@@ -12,7 +12,7 @@ get_header( 'event' );
         <div id="wpmudevevents-wrapper">
             <h2><?php echo sprintf(
             	__('Events for %s', Eab_EventsHub::TEXT_DOMAIN),
-            	date("M Y", $time)
+            	date_i18n("F Y", $time)
 			); ?></h2>
             <div class="wpmudevevents-list">
             <?php

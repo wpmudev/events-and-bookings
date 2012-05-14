@@ -25,9 +25,17 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		$options = wp_parse_args((array)$instance, $this->_defaults);
 		
 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Upcoming', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
-		$_events = Eab_CollectionFactory::get_upcoming_weeks_events(time(), array(
+		$query_args = array(
 			'posts_per_page' => $options['limit'],
-		));
+		);
+		if ($options['category']) {
+			$query_args['tax_query'] = array(array(
+				'taxonomy' => 'eab_events_category',
+				'field' => 'id',
+				'terms' => (int)$options['category'],
+			));
+		}
+		$_events = Eab_CollectionFactory::get_upcoming_weeks_events(time(), $query_args);
 	
 		if (is_array($_events) && count($_events) > 0) {
 		?>
@@ -81,6 +89,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
         $instance['thumbnail'] = (int)$new_instance['thumbnail'];
         $instance['limit'] = (int)$new_instance['limit'];
         $instance['dates'] = (int)$new_instance['dates'];
+        $instance['category'] = (int)$new_instance['category'];
 	
         return $instance;
     }
@@ -88,6 +97,8 @@ class Eab_Upcoming_Widget extends Eab_Widget {
     function form($instance) {
 		$options = wp_parse_args((array)$instance, $this->_defaults);
         $options['title'] = strip_tags($instance['title']);	
+		
+		$categories = get_terms('eab_events_category');
 	?>
 	<div style="text-align:left">
             <label for="<?php echo $this->get_field_id('title'); ?>" style="line-height:35px;display:block;">
@@ -121,7 +132,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 					value="1" <?php echo ($options['thumbnail'] ? 'checked="checked"' : ''); ?> 
 				/>
             	<?php _e('Show thumbnail', $this->translation_domain); ?>
-            </label>
+           </label>
            <label for="<?php echo $this->get_field_id('limit'); ?>" style="line-height:35px;display:block;">
             	<?php _e('Limit', $this->translation_domain); ?>:
 				<select id="<?php echo $this->get_field_id('limit'); ?>" name="<?php echo $this->get_field_name('limit'); ?>">
@@ -130,7 +141,17 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 						<option value="<?php echo $i; ?>" <?php echo $selected;?>><?php echo $i;?></option>
 					<?php } ?>
 				</select> 
-            </label>
+           </label>
+           <label for="<?php echo $this->get_field_id('category'); ?>" style="line-height:35px;display:block;">
+            	<?php _e('Only Events from this category', $this->translation_domain); ?>:
+				<select id="<?php echo $this->get_field_id('category'); ?>" name="<?php echo $this->get_field_name('category'); ?>">
+					<option><?php _e('Any', $this->translation_domain);?></option>
+					<?php foreach ($categories as $category) { ?>
+						<?php $selected = ($category->term_id == $options['category']) ? 'selected="selected"' : ''; ?>
+						<option value="<?php echo $category->term_id; ?>" <?php echo $selected;?>><?php echo $category->name;?></option>
+					<?php } ?>
+				</select> 
+           </label>
 	</div>
 	<?php
     }

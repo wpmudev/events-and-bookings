@@ -2,6 +2,7 @@
 /**
  * Holds calendar abstract hub class, 
  * and concrete implementations.
+ * V1.3
  */
 
 /**
@@ -14,6 +15,21 @@ abstract class WpmuDev_CalendarTable {
 	
 	public function __construct ($events) {
 		$this->_events = $events;
+		// To follow WP Start of week setting
+		if ( !$this->start_of_week = get_option('start_of_week') )
+			$this->start_of_week = 0;
+	}
+	/**
+	 * Arranges days array acc. to start of week, e.g 1234560 (Week starting with Monday)
+	 * @ days: input array
+	 */	
+	public function arrange( $days ) {
+		if ( $this->start_of_week ) {
+			for ( $n = 1; $n<=$this->start_of_week; $n++ )
+				array_push( $days, array_shift( $days ) );
+		}
+
+		return $days;
 	}
 	
 	public function get_timestamp () {
@@ -21,7 +37,7 @@ abstract class WpmuDev_CalendarTable {
 	}
 	
 	public function get_month_calendar ($timestamp=false) {
-		$date = $timestamp ? $timestamp : time();
+		$date = $timestamp ? $timestamp : current_time('timestamp');
 		
 		$this->_current_timestamp = $date;
 		
@@ -33,7 +49,6 @@ abstract class WpmuDev_CalendarTable {
 		$first = (int)date('w', strtotime(date('Y-m-01', $time)));
 		$last = (int)date('w', strtotime(date('Y-m-' . $days, $time)));
 		
-		$pad_bottom = $last ? 6 - $last : 0;
 		
 		$post_info = array();
 		foreach ($this->_events as $event) {
@@ -52,13 +67,20 @@ abstract class WpmuDev_CalendarTable {
 		
 		$ret .= $this->_get_first_row();
 		
-		$ret .= ($first ? '<tr><td colspan="' . $first . '">&nbsp;</td>' : '<tr>');
+		if ( $first > $this->start_of_week )
+			$ret .= '<tr><td class="no-left-border" colspan="' . ($first - $this->start_of_week) . '">&nbsp;</td>';
+		else if ( $first < $this->start_of_week )
+			$ret .= '<tr><td class="no-left-border" colspan="' . (7 + $first - $this->start_of_week) . '">&nbsp;</td>';
+		else
+			$ret .= '<tr>';
+		
+		
 		for ($i=1; $i<=$days; $i++) {
 			$date = date('Y-m-' . sprintf("%02d", $i), $time);
 			$dow = (int)date('w', strtotime($date));
 			$current_day_start = strtotime("{$date} 00:00"); 
 			$current_day_end = strtotime("{$date} 23:59");
-			if (0 == $dow) $ret .= '</tr><tr>';
+			if ($this->start_of_week == $dow) $ret .= '</tr><tr>';
 			
 			$this->reset_event_info_storage();
 			foreach ($post_info as $ipost) {
@@ -81,7 +103,12 @@ abstract class WpmuDev_CalendarTable {
 			$ret .= "<td {$today}>{$activity}</td>";
 		}
 		
-		$ret .= ($pad_bottom ? '<td colspan="' . $pad_bottom . '">&nbsp;</td></tr>' : '</tr>');
+		if ( $last > $this->start_of_week )
+			$ret .= '<td class="no-right-border" colspan="' . (6 - $last + $this->start_of_week) . '">&nbsp;</td></tr>'; 
+		else if ( $last + 1 == $this->start_of_week )
+			$ret .= '</tr>'; 
+		else
+			$ret .= '<td class="no-right-border" colspan="' . (6 + $last - $this->start_of_week) . '">&nbsp;</td></tr>';
 		
 		$ret .= $this->_get_last_row();
 		
@@ -93,7 +120,7 @@ abstract class WpmuDev_CalendarTable {
 	}
 	
 	protected function _get_table_meta_row ($which) {
-		$day_names_array = $this->get_day_names();
+		$day_names_array = $this->arrange( $this->get_day_names() );
 		$cells = '<th>' . join('</th><th>', $day_names_array) . '</th>';
 		return "<{$which}><tr>{$cells}</tr></{$which}>";
 	}
@@ -171,13 +198,13 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 	
 	public function get_day_names () {
 		return array(
-			__('S', Eab_EventsHub::TEXT_DOMAIN),
-			__('M', Eab_EventsHub::TEXT_DOMAIN),
-			__('T', Eab_EventsHub::TEXT_DOMAIN),
-			__('W', Eab_EventsHub::TEXT_DOMAIN),
-			__('T', Eab_EventsHub::TEXT_DOMAIN),
-			__('F', Eab_EventsHub::TEXT_DOMAIN),
-			__('S', Eab_EventsHub::TEXT_DOMAIN),
+			__('Su', Eab_EventsHub::TEXT_DOMAIN),
+			__('Mo', Eab_EventsHub::TEXT_DOMAIN),
+			__('Tu', Eab_EventsHub::TEXT_DOMAIN),
+			__('We', Eab_EventsHub::TEXT_DOMAIN),
+			__('Th', Eab_EventsHub::TEXT_DOMAIN),
+			__('Fr', Eab_EventsHub::TEXT_DOMAIN),
+			__('Sa', Eab_EventsHub::TEXT_DOMAIN),
 		);
 	}
 	

@@ -3,9 +3,14 @@
 Plugin Name: Manual Payments
 Description: Allows users to pay manually (check, wire transfer, etc)
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 0.2
+Version: 0.27
 Author: Hakan Evin
 */
+
+/*
+Detail: Adds codes to the front end for the manual payment instructions. These instructions are entered from this setting page, under <b>Manual Payment settings</b>. Also adds codes to the Event page so that you can select that a member paid manually.
+*/
+
 
 class Eab_Events_ManualPayments {
 
@@ -72,6 +77,7 @@ class Eab_Events_ManualPayments {
 	 * Adds the button to the front end that reveals instructions box
 	 */	
 	function add_select_button( $content, $event_id ) {
+		if ($this->_data->get_option('paypal_email')) $content .= '<br /><br />';
 		$content .= '<a class="wpmudevevents-yes-submit" style="float:none !important" href="javascript:void(0)" id="manual_payment_select_'.$event_id.'">'. $this->_data->get_option('manual_payment_select') . '</a>';
 		$content .= '<script type="text/javascript">';
 		$content .= 'jQuery(document).ready(function($){
@@ -103,7 +109,10 @@ class Eab_Events_ManualPayments {
 								"nonce":"'.wp_create_nonce("manual-payment-nonce").'"
 							}, function (data) {
 								if (data && data.error) {alert(data.error);}
-								else {$("#manual_payment_pay_'.$event_id.'").css("opacity","0.2");}
+								else {
+									$("#manual_payment_pay_'.$event_id.'").css("opacity","0.2");
+									alert("'.__('Thank you for the payment!',Eab_EventsHub::TEXT_DOMAIN).'");
+								}
 							});
 							return false;
 						});
@@ -164,7 +173,7 @@ class Eab_Events_ManualPayments {
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-manual_payment_instructions" ><?php _e('Instructions', Eab_EventsHub::TEXT_DOMAIN); ?>&nbsp;:</label>
 						<span><?php echo $tips->add_tip(__('Write the procedure that the user needs to do for a manual payment here. Use MANUALPAYMENTBUTTON to insert the Pay Button to the desired location.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
-						<?php wp_editor( $this->_data->get_option('manual_payment_instructions'), 'manualpaymentsinstructions', array('textarea_name'=>'event_default[manual_payment_instructions]') ); ?>
+						<?php wp_editor( $this->_data->get_option('manual_payment_instructions'), 'manualpaymentsinstructions', array('textarea_name'=>'event_default[manual_payment_instructions]', 'textarea_rows' => 5) ); ?>
 					</div>
 					    
 				</div>

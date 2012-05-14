@@ -40,12 +40,14 @@ class Eab_Template {
 		// Added by Hakan
 		$show_pay_note = $event->is_premium() && $event->user_is_coming() && !$event->user_paid();
 		$show_pay_note = apply_filters('eab-event-show_pay_note', $show_pay_note, $event->get_id () ); 
-		
+
 		if ( $show_pay_note	) {
 			$new_content .= '<div id="wpmudevevents-payment">';
 			$new_content .= __('You haven\'t paid for this event', Eab_EventsHub::TEXT_DOMAIN).' ';
 			$new_content .= self::get_payment_forms($event);
 			$new_content .= '</div>';
+		} else if ($event->is_premium() && $event->user_paid()) {
+			$new_content .= __('You already paid for this event', Eab_EventsHub::TEXT_DOMAIN);
 		}
 		
 		// Added by Hakan
@@ -97,8 +99,8 @@ class Eab_Template {
 			$content .= '<a href="#" id="wpmudevevents-hide-rsvps" class="hide-if-no-js wpmudevevents-viewrsvps wpmudevevents-hidersvps">' .
 				__('Hide who has RSVPed', Eab_EventsHub::TEXT_DOMAIN) .
 			'</a>';
-			$content .= '<div id="wpmudevevents-rsvps-response"></div>';
 			$content .= '</div>';
+			$content .= '<div id="wpmudevevents-rsvps-response"></div>';
 		}
 		
 		return $content;
@@ -226,7 +228,7 @@ class Eab_Template {
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
 		
-		$bookings = $wpdb->get_results($wpdb->prepare("SELECT user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s;", $event->get_id(), $status));
+		$bookings = $wpdb->get_results($wpdb->prepare("SELECT id,user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s;", $event->get_id(), $status));
 		if (!count($bookings)) return false;
 		
 		$content = '';		
@@ -242,10 +244,20 @@ class Eab_Template {
 				$user_data->display_name .
 			'</a>';
 			if ($event->is_premium()) {
-				$payment_status = $event->user_paid()
-					? '<span class="eab-guest-payment_info-paid">' . __('Paid', Eab_EventsHub::TEXT_DOMAIN) . '</span>'
-					: '<span class="eab-guest-payment_info-not_paid">' . __('Not paid', Eab_EventsHub::TEXT_DOMAIN) . '</span>'
-				;
+				if ($event->user_paid($booking->user_id)) {
+				//if ($event->get_booking_paid($booking->id)) {
+					$ticket_count = $event->get_booking_meta($booking->id, 'booking_ticket_count');
+					$ticket_count = $ticket_count ? $ticket_count : 1;
+					$payment_status = '' .
+						'<span class="eab-guest-payment_info-paid">' . 
+							__('Paid', Eab_EventsHub::TEXT_DOMAIN) . 
+						'</span>' .
+						'&nbsp;' .
+						sprintf(__('(%s tickets)', Eab_EventsHub::TEXT_DOMAIN), $ticket_count) .
+					''; 
+				} else {
+					$payment_status = '<span class="eab-guest-payment_info-not_paid">' . __('Not paid', Eab_EventsHub::TEXT_DOMAIN) . '</span>';
+				}
 				// Added by Hakan
 				$payment_status = apply_filters('eab-event-payment_status', $payment_status, $booking->user_id ); 
 				$content .= "<div class='eab-guest-payment_info'>{$payment_status}</div>";
@@ -255,6 +267,9 @@ class Eab_Template {
 					__('Cancel attendance', Eab_EventsHub::TEXT_DOMAIN) .
 				'</a></div>';
 			}
+			$content .= '<div class="eab-guest-actions"><a href="#delete-attendance" class="eab-guest-delete_attendance" data-eab-user_id="' . $booking->user_id . '" data-eab-event_id="' . $event->get_id() . '">' .
+				__('Delete attendance entirely', Eab_EventsHub::TEXT_DOMAIN) .
+			'</a></div>';
 			$content = apply_filters('eab-event-booking_metabox_content', $content, $booking->user_id );
 			$content .= '</div>'; // .eab-guest
 			$content .= '</li>';
@@ -280,9 +295,6 @@ class Eab_Template {
 		;
 	}
 	
-	/**
-	 * @TODO: FIX!
-	 */
 	public static function get_breadcrumbs ($post) {
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
 		$start = $event->get_start_timestamp();
@@ -311,7 +323,7 @@ class Eab_Template {
 		
 		$content = '';
 		
-		$content .= @$eab_options['paypal_sandbox'] 
+		$content .= $data->get_option('paypal_sandbox') 
 			? '<form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">'
 			: '<form action="https://www.paypal.com/cgi-bin/webscr" method="post">'
 		;
@@ -325,6 +337,17 @@ class Eab_Template {
 		$content .= '<input type="hidden" name="return" value="' . get_permalink($event->get_id()) . '" />';
 		$content .= '<input type="hidden" name="currency_code" value="' . $data->get_option('currency') . '">';
 		$content .= '<input type="hidden" name="cmd" value="_xclick" />';
+		
+		// Add multiple tickets
+		$extra_attributes = apply_filters('eab-payment-paypal_tickets-extra_attributes', $extra_attributes, $event->get_id(), $booking_id);
+		$content .= '' .// '<a href="#buy-tickets" class="eab-buy_tickets-trigger" style="display:none">' . __('Buy tickets', Eab_EventsHub::TEXT_DOMAIN) . '</a>' . 
+			sprintf(
+				//'<p class="eab-buy_tickets-target">' . __('I want to buy %s ticket(s)', Eab_EventsHub::TEXT_DOMAIN) . '</p>', 
+				'<p>' . __('I want to buy %s ticket(s)', Eab_EventsHub::TEXT_DOMAIN) . '</p>', 
+				'<input type="number" size="2" name="quantity" value="1" min="1" ' . $extra_attributes . ' />'
+			)
+		;
+		
 		$content .= '<input type="image" name="submit" border="0" src="https://www.paypal.com/en_US/i/btn/btn_paynow_SM.gif" alt="PayPal - The safer, easier way to pay online" />';
 		$content .= '<img alt="" border="0" width="1" height="1" src="https://www.paypal.com/en_US/i/scr/pixel.gif" />';
 		$content .= '</form>';
@@ -471,12 +494,12 @@ class Eab_Template {
 			;
 			
 			$content .= $key ? __(' and ', Eab_EventsHub::TEXT_DOMAIN) : '';
-			$content .= sprintf(
-				__('On %s from %s to %s<br />', Eab_EventsHub::TEXT_DOMAIN),
-				date_i18n(get_option('date_format'), $start),
-				date_i18n(get_option('time_format'), $start),
-				$end_date_str . ' ' . date_i18n(get_option('time_format'), $end)
-			);
+			$content .= apply_filters('eab-events-event_date_string', sprintf(
+				__('On %s <span class="wpmudevevents-date_format-start">from %s</span> <span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN),
+				'<span class="wpmudevevents-date_format-start_date">' . date_i18n(get_option('date_format'), $start) . '</span>',
+				'<span class="wpmudevevents-date_format-start_time">' . date_i18n(get_option('time_format'), $start) . '</span>',
+				'<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span> <span class="wpmudevevents-date_format-end_time">' . date_i18n(get_option('time_format'), $end) . '</span>'
+			), $event->get_id(), $start, $end);
 		}
 		return $content;
 	}

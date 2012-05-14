@@ -702,6 +702,25 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return $wpdb->query($wpdb->prepare("UPDATE " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " SET status='no' WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
 	}
 	
+	public function delete_attendance ($user_id=false) {
+		$user_id = (int)$this->_to_user_id($user_id);
+		if (!$user_id) return false;
+		if ($this->is_premium() && $this->user_paid()) return false; // Can't edit attendance for paid premium events
+		
+		global $wpdb;
+		return $wpdb->query($wpdb->prepare("DELETE FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
+	}
+	
+/* ----- Meta operations ----- */
+
+	public function set_meta ($key, $value) {
+		return update_post_meta($this->get_id(), $key, $value);
+	}
+
+	public function get_meta ($key) {
+		return get_post_meta($this->get_id(), $key, true);
+	}
+	
 	
 	private function _to_user_id ($user_id) {
 		$user_id = (int)$user_id;

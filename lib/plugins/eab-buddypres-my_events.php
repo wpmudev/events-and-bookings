@@ -7,6 +7,10 @@ Version: 1.0
 Author: Ve Bailovity (Incsub)
 */
 
+/*
+Detail: Displays lists of user RSVPs on your users member pages.
+*/ 
+
 class Eab_BuddyPress_MyEvents {
 	
 	private function __construct () {}

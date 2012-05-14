@@ -5,7 +5,7 @@
  Description: Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.
  Author: S H Mohanjith (Incsub)
  WDP ID: 249
- Version: 1.2
+ Version: 1.3
  Author URI: http://premium.wpmudev.org
 */
 
@@ -24,7 +24,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.1';
+    const CURRENT_VERSION = '1.3';
     
     /**
      * Translation domain
@@ -97,6 +97,7 @@ class Eab_EventsHub {
 		add_action('widgets_init', array(&$this, 'widgets_init'));
 		
 		add_action('wp_ajax_nopriv_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
+		add_action('wp_ajax_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
 		add_action('wp_ajax_nopriv_eab_list_rsvps', array(&$this, 'process_list_rsvps'));
 		add_action('wp_ajax_eab_list_rsvps', array(&$this, 'process_list_rsvps'));
 		add_filter('single_template', array( &$this, 'handle_single_template' ) );
@@ -133,11 +134,39 @@ class Eab_EventsHub {
 			add_action('wp_ajax_nopriv_eab_get_twitter_auth_url', array($this, 'handle_get_twitter_auth_url'));
 			add_action('wp_ajax_nopriv_eab_twitter_login', array($this, 'handle_twitter_login'));
 			
+			add_action('wp_ajax_nopriv_eab_get_google_auth_url', array($this, 'handle_get_google_auth_url'));
+			add_action('wp_ajax_nopriv_eab_google_login', array($this, 'handle_google_login'));
+
+			add_action('wp_ajax_nopriv_eab_wordpress_login', array($this, 'handle_wordpress_login'));
+			add_action('wp_ajax_nopriv_eab_wordpress_register', array($this, 'handle_wordpress_register'));
+			
 			add_action('wp_ajax_eab_get_form', array($this, 'handle_get_form'));
+			
+			// API avatars
+			add_filter('get_avatar', array($this, 'get_social_api_avatar'), 10, 3);
+			
+			// Google
+			if ( !session_id() )
+				session_start();
+			if (!class_exists('LightOpenID')) 
+				include_once  WP_PLUGIN_DIR . '/events-and-bookings/lib/lightopenid/openid.php';
+			$this->openid = new LightOpenID;
+			
+			$this->openid->identity = 'https://www.google.com/accounts/o8/id';
+			$this->openid->required = array('namePerson/first', 'namePerson/last', 'namePerson/friendly', 'contact/email');
+			if (!empty($_REQUEST['openid_ns'])) {
+			$cache = $this->openid->getAttributes();
+				if (isset($cache['namePerson/first']) || isset($cache['namePerson/last']) || isset($cache['contact/email'])) {
+					$_SESSION['wdcp_google_user_cache'] = $cache;
+				}
+			}
+			$this->_google_user_cache = $_SESSION['wdcp_google_user_cache'];
+			
 		}
 		// End API login & form section	
 		add_action('wp_ajax_eab_restart_tutorial', array($this, 'handle_tutorial_restart'));
 		add_action('wp_ajax_eab_cancel_attendance', array($this, 'handle_attendance_cancel'));		
+		add_action('wp_ajax_eab_delete_attendance', array($this, 'handle_attendance_delete'));		
     }
 
 	function process_recurrent_trashing ($post_id) {
@@ -208,6 +237,23 @@ class Eab_EventsHub {
 			Eab_EventModel::POST_TYPE,
 			apply_filters('eab-post_type-register', $event_type_args)
 		);
+		register_taxonomy(
+			'eab_events_category',		
+			Eab_EventModel::POST_TYPE,
+			array(
+				'labels' => array(
+					'name' => __('Event Categories', self::TEXT_DOMAIN),
+					'singular_name' => __('Event Category', self::TEXT_DOMAIN),
+					'singular_name' => __('Event Category', self::TEXT_DOMAIN),
+				),
+				'hierarchical' => true,
+				'public' => true,
+				'rewrite' => array(
+					'slug' => $this->_data->get_option('slug'),
+					'with_front' => true,
+				),
+			)
+		);
 		
 		$pts_args = array('show_in_admin_all_list' => false);
 		if (is_admin()) $pts_args['protected'] = true; 
@@ -247,23 +293,23 @@ class Eab_EventsHub {
 		
 		if (isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'incsub_event-update-options')) {
 			$options = array();
-		    $options['slug'] = $_POST['event_default']['slug'];
-			$options['accept_payments'] = $_POST['event_default']['accept_payments'];
-			$options['accept_api_logins'] = $_POST['event_default']['accept_api_logins'];
-			$options['display_attendees'] = $_POST['event_default']['display_attendees'];
-			$options['currency'] = $_POST['event_default']['currency'];
-			$options['paypal_email'] = $_POST['event_default']['paypal_email'];
-			$options['paypal_sandbox'] = @$_POST['event_default']['paypal_sandbox'];
+		    $options['slug'] 						= $_POST['event_default']['slug'];
+			$options['accept_payments'] 			= $_POST['event_default']['accept_payments'];
+			$options['accept_api_logins'] 			= $_POST['event_default']['accept_api_logins'];
+			$options['display_attendees'] 			= $_POST['event_default']['display_attendees'];
+			$options['currency'] 					= $_POST['event_default']['currency'];
+			$options['paypal_email'] 				= $_POST['event_default']['paypal_email'];
+			$options['paypal_sandbox'] 				= @$_POST['event_default']['paypal_sandbox'];
 			
-			$options['override_appearance_defaults'] = $_POST['event_default']['override_appearance_defaults'];
-			$options['archive_template'] = $_POST['event_default']['archive_template'];
-			$options['single_template'] = $_POST['event_default']['single_template'];
+			$options['override_appearance_defaults']	= $_POST['event_default']['override_appearance_defaults'];
+			$options['archive_template'] 			= $_POST['event_default']['archive_template'];
+			$options['single_template'] 			= $_POST['event_default']['single_template'];
 			
-			$options['facebook-app_id'] = $_POST['event_default']['facebook-app_id'];
-			$options['facebook-no_init'] = $_POST['event_default']['facebook-no_init'];
+			$options['facebook-app_id'] 			= $_POST['event_default']['facebook-app_id'];
+			$options['facebook-no_init'] 			= $_POST['event_default']['facebook-no_init'];
 			
-			$options['twitter-app_id'] = $_POST['event_default']['twitter-app_id'];
-			$options['twitter-app_secret'] = $_POST['event_default']['twitter-app_secret'];
+			$options['twitter-app_id'] 				= $_POST['event_default']['twitter-app_id'];
+			$options['twitter-app_secret'] 			= $_POST['event_default']['twitter-app_secret'];
 			
 		    //update_option('incsub_event_default', $this->_options['default']);
 			$options = apply_filters('eab-settings-before_save', $options);
@@ -295,7 +341,7 @@ class Eab_EventsHub {
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_yes', $event_id, $current_user->ID );
 				$this->recount_bookings($event_id);
-				wp_redirect('?eab_success_msg='.urlencode("Excellent! We've got you marked as coming and we'll see you there!"));
+				wp_redirect('?eab_success_msg='.urlencode(__("Excellent! We've got you marked as coming and we'll see you there!", self::TEXT_DOMAIN)));
 				exit();
 		    }
 		    if (isset($_POST['action_maybe'])) {
@@ -305,7 +351,7 @@ class Eab_EventsHub {
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_maybe', $event_id, $current_user->ID );
 				$this->recount_bookings($event_id);
-				wp_redirect('?eab_success_msg='.urlencode("Thanks for letting us know. Hopefully you'll be able to make it!"));
+				wp_redirect('?eab_success_msg='.urlencode(__("Thanks for letting us know. Hopefully you'll be able to make it!", self::TEXT_DOMAIN)));
 				exit();
 		    }
 		    if (isset($_POST['action_no'])) {
@@ -315,7 +361,7 @@ class Eab_EventsHub {
 				// --todo: Remove from BP activity stream
 				do_action( 'incsub_event_booking_no', $event_id, $current_user->ID );
 				$this->recount_bookings($event_id);
-				wp_redirect('?eab_success_msg='.urlencode("That's too bad you won't be able to make it"));
+				wp_redirect('?eab_success_msg='.urlencode(__("That's too bad you won't be able to make it", self::TEXT_DOMAIN)));
 				exit();
 		    }
 		}	
@@ -400,7 +446,7 @@ class Eab_EventsHub {
     
     function process_paypal_ipn() {
 		$req = 'cmd=_notify-validate';
-		
+	
 		$request = $_REQUEST;
 		
 		$post_values = "";
@@ -417,7 +463,7 @@ class Eab_EventsHub {
 		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
 		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 		
-		$ip = $ip;
+		//$ip = $ip;
 		
 		$pay_to_email = $request['receiver_email'];
 		$pay_from_email = $request['payer_email'];
@@ -425,10 +471,10 @@ class Eab_EventsHub {
 		
 		$status = $request['payment_status'];
 		$amount = $request['mc_gross'];
+		$ticket_count = $request['quantity']; // Ticket count is the number of paid for tickets
 		$currency = $request['mc_currency'];
 		$test_ipn = $request['test_ipn'];
 		$event_id = $request['item_number'];
-		
 		$booking_id = (int)$request['booking_id'];
 		$blog_id = (int)$request['blog_id'];
 		
@@ -440,9 +486,8 @@ class Eab_EventsHub {
 		    $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 		}
 		
-		switch_to_blog($blog_id);
+		if (is_multisite()) switch_to_blog($blog_id);
 		$booking_obj = Eab_EventModel::get_booking($booking_id);
-	
 		
 		if (!$booking_obj || !$booking_obj->id) {
 		    header('HTTP/1.0 404 Not Found');
@@ -458,17 +503,25 @@ class Eab_EventsHub {
 		    exit(0);
 		}
 		
-		if ($this->_options['default']['currency'] != $currency) {
+		if (@$eab_options['currency'] != $currency) {
 		    header('HTTP/1.0 400 Bad Request');
 		    header('Content-type: text/plain; charset=UTF-8');
 		    print 'We were not expecting you. REF: PP1';
 		    exit(0);
 		}
 		
-		if ($amount != get_post_meta($event_id, 'incsub_event_fee', true)) {	    
+		//if ($amount != get_post_meta($event_id, 'incsub_event_fee', true)) {	    
+		if ($amount != $ticket_count * get_post_meta($event_id, 'incsub_event_fee', true)) {	    
 		    header('HTTP/1.0 400 Bad Request');
 		    header('Content-type: text/plain; charset=UTF-8');
 		    print 'We were not expecting you. REF: PP2';
+	    	    exit(0);
+		}
+
+		if (!$ticket_count) {	    
+		    header('HTTP/1.0 400 Bad Request');
+		    header('Content-type: text/plain; charset=UTF-8');
+		    print 'Cheapskate. REF: PP2';
 	    	    exit(0);
 		}
 		
@@ -493,6 +546,7 @@ class Eab_EventsHub {
 				    if ((int)@$eab_options['paypal_sandbox'] == 1) {
 						// Sandbox, it's allowed so do stuff
 				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_transaction_key', $transaction_id);
+				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_ticket_count', $ticket_count);
 				    } else {
 				    	// Sandbox, not allowed, bail out
 				    	header('HTTP/1.0 400 Bad Request');
@@ -503,6 +557,7 @@ class Eab_EventsHub {
 				} else {
 				    // Paid
 				    Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_transaction_key', $transaction_id);
+					Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_ticket_count', $ticket_count);
 				}
 				header('HTTP/1.0 200 OK');
 				header('Content-type: text/plain; charset=UTF-8');
@@ -513,7 +568,7 @@ class Eab_EventsHub {
 			}
 		    fclose ($fp);
 	    }
-		restore_current_blog();
+		if (is_multisite()) restore_current_blog();
 		header('HTTP/1.0 200 OK');
 		header('Content-type: text/plain; charset=UTF-8');
 		print 'Thank you very much for letting us know. REF: '.$message;
@@ -750,10 +805,18 @@ class Eab_EventsHub {
     function wp_enqueue_scripts() {
 		global $wp_query;
 		
+		echo '<script type="text/javascript">var _eab_data=' . json_encode(apply_filters('eab-javascript-public_data', array(
+			'ajax_url' => admin_url('admin-ajax.php'),
+			'root_url' => plugins_url('events-and-bookings/img/'),
+			'fb_scope' => 'email',
+		))) . ';</script>';
+		/*
 		printf(
-			'<script type="text/javascript">var _eab_data={"ajax_url": "%s", "root_url": "%s"};</script>',
+			'<script type="text/javascript">var _eab_data=;</script>',
+			//{"ajax_url": "%s", "root_url": "%s"};</script>',
 			admin_url('admin-ajax.php'), plugins_url('events-and-bookings/img/')
 		);
+		*/
 		if (isset($wp_query->query_vars['post_type']) && $wp_query->query_vars['post_type'] == 'incsub_event') {
 		    wp_enqueue_script('eab_event_js');
 			if (!$this->_data->get_option('accept_api_logins')) return false;
@@ -764,9 +827,22 @@ class Eab_EventsHub {
 			wp_localize_script('eab_api_js', 'l10nEabApi', array(
 				'facebook' => __('Login with Facebook', self::TEXT_DOMAIN),
 				'twitter' => __('Login with Twitter', self::TEXT_DOMAIN),
+				'google' => __('Login with Google', self::TEXT_DOMAIN),
 				'wordpress' => sprintf(__('Login with %s', self::TEXT_DOMAIN), $domain),
 				'cancel' => __('Cancel', self::TEXT_DOMAIN),
 				'please_wait' => __('Please, wait...', self::TEXT_DOMAIN),
+				
+				'wp_register' => __('Register', self::TEXT_DOMAIN), 
+				'wp_registration_msg' => __('Create a username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
+				'wp_login' => __('Log in', self::TEXT_DOMAIN), 
+				'wp_login_msg' => __('Login with your existing username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
+				'wp_username' => __('Username', self::TEXT_DOMAIN), 
+				'wp_password' => __('Password', self::TEXT_DOMAIN), 
+				'wp_email' => __('Email', self::TEXT_DOMAIN), 
+				'wp_toggle_on' => __('Already a member? Log in here', self::TEXT_DOMAIN), 
+				'wp_toggle_off' => __('Click here to register', self::TEXT_DOMAIN), 
+				'wp_submit' => __('Submit', self::TEXT_DOMAIN), 
+				'wp_cancel' => __('Cancel', self::TEXT_DOMAIN), 
 			));
 			if (!$this->_data->get_option('facebook-no_init')) {
 				add_action('wp_footer', create_function('', "echo '" .
@@ -792,6 +868,7 @@ class Eab_EventsHub {
 				) .
 				"';"));
 			}
+			do_action('eab-javascript-enqueue_scripts');
 		}
 	
     }
@@ -1732,6 +1809,7 @@ class Eab_EventsHub {
 						</span>
 					    <?php } ?>
 					</div>
+					
 				</div>
 		    </div>
 		    <?php do_action('eab-settings-after_appearance_settings'); ?>
@@ -1955,22 +2033,32 @@ class Eab_EventsHub {
 		$email = is_email($data->email);
 		if (!$email) die(json_encode($resp)); // Wrong email
 		
-		$wp_user = get_user_by('email', $email);
+		$wordp_user = get_user_by('email', $email);
 		
-		if (!$wp_user) { // Not an existing user, let's create a new one
+		if (!$wordp_user) { // Not an existing user, let's create a new one
 			$password = wp_generate_password(12, false);
 			$username = @$data->name
 				? preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->name))
 				: preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->first_name)) . '_' . preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->last_name))
 			;
 	
-			$wp_user = wp_create_user($username, $password, $email);
-			if (is_wp_error($wp_user)) die(json_encode($resp)); // Failure creating user
+			$wordp_user = wp_create_user($username, $password, $email);
+			if (is_wp_error($wordp_user)) die(json_encode($resp)); // Failure creating user
+			else {
+				update_user_meta($wordp_user, 'first_name', @$data->first_name);
+				update_user_meta($wordp_user, 'last_name', @$data->last_name);
+			}
 		} else {
-			$wp_user = $wp_user->ID;
+			$wordp_user = $wordp_user->ID;
 		}
 		
-		$user = get_userdata($wp_user);
+		update_user_meta($wordp_user, '_eab_fb', array(
+			'id' => $fb_uid,
+			'token' => $token,
+		));
+		do_action('eab-user_logged_in-facebook', $wordp_user, $fb_uid, $token);
+		
+		$user = get_userdata($wordp_user);
 
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with Facebook, yay
@@ -2028,14 +2116,14 @@ class Eab_EventsHub {
 		
 		$twitter = $this->_get_twitter_object($access['oauth_token'], $access['oauth_token_secret']);
 		$tw_user = $twitter->get('account/verify_credentials');
-		
+
 		// Have user, now register him/her
 		$domain = preg_replace('/www\./', '', parse_url(site_url(), PHP_URL_HOST));
 		$username = preg_replace('/[^_0-9a-z]/i', '_', strtolower($tw_user->name));
 		$email = $username . '@twitter.' . $domain; //STUB email
-		$wp_user = get_user_by('email', $email);
+		$wordp_user = get_user_by('email', $email);
 		
-		if (!$wp_user) { // Not an existing user, let's create a new one
+		if (!$wordp_user) { // Not an existing user, let's create a new one
 			$password = wp_generate_password(12, false);
 			$count = 0;
 			while (username_exists($username)) {
@@ -2043,15 +2131,180 @@ class Eab_EventsHub {
 				if (++$count > 10) break;
 			}
 	
-			$wp_user = wp_create_user($username, $password, $email);
-			if (is_wp_error($wp_user)) die(json_encode($resp)); // Failure creating user
+			$wordp_user = wp_create_user($username, $password, $email);
+			if (is_wp_error($wordp_user)) die(json_encode($resp)); // Failure creating user
+			else {
+				list($first_name, $last_name) = explode(' ', @$tw_user->name, 2);
+				update_user_meta($wordp_user, 'first_name', $first_name);
+				update_user_meta($wordp_user, 'last_name', $last_name);
+			}
 		} else {
-			$wp_user = $wp_user->ID;
+			$wordp_user = $wordp_user->ID;
 		}
 		
-		$user = get_userdata($wp_user);
+		update_user_meta($wordp_user, '_eab_tw', array(
+			'id' => $tw_user->id,
+			'avatar' => $tw_user->profile_image_url,
+			'token' => $access,
+		));
+		do_action('eab-user_logged_in-twitter', $wordp_user, $tw_user->id, $tw_user->profile_image_url, $access);
+		
+		$user = get_userdata($wordp_user);
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with Twitter, yay
+		do_action('wp_login', $user->user_login);
+		
+		die(json_encode(array(
+			"status" => 1,
+		)));
+	}
+	
+	/**
+	 * Save a message to the log file
+	 */	
+	function log( $message='' ) {
+		// Don't give warning if folder is not writable
+		@file_put_contents( WP_PLUGIN_DIR . "/events-and-bookings/log.txt", $message . chr(10). chr(13), FILE_APPEND ); 
+	}
+	
+	
+	/**
+	 * Get OAuth request URL and token.
+	 */
+	function handle_get_google_auth_url () {
+		header("Content-type: application/json");
+		
+		$this->openid->returnUrl = $_POST['url'];
+		
+		echo json_encode(array(
+			'url' => $this->openid->authUrl()
+		));
+		exit();
+	}
+	
+	/**
+	 * Login or create a new user using whatever data we get from Google.
+	 */
+	function handle_google_login () {
+		header("Content-type: application/json");
+		$resp = array(
+			"status" => 0,
+		);
+		
+		$cache = $this->openid->getAttributes();
+		
+		if (isset($cache['namePerson/first']) || isset($cache['namePerson/last']) || isset($cache['namePerson/friendly']) || isset($cache['contact/email'])) {
+			$this->_google_user_cache = $cache;
+		}
+
+		// Have user, now register him/her
+		if ( !$username = $this->_google_user_cache['namePerson/friendly'] )
+			$username = $this->_google_user_cache['namePerson/first'];
+		$email = $this->_google_user_cache['contact/email'];
+		$wordp_user = get_user_by('email', $email);
+		
+		if (!$wordp_user) { // Not an existing user, let's create a new one
+			$password = wp_generate_password(12, false);
+			$count = 0;
+			while (username_exists($username)) {
+				$username .= rand(0,9);
+				if (++$count > 10) break;
+			}
+	
+			$wordp_user = wp_create_user($username, $password, $email);
+			if (is_wp_error($wordp_user)) 
+				die(json_encode($resp)); // Failure creating user
+			else {
+				update_user_meta($wordp_user, 'first_name', $this->_google_user_cache['namePerson/first']);
+				update_user_meta($wordp_user, 'last_name', $this->_google_user_cache['namePerson/last']);
+			}
+		} 
+		else {
+			$wordp_user = $wordp_user->ID;
+		}
+		
+		
+		$user = get_userdata($wordp_user);
+		wp_set_current_user($user->ID, $user->user_login);
+		wp_set_auth_cookie($user->ID); // Logged in with Google, yay
+		do_action('wp_login', $user->user_login);
+		
+		die(json_encode(array(
+			"status" => 1,
+		)));
+	}
+
+	function handle_wordpress_login () {
+		header("Content-type: application/json");
+		$resp = array(
+			"status" => 0,
+		);
+		$data = stripslashes_deep(@$_POST['data']);
+		$login = @$data['username'];
+		$pass = @$data['password'];
+		if (!user_pass_ok($login, $pass)) die(json_encode($resp));
+		
+		$user = get_user_by('login', $login);
+		if (is_wp_error($user)) die(json_encode($resp));
+		
+		wp_set_current_user($user->ID, $user->user_login);
+		wp_set_auth_cookie($user->ID); // Logged in with WordPress, yay
+		do_action('wp_login', $user->user_login);
+		
+		die(json_encode(array(
+			"status" => 1,
+		)));
+	}
+
+	function handle_wordpress_register () {
+		header("Content-type: application/json");
+		$resp = array(
+			"status" => 0,
+		);
+		$data = stripslashes_deep(@$_POST['data']);
+		$login = @$data['username'];
+		$email = @$data['email'];
+		
+		// Check the username
+		if ( empty($login) ) {
+			//$errors[] = __('Please enter a username.');
+			die(json_encode($resp));
+		}
+		if ( !validate_username( $login ) ) {
+			//$errors[] = __('This username is invalid.  Please enter a valid username.');
+			die(json_encode($resp));
+		}
+		if ( username_exists( $login ) ) {
+			//$errors[] = __('This username is already registered, please choose another.');
+			die(json_encode($resp));
+		}
+
+		// Check the e-mail address
+		if (empty($email)) {
+			//$errors[] = __('Please type your e-mail address.');
+			die(json_encode($resp));
+		} else if ( !is_email( $email ) ) {
+			//$errors[] = __('The email address appears invalid.');
+			//$email = '';
+			die(json_encode($resp));
+		}
+		if ( email_exists( $email ) ) {
+			//$errors[] = __('This email is already registered, please choose another.');
+			die(json_encode($resp));
+		}
+
+		$password = wp_generate_password(12, false);
+		
+		$wordp_user = wp_create_user($login, $password, $email);
+		if (is_wp_error($wordp_user)) die(json_encode($resp));
+		
+		$user = get_userdata($wordp_user);
+		
+		//notify
+		wp_new_user_notification($user->ID, $password);
+		
+		wp_set_current_user($user->ID, $user->user_login);
+		wp_set_auth_cookie($user->ID); // Logged in with WordPress, yay
 		do_action('wp_login', $user->user_login);
 		
 		die(json_encode(array(
@@ -2082,57 +2335,69 @@ class Eab_EventsHub {
 		die;
 	}
 	
+	function handle_attendance_delete () {
+		$user_id = (int)$_POST['user_id'];
+		$post_id = (int)$_POST['post_id'];
+		
+		$post = get_post($post_id);
+		$event = new Eab_EventModel($post);
+		$event->delete_attendance($user_id);
+		echo $this->meta_box_part_bookings($post);
+		die;
+	}
+	
 	/**
 	 * Proper query rewriting.
 	 * HAVE to calculate in the year as well.
 	 */
 	function load_events_from_query () {
+		if (is_admin()) return false;
 		global $wp_query;
 		if (
 			'incsub_event' == $wp_query->query_vars['post_type']
+			/*
 			&&
 			(
 				(isset($wp_query->query_vars['event_monthnum']) && $wp_query->query_vars['event_monthnum']) 
 				|| 
 				(isset($wp_query->query_vars['event_year']) && $wp_query->query_vars['event_year'])
 			)
+			*/
 		) {
 			$year = (int)@$wp_query->query_vars['event_year'];
 			$year = $year ? $year : date('Y');
 			$month = (int)@$wp_query->query_vars['event_monthnum'];
+			$month = $month ? $month : date('m');
+
 			$wp_query = Eab_CollectionFactory::get_upcoming(strtotime("{$year}-{$month}-01 00:00"), $wp_query->query);
-			/*
-			if (!$month) {
-				$start_month = '01';
-				$end_month = '12';
-			} else {
-				$start_month = $month ? sprintf("%02d", $month) : date('m');
-				$end_month = sprintf("%02d", (int)$month+1);				
-			}
-			$args = array_merge(
-			 	$wp_query->query,
-			 	array(
-				 	'post_type' => 'incsub_event',
-	        		'suppress_filters' => false, 
-	        		'meta_query' => array(
-	        			array(
-		        			'key' => 'incsub_event_start',
-		        			'value' => "{$year}-{$end_month}-01 00:00",
-		        			'compare' => '<',
-		        			'type' => 'DATETIME'
-	        			),
-	        			array(
-		        			'key' => 'incsub_event_end',
-		        			'value' => "{$year}-{$start_month}-01 00:00",
-		        			'compare' => '>=',
-		        			'type' => 'DATETIME'
-	        			),
-	        		)
-				)
-        	);
-            $wp_query = new WP_Query($args);
-			*/
 		}
+	}
+	
+	function get_social_api_avatar ($avatar, $id_or_email, $size = '96') {
+		$wp_uid = false;
+		if (is_object($id_or_email)) {
+			if (isset($id_or_email->comment_author_email)) $id_or_email = $id_or_email->comment_author_email;
+			else return $avatar;
+		}
+
+		if (is_numeric($id_or_email)) {
+			$wp_uid = (int)$id_or_email;
+		} else if (is_email($id_or_email)) {
+			$user = get_user_by('email', $id_or_email);
+			if ($user) $wp_uid = $user->ID;
+		} else return $avatar;
+		if (!$wp_uid) return $avatar;
+		
+		$fb = get_user_meta($wp_uid, '_eab_fb', true);
+		if ($fb && isset($fb['id'])) {
+			return "<img class='avatar avatar-{$size} photo eab-avatar eab-avatar-facebook' width='{$size}' height='{$size}' src='https://graph.facebook.com/" . $fb['id'] . "/picture' />";
+		}
+		$tw = get_user_meta($wp_uid, '_eab_tw', true);
+		if ($tw && isset($tw['avatar'])) {
+			return "<img class='avatar avatar-{$size} photo eab-avatar eab-avatar-twitter' width='{$size}' height='{$size}' src='" . $tw['avatar'] . "' />";
+		}
+		
+		return $avatar;
 	}
 }
 

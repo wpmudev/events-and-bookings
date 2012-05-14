@@ -241,6 +241,20 @@ $(function () {
 		})
 		return false;
 	});
+	// Attendance deleting
+	$(".eab-guest-delete_attendance").live('click', function () {
+		var $me = $(this);
+		var user_id = $me.attr("data-eab-user_id");
+		var post_id = $me.attr("data-eab-event_id");
+		$.post(ajaxurl, {
+			"action": "eab_delete_attendance",
+			"user_id": user_id,
+			"post_id": post_id,
+		}, function (data) {
+			$("#eab-bookings-response").html(data);
+		})
+		return false;
+	});
 
 });
 })(jQuery);

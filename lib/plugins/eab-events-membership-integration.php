@@ -1,10 +1,14 @@
 <?php
 /*
-Plugin Name: Membership Integration Addon for Events+
-Description: Allows Events+ to Integrate with Membership plugin
+Plugin Name: Membership Integration
+Description: Allows Events+ to Integrate with Membership plugin, so that members can be selected to be exempt from payment for paid events. <br /><b>Requires <a href="http://premium.wpmudev.org/project/membership">Membership plugin</a>.</b>
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 0.11
+Version: 0.25
 Author: Hakan Evin
+*/
+
+/*
+Detail: Adds a field to the Event page so that you can select which membership level(s) will be exempt from payments for a selected paid event.
 */
 
 class Eab_Events_MembershipIntegration {

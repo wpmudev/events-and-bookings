@@ -7,6 +7,10 @@ Version: 1.0
 Author: Ve Bailovity (Incsub)
 */
 
+/*
+Detail: Allows deeper integration of your Events with BuddyPress groups. <br /> <b>Requires BuddyPress Groups component</b>
+*/ 
+
 class Eab_BuddyPress_GroupEvents {
 	
 	const SLUG = 'group-events';

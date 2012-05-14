@@ -7,6 +7,10 @@ Version: 1.0
 Author: Ve Bailovity (Incsub)
 */
 
+/*
+Detail: By default, Front-page editor will work with preconfigured stub URL. However, you can create your own page, add the Front-page editing shortcode (<code>[eab_event_editor]</code>) to the content and configure your Add/Edit links in plugin settings to use this page instead.
+*/
+
 class Eab_Events_FrontPageEditing {
 	
 	const SLUG = 'edit-event';

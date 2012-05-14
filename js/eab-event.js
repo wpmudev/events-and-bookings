@@ -28,4 +28,13 @@ jQuery(function() {
             return false;
         }
     );
+    
+    jQuery(".eab-buy_tickets-target").hide();
+    jQuery(".eab-buy_tickets-trigger")
+    	.show()
+    	.on('click', function () {
+    		jQuery(this).hide().parent().find(".eab-buy_tickets-target").show();
+    		return false;
+    	})
+    ;
 });
