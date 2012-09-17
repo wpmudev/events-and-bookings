@@ -8,7 +8,7 @@ class Eab_ExporterFactory {
 	const DISPOSITION_KEY = 'disposition';
 
 	public static function serve ($args) {
-		if (!$args || !is_array($args)) wp_die(__('Invalid argument format.'), Eab_EventsHub::TEXT_DOMAIN);
+		if (!$args || !is_array($args)) wp_die(__('Invalid argument format.', Eab_EventsHub::TEXT_DOMAIN));
 		$args = wp_parse_args($args, array(
 			self::EXPORTER_KEY => 'attendees',
 			'format' => 'csv',
@@ -16,7 +16,7 @@ class Eab_ExporterFactory {
 			'disposition' => Eab_Exporter::DISPOSITION_ATTACHMENT,
 		));
 		$class = 'Eab_Exporter_' . ucfirst(strtolower($args['format']));
-		if (!class_exists($class)) wp_die(__('Invalid exporter requested.'), Eab_EventsHub::TEXT_DOMAIN);
+		if (!class_exists($class)) wp_die(__('Invalid exporter requested.', Eab_EventsHub::TEXT_DOMAIN));
 
 		$me = new $class($args);
 		$me->export();

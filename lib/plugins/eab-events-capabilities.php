@@ -37,7 +37,7 @@ class Eab_Events_Capabilities {
 		add_filter('eab-capabilities-user_can', array($this, 'check_capability_for'), 10, 4);
 	}
 	
-	function check_capability_for ($capability, $user, $capable, $args) {
+	function check_capability_for ($capable, $capability, $user, $args) {
 		if (!in_array($capability, array_keys($this->_capabilities))) return $capable;
 
 		$roles_map = $this->_data->get_option('eab-capabilities_map');

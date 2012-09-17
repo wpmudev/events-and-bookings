@@ -18,7 +18,6 @@ abstract class WpmuDev_Collection {
 	public function __construct ($args) {
 		$query = $this->build_query_args($args);
 		$this->_query = new WP_Query($query);
-//echo '<pre>';die(var_Export($this->_query));
 	}
 	
 	/**
@@ -94,7 +93,13 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 
 	public function order_by_date ($q) {
 		global $wpdb;
-		return "eab_meta.meta_value ASC"; // @TODO: SET UP EVENT ORDERING DIRECTION!!
+		$allowed = array("ASC", "DESC");
+		$direction = (defined('EAB_COLLECTION_DATE_ORDERING_DIRECTION') && in_array(strtoupper(EAB_COLLECTION_DATE_ORDERING_DIRECTION), $allowed))
+			? strtoupper(EAB_COLLECTION_DATE_ORDERING_DIRECTION)
+			: "ASC"
+		;
+		$direction = apply_filters('eab-collection-date_ordering_direction', $direction);
+		return "eab_meta.meta_value {$direction}";
 	}
 
 	public function join_postmeta ($q) {
@@ -166,7 +171,11 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
  */
 class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 
+	const WEEK_COUNT = 5;
+
 	public function __construct ($timestamp=false, $args=array()) {
+		if (!defined('EAB_COLLECTION_UPCOMING_WEEKS_COUNT')) define('EAB_COLLECTION_UPCOMING_WEEKS_COUNT', self::WEEK_COUNT, true);
+
 		add_filter('posts_where', array($this, 'posts_where'));
 		add_filter('posts_join', array($this, 'join_postmeta'));
 		add_filter('posts_orderby', array($this, 'order_by_date'));
@@ -199,8 +208,11 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 		if (!isset($args['incsub_event'])) { // If not single
 			$forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
 		}
-		
-		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;		
+
+		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;	
+
+		$weeks = apply_filters('eab-collection-upcoming_weeks-week_number', EAB_COLLECTION_UPCOMING_WEEKS_COUNT);
+		$weeks = is_numeric($weeks) ? $weeks : self::WEEK_COUNT;
 		
 		$args = array_merge(
 			$args,
@@ -211,7 +223,7 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_start',
-						'value' => date( "Y-m-d H:i", $time + 5 * 7 * 86400 ), // Events whose starting dates are 5 weeks from now
+						'value' => date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are 5 weeks from now
 		    			'compare' => '<',
 		    			'type' => 'DATETIME'
 					),
@@ -330,6 +342,30 @@ class Eab_ArchivedCollection extends Eab_Collection {
 	}
 }
 
+/**
+ * All expired events
+ */
+class Eab_ExpiredCollection extends Eab_Collection {
+	
+	public function build_query_args ($args) {
+		
+		$args = array_merge(
+			$args,
+			array(
+			 	'post_type' => 'incsub_event',
+				'posts_per_page' => -1,
+				'meta_query' => array(
+					array(
+		    			'key' => 'incsub_event_status',
+		    			'value' => Eab_EventModel::STATUS_EXPIRED,
+					),
+				)
+			)
+		);
+		return $args;
+	}
+}
+
 class Eab_AllRecurringChildrenCollection extends Eab_Collection {
 	
 	public function build_query_args ($arg) {
@@ -429,4 +465,9 @@ class Eab_CollectionFactory {
 		$me = new Eab_OrganizerCollection($user_id);
 		return $me->to_collection();
 	} 
+
+	public static function get_expired_events ($args=array()) {
+		$me = new Eab_ExpiredCollection($args);
+		return $me->to_collection();
+	}
 }

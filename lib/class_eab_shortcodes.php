@@ -6,6 +6,7 @@ class Eab_Shortcodes {
 		'calendar' => 'eab_calendar',
 		'archive' => 'eab_archive',
 		'single' => 'eab_single',
+		'expired' => 'eab_expired',
 	);
 	
 	public static function serve () {
@@ -50,6 +51,26 @@ class Eab_Shortcodes {
 		
 		$time = $args['date'] ? strtotime($args['date']) : time();
 		$events = ($args['network'] && is_multisite()) ? Eab_Network::get_upcoming_events(30) : Eab_CollectionFactory::get_upcoming_events($time);
+
+		$ret = '';
+		foreach ($events as $event) {
+			$ret .= '<h4>' . $event->get_title() . '</h4>' . Eab_Template::get_archive_content($event);
+		}
+		wp_enqueue_style('eab_front');
+		wp_enqueue_script('eab_event_js');
+		return $ret;
+	}
+
+	/**
+	 * Expired shortcode handler.
+	 */
+	function process_expired_shortcode ($args, $content=false) {
+		$args = wp_parse_args($args, array(
+			'class' => false,
+			'network' => false,
+		));
+		
+		$events = Eab_CollectionFactory::get_expired_events();
 
 		$ret = '';
 		foreach ($events as $event) {

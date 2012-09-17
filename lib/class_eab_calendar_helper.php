@@ -192,7 +192,6 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 	
 	protected $_titles = array();
 	protected $_data = array();
-	
 	public function get_calendar_id () { return false; }
 	public function get_calendar_class () { return 'eab-upcoming_calendar_widget'; }
 	
@@ -255,7 +254,7 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 			'</td>' .
 			'<td colspan="3" style="text-align:center;">' .
 				'<input type="hidden" class="eab-cuw-calendar_date" value="' . $time . '" />' .
-				'<a href="' . Eab_Template::get_archive_url($time, true) . '" class="' . $this->get_calendar_class() . '-navigation-link eab-cuw-calendar_date">' . date('M Y', $time) . '</a>' .
+				'<a href="' . Eab_Template::get_archive_url($time, true) . '" class="' . $this->get_calendar_class() . '-navigation-link eab-cuw-calendar_date">' . date_i18n('M Y', $time) . '</a>' .
 			'</td>' .
 			'<td>' .
 				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-prev eab-time_unit-month" href="' . 

@@ -78,7 +78,7 @@ class Eab_Events_FrontPageEditing {
 			} 
 			?>
 			</select>
-			<?php echo $tips->add_tip(__("Don't forget to add this shortcode to your selected page: <code>[eab_event_editor]</code>")); ?>
+			<?php echo $tips->add_tip(__("Don't forget to add this shortcode to your selected page: <code>[eab_event_editor]</code>", Eab_EventsHub::TEXT_DOMAIN)); ?>
 			<div><?php _e('By default, Front-page editor will work with preconfigured stub URL. However, you can create your own page, add the Front-page editing shortcode (<code>[eab_event_editor]</code>) to the content and configure your Add/Edit links here to use this page instead.', Eab_EventsHub::TEXT_DOMAIN);?></div>
 		</div>
 <?php if (Eab_AddonHandler::is_plugin_active('eab-buddypres-my_events')) { ?>
@@ -88,7 +88,7 @@ class Eab_Events_FrontPageEditing {
 				<input type="checkbox" id="eab-events-fpe-integrate_with_my_events" name="eab-events-fpe[integrate_with_my_events]" value="1" <?php echo $integrate_with_my_events; ?> />
 				<?php _e('Integrate with <em>My Events</em> add-on', Eab_EventsHub::TEXT_DOMAIN); ?>
 			</label>
-			<?php echo $tips->add_tip(__("Enabling this option will add a new &quot;Add Event&quot; tab to &quot;My Events&quot;")); ?>
+			<?php echo $tips->add_tip(__("Enabling this option will add a new &quot;Add Event&quot; tab to &quot;My Events&quot;", Eab_EventsHub::TEXT_DOMAIN)); ?>
 		</div>
 <?php } ?>
 	</div>

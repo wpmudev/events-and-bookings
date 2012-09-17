@@ -4,6 +4,14 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.4.1 - 2012-09-17
+----------------------------------------------------------------------
+- Exposing more hooks for extending and customization.
+- L10n improvements.
+- Removable multiple times.
+- Network-wide permalink fix.
+- Not forcing future dates only in the calendar selector.
+
 1.4 - 2012-08-17
 ----------------------------------------------------------------------
 - Fix for FPE issue with missing Google Maps plugin.

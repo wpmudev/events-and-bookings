@@ -14,11 +14,11 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	}
 	
 	function css_load_styles () {
-		wp_enqueue_style('eab-upcoming_calendar_widget-style', plugins_url('events-and-bookings/css/upcoming_calendar_widget.css'));
+		if (!is_admin()) wp_enqueue_style('eab-upcoming_calendar_widget-style', plugins_url('events-and-bookings/css/upcoming_calendar_widget.css'));
 	}
 
 	function js_load_scripts () {
-		wp_enqueue_script('eab-upcoming_calendar_widget-script', plugins_url('events-and-bookings/js/upcoming_calendar_widget.js'), array('jquery'));
+		if (!is_admin()) wp_enqueue_script('eab-upcoming_calendar_widget-script', plugins_url('events-and-bookings/js/upcoming_calendar_widget.js'), array('jquery'));
 	}
 	
 	function form ($instance) {

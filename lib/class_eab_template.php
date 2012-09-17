@@ -496,10 +496,20 @@ class Eab_Template {
 			
 			$content .= $key ? __(' and ', Eab_EventsHub::TEXT_DOMAIN) : '';
 
-			$start_string = $event->has_no_start_time($key)
-				? sprintf(__('On <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
-				: sprintf(__('On %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
-			;
+			// Differentiate start/end date equality
+			if ($end_date_str) {
+				// Start and end day stamps differ
+				$start_string = $event->has_no_start_time($key)
+					? sprintf(__('On <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
+					: sprintf(__('On %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+				;
+			} else {
+				// The start and end day stamps do NOT differ
+				$start_string = $event->has_no_start_time($key)
+					? sprintf(__('Takes place on <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
+					: sprintf(__('Takes place on %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+				;
+			}
 			$end_string = $event->has_no_end_time($key)
 				? sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span>')
 				: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span> <span class="wpmudevevents-date_format-end_time">' . date_i18n(get_option('time_format'), $end) . '</span>')

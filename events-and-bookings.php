@@ -4,8 +4,9 @@
  Plugin URI: http://premium.wpmudev.org/project/events-and-booking
  Description: Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.
  Author: S H Mohanjith (Incsub)
+ Text Domain: eab
  WDP ID: 249
- Version: 1.4
+ Version: 1.4.1
  Author URI: http://premium.wpmudev.org
 */
 
@@ -24,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.3';
+    const CURRENT_VERSION = '1.4';
     
     /**
      * Translation domain
@@ -160,7 +161,7 @@ class Eab_EventsHub {
 					$_SESSION['wdcp_google_user_cache'] = $cache;
 				}
 			}
-			$this->_google_user_cache = $_SESSION['wdcp_google_user_cache'];
+			$this->_google_user_cache = isset($_SESSION['wdcp_google_user_cache']) ? $_SESSION['wdcp_google_user_cache'] : false;
 			
 		}
 		// End API login & form section	
@@ -286,6 +287,7 @@ class Eab_EventsHub {
 		$event_localized = array(
 		    'view_all_bookings' => __('View all RSVPs', self::TEXT_DOMAIN),
 		    'back_to_gettting_started' => __('Back to getting started', self::TEXT_DOMAIN),
+		    'start_of_week' => get_option('start_of_week'),
 		);
 		
 		wp_localize_script('eab_admin_js', 'eab_event_localized', $event_localized);
@@ -388,21 +390,21 @@ class Eab_EventsHub {
 		wp_enqueue_script('thickbox');
         wp_enqueue_script('eab_editor',  plugins_url('events-and-bookings/js/editor.js'), array('jquery'));
         wp_localize_script('eab_editor', 'eab_l10nEditor', array(
-            'loading' => __('Loading maps... please wait', 'agm_google_maps'),
-            'use_this_map' => __('Insert this map', 'agm_google_maps'),
-            'preview_or_edit' => __('Preview/Edit', 'agm_google_maps'),
-            'delete_map' => __('Delete', 'agm_google_maps'),
-            'add_map' => __('Add Map', 'agm_google_maps'),
-            'existing_map' => __('Existing map', 'agm_google_maps'),
-            'no_existing_maps' => __('No existing maps', 'agm_google_maps'),
-            'new_map' => __('Create new map', 'agm_google_maps'),
-            'advanced' => __('Advanced mode', 'agm_google_maps'),
-            'advanced_mode_activate_help' => __('Activate Advanced mode to select individual maps to merge into one new map or to batch delete maps', 'agm_google_maps'),
-	    	'advanced_mode_help' => __('To create a new map from several maps select the maps you want to use and click Merge locations', 'agm_google_maps'),
-            'advanced_off' => __('Exit advanced mode', 'agm_google_maps'),
-	    	'merge_locations' => __('Merge locations', 'agm_google_maps'),
-	    	'batch_delete' => __('Batch delete', 'agm_google_maps'),
-            'new_map_intro' => __('Create a new map which can be inserted into this post or page. Once you are done you can manage all maps below', 'agm_google_maps'),
+            'loading' => __('Loading maps... please wait', Eab_EventsHub::TEXT_DOMAIN),
+            'use_this_map' => __('Insert this map', Eab_EventsHub::TEXT_DOMAIN),
+            'preview_or_edit' => __('Preview/Edit', Eab_EventsHub::TEXT_DOMAIN),
+            'delete_map' => __('Delete', Eab_EventsHub::TEXT_DOMAIN),
+            'add_map' => __('Add Map', Eab_EventsHub::TEXT_DOMAIN),
+            'existing_map' => __('Existing map', Eab_EventsHub::TEXT_DOMAIN),
+            'no_existing_maps' => __('No existing maps', Eab_EventsHub::TEXT_DOMAIN),
+            'new_map' => __('Create new map', Eab_EventsHub::TEXT_DOMAIN),
+            'advanced' => __('Advanced mode', Eab_EventsHub::TEXT_DOMAIN),
+            'advanced_mode_activate_help' => __('Activate Advanced mode to select individual maps to merge into one new map or to batch delete maps', Eab_EventsHub::TEXT_DOMAIN),
+	    	'advanced_mode_help' => __('To create a new map from several maps select the maps you want to use and click Merge locations', Eab_EventsHub::TEXT_DOMAIN),
+            'advanced_off' => __('Exit advanced mode', Eab_EventsHub::TEXT_DOMAIN),
+	    	'merge_locations' => __('Merge locations', Eab_EventsHub::TEXT_DOMAIN),
+	    	'batch_delete' => __('Batch delete', Eab_EventsHub::TEXT_DOMAIN),
+            'new_map_intro' => __('Create a new map which can be inserted into this post or page. Once you are done you can manage all maps below', Eab_EventsHub::TEXT_DOMAIN),
         ));
     }
 
@@ -938,7 +940,7 @@ class Eab_EventsHub {
 					$no_end = $event->has_no_end_time($key) ? 'checked="checked"' : '';
 			
 					$content .= '<div class="eab-section-block">';
-					$content .= '<div class="eab-section-heading">'.sprintf(__('Part %d', self::TEXT_DOMAIN), $key+1).'</div>';
+					$content .= '<div class="eab-section-heading">' . sprintf(__('Part %d', self::TEXT_DOMAIN), $key+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 					$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$key.'">';
 					$content .= __('Start', self::TEXT_DOMAIN).':</label>&nbsp;';
 					$content .= '<input type="text" name="incsub_event_start['.$key.']" id="incsub_event_start_'.$key.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" /> ';
@@ -959,7 +961,7 @@ class Eab_EventsHub {
 			} else {
 			    $i=0;
 			    $content .= '<div class="eab-section-block">';
-			    $content .= '<div class="eab-section-heading">'.sprintf(__('Part %d', self::TEXT_DOMAIN), $i+1).'</div>';
+			    $content .= '<div class="eab-section-heading">' . sprintf(__('Part %d', self::TEXT_DOMAIN), $key+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 			    $content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$i.'">';
 			    $content .= __('Start', self::TEXT_DOMAIN).':</label>&nbsp;';
 			    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="" size="10" /> ';
@@ -983,7 +985,7 @@ class Eab_EventsHub {
 			
 			$content .= '<div id="eab-add-more-bank">';
 			$content .= '<div class="eab-section-block">';
-			$content .= '<div class="eab-section-heading">'.__('Part bank', self::TEXT_DOMAIN).'</div>';
+			$content .= '<div class="eab-section-heading">' . sprintf(__('Part bank', self::TEXT_DOMAIN), $key+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 			$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_bank" >';
 			$content .= __('Start', self::TEXT_DOMAIN).':</label>&nbsp;';
 			$content .= '<input type="text" name="incsub_event_start_b[bank]" id="incsub_event_start_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_start_b" value="" size="10" /> ';
@@ -1470,12 +1472,12 @@ class Eab_EventsHub {
 				
 				if (current_user_can($post_type_object->cap->delete_post, $event->get_id())) {
 					if ('trash' == $post->post_status) {
-						$actions['untrash'] = "<a title='" . esc_attr(__('Restore this Event from the Trash', self::TEXT_DOMAIN)) . "' href='" . wp_nonce_url(admin_url(sprintf($post_type_object->_edit_link . '&amp;action=untrash', $event->get_id())), 'untrash-' . $post->post_type . '_' . $event->get_id()) . "'>" . __( 'Restore' ) . "</a>";
+						$actions['untrash'] = "<a title='" . esc_attr(__('Restore this Event from the Trash', self::TEXT_DOMAIN)) . "' href='" . wp_nonce_url(admin_url(sprintf($post_type_object->_edit_link . '&amp;action=untrash', $event->get_id())), 'untrash-' . $post->post_type . '_' . $event->get_id()) . "'>" . __('Restore') . "</a>";
 					} else if (EMPTY_TRASH_DAYS) {
 						$actions['trash'] = '<a class="submitdelete" title="' . esc_attr(__('Move this Event to the Trash', self::TEXT_DOMAIN)) . '" href="' . get_delete_post_link($event->get_id()) . '">' . __('Trash') . '</a>';
 					}
 					if ('trash' == $post->post_status || !EMPTY_TRASH_DAYS) {
-						$actions['delete'] = "<a class='submitdelete' title='" . esc_attr(__('Delete this Event permanently'), self::TEXT_DOMAIN) . "' href='" . get_delete_post_link($event->get_id(), '', true ) . "'>" . __( 'Delete Permanently' ) . "</a>";
+						$actions['delete'] = "<a class='submitdelete' title='" . esc_attr(__('Delete this Event permanently', self::TEXT_DOMAIN)) . "' href='" . get_delete_post_link($event->get_id(), '', true ) . "'>" . __('Delete Permanently') . "</a>";
 					}
 				}
 				
@@ -1487,7 +1489,7 @@ class Eab_EventsHub {
 						else $event_id = $children[0]->get_id(); 
 					}
 					if ($event_id) {
-						$actions['view'] = '<a href="' . get_permalink($event_id) . '" title="' . esc_attr(sprintf(__( 'View &#8220;%s&#8221;'), $event->get_title())) . '" rel="permalink">' . __('View') . '</a>';
+						$actions['view'] = '<a href="' . get_permalink($event_id) . '" title="' . esc_attr(sprintf(__('View &#8220;%s&#8221;'), $event->get_title())) . '" rel="permalink">' . __('View') . '</a>';
 					}
 				}
 				echo $title . WP_List_Table::row_actions($actions);
@@ -1582,7 +1584,7 @@ class Eab_EventsHub {
 						}
 						break;
 				}
-				$capable = apply_filters('eab-capabilities-user_can', $cap, $current_user, $capable, $args);
+				$capable = apply_filters('eab-capabilities-user_can', $capable, $cap, $current_user, $args);
 				
 				if ($capable) {
 				    $allcaps[$cap] = 1;
@@ -2407,9 +2409,9 @@ class Eab_EventsHub {
 			)
 			*/
 		) {
-			$original_year = (int)@$wp_query->query_vars['event_year'];
+			$original_year = isset($wp_query->query_vars['event_year']) ? (int)$wp_query->query_vars['event_year'] : false;
 			$year = $original_year ? $original_year : date('Y');
-			$original_month = (int)@$wp_query->query_vars['event_monthnum'];
+			$original_month = isset($wp_query->query_vars['event_monthnum']) ? (int)$wp_query->query_vars['event_monthnum'] : false;
 			$month = $original_month ? $original_month : date('m');
 
 			do_action('eab-query_rewrite-before_query_replacement', $original_year, $original_month);
@@ -2483,6 +2485,6 @@ if ( !function_exists( 'wdp_un_check' ) ) {
 
 	function wdp_un_check() {
 		if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
-			echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', 'wpmudev') . '</a></p></div>';
+			echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', Eab_EventsHub::TEXT_DOMAIN) . '</a></p></div>';
 	}
 }

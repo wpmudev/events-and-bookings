@@ -116,8 +116,8 @@ class Eab_AddonHandler {
 		echo "<table class='widefat' id='eab_addons_hub'>";
 		echo '<thead>';
 		echo '<tr>';
-		echo '<th width="30%">' . __('Name', 'eab') . '</th>';
-		echo '<th>' . __('Description', 'eab') . '</th>';
+		echo '<th width="30%">' . __('Name', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
+		echo '<th>' . __('Description', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
 		echo '</tr>';
 		echo '<thead>';
 		echo "<tbody>";
@@ -131,17 +131,17 @@ class Eab_AddonHandler {
 			echo "<br />";
 			echo ($is_active
 				?
-				'<a href="#deactivate" class="eab_deactivate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Deactivate', 'eab') . '</a>'
+				'<a href="#deactivate" class="eab_deactivate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Deactivate', Eab_EventsHub::TEXT_DOMAIN) . '</a>'
 				:
-				'<a href="#activate" class="eab_activate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Activate', 'eab') . '</a>'
+				'<a href="#activate" class="eab_activate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Activate', Eab_EventsHub::TEXT_DOMAIN) . '</a>'
 			);
 			echo "</td>";
 			echo '<td>' .
 				$plugin_data['Description'] .
 				'<br />' .
-				sprintf(__('Version %s', 'eab'), $plugin_data['Version']) .
+				sprintf(__('Version %s', Eab_EventsHub::TEXT_DOMAIN), $plugin_data['Version']) .
 				'&nbsp;|&nbsp;' .
-				sprintf(__('by %s', 'eab'), '<a href="' . $plugin_data['Plugin URI'] . '">' . $plugin_data['Author'] . '</a>');
+				sprintf(__('by %s', Eab_EventsHub::TEXT_DOMAIN), '<a href="' . $plugin_data['Plugin URI'] . '">' . $plugin_data['Author'] . '</a>');
 			if ( $plugin_data['Detail'] )
 				echo '&nbsp;' . $tips->add_tip( $plugin_data['Detail'] );
 			echo '</td>';

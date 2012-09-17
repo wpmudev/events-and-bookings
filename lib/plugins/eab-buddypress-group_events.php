@@ -59,7 +59,7 @@ class Eab_BuddyPress_GroupEvents {
 		foreach ($query->posts as $post) {
 			$group = (int)get_post_meta($post->ID, 'eab_event-bp-group_event', true);
 			if ($group) {
-				if (!groups_is_user_member($current_user->id, $group)) continue; 
+				if (!groups_is_user_member($current_user->ID, $group)) continue; 
 			}
 			$posts[] = $post;
 		}

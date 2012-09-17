@@ -240,3 +240,9 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 #eab_addons_hub {
 	line-height: 1.6em;
 }
+
+#eab-add-more-rows .eab-event-remove_time {
+    font-style: normal;
+    padding-left: 2em;
+    font-size: .8em;
+}

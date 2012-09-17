@@ -57,8 +57,8 @@ class Eab_Network {
 			if ($count == $limit) break;
 			switch_to_blog($event->blog_id);
 			$post = get_post($event->post_id);
-			$event = new Eab_EventModel($post);
-			if ($event->is_expired()) continue;
+			$tmp_event_instance = new Eab_EventModel($post);
+			if ($tmp_event_instance->is_expired()) continue;
 			$post->blog_id = $event->blog_id;
 			$result[] = $post;
 			$count++;

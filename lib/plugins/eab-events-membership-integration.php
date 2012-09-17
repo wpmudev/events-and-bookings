@@ -3,7 +3,7 @@
 Plugin Name: Membership Integration
 Description: Allows Events+ to Integrate with our Membership plugin, so that members can receive a alternative fee for paid events. <br /><b>Requires <a href="http://premium.wpmudev.org/project/membership">Membership plugin</a>.</b>
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 0.25
+Version: 0.3
 Author: Hakan Evin
 */
 
@@ -55,6 +55,10 @@ class Eab_Events_MembershipIntegration {
 	 * Load jQuery multiselect
 	 */	
 	function load_scripts() {
+		if (function_exists('get_current_screen')) {
+			$screen = get_current_screen();
+			if (!preg_match('/' . preg_quote(Eab_EventModel::POST_TYPE, '/') . '/', $screen->id)) return false; // Add on used pages
+		}
 		wp_enqueue_script('jquery-multiselect',plugins_url('events-and-bookings/js/').'jquery.multiselect.min.js',array('jquery','jquery-ui-widget'));
 		wp_enqueue_style('jquery-multiselect-css',plugins_url('events-and-bookings/css/').'jquery.multiselect.css');
 	}

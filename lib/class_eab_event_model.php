@@ -355,12 +355,12 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 
 	public function has_no_start_time ($key=0) {
 		$raw = get_post_meta($this->get_id(), 'incsub_event_no_start');
-		return $raw[$key];
+		return isset($raw[$key]) ? $raw[$key] : false;
 	}
 	
 	public function has_no_end_time ($key=0) {
 		$raw = get_post_meta($this->get_id(), 'incsub_event_no_end');
-		return $raw[$key];
+		return isset($raw[$key]) ? $raw[$key] : false;
 	}
 	
 	/**

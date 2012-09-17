@@ -12,12 +12,12 @@ class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 		$limit = esc_attr($instance['limit']);
 		
 		$html .= '<p>';
-		$html .= '<label for="' . $this->get_field_id('title') . '">' . __('Title:', 'wdfb') . '</label>';
+		$html .= '<label for="' . $this->get_field_id('title') . '">' . __('Title:', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
 		$html .= '<input type="text" name="' . $this->get_field_name('title') . '" id="' . $this->get_field_id('title') . '" class="widefat" value="' . $title . '"/>';
 		$html .= '</p>';
 
 		$html .= '<p>';
-		$html .= '<label for="' . $this->get_field_id('limit') . '">' . __('Display only this many events:', 'wdfb') . '</label>';
+		$html .= '<label for="' . $this->get_field_id('limit') . '">' . __('Display only this many events:', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
 		$html .= '<select name="' . $this->get_field_name('limit') . '" id="' . $this->get_field_id('limit') . '">';
 		for ($i=1; $i<11; $i++) {
 			$html .= '<option value="' . $i . '" ' . (($limit == $i) ? 'selected="selected"' : '') . '>' . $i . '</option>';
