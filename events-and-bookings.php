@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.4.1
+ Version: 1.4.2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.4';
+    const CURRENT_VERSION = '1.4.2';
     
     /**
      * Translation domain
@@ -88,8 +88,8 @@ class Eab_EventsHub {
 		add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
 		add_action('wp_enqueue_scripts', array(&$this, 'wp_enqueue_scripts'));
 		
-		add_action('manage_incsub_event_posts_custom_column', array(&$this, 'manage_posts_custom_column') );
-		add_filter('manage_incsub_event_posts_columns', array(&$this, 'manage_posts_columns') );
+		add_action('manage_incsub_event_posts_custom_column', array($this, 'manage_posts_custom_column'));
+		add_filter('manage_incsub_event_posts_columns', array($this, 'manage_posts_columns'), 99);
 		
 		add_action('add_meta_boxes_incsub_event', array(&$this, 'meta_boxes') );
 		add_action('wp_insert_post', array(&$this, 'save_event_meta'), 10, 2 );
@@ -195,7 +195,8 @@ class Eab_EventsHub {
      * @see		http://adambrown.info/p/wp_hooks/hook/init
      */
     function init() {
-		global $wpdb, $wp_rewrite, $current_user, $blog_id;
+		global $wpdb, $wp_rewrite, $current_user, $blog_id, $wp_version;
+		$version = preg_replace('/-.*$/', '', $wp_version);
 		
 		if (preg_match('/mu\-plugin/', PLUGINDIR) > 0) {
 		    load_muplugin_textdomain(self::TEXT_DOMAIN, dirname(plugin_basename(__FILE__)).'/languages');
@@ -1234,7 +1235,7 @@ class Eab_EventsHub {
     
     function save_event_meta($post_id, $post = null) {
 		global $wpdb;
-		
+
 		//skip quick edit
 		if ( defined('DOING_AJAX') )
 		    return;
@@ -1299,18 +1300,43 @@ class Eab_EventsHub {
 			delete_post_meta($post_id, 'incsub_event_no_start');
 			delete_post_meta($post_id, 'incsub_event_end');
 			delete_post_meta($post_id, 'incsub_event_no_end');
+			//$start = $no_start = $end = $no_end = array();
 		   	if (isset($_POST['incsub_event_start']) && count($_POST['incsub_event_start']) > 0) foreach ($_POST['incsub_event_start'] as $i => $event_start) {
+		   		if (empty($_POST['incsub_event_start'][$i]) || empty($_POST['incsub_event_end'][$i])) continue;
 		   		if (!empty($_POST['incsub_event_start'][$i])) {
 					$start_time = @$_POST['incsub_event_no_start_time'][$i] ? '00:01' : @$_POST['incsub_event_start_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}")));
 				    if (@$_POST['incsub_event_no_start_time'][$i]) add_post_meta($post_id, 'incsub_event_no_start', 1);
+				    else add_post_meta($post_id, 'incsub_event_no_start', 0);
 				} 
 				if (!empty($_POST['incsub_event_end'][$i])) {
 		   			$end_time = @$_POST['incsub_event_no_end_time'][$i] ? '23:59' : @$_POST['incsub_event_end_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}")));
 				    if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
+				    else add_post_meta($post_id, 'incsub_event_no_end', 0);
 				} 
+			/*
+				if (!empty($_POST['incsub_event_start'][$i]) && !empty($_POST['incsub_event_end'][$i])) {
+					$start_time = @$_POST['incsub_event_no_start_time'][$i] ? '00:01' : @$_POST['incsub_event_start_time'][$i];
+				    //add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}")));
+				    //if (@$_POST['incsub_event_no_start_time'][$i]) add_post_meta($post_id, 'incsub_event_no_start', 1);
+				    $start[$i] = date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}"));
+				    $no_start[$i] = (int)(!empty($_POST['incsub_event_no_start_time'][$i]));
+
+				    $end_time = @$_POST['incsub_event_no_end_time'][$i] ? '23:59' : @$_POST['incsub_event_end_time'][$i];
+				    //add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}")));
+				    //if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
+				    $end[$i] = date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}"));
+				    $no_end[$i] = (int)(!empty($_POST['incsub_event_no_end_time'][$i]));
+				}
+			*/
 			}
+			/*
+			update_post_meta($post_id, 'incsub_event_start', $start);
+			update_post_meta($post_id, 'incsub_event_no_start', $no_start);
+			update_post_meta($post_id, 'incsub_event_end', $end);
+			update_post_meta($post_id, 'incsub_event_no_end', $no_end);
+			*/
 		    //for any other plugin to hook into
 		    do_action( 'incsub_event_save_when_meta', $post_id, $meta );
 		}
@@ -1405,20 +1431,26 @@ class Eab_EventsHub {
 		global $post_status;
 
 		$columns['cb'] = $old_columns['cb'];
-		//$columns['title'] = $old_columns['title'];
 		$columns['event'] = $old_columns['title'];
+		
+		// Allow for WPML translation field
+		if (isset($old_columns['icl_translations'])) {
+			$columns['icl_translations'] = $old_columns['icl_translations'];
+		}
+		
 		$columns['start'] = __('When', self::TEXT_DOMAIN);
 		$columns['venue'] = __('Where', self::TEXT_DOMAIN);
 		$columns['author'] = $old_columns['author'];
 		$columns['date'] = $old_columns['date'];
 		$columns['attendees'] = __('RSVPs', self::TEXT_DOMAIN);
+
 		
 		return $columns;
     }
     
     function manage_posts_custom_column($column) {
 		global $post;
-	
+
 		switch ($column) {
 			case "attendees":
 				global $wpdb;
@@ -1441,7 +1473,7 @@ class Eab_EventsHub {
 					$repeats = $event->get_supported_recurrence_intervals();
 					$title = @$repeats[$event->get_recurrence()];
 					$start = date(get_option('date_format', 'Y-m-d'), $event->get_recurrence_starts());
-					$end = date(get_option('date_format', 'Y-m-d'), $event->get_recurrence_starts());
+					$end = date(get_option('date_format', 'Y-m-d'), $event->get_recurrence_ends());
 					printf(__("From %s, repeats every %s until %s", self::TEXT_DOMAIN), $start, $title, $end);
 				}
 				break;
@@ -1467,7 +1499,7 @@ class Eab_EventsHub {
 				
 				if (current_user_can($post_type_object->cap->edit_post, $event->get_id()) && 'trash' != $post->post_status) {
 					$actions['edit'] = '<a title="' . esc_attr(__('Edit Event', self::TEXT_DOMAIN)) . '" href="' . $edit_link . '">' . __('Edit') . '</a>';
-					$actions['inline hide-if-no-js'] = '<a href="#" class="editinline" title="' . esc_attr(__( 'Edit this Event inline', self::TEXT_DOMAIN)) . '">' . __('Quick&nbsp;Edit') . '</a>';
+					if (!$event->is_recurring()) $actions['inline hide-if-no-js'] = '<a href="#" class="editinline" title="' . esc_attr(__( 'Edit this Event inline', self::TEXT_DOMAIN)) . '">' . __('Quick&nbsp;Edit') . '</a>';
 				}
 				
 				if (current_user_can($post_type_object->cap->delete_post, $event->get_id())) {
@@ -2487,4 +2519,30 @@ if ( !function_exists( 'wdp_un_check' ) ) {
 		if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
 			echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', Eab_EventsHub::TEXT_DOMAIN) . '</a></p></div>';
 	}
+}
+
+// Core WP postmeta fetching functions don't order by meta_id - fix that...
+// ... unless explicitly told not to.
+if (!(defined('EAB_SKIP_FORCED_META_ID_ORDERING') && EAB_SKIP_FORCED_META_ID_ORDERING)) {
+
+	/**
+	 * Late-bound `$wpdb` query filter.
+	 */
+	function _eab_wpdb_filter_postmeta_query ($q) {
+		global $wpdb;
+		if (!preg_match('/^\s*SELECT/i', $q)) return $q;
+		$postmeta = preg_quote($wpdb->postmeta, '/');
+		if (preg_match("/\b{$postmeta}\b/", $q) && !preg_match('/\bORDER BY\b/i', $q)) $q .= " ORDER BY {$wpdb->postmeta}.meta_id";
+		remove_filter('query', '_eab_wpdb_filter_postmeta_query'); // Clean up
+		return $q;
+	}
+
+	/**
+	 * Late binding filter for forced query ordering on postmeta requests.
+	 */
+	function _eab_filter_meta_query ($check) {
+		add_filter('query', '_eab_wpdb_filter_postmeta_query');
+		return $check;
+	}
+	add_filter('get_post_metadata', '_eab_filter_meta_query');
 }

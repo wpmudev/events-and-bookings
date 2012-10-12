@@ -164,9 +164,17 @@ abstract class WpmuDev_CalendarTable {
 abstract class Eab_CalendarTable extends WpmuDev_CalendarTable {
 	
 	protected function _get_item_data ($post) {
-		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
-		$event_starts = $event->get_start_dates();
-		$event_ends = $event->get_end_dates();
+		if (isset($post->blog_id)) { // Originates from network
+			switch_to_blog($post->blog_id);
+			$event = new Eab_EventModel($post);
+			$event_starts = $event->get_start_dates();
+			$event_ends = $event->get_end_dates();
+			restore_current_blog();
+		} else { // Originates from this blog
+			$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
+			$event_starts = $event->get_start_dates();
+			$event_ends = $event->get_end_dates();
+		}
 		$res = array(
 			'id' => $event->get_id(),
 			'title' => $event->get_title(),
@@ -219,10 +227,12 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 
 	public function set_event_info ($event_tstamps, $current_tstamps, $event_info) {
 		$this->_titles[] = esc_attr($event_info['title']);
-		$this->_data[] = '<a class="wpmudevevents-upcoming_calendar_widget-event ' . $event_info['status_class'] . '" href="' . get_permalink($event_info['id']) . '">' . 
+		$permalink = isset($event_info['blog_id']) ? get_blog_permalink($event_info['blog_id'], $event_info['id']) : get_permalink($event_info['id']);
+		$this->_data[] = '<a class="wpmudevevents-upcoming_calendar_widget-event ' . $event_info['status_class'] . '" href="' . $permalink . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-upcoming_calendar_widget-event-info">' . 
-				date_i18n(get_option('date_format'), $event_tstamps['start']) . ' ' . $event_info['event_venue'] .
+				apply_filters('eab-calendar-upcoming_calendar_widget-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . 
+				' ' . $event_info['event_venue'] .
 			'</span>' .
 		'</a>'; 
 	}
@@ -283,7 +293,8 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $event_info['status_class'] . '" href="' . get_permalink($event_info['id']) . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' . 
-				date_i18n(get_option('date_format'), $event_tstamps['start']) . ' ' . $event_info['event_venue'] .
+				apply_filters('eab-calendar-event_archive-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . 
+				' ' . $event_info['event_venue'] .
 			'</span>' . 
 		'</a>'; 
 	}

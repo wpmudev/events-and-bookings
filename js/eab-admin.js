@@ -119,6 +119,7 @@ jQuery(function() {
     
     function _eab_validate_when(_c) {
     	if ("bank" == _c) return true; // Don't check bank dates - they're stubs
+    	if (jQuery("#icl_translation_of").length) return true; // Assume translation
 		_start = false;
 		if (jQuery('#incsub_event_start_'+_c).val() != '') {
 		    _start = new Date(jQuery('#incsub_event_start_'+_c).val());
@@ -253,6 +254,7 @@ $(function () {
 	$("#eab-eab-start_recurrence-button").click(toggle_recurrence_settings);
 	// Init recurrence mode toggle
 	$("#eab_event-repeat_every").change(toggle_recurrence_mode);
+	toggle_recurrence_mode();
 	// Init recurrence instances toggle
 	$("#eab_event-edit_recurring_instances").click(toggle_recurrence_instances);
 	// Initialize slug box

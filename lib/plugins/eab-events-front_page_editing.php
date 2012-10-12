@@ -429,7 +429,7 @@ class Eab_Events_FrontPageEditing {
 		// Start Categories
 		$event_cat_ids = $event->get_category_ids();
 		$event_cat_ids = $event_cat_ids ? $event_cat_ids : array();
-		$all_cats = get_terms('eab_events_category');
+		$all_cats = get_terms('eab_events_category', array('hide_empty' => false));
 		$all_cats = $all_cats ? $all_cats : array();
 		$ret .= '<div class="eab-events-fpe-meta_box" id="eab-events-fpe-meta_box-categories">';
 		// Categories

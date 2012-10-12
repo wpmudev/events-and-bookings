@@ -1,0 +1,35 @@
+<wpml-config>
+    <custom-fields>
+        <custom-field action="copy">agm_map_created</custom-field>
+        <custom-field action="copy">eab_capacity</custom-field>
+        <custom-field action="copy">eab_event-bp-group_event</custom-field>
+        <custom-field action="copy">eab_events_mi</custom-field>
+        <custom-field action="copy">eab_events_mi_price</custom-field>
+        <custom-field action="copy">eab_event_recurrence_ends</custom-field>
+        <custom-field action="copy">eab_event_recurrence_parts</custom-field>
+        <custom-field action="copy">eab_event_recurrence_starts</custom-field>
+        <custom-field action="copy">eab_event_recurring</custom-field>
+        <custom-field action="copy">eab_public_announcement</custom-field>
+        <custom-field action="copy">incsub_event_attending_count</custom-field>
+        <custom-field action="copy">incsub_event_start</custom-field>
+        <custom-field action="copy">incsub_event_end</custom-field>
+        <custom-field action="copy">incsub_event_fee</custom-field>
+        <custom-field action="copy">incsub_event_yes_count</custom-field>
+        <custom-field action="copy">incsub_event_no_count</custom-field>
+        <custom-field action="copy">incsub_event_maybe_count</custom-field>
+        <custom-field action="copy">incsub_event_no_end</custom-field>
+        <custom-field action="copy">incsub_event_no_start</custom-field>
+        <custom-field action="copy">incsub_event_paid</custom-field>
+        <custom-field action="copy">incsub_event_status</custom-field>
+        <custom-field action="copy">incsub_event_venue</custom-field>
+        <custom-field action="copy">_thumbnail_id</custom-field>
+        <custom-field action="copy">_wp_attached_file</custom-field>
+    </custom-fields>
+   
+    <custom-types>
+        <custom-type translate="1">incsub_event</custom-type>
+    </custom-types>    
+    <taxonomies>
+        <taxonomy translate="1">eab_events_category</taxonomy>
+    </taxonomies>      
+</wpml-config>

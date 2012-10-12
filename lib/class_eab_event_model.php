@@ -504,7 +504,12 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		if (self::RECURRANCE_WEEKLY == $interval) {
 			for ($i = 0; $i<=6; $i++) {
 				if (!in_array($i, $time_parts['weekday'])) continue;
-				$begin = strtotime("this Sunday", $start) + ($i * 86400);
+				$sunday = strtotime("this Sunday", $start) < $start
+					? strtotime("this Sunday", $start)
+					: strtotime("last Sunday", $start)
+				;
+				$to_day = $i * 86400;
+				$begin = $sunday + $to_day;
 				$increment = 7*86400;
 				for ($j = $begin; $j<=$end; $j+=$increment) {
 					$timestamp = date('Y-m-d', $j) . ' ' . $time_parts['time'];

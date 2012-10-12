@@ -24,11 +24,21 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	function form ($instance) {
 		$title = esc_attr($instance['title']);
 		$date = esc_attr($instance['date']);
+		$network = esc_attr($instance['network']) ? 'checked="checked"' : '';
 		
 		$html .= '<p>';
 		$html .= '<label for="' . $this->get_field_id('title') . '">' . __('Title:', $this->translation_domain) . '</label>';
 		$html .= '<input type="text" name="' . $this->get_field_name('title') . '" id="' . $this->get_field_id('title') . '" class="widefat" value="' . $title . '"/>';
 		$html .= '</p>';
+
+		if (is_multisite()) {
+			$html .= '<p>' .
+				'<label for="' . $this->get_field_id('network') . '">' . 
+				'<input type="checkbox" name="' . $this->get_field_name('network') . '" id="' . $this->get_field_id('network') . '" value="1" ' . $network . ' /> ' .
+				__('Network-wide?', $this->translation_domain) .
+				'</label> ' .
+			'</p>';
+		}
 	
 		echo $html;
 	}
@@ -37,6 +47,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['date'] = strip_tags($new_instance['date']);
+		$instance['network'] = strip_tags($new_instance['network']);
 
 		return $instance;
 	}
@@ -45,17 +56,21 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
 		$date = $instance['date'];
+		$network = (int)$instance['network'];
 		
 		$date = time(); // Refactor
 		
 		echo $before_widget;
 		if ($title) echo $before_title . $title . $after_title;
-		echo $this->_render_calendar($date);
+		echo $this->_render_calendar($date, $network);
 		echo $after_widget;	
 	}
 	
-	private function _render_calendar ($date) {
-		$events = Eab_CollectionFactory::get_upcoming_events($date);//eab_get_upcoming_events($date);
+	private function _render_calendar ($date, $network=false) {
+		$events = $network
+			? Eab_Network::get_upcoming_events(10)
+			: $events = Eab_CollectionFactory::get_upcoming_events($date)
+		;
 		if (!class_exists('Eab_CalendarTable_UpcomingCalendarWidget')) require_once EAB_PLUGIN_DIR . 'lib/class_eab_calendar_helper.php';
 		$renderer = new Eab_CalendarTable_UpcomingCalendarWidget($events);
 		return $renderer->get_month_calendar($date);

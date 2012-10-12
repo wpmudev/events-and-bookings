@@ -4,6 +4,13 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.4.2 - 2012-10-12
+----------------------------------------------------------------------
+- Added network options to calendar upcoming widget.
+- Added Public Announcement Events add-on.
+- Forcing meta query ordering, with optional override.
+- Recurrence mode toggling on load fixes timestamp issues.
+
 1.4.1 - 2012-09-17
 ----------------------------------------------------------------------
 - Exposing more hooks for extending and customization.
