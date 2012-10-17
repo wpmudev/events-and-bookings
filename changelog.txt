@@ -4,6 +4,13 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.4.3 - 2012-10-17
+----------------------------------------------------------------------
+- Added Noindex meta for Events add-on.
+- Adding front editor support for Public Announcement events.
+- Fix for manual payments issue with custom templates.
+- Exposed more hooks (login URL redirection and PayPal IPN response).
+
 1.4.2 - 2012-10-12
 ----------------------------------------------------------------------
 - Added network options to calendar upcoming widget.

@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.4.2
+ Version: 1.4.3
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.4.2';
+    const CURRENT_VERSION = '1.4.3';
     
     /**
      * Translation domain
@@ -556,6 +556,7 @@ class Eab_EventsHub {
 						// Sandbox, it's allowed so do stuff
 				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_transaction_key', $transaction_id);
 				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_ticket_count', $ticket_count);
+				    	do_action('eab-ipn-event_paid', $event_id, $amount, $booking_obj->id);
 				    } else {
 				    	// Sandbox, not allowed, bail out
 				    	header('HTTP/1.0 400 Bad Request');
@@ -567,6 +568,7 @@ class Eab_EventsHub {
 				    // Paid
 				    Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_transaction_key', $transaction_id);
 					Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_ticket_count', $ticket_count);
+			    	do_action('eab-ipn-event_paid', $event_id, $amount, $booking_obj->id);
 				}
 				header('HTTP/1.0 200 OK');
 				header('Content-type: text/plain; charset=UTF-8');
@@ -1467,13 +1469,18 @@ class Eab_EventsHub {
 				break;
 			case "start":
 				$event = new Eab_EventModel($post);
+				$df = get_option('date_format', 'Y-m-d');
 				if (!$event->is_recurring()) {
-					echo date(get_option('date_format', 'Y-m-d'), $event->get_start_timestamp());
+					echo 
+						date_i18n($df, $event->get_start_timestamp()) .
+						' - ' .
+						date_i18n($df, $event->get_end_timestamp())
+					;
 				} else {
 					$repeats = $event->get_supported_recurrence_intervals();
 					$title = @$repeats[$event->get_recurrence()];
-					$start = date(get_option('date_format', 'Y-m-d'), $event->get_recurrence_starts());
-					$end = date(get_option('date_format', 'Y-m-d'), $event->get_recurrence_ends());
+					$start = date_i18n($df, $event->get_recurrence_starts());
+					$end = date_i18n($df, $event->get_recurrence_ends());
 					printf(__("From %s, repeats every %s until %s", self::TEXT_DOMAIN), $start, $title, $end);
 				}
 				break;

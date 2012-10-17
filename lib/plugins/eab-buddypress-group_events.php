@@ -235,7 +235,7 @@ class Eab_BuddyPress_GroupEvents {
 		$renderer = new Eab_CalendarTable_EventArchiveCalendar($events);
 		
 		do_action('eab-buddypress-group_events-before_events');
-		echo '<h3>' . date('F Y', $timestamp) . '</h3>'; 
+		echo '<h3>' . date_i18n('F Y', $timestamp) . '</h3>'; 
 		do_action('eab-buddypress-group_events-after_head');
 		echo $this->_get_navigation($timestamp);
 		echo $renderer->get_month_calendar($timestamp);
@@ -247,8 +247,8 @@ class Eab_BuddyPress_GroupEvents {
 		global $bp;
 		$root = $bp->root_domain . '/' . $bp->groups->slug . '/' . $bp->groups->current_group->slug . '/';
 		
-		$prev_url = $root . self::SLUG . date('/Y/m/', $timestamp - (28*86400));
-		$next_url = $root . self::SLUG . date('/Y/m/', $timestamp + (32*86400));
+		$prev_url = $root . self::SLUG . date_i18n('/Y/m/', $timestamp - (28*86400));
+		$next_url = $root . self::SLUG . date_i18n('/Y/m/', $timestamp + (32*86400));
 		
 		return '<div class="eab-bp-group_events-navigation">' .
 			'<div class="eab-bp-group_events-navigation-prev" style="float:left">' .

@@ -52,7 +52,7 @@ class Eab_Template {
 		}
 		
 		// Added by Hakan
-		$new_content = apply_filters('eab-event-after_payment_forms', $new_content, $event->get_id());
+		//$new_content = apply_filters('eab-event-after_payment_forms', $new_content, $event->get_id()); // Moved this to self::get_payment_forms()
 	
 		$new_content .= '<div class="eab-needtomove"><div id="event-bread-crumbs" >' . self::get_breadcrumbs($event) . '</div></div>';
 		
@@ -352,6 +352,10 @@ class Eab_Template {
 		$content .= '<input type="image" name="submit" border="0" src="https://www.paypal.com/en_US/i/btn/btn_paynow_SM.gif" alt="PayPal - The safer, easier way to pay online" />';
 		$content .= '<img alt="" border="0" width="1" height="1" src="https://www.paypal.com/en_US/i/scr/pixel.gif" />';
 		$content .= '</form>';
+
+		// Moved this here so manual payments get propagated to templates.
+		$content = apply_filters('eab-event-after_payment_forms', $content, $event->get_id());
+
 		// Added by Hakan
 		$content = apply_filters('eab-event-payment_forms', $content, $event->get_id());
 		
@@ -436,16 +440,19 @@ class Eab_Template {
 				'" />';
 				$content .= '</form>';
 			} else {
+				$login_url_y = apply_filters('eab-rsvps-rsvp_login_page-yes', wp_login_url(get_permalink($event->get_id())) . '&eab=y');
+				$login_url_m = apply_filters('eab-rsvps-rsvp_login_page-maybe', wp_login_url(get_permalink($event->get_id())) . '&eab=m');
+				$login_url_n = apply_filters('eab-rsvps-rsvp_login_page-no', wp_login_url(get_permalink($event->get_id())) . '&eab=n');
 				$content .= '<input type="hidden" name="event_id" value="' . $event->get_id() . '" />';
 				$content .= '<a class="wpmudevevents-no-submit" href="' .
-					wp_login_url(get_permalink($event->get_id())) .
-				'&eab=n" >'.__('No', Eab_EventsHub::TEXT_DOMAIN).'</a>';
+					$login_url_n .
+				'" >'.__('No', Eab_EventsHub::TEXT_DOMAIN).'</a>';
 				$content .= '<a class="wpmudevevents-maybe-submit" href="' .
-					wp_login_url(get_permalink($event->get_id())) .
-				'&eab=m" >'.__('Maybe', Eab_EventsHub::TEXT_DOMAIN).'</a>';
+					$login_url_m .
+				'" >'.__('Maybe', Eab_EventsHub::TEXT_DOMAIN).'</a>';
 				$content .= '<a class="wpmudevevents-yes-submit" href="' .
-					wp_login_url(get_permalink($event->get_id())) .
-				'&eab=y" >'.__('I\'m Attending', Eab_EventsHub::TEXT_DOMAIN).'</a>';
+					$login_url_y .
+				'" >'.__('I\'m Attending', Eab_EventsHub::TEXT_DOMAIN).'</a>';
 			}
 		}
 		
