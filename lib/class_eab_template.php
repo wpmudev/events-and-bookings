@@ -400,10 +400,20 @@ class Eab_Template {
 	public static function get_error_notice() {
 		if (!isset( $_GET['eab_success_msg'] ) && !isset( $_GET['eab_error_msg'] )) return;
 		
-		$content = isset($_GET['eab_success_msg']) 
-			? '<div id="eab-success-notice" class="message success">'. __(stripslashes($_GET['eab_success_msg']), Eab_EventsHub::TEXT_DOMAIN).'</div>'
-			: ''
-		;
+		$legacy_redirects = apply_filters(
+			'eab-rsvps-status_messages-legacy_redirects',
+			(defined('EAB_RSVPS_LEGACY_REDIRECTS') && EAB_RSVPS_LEGACY_REDIRECTS)
+		);
+
+		$content = '';
+		if (isset($_GET['eab_success_msg'])) {
+			$status = stripslashes($_GET['eab_success_msg']);
+			$message = $legacy_redirects
+				? apply_filters('eab-rsvps-status_messages-legacy_message', $status)
+				: self::get_success_message($status)
+			;
+			if ($message) $content = '<div id="eab-success-notice" class="message success">' . $message . '</div>';
+		}
 		
 		$content .= isset($_GET['eab_error_msg'])
 		 	? '<div id="eab-error-notice" class="message error">'.__(stripslashes($_GET['eab_error_msg']), Eab_EventsHub::TEXT_DOMAIN).'</div>'
@@ -539,6 +549,73 @@ class Eab_Template {
 		$status = $event->get_status();
 		return sanitize_html_class($status);
 	}
+
+	public static function get_success_message_code ($status=false) {
+		$status = $status ? $status : Eab_EventModel::BOOKING_YES;
+
+		$legacy_redirects = apply_filters(
+			'eab-rsvps-status_messages-legacy_redirects',
+			(defined('EAB_RSVPS_LEGACY_REDIRECTS') && EAB_RSVPS_LEGACY_REDIRECTS)
+		);
+
+		$value = $legacy_redirects
+			? self::get_success_message($status)
+			: $status
+		;
+		return urlencode($value);
+	}	
+
+	public static function get_success_message ($status=false) {
+		$status = $status ? $status : Eab_EventModel::BOOKING_YES;
+
+		$map = apply_filters('eab-rsvps-status_messages-map', array(
+			Eab_EventModel::BOOKING_YES => __("Excellent! We've got you marked as coming and we'll see you there!", Eab_EventsHub::TEXT_DOMAIN),
+			Eab_EventModel::BOOKING_MAYBE => __("Thanks for letting us know. Hopefully you'll be able to make it!", Eab_EventsHub::TEXT_DOMAIN),
+			Eab_EventModel::BOOKING_NO => __("That's too bad you won't be able to make it", Eab_EventsHub::TEXT_DOMAIN),
+		));
+		return isset($map[$status])
+			? $map[$status]
+			: apply_filters('eab-rsvps-status_messages-fallback_message', false)
+		;
+	}
+
+/* ----- Utility methods ----- */
+
+	public static function util_strlen ($str) {
+		return preg_match_all ('/./u', $str, $m);
+	}
+
+	public static function util_substr ($str, $start=0, $length=false) {
+		if (!$str) return false;
+
+		if (!is_numeric($start)) $start = 0;
+
+		$strlen = self::util_strlen($str);
+		$max = $strlen - $start;
+		$length = $length 
+			? ($length > $max ? $max : $length)
+			: $strlen
+		;
+		
+		return $start
+			? preg_replace ('/^(.{'.$length.'}).*$/mu', '\1', $str)
+			: preg_replace ('/^.{'.$start.'}(.{'.$length.'}).*$/mu', '\1', $str)
+		;
+	}
+
+	public static function util_safe_substr ($str, $start=0, $length=false) {
+		return self::util_substr(wp_strip_all_tags($str), $start, $length);
+	}
 	
+	public static function util_words_limit ($str, $count=false, $default_suffix='... ') {
+		if (!$count) return $str;
+		$str = preg_replace('/\s+/', ' ', $str);
+		$words = explode(' ', $str);
+		
+		return count($words) <= $count
+			? $str
+			: join(' ', array_slice($words, 0, $count)) . $default_suffix;
+		;
+	}
 	
 }

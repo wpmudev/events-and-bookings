@@ -4,10 +4,11 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 	
 	private $_defaults = array();
     
-    function __construct() {
+    function __construct () {
     	$this->_defaults = array( 
 			'title' => __('Upcoming', $this->translation_domain),
 			'excerpt' => false,
+			'excerpt_words_limit' => false,
 			'thumbnail' => false,
 			'limit' => 5,
 			'dates' => false,
@@ -17,7 +18,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		parent::WP_Widget( 'incsub_event_upcoming', __('Upcoming Events', $this->translation_domain), $widget_ops, $control_ops );
     }
     
-    function widget($args, $instance) {
+    function widget ($args, $instance) {
 		global $wpdb, $current_site, $post, $wiki_tree;
 		
 		extract($args);
@@ -50,8 +51,10 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 						$raw = wp_get_attachment_image_src(get_post_thumbnail_id($_event->get_id()));
 						$thumbnail = $raw ? @$raw[0] : false;
 					}
+					$excerpt = false;
 					if ($options['excerpt']) {
-						$excerpt = $_event->get_excerpt() ? $_event->get_excerpt() : substr(strip_tags($_event->get_content()), 0, 250);
+						$words = (int)$options['excerpt_words_limit'] ? (int)$options['excerpt_words_limit'] : false;
+						$excerpt = eab_call_template('util_words_limit', $_event->get_excerpt_or_fallback(), $words);
 					}
 			    ?>
 					<li>
@@ -80,12 +83,13 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		}
     }
     
-    function update($new_instance, $old_instance) {
+    function update ($new_instance, $old_instance) {
 		$instance = $old_instance;
         $new_instance = wp_parse_args((array)$new_instance, $this->_defaults);
         
         $instance['title'] = strip_tags($new_instance['title']);
         $instance['excerpt'] = (int)$new_instance['excerpt'];
+        $instance['excerpt_words_limit'] = (int)$new_instance['excerpt_words_limit'];
         $instance['thumbnail'] = (int)$new_instance['thumbnail'];
         $instance['limit'] = (int)$new_instance['limit'];
         $instance['dates'] = (int)$new_instance['dates'];
@@ -94,7 +98,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
         return $instance;
     }
     
-    function form($instance) {
+    function form ($instance) {
 		$options = wp_parse_args((array)$instance, $this->_defaults);
         $options['title'] = strip_tags($instance['title']);	
 		
@@ -124,6 +128,15 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 					value="1" <?php echo ($options['excerpt'] ? 'checked="checked"' : ''); ?> 
 				/>
             	<?php _e('Show excerpt', $this->translation_domain); ?>
+            </label>
+             <label for="<?php echo $this->get_field_id('excerpt_words_limit'); ?>" style="display:block; margin-left:1.8em">
+            	<?php _e('Limit my excerpt to this many words <small>(<code>0</code> for no limit)</small>:', $this->translation_domain); ?>
+				<input type="text" 
+					size="2"
+					id="<?php echo $this->get_field_id('excerpt_words_limit'); ?>" 
+					name="<?php echo $this->get_field_name('excerpt_words_limit'); ?>" 
+					value="<?php echo (int)$options['excerpt_words_limit']; ?>"
+				/>
             </label>
             <label for="<?php echo $this->get_field_id('thumbnail'); ?>" style="display:block;">
 				<input type="checkbox" 

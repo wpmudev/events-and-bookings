@@ -125,7 +125,11 @@ class Eab_BuddyPress_GroupEvents {
 		if (!function_exists('groups_get_groups')) return $box;
 		$group_id = get_post_meta($post->ID, 'eab_event-bp-group_event', true);
 		
-		$groups = groups_get_groups();
+		$group_count = defined('EAB_BP_GROUPS_LIST_GROUP_LIMIT') && intval(EAB_BP_GROUPS_LIST_GROUP_LIMIT)
+			? EAB_BP_GROUPS_LIST_GROUP_LIMIT
+			: groups_get_total_group_count()
+		;
+		$groups = groups_get_groups(array('per_page' => $group_count , 'type' => 'alphabetical'));
 		$groups = @$groups['groups'] ? $groups['groups'] : array();
 		
 		$ret = '';
@@ -153,7 +157,11 @@ class Eab_BuddyPress_GroupEvents {
 		if (!function_exists('groups_get_groups')) return $box;
 		$group_id = get_post_meta($event->get_id(), 'eab_event-bp-group_event', true);
 		
-		$groups = groups_get_groups();
+		$group_count = defined('EAB_BP_GROUPS_LIST_GROUP_LIMIT') && intval(EAB_BP_GROUPS_LIST_GROUP_LIMIT)
+			? EAB_BP_GROUPS_LIST_GROUP_LIMIT
+			: groups_get_total_group_count()
+		;
+		$groups = groups_get_groups(array('per_page' => $group_count , 'type' => 'alphabetical'));
 		$groups = @$groups['groups'] ? $groups['groups'] : array();
 		
 		$ret .= '<div class="eab-events-fpe-meta_box">';

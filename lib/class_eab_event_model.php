@@ -253,6 +253,7 @@ abstract class WpmuDev_DatedVenuePremiumModel extends WpmuDev_DatedVenuePremiumI
 	abstract public function get_title();
 	abstract public function get_author();
 	abstract public function get_excerpt();
+	abstract public function get_excerpt_or_fallback();
 	abstract public function get_content();
 	abstract public function get_type();
 	abstract public function get_parent();
@@ -319,6 +320,28 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 
 	public function get_excerpt () {
 		return $this->_event->post_excerpt;
+	}
+
+	public function get_excerpt_or_fallback ($final_length=false, $default_suffix='... ') {
+		$excerpt = $this->get_excerpt();
+		$excerpt = $excerpt
+			? $excerpt
+			: $this->get_content()
+		;
+		if (!function_exists('eab_call_template')) return wp_strip_all_tags($excerpt);
+
+		$suffix = false;
+		$length = eab_call_template('util_strlen', $excerpt);
+		if ($final_length && $length > $final_length) {
+			$length = $final_length;
+			$suffix = $default_suffix;
+			if (!preg_match('/...\s*$/', $excerpt)) {
+				$excerpt = preg_replace('/\s*...\s*$/', '', $excerpt);
+				$length -= strlen($suffix);
+			}
+		}
+		$excerpt = eab_call_template('util_safe_substr', $excerpt, 0, $length);
+		return "{$excerpt}{$suffix}";
 	}
 
 	public function get_content () {

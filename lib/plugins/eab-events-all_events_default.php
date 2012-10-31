@@ -44,7 +44,7 @@ class Eab_Events_AllEventsDefault {
 	}
 	
 	function yearly_events_start () { return date('Y') . '-01-01 00:01'; }
-	function yearly_events_end () { return date('Y') . '12-31 23:59'; }
+	function yearly_events_end () { return date('Y') . '-12-31 23:59'; }
 	function unbind_yearly_replacements () {
 		remove_filter('eab-collection-upcoming-start_timestamp', array($this, 'yearly_events_start')); 
 		remove_filter('eab-collection-upcoming-end_timestamp', array($this, 'yearly_events_end')); 

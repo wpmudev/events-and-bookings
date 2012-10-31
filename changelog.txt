@@ -4,6 +4,14 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.4.4 - 2012-10-31
+----------------------------------------------------------------------
+- Added "Activity auto-updates" add-on.
+- Fix for rewrite rule flushing.
+- Fix for message redirects, optional old behavior through a define.
+- Fix for group limiting issue in "Group events" add-on.
+- Added SEO plugin compatibility for "Noindex meta for Events" add-on.
+
 1.4.3 - 2012-10-17
 ----------------------------------------------------------------------
 - Added Noindex meta for Events add-on.

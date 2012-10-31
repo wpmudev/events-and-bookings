@@ -36,7 +36,7 @@ class Eab_Events_Nre {
 			add_action('eab-settings-after_plugin_settings', array($this, 'show_settings'));
 			add_filter('eab-settings-before_save', array($this, 'save_settings'));
 		} else {
-			add_action('wp_head', array($this, 'dispatch_noindex'));
+			add_action('wp_head', array($this, 'dispatch_noindex'), 1);
 		}
 	}
 
@@ -99,6 +99,28 @@ class Eab_Events_Nre {
 		else $this->_dispatch_archive_noindex();
 	}
 
+	private function _check_known_conflicts () {
+		// Greg's High Performance SEO
+		if (class_exists('gregsHighPerformanceSEO')) {
+			global $ghpseo;
+			remove_action('wp_head', array($ghpseo,'robots'), 4);
+		}
+		// Joost's WordPress SEO
+		if (class_exists('WPSEO_Frontend')) {
+			remove_all_filters('wpseo_robots');
+			add_filter('wpseo_robots', '__return_false');
+		}
+		// SEO Ultimate
+		if (class_exists('SEO_Ultimate') && class_exists('SU_MetaRobots')) {
+			remove_all_filters('su_meta_robots');
+			add_filter('su_meta_robots', '__return_false');
+		}
+		// Infinite SEO doesn't add robots unless told to.
+
+		// Allow others to join in...
+		do_action('eab-noindex_meta-conflict_check');
+	}
+
 	private function _dispatch_archive_noindex () {
 		if (!is_archive()) return false;
 		$type = get_query_var('post_type');
@@ -121,6 +143,9 @@ class Eab_Events_Nre {
 			if (self::FUTURE_ONLY == $this->_options['noindex_archives'] && $in_past) return false;
 		}
 
+		// Unbind SEO plugin output
+		$this->_check_known_conflicts();
+
 		$robots = (int)$this->_options['nofollow_too'] ? 'noindex,nofollow' : 'noindex';
 
 		echo "<meta name='robots' content='{$robots}' />\n";
@@ -136,6 +161,9 @@ class Eab_Events_Nre {
 			if (self::PAST_ONLY == $this->_options['noindex_scope'] && $event->get_start_timestamp() > $time) return false;
 			if (self::FUTURE_ONLY == $this->_options['noindex_scope'] && $event->get_start_timestamp() < $time) return false;
 		}
+
+		// Unbind SEO plugin output
+		$this->_check_known_conflicts();
 
 		$robots = (int)$this->_options['nofollow_too'] ? 'noindex,nofollow' : 'noindex';
 

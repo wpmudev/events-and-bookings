@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.4.3
+ Version: 1.4.4
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.4.3';
+    const CURRENT_VERSION = '1.4.4';
     
     /**
      * Translation domain
@@ -70,55 +70,55 @@ class Eab_EventsHub {
 		global $wpdb, $wp_version;
 		
 		// Activation deactivation hooks
-		register_activation_hook(__FILE__, array(&$this, 'install'));
-		register_deactivation_hook(__FILE__, array(&$this, 'uninstall'));
+		register_activation_hook(__FILE__, array($this, 'install'));
+		register_deactivation_hook(__FILE__, array($this, 'uninstall'));
 		
 		// Actions
-		add_action('init', array(&$this, 'init'), 0);
-		add_action('init', array(&$this, 'process_rsvps'), 99); // Bind this a bit later, so BP can load up
-		add_action('admin_init', array(&$this, 'admin_init'), 0);
+		add_action('init', array($this, 'init'), 0);
+		add_action('init', array($this, 'process_rsvps'), 99); // Bind this a bit later, so BP can load up
+		add_action('admin_init', array($this, 'admin_init'), 0);
 		if (version_compare($wp_version, "3.3") >= 0) {
-		    add_action('admin_init', array(&$this, 'tutorial') );
+		    add_action('admin_init', array($this, 'tutorial') );
 		}
-		add_action('admin_menu', array(&$this, 'admin_menu'));
+		add_action('admin_menu', array($this, 'admin_menu'));
 		add_action('admin_notices', array($this, 'check_permalink_format'));
 	
-		add_action('option_rewrite_rules', array(&$this, 'check_rewrite_rules'));
+		add_action('option_rewrite_rules', array($this, 'check_rewrite_rules'));
 		
-		add_action('wp_print_styles', array(&$this, 'wp_print_styles'));
-		add_action('wp_enqueue_scripts', array(&$this, 'wp_enqueue_scripts'));
+		add_action('wp_print_styles', array($this, 'wp_print_styles'));
+		add_action('wp_enqueue_scripts', array($this, 'wp_enqueue_scripts'));
 		
 		add_action('manage_incsub_event_posts_custom_column', array($this, 'manage_posts_custom_column'));
 		add_filter('manage_incsub_event_posts_columns', array($this, 'manage_posts_columns'), 99);
 		
-		add_action('add_meta_boxes_incsub_event', array(&$this, 'meta_boxes') );
-		add_action('wp_insert_post', array(&$this, 'save_event_meta'), 10, 2 );
-		add_action('admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts') );
-		add_action('admin_print_styles', array(&$this, 'admin_print_styles') );
-		add_action('widgets_init', array(&$this, 'widgets_init'));
+		add_action('add_meta_boxes_incsub_event', array($this, 'meta_boxes') );
+		add_action('wp_insert_post', array($this, 'save_event_meta'), 10, 2 );
+		add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts') );
+		add_action('admin_print_styles', array($this, 'admin_print_styles') );
+		add_action('widgets_init', array($this, 'widgets_init'));
 		
-		add_action('wp_ajax_nopriv_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
-		add_action('wp_ajax_eab_paypal_ipn', array(&$this, 'process_paypal_ipn'));
-		add_action('wp_ajax_nopriv_eab_list_rsvps', array(&$this, 'process_list_rsvps'));
-		add_action('wp_ajax_eab_list_rsvps', array(&$this, 'process_list_rsvps'));
-		add_filter('single_template', array( &$this, 'handle_single_template' ) );
-		add_filter('archive_template', array( &$this, 'handle_archive_template' ) );
+		add_action('wp_ajax_nopriv_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
+		add_action('wp_ajax_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
+		add_action('wp_ajax_nopriv_eab_list_rsvps', array($this, 'process_list_rsvps'));
+		add_action('wp_ajax_eab_list_rsvps', array($this, 'process_list_rsvps'));
 		
-		add_action('wp', array($this, 'load_events_from_query'));
+		add_filter('single_template', array($this, 'handle_single_template'));
+		add_filter('archive_template', array($this, 'handle_archive_template'));
+		add_action('wp', array($this, 'load_events_from_query'), 20);
 		
-		add_filter('rewrite_rules_array', array(&$this, 'add_rewrite_rules'));
-		add_filter('post_type_link', array(&$this, 'post_type_link'), 10, 3);
+		add_filter('rewrite_rules_array', array($this, 'add_rewrite_rules'));
+		add_filter('post_type_link', array($this, 'post_type_link'), 10, 3);
 		
-		add_filter('query_vars', array(&$this, 'query_vars') );
-		add_filter('cron_schedules', array(&$this, 'cron_schedules') );
+		add_filter('query_vars', array($this, 'query_vars') );
+		add_filter('cron_schedules', array($this, 'cron_schedules') );
 		
-		add_filter('views_edit-incsub_event', array(&$this, 'views_list') );
-		add_filter('agm_google_maps-post_meta-address', array(&$this, 'agm_google_maps_post_meta_address'));
-		add_filter('agm_google_maps-options', array(&$this, 'agm_google_maps_options'));
+		add_filter('views_edit-incsub_event', array($this, 'views_list') );
+		add_filter('agm_google_maps-post_meta-address', array($this, 'agm_google_maps_post_meta_address'));
+		add_filter('agm_google_maps-options', array($this, 'agm_google_maps_options'));
 		
-		add_filter('user_has_cap', array(&$this, 'user_has_cap'), 10, 3);
+		add_filter('user_has_cap', array($this, 'user_has_cap'), 10, 3);
 		
-		add_filter('login_message', array(&$this, 'login_message'), 10);
+		add_filter('login_message', array($this, 'login_message'), 10);
 		
 		$this->_data = Eab_Options::get_instance();
 		
@@ -147,16 +147,14 @@ class Eab_EventsHub {
 			add_filter('get_avatar', array($this, 'get_social_api_avatar'), 10, 3);
 			
 			// Google
-			if ( !session_id() )
-				session_start();
-			if (!class_exists('LightOpenID')) 
-				include_once  WP_PLUGIN_DIR . '/events-and-bookings/lib/lightopenid/openid.php';
+			if (!session_id()) session_start();
+			if (!class_exists('LightOpenID')) include_once  WP_PLUGIN_DIR . '/events-and-bookings/lib/lightopenid/openid.php';
 			$this->openid = new LightOpenID;
 			
 			$this->openid->identity = 'https://www.google.com/accounts/o8/id';
 			$this->openid->required = array('namePerson/first', 'namePerson/last', 'namePerson/friendly', 'contact/email');
 			if (!empty($_REQUEST['openid_ns'])) {
-			$cache = $this->openid->getAttributes();
+				$cache = $this->openid->getAttributes();
 				if (isset($cache['namePerson/first']) || isset($cache['namePerson/last']) || isset($cache['contact/email'])) {
 					$_SESSION['wdcp_google_user_cache'] = $cache;
 				}
@@ -282,7 +280,6 @@ class Eab_EventsHub {
 		if (defined('AGM_PLUGIN_URL')) {
 		    add_action('admin_print_scripts-post.php', array($this, 'js_editor_button'));
 		    add_action('admin_print_scripts-post-new.php', array($this, 'js_editor_button'));
-		    //add_action('admin_print_scripts-widgets.php', array($this, 'js_widget_editor'));
 		}
 	
 		$event_localized = array(
@@ -349,7 +346,7 @@ class Eab_EventsHub {
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_yes', $event_id, $current_user->ID );
 				$this->recount_bookings($event_id);
-				wp_redirect('?eab_success_msg='.urlencode(__("Excellent! We've got you marked as coming and we'll see you there!", self::TEXT_DOMAIN)));
+				wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES));
 				exit();
 		    }
 		    if (isset($_POST['action_maybe'])) {
@@ -359,7 +356,7 @@ class Eab_EventsHub {
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_maybe', $event_id, $current_user->ID );
 				$this->recount_bookings($event_id);
-				wp_redirect('?eab_success_msg='.urlencode(__("Thanks for letting us know. Hopefully you'll be able to make it!", self::TEXT_DOMAIN)));
+				wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_MAYBE));
 				exit();
 		    }
 		    if (isset($_POST['action_no'])) {
@@ -369,7 +366,7 @@ class Eab_EventsHub {
 				// --todo: Remove from BP activity stream
 				do_action( 'incsub_event_booking_no', $event_id, $current_user->ID );
 				$this->recount_bookings($event_id);
-				wp_redirect('?eab_success_msg='.urlencode(__("That's too bad you won't be able to make it", self::TEXT_DOMAIN)));
+				wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_NO));
 				exit();
 		    }
 		}	
@@ -654,7 +651,7 @@ class Eab_EventsHub {
 				if (file_exists($path)) return $path;
 				else {
 					// A more specific template was not found, so load the default one
-				    add_filter('the_content', array(&$this, 'archive_content'));
+				    add_filter('the_content', array($this, 'archive_content'));
 				    if (file_exists(get_stylesheet_directory().'/archive.php')) {
 						$path = get_stylesheet_directory().'/archive.php';
 				    } else if (file_exists(get_template_directory().'/archive.php')) {
@@ -663,7 +660,7 @@ class Eab_EventsHub {
 				}
 			} else if ($eab_type && $is_theme_tpl) {
 				// Selected file is a theme file
-			    add_filter('the_content', array(&$this, 'archive_content'));
+			    add_filter('the_content', array($this, 'archive_content'));
 				if (file_exists(get_stylesheet_directory() . '/' . $eab_type)) {
 					$path = get_stylesheet_directory() . '/' . $eab_type;
 			    } else if (file_exists(get_template_directory() . '/' . $eab_type)) {
@@ -671,7 +668,7 @@ class Eab_EventsHub {
 			    }
 			} else {
 			    // A more specific template was not found, so load the default one
-			    add_filter('the_content', array(&$this, 'archive_content'));
+			    add_filter('the_content', array($this, 'archive_content'));
 			    if (file_exists(get_stylesheet_directory().'/archive.php')) {
 					$path = get_stylesheet_directory().'/archive.php';
 			    } else if (file_exists(get_template_directory().'/archive.php')) {
@@ -723,7 +720,7 @@ class Eab_EventsHub {
 				else {
 					// A more specific template was not found, so load the default one
 				    add_filter('agm_google_maps-options', 'eab_autoshow_map_off', 99); // Shut down maps autoshowing
-				    add_filter('the_content', array(&$this, 'single_content'));
+				    add_filter('the_content', array($this, 'single_content'));
 				    if (file_exists(get_stylesheet_directory().'/single.php')) {
 						$path = get_stylesheet_directory().'/single.php';
 				    } else if (file_exists(get_template_directory().'/single.php')) {
@@ -732,7 +729,7 @@ class Eab_EventsHub {
 				}
 			} else if ($eab_type && $is_theme_tpl) {
 				// Selected file is a theme file
-			    add_filter('the_content', array(&$this, 'single_content'));
+			    add_filter('the_content', array($this, 'single_content'));
 				if (file_exists(get_stylesheet_directory() . '/' . $eab_type)) {
 					$path = get_stylesheet_directory() . '/' . $eab_type;
 			    } else if (file_exists(get_template_directory() . '/' . $eab_type)) {
@@ -741,7 +738,7 @@ class Eab_EventsHub {
 			} else {
 			    // A more specific template was not found, so load the default one
 			    add_filter('agm_google_maps-options', 'eab_autoshow_map_off', 99); // Shut down maps autoshowing
-			    add_filter('the_content', array(&$this, 'single_content'));
+			    add_filter('the_content', array($this, 'single_content'));
 			    if (file_exists(get_stylesheet_directory().'/single.php')) {
 					$path = get_stylesheet_directory().'/single.php';
 			    } else if (file_exists(get_template_directory().'/single.php')) {
@@ -770,10 +767,10 @@ class Eab_EventsHub {
     function meta_boxes() {
 		global $post, $current_user;
 		
-		add_meta_box('incsub-event', __('Event Details', self::TEXT_DOMAIN), array(&$this, 'event_meta_box'), 'incsub_event', 'side', 'high');
-		add_meta_box('incsub-event-bookings', __("Event RSVPs", self::TEXT_DOMAIN), array(&$this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
+		add_meta_box('incsub-event', __('Event Details', self::TEXT_DOMAIN), array($this, 'event_meta_box'), 'incsub_event', 'side', 'high');
+		add_meta_box('incsub-event-bookings', __("Event RSVPs", self::TEXT_DOMAIN), array($this, 'bookings_meta_box'), 'incsub_event', 'normal', 'high');
 		if (isset($_REQUEST['eab_step'])) {
-		    add_meta_box('incsub-event-wizard', __('Are you following the step by step guide?', self::TEXT_DOMAIN), array(&$this, 'wizard_meta_box'), 'incsub_event', 'normal', 'low');
+		    add_meta_box('incsub-event-wizard', __('Are you following the step by step guide?', self::TEXT_DOMAIN), array($this, 'wizard_meta_box'), 'incsub_event', 'normal', 'low');
 		}
 		do_action('eab-event_meta-meta_box_registration');
     }
@@ -1386,41 +1383,36 @@ class Eab_EventsHub {
 		
 		return $permalink;
     }
+
+    private function _get_rewrite_rules () {
+    	$slug = $this->_data->get_option('slug');
+    	return array(
+			"{$slug}/([0-9]{4})/?$" => 'index.php?event_year=$matches[1]&post_type=incsub_event',
+			"{$slug}/([0-9]{4})/([0-9]{1,2})/?$" => 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&post_type=incsub_event',
+			"{$slug}/([0-9]{4})/([0-9]{1,2})/(.+?)/?$" => 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]',
+    	);
+    }
     
     function add_rewrite_rules($rules){
-		$new_rules = array();
-		$slug = $this->_data->get_option('slug');
-		unset($rules[$slug . '/([0-9]{4})/([0-9]{1,2})/?$']);
-		unset($rules[$slug .'/([0-9]{4})/?$']);
-		$new_rules[$slug .'/([0-9]{4})/?$'] = 'index.php?event_year=$matches[1]&post_type=incsub_event';
-		$new_rules[$slug .'/([0-9]{4})/([0-9]{1,2})/?$'] = 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&post_type=incsub_event';
-		$new_rules[$slug .'/([0-9]{4})/([0-9]{2})/(.+?)/?$'] = 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]';
-		
+		$new_rules = $this->_get_rewrite_rules();
+		foreach ($new_rules as $rx => $rpl) {
+			unset($rules[$rx]);
+		}
 		return array_merge($new_rules, $rules);
     }
     
     function check_rewrite_rules($value) {
 		//prevent an infinite loop
-		if ( ! post_type_exists( 'incsub_event' ) )
-		    return $value;
-		
-		if (!is_array($value))
-		    $value = array();
-		
-		$slug = $this->_data->get_option('slug');
-		$array_key = $slug . '/([0-9]{4})/?$';
-		if ( !array_key_exists($array_key, $value) ) {
-		    $this->flush_rewrite();
+		if (!post_type_exists(Eab_EventModel::POST_TYPE)) return $value;
+
+		$value = is_array($value) ? $value : array();
+		$rules = $this->_get_rewrite_rules();
+
+		foreach ($rules as $rx => $rpl) {
+			if (array_key_exists($rx, $value)) continue;
+			$this->flush_rewrite();
+			break;
 		}
-		$array_key = $slug . '/([0-9]{4})/([0-9]{1,2})/?$';
-		if ( !array_key_exists($array_key, $value) ) {
-		    $this->flush_rewrite();
-		}
-		$array_key = $slug . '/([0-9]{4})/([0-9]{1,2})/(.+?)/?$';
-		if ( !array_key_exists($array_key, $value) ) {
-		    $this->flush_rewrite();
-		}
-		return $value;
     }
     
     function query_vars($vars) {
@@ -1428,6 +1420,12 @@ class Eab_EventsHub {
 		array_push($vars, 'event_monthnum');
 		return $vars;
     }
+
+
+	function flush_rewrite() {
+		global $wp_rewrite;
+		$wp_rewrite->flush_rules();
+	}
     
     function manage_posts_columns($old_columns)	{
 		global $post_status;
@@ -1633,12 +1631,6 @@ class Eab_EventsHub {
 		return $allcaps;
     }
     
-    function flush_rewrite() {
-	global $wp_rewrite;
-	
-	$wp_rewrite->flush_rules();
-    }
-    
     /**
      * Deactivation hook
      * 
@@ -1661,7 +1653,7 @@ class Eab_EventsHub {
 	        global $menu;
 		
 		if (get_option('eab_setup', false) == false) {
-		    add_submenu_page('edit.php?post_type=incsub_event', __("Get Started", self::TEXT_DOMAIN), __("Get started", self::TEXT_DOMAIN), 'manage_options', 'eab_welcome', array(&$this,'welcome_render'));
+		    add_submenu_page('edit.php?post_type=incsub_event', __("Get Started", self::TEXT_DOMAIN), __("Get started", self::TEXT_DOMAIN), 'manage_options', 'eab_welcome', array($this,'welcome_render'));
 		    
 		    if (isset($submenu['edit.php?post_type=incsub_event']) && is_array($submenu['edit.php?post_type=incsub_event'])) foreach ($submenu['edit.php?post_type=incsub_event'] as $k=>$item) {
 				if ($item[2] == 'eab_welcome') {
@@ -1670,7 +1662,7 @@ class Eab_EventsHub {
 				}
 		    }
 		}
-		add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array(&$this,'settings_render'));
+		add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array($this,'settings_render'));
 		if (isset($submenu['edit.php?post_type=incsub_event']) && is_array($submenu['edit.php?post_type=incsub_event'])) ksort($submenu['edit.php?post_type=incsub_event']);
     }
 	    
@@ -2437,17 +2429,7 @@ class Eab_EventsHub {
 	function load_events_from_query () {
 		if (is_admin()) return false;
 		global $wp_query;
-		if (
-			'incsub_event' == $wp_query->query_vars['post_type']
-			/*
-			&&
-			(
-				(isset($wp_query->query_vars['event_monthnum']) && $wp_query->query_vars['event_monthnum']) 
-				|| 
-				(isset($wp_query->query_vars['event_year']) && $wp_query->query_vars['event_year'])
-			)
-			*/
-		) {
+		if (Eab_EventModel::POST_TYPE == $wp_query->query_vars['post_type']) {
 			$original_year = isset($wp_query->query_vars['event_year']) ? (int)$wp_query->query_vars['event_year'] : false;
 			$year = $original_year ? $original_year : date('Y');
 			$original_month = isset($wp_query->query_vars['event_monthnum']) ? (int)$wp_query->query_vars['event_monthnum'] : false;
