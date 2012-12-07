@@ -4,6 +4,7 @@ Plugin Name: BuddyPress: Activity auto-updates
 Description: Auto-post an activity update when something happens with your Events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
+AddonType: BuddyPress
 Author: Ve Bailovity (Incsub)
 */
 

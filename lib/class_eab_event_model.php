@@ -311,15 +311,24 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	}
 
 	public function get_title () {
-		return $this->_event->post_title;
+		return !empty($this->_event)
+			? $this->_event->post_title
+			: false
+		;
 	}
 
 	public function get_author () {
-		return $this->_event->post_author;
+		return !empty($this->_event)
+			? $this->_event->post_author
+			: false
+		;
 	}
 
 	public function get_excerpt () {
-		return $this->_event->post_excerpt;
+		return !empty($this->_event)
+			? $this->_event->post_excerpt
+			: false
+		;
 	}
 
 	public function get_excerpt_or_fallback ($final_length=false, $default_suffix='... ') {
@@ -345,15 +354,24 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	}
 
 	public function get_content () {
-		return $this->_event->post_content;
+		return !empty($this->_event)
+			? $this->_event->post_content
+			: false
+		;
 	}
 	
 	public function get_type () {
-		return $this->_event->post_type;
+		return !empty($this->_event)
+			? $this->_event->post_type
+			: false
+		;
 	}
 
 	public function get_parent () {
-		return $this->_event->post_parent;
+		return !empty($this->_event)
+			? $this->_event->post_parent
+			: false
+		;
 	}
 
 	public function is_trashed () {
@@ -371,6 +389,15 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$cats = array();
 		foreach ($list as $category) $cats[] = $category->term_id;
 		return $cats;
+	}
+
+	public function get_featured_image ($size=false) {
+		$size = $size ? $size : 'medium';
+		return get_the_post_thumbnail($this->get_id(), $size);
+	}
+
+	public function get_featured_image_url ($size=false) {
+		return wp_get_attachment_url(get_post_thumbnail_id($this->get_id()));
 	}
 
 
@@ -664,6 +691,31 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			: $wpdb->get_results($wpdb->prepare("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d;", $this->get_id()))
 		;
 	}
+
+	/**
+	 * Returns a list of promised bookings.
+	 * @param  mixed $status Booking status (const), or false for all possible bookings.
+	 * @param  mixed $since UNIX timestamp, or false for no lower time limit
+	 * @return array A list of booking results.
+	 */
+	public static function get_bookings ($status=false, $since=false) {
+		$rsvps = array(
+			self::BOOKING_YES,
+			self::BOOKING_MAYBE,
+			self::BOOKING_NO,
+		);
+		$status = $status && in_array($status, $rsvps)
+			? "status='" . $status . "'"
+			: "status IN('" . join("', '", $rsvps) . "')"
+		;
+
+		$since = $since
+			? "AND timestamp > '" . date('Y-m-d H:i:s', $since) . "'"
+			: ''
+		;
+		global $wpdb;
+		return $wpdb->get_results("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE {$status} {$since}");
+	}
 	
 	public function get_rsvps () {
 		global $wpdb;
@@ -765,8 +817,8 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	public function delete_attendance ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
 		if (!$user_id) return false;
-		if ($this->is_premium() && $this->user_paid()) return false; // Can't edit attendance for paid premium events
-		
+		if ($this->is_premium() && $this->user_paid($user_id)) return false; // Can't edit attendance for paid premium events
+
 		global $wpdb;
 		return $wpdb->query($wpdb->prepare("DELETE FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
 	}

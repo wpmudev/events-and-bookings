@@ -371,7 +371,7 @@ class Eab_Template {
 	public static function get_archive_url ($timestamp=false, $full=false) {
 		global $blog_id;
 		$data = Eab_Options::get_instance();
-		$timestamp = $timestamp ? $timestamp : time();
+		$timestamp = $timestamp ? $timestamp : eab_current_time();
 		$format = $full ? 'Y/m' : 'Y';
 		return get_site_url(
 			$blog_id, 
@@ -520,17 +520,30 @@ class Eab_Template {
 					? sprintf(__('On <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
 					: sprintf(__('On %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
 				;
+				$end_string = $event->has_no_end_time($key)
+					? sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span>')
+					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span> <span class="wpmudevevents-date_format-end_time">' . date_i18n(get_option('time_format'), $end) . '</span>')
+				;
 			} else {
 				// The start and end day stamps do NOT differ
-				$start_string = $event->has_no_start_time($key)
-					? sprintf(__('Takes place on <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
-					: sprintf(__('Takes place on %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+				if (eab_current_time() > $start) {
+					// In the past
+					$start_string = $event->has_no_start_time($key)
+						? sprintf(__('Took place on <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
+						: sprintf(__('Took place on %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+					;
+				} else {
+					// Now, or in the future
+					$start_string = $event->has_no_start_time($key)
+						? sprintf(__('Takes place on <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
+						: sprintf(__('Takes place on %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+					;
+				}
+				$end_string = $event->has_no_end_time($key)
+					? ''
+					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span> <span class="wpmudevevents-date_format-end_time">' . date_i18n(get_option('time_format'), $end) . '</span>')
 				;
 			}
-			$end_string = $event->has_no_end_time($key)
-				? sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span>')
-				: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span> <span class="wpmudevevents-date_format-end_time">' . date_i18n(get_option('time_format'), $end) . '</span>')
-			;
 			$content .= apply_filters('eab-events-event_date_string', "{$start_string} {$end_string}", $event->get_id(), $start, $end);
 			/*
 			$content .= apply_filters('eab-events-event_date_string', sprintf(
@@ -579,6 +592,51 @@ class Eab_Template {
 		;
 	}
 
+	public static function get_shortcode_archive_output ($events, $args) {
+		$out = '<section class="eab-events-archive ' . $args['class'] . '">';
+		foreach ($events as $event) {
+			$out .= '<article class="eab-event ' . eab_call_template('get_status_class', $event) . '" id="eab-event-' . $event->get_id() . '">' .
+				'<h4>' . $event->get_title() . '</h4>' .
+				'<div class="eab-event-body">' .
+					eab_call_template('get_archive_content', $event) .
+				'</div>' .
+			'</article>';
+		}
+		$out .= '</section>';
+		return $out;
+	}
+
+	public static function get_shortcode_calendar_output ($events, $args) {
+		if (!class_exists('Eab_CalendarTable_EventShortcodeCalendar')) require_once EAB_PLUGIN_DIR . 'lib/class_eab_calendar_helper.php';
+		$renderer = new Eab_CalendarTable_EventShortcodeCalendar($events);
+
+		$renderer->set_class($args['class']);
+		$renderer->set_footer($args['footer']);
+		$renderer->set_scripts(!$args['override_scripts']);
+
+		return '<section class="wpmudevevents-list">' . $renderer->get_month_calendar($args['date']) . '</section>';
+	}
+
+	public static function get_shortcode_events_map_marker_body_output ($event, $args) {
+		$class_pfx = !empty($args['class']) ? $args['class'] : 'eab-events_map';
+		return "<div class='{$class_pfx}-venue'>" .
+			'<a href="' . get_permalink($event->get_id()) . '">' .
+				$event->get_venue_location() .
+			'</a>' .
+		"</div><div class='{$class_pfx}-dates'>" .
+			eab_call_template('get_event_dates', $event) .
+		'</div>';
+	}
+
+	public static function get_shortcode_single_output ($event, $args) {
+		return '<div class="eab-event ' . $args['class'] . '">' .
+			'<h4>' . $event->get_title() . '</h4>' .
+			'<div class="eab-event-body">' .
+				eab_call_template('get_single_content', $event) .
+			'</div>' .
+		'</div>';
+	}
+
 /* ----- Utility methods ----- */
 
 	public static function util_strlen ($str) {
@@ -616,6 +674,95 @@ class Eab_Template {
 			? $str
 			: join(' ', array_slice($words, 0, $count)) . $default_suffix;
 		;
+	}
+
+	public static function util_locate_template ($template) {
+		$path = false;
+		if (!$template) return $path;
+
+		$file = basename(trim($template));
+		$file = preg_match('/\.php$/', $file) ? $file : "{$file}.php";
+
+		// Check theme dir first
+		if (file_exists(get_stylesheet_directory() . '/' . $file)) {
+			$path = get_stylesheet_directory() . '/' . $file;
+		} else if (file_exists(get_template_directory() . '/' . $file)) {
+			$path = get_template_directory() . '/' . $file;
+		}
+		if ($path) return $path;
+
+		// Check fallback directory
+		if (file_exists(EAB_PLUGIN_DIR . "default-templates/{$file}")) return EAB_PLUGIN_DIR . "default-templates/{$file}";
+		return false;
+	}
+
+	public static function util_get_default_template_style ($template) {
+		$style = false;
+		if (!$template) return $style;
+
+		$template = basename(trim($template));
+		$style_path = file_exists(EAB_PLUGIN_DIR . "default-templates/{$template}/events.css");
+		return $style_path ? plugins_url(EAB_PLUGIN_BASENAME . "/default-templates/{$template}/events.css") : false;
+	}
+
+	public static function util_apply_shortcode_template ($events, $args) {
+		$output = false;
+		// Check template output
+		if (eab_has_template_method($args['template'])) {
+			// Template class method call
+			$output = eab_call_template($args['template'], $events, $args);
+		} else {
+			// Template file
+			$template = eab_call_template('util_locate_template', $args['template']);
+			if ($template) {
+				ob_start();
+				include($template);
+				$output = ob_get_clean();
+			}
+		}
+		return $output;
+	}
+
+	public static function util_shortcode_argument_type_string ($raw_type, $argument, $tag) {
+		$type_map = array(
+			'boolean' => array(
+				'type' => __('boolean', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('"yes" or "no"', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="yes"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'integer' => array(
+				'type' => __('integer', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => 'numeric value',
+				'example' => sprintf(__('%s="326"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string' => array(
+				'type' => __('string', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('"mystring"', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="mystring"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string:date' => array(
+				'type' => __('date', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('date format string', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="2011-11-18"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string:or_integer' => array(
+				'type' => __('string or integer', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('"some_text" or "212"', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="some_text"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string:sort' => array(
+				'type' => __('ordering keyword', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('"ASC" or "DESC"', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="ASC"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+		);
+		if (empty($type_map[$raw_type])) return "<code>({$raw_type})</code>";
+
+		$type = $type_map[$raw_type];
+		$title = 'title="' . esc_attr(
+			sprintf(__("%s, e.g. [%s ... %s]", Eab_EventsHub::TEXT_DOMAIN), $type['value'], $tag, $type['example'])
+		) . '"';
+		return "<abbr {$title}>({$type['type']})</abbr>";
 	}
 	
 }

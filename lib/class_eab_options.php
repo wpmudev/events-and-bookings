@@ -54,7 +54,11 @@ class Eab_Options {
 		foreach ($values as $name => $value) {
 			$this->set_option($name, $value);
 		}
-		update_option(self::OPTIONS_KEY, $this->_data);
+		$this->update();
+	}
+
+	public function update () {
+		return update_option(self::OPTIONS_KEY, $this->_data);
 	}
 	
 	private function _populate () {

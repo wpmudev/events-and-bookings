@@ -5,14 +5,14 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 	private $_defaults = array();
     
     function __construct () {
-    	$this->_defaults = array( 
+    	$this->_defaults = apply_filters('eab-widgets-upcoming-default_fields', array( 
 			'title' => __('Upcoming', $this->translation_domain),
 			'excerpt' => false,
 			'excerpt_words_limit' => false,
 			'thumbnail' => false,
 			'limit' => 5,
 			'dates' => false,
-		);
+		));
 		$widget_ops = array('description' => __('Display List of Upcoming Events', $this->translation_domain));
         $control_ops = array('title' => __('Upcoming', $this->translation_domain));        
 		parent::WP_Widget( 'incsub_event_upcoming', __('Upcoming Events', $this->translation_domain), $widget_ops, $control_ops );
@@ -23,6 +23,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		
 		extract($args);
 		
+		$instace = apply_filters('eab-widgets-upcoming-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
 		
 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Upcoming', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
@@ -36,7 +37,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 				'terms' => (int)$options['category'],
 			));
 		}
-		$_events = Eab_CollectionFactory::get_upcoming_weeks_events(time(), $query_args);
+		$_events = Eab_CollectionFactory::get_upcoming_weeks_events(eab_current_time(), $query_args);
 	
 		if (is_array($_events) && count($_events) > 0) {
 		?>
@@ -72,6 +73,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 						<?php if ($options['excerpt'] && $excerpt) { ?>
 							<p><?php echo $excerpt; ?></p>
 						<?php } ?>
+						<?php do_action('eab-widgets-upcoming-after_event', $options, $_event, $this); ?>
 					</li>
 			    <?php
 				}
@@ -94,11 +96,14 @@ class Eab_Upcoming_Widget extends Eab_Widget {
         $instance['limit'] = (int)$new_instance['limit'];
         $instance['dates'] = (int)$new_instance['dates'];
         $instance['category'] = (int)$new_instance['category'];
+
+        $instance = apply_filters('eab-widgets-upcoming-instance_update', $instance, $new_instance, $this);
 	
         return $instance;
     }
     
     function form ($instance) {
+    	$instance = apply_filters('eab-widgets-upcoming-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
         $options['title'] = strip_tags($instance['title']);	
 		
@@ -165,6 +170,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 					<?php } ?>
 				</select> 
            </label>
+           <?php do_action('eab-widgets-upcoming-widget_form', $options, $this); ?>
 	</div>
 	<?php
     }

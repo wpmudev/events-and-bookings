@@ -37,7 +37,7 @@ class Eab_Events_ExpireMonthOldEvents {
 	function expire_archived_events () {
 		if (class_exists('Eab_Events_ExpirePastEvents')) return false;
 		$args = array();
-		$collection = new Eab_LastMonthArchivedCollection(time(), $args);
+		$collection = new Eab_LastMonthArchivedCollection(eab_current_time(), $args);
 		$events = $collection->to_collection();
 		foreach ($events as $event) {
 			$event->set_status(Eab_EventModel::STATUS_EXPIRED);

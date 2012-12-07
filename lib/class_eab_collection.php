@@ -64,7 +64,7 @@ abstract class Eab_TimedCollection extends Eab_Collection {
 	 * NEVER NEVER EVER call this directly. Use Factory instead.
 	 */
 	public function __construct ($timestamp=false, $args=array()) {
-		$this->_timestamp = $timestamp ? $timestamp : time();
+		$this->_timestamp = $timestamp ? $timestamp : eab_current_time();
 		$query = $this->build_query_args($args);
 		parent::__construct($query);
 	}
@@ -82,33 +82,14 @@ abstract class Eab_TimedCollection extends Eab_Collection {
 class Eab_UpcomingCollection extends Eab_TimedCollection {
 
 	public function __construct ($timestamp=false, $args=array()) {
-		add_filter('posts_where', array($this, 'posts_where'));
-		add_filter('posts_join', array($this, 'join_postmeta'));
-		add_filter('posts_orderby', array($this, 'order_by_date'));
+		Eab_Filter::start_date_ordering_set_up();
+		add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));
 		parent::__construct($timestamp, $args);
-		remove_filter('posts_where', array($this, 'posts_where'));
-		remove_filter('posts_join', array($this, 'join_postmeta'));
-		remove_filter('posts_orderby', array($this, 'order_by_date'));
+		Eab_Filter::start_date_ordering_tear_down();
 	}
 
-	public function order_by_date ($q) {
-		global $wpdb;
-		$allowed = array("ASC", "DESC");
-		$direction = (defined('EAB_COLLECTION_DATE_ORDERING_DIRECTION') && in_array(strtoupper(EAB_COLLECTION_DATE_ORDERING_DIRECTION), $allowed))
-			? strtoupper(EAB_COLLECTION_DATE_ORDERING_DIRECTION)
-			: "ASC"
-		;
-		$direction = apply_filters('eab-collection-date_ordering_direction', $direction);
-		return "eab_meta.meta_value {$direction}";
-	}
-
-	public function join_postmeta ($q) {
-		global $wpdb;
-		return "{$q} JOIN {$wpdb->postmeta} AS eab_meta ON ({$wpdb->posts}.ID = eab_meta.post_id)";
-	}
-
-	public function posts_where ($q) {
-		return "{$q} AND eab_meta.meta_key='incsub_event_start'";
+	public function propagate_direction_filter ($direction) {
+		return apply_filters('eab-collection-date_ordering_direction', $direction);
 	}
 	
 	public function build_query_args ($args) {
@@ -176,29 +157,16 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 	public function __construct ($timestamp=false, $args=array()) {
 		if (!defined('EAB_COLLECTION_UPCOMING_WEEKS_COUNT')) define('EAB_COLLECTION_UPCOMING_WEEKS_COUNT', self::WEEK_COUNT, true);
 
-		add_filter('posts_where', array($this, 'posts_where'));
-		add_filter('posts_join', array($this, 'join_postmeta'));
-		add_filter('posts_orderby', array($this, 'order_by_date'));
+		Eab_Filter::start_date_ordering_set_up();
+		add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));
 		parent::__construct($timestamp, $args);
-		remove_filter('posts_where', array($this, 'posts_where'));
-		remove_filter('posts_join', array($this, 'join_postmeta'));
-		remove_filter('posts_orderby', array($this, 'order_by_date'));
+		Eab_Filter::start_date_ordering_tear_down();
 	}
 
-	public function order_by_date ($q) {
-		global $wpdb;
-		return "eab_meta.meta_value ASC"; // @TODO: SET UP EVENT ORDERING DIRECTION!!
+	public function propagate_direction_filter ($direction) {
+		return apply_filters('eab-collection-date_ordering_direction', $direction);
 	}
 
-	public function join_postmeta ($q) {
-		global $wpdb;
-		return "{$q} JOIN {$wpdb->postmeta} AS eab_meta ON ({$wpdb->posts}.ID = eab_meta.post_id)";
-	}
-
-	public function posts_where ($q) {
-		return "{$q} AND eab_meta.meta_key='incsub_event_start'";
-	}
-	
 	public function build_query_args ($args) {
 		// Changes by Hakan
 		// Commented lines were not removed intentionally.
@@ -213,7 +181,7 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 
 		$weeks = apply_filters('eab-collection-upcoming_weeks-week_number', EAB_COLLECTION_UPCOMING_WEEKS_COUNT);
 		$weeks = is_numeric($weeks) ? $weeks : self::WEEK_COUNT;
-		
+
 		$args = array_merge(
 			$args,
 			array(
@@ -223,7 +191,7 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_start',
-						'value' => date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are 5 weeks from now
+						'value' => date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are $weeks weeks from now
 		    			'compare' => '<',
 		    			'type' => 'DATETIME'
 					),
@@ -409,6 +377,15 @@ class Eab_CollectionFactory {
 	public static function get_upcoming_events ($timestamp=false, $args=array()) {
 		$me = new Eab_UpcomingCollection($timestamp, $args);
 		return $me->to_collection();
+	}
+
+	/**
+	 * Upcoming events weeks factory method
+	 * @return array Eab_UpcomingWeeksCollection instance
+	 */
+	public static function get_upcoming_weeks ($timestamp=false, $args=array()) {
+		$me = new Eab_UpcomingWeeksCollection($timestamp, $args);
+		return $me->to_query();
 	}
 
 	/**

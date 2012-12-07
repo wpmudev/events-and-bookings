@@ -5,13 +5,13 @@ class Eab_Popular_Widget extends Eab_Widget {
 	private $_defaults;
     
     function __construct () {
-    	$this->_defaults = array( 
+    	$this->_defaults = apply_filters('eab-widgets-popular-default_fields', array( 
 			'title' => __('Most Popular', $this->translation_domain),
 			'excerpt' => false,
 			'excerpt_words_limit' => false,
 			'thumbnail' => false,
 			'limit' => 5,
-		);
+		));
 		$widget_ops = array( 'description' => __('Display List of Popular events', $this->translation_domain) );
         $control_ops = array( 'title' => __('Most Popular', $this->translation_domain));     
 		parent::WP_Widget( 'incsub_event_popular', __('Most Popular Events', $this->translation_domain), $widget_ops, $control_ops );
@@ -22,6 +22,7 @@ class Eab_Popular_Widget extends Eab_Widget {
 		
 		extract($args);
 		
+		$instace = apply_filters('eab-widgets-popular-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
 		
 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Most Popular', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
@@ -58,6 +59,7 @@ class Eab_Popular_Widget extends Eab_Widget {
 					<?php if ($options['excerpt'] && $excerpt) { ?>
 						<p><?php echo $excerpt; ?></p>
 					<?php } ?>
+					<?php do_action('eab-widgets-popular-after_event', $options, $_event, $this); ?>
 				</li>
 			    <?php
 				}
@@ -79,11 +81,14 @@ class Eab_Popular_Widget extends Eab_Widget {
         $instance['excerpt_words_limit'] = (int)$new_instance['excerpt_words_limit'];
         $instance['thumbnail'] = (int)$new_instance['thumbnail'];
         $instance['limit'] = (int)$new_instance['limit'];
+
+        $instance = apply_filters('eab-widgets-popular-instance_update', $instance, $new_instance, $this);
 	
         return $instance;
     }
     
-    function form($instance) {
+    function form ($instance) {
+    	$instance = apply_filters('eab-widgets-popular-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
         $options['title'] = strip_tags($instance['title']);	
 	
@@ -126,6 +131,7 @@ class Eab_Popular_Widget extends Eab_Widget {
 					<?php } ?>
 				</select> 
             </label>
+            <?php do_action('eab-widgets-popular-widget_form', $options, $this); ?>
 	</div>
 	<?php
     }

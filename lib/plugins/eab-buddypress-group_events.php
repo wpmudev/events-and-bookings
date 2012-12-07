@@ -3,7 +3,8 @@
 Plugin Name: BuddyPress: Group Events
 Description: Allows you to connect your Events with your BuddyPress groups.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 1.0
+Version: 1.1
+AddonType: BuddyPress
 Author: Ve Bailovity (Incsub)
 */
 
@@ -37,7 +38,7 @@ class Eab_BuddyPress_GroupEvents {
 		if ($this->_data->get_option('bp-group_event-private_events')) {
 			add_filter('wpmudev-query', array($this, 'filter_query'));
 		}
-		
+
 		add_action('bp_init', array($this, 'add_tab'));
 		add_filter('eab-event_meta-event_meta_box-after', array($this, 'add_meta_box'));
 		add_action('eab-event_meta-save_meta', array($this, 'save_meta'));
@@ -47,7 +48,51 @@ class Eab_BuddyPress_GroupEvents {
 		add_filter('eab-events-fpe-add_meta', array($this, 'add_fpe_meta_box'), 10, 2);
 		add_action('eab-events-fpe-enqueue_dependencies', array($this, 'enqueue_fpe_dependencies'), 10, 2);
 		add_action('eab-events-fpe-save_meta', array($this, 'save_fpe_meta'), 10, 2);
+
+		// Upcoming and popular widget integration
+		add_filter('eab-widgets-upcoming-default_fields', array($this, 'widget_instance_defaults'));
+		add_filter('eab-widgets-popular-default_fields', array($this, 'widget_instance_defaults'));
+		
+		add_filter('eab-widgets-upcoming-instance_update', array($this, 'widget_instance_update'), 10, 2);
+		add_filter('eab-widgets-popular-instance_update', array($this, 'widget_instance_update'), 10, 2);
+		
+		add_action('eab-widgets-upcoming-widget_form', array($this, 'widget_form'), 10, 2);
+		add_action('eab-widgets-popular-widget_form', array($this, 'widget_form'), 10, 2);
+		
+		add_action('eab-widgets-upcoming-after_event', array($this, 'widget_event_group'), 10, 2);
+		add_action('eab-widgets-popular-after_event', array($this, 'widget_event_group'), 10, 2);
 	}
+
+	function widget_instance_defaults ($defaults) {
+		$defaults['show_bp_group'] = false;
+		return $defaults;
+	}
+
+	function widget_instance_update ($instance, $new) {
+		$instance['show_bp_group'] = (int)$new['show_bp_group'];
+		return $instance;
+	}
+
+	function widget_form ($options, $widget) {
+		?>
+<label for="<?php echo $widget->get_field_id('show_bp_group'); ?>" style="display:block;">
+	<input type="checkbox" 
+		id="<?php echo $widget->get_field_id('show_bp_group'); ?>" 
+		name="<?php echo $widget->get_field_name('show_bp_group'); ?>" 
+		value="1" <?php echo ($options['show_bp_group'] ? 'checked="checked"' : ''); ?> 
+	/>
+	<?php _e('Show BuddyPress group', Eab_EventsHub::TEXT_DOMAIN); ?>
+</label>
+		<?php
+	}
+
+	function widget_event_group ($options, $event) {
+		if (empty($options['show_bp_group'])) return false;
+		$name = Eab_GroupEvents_Template::get_group_name($event->get_id());
+		if (!$name) return false;
+		echo '<div class="eab-event_group">' . $name . '</div>';
+	}
+
 
 	function filter_query ($query) {
 		global $current_user;
@@ -95,6 +140,7 @@ class Eab_BuddyPress_GroupEvents {
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 		$checked = $this->_data->get_option('bp-group_event-auto_join_groups') ? 'checked="checked"' : '';
 		$private = $this->_data->get_option('bp-group_event-private_events') ? 'checked="checked"' : '';
+		$user_groups_only = $this->_data->get_option('bp-group_event-user_groups_only') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-group_events" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Group Events settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -109,6 +155,11 @@ class Eab_BuddyPress_GroupEvents {
 			<input type="checkbox" id="eab_event-bp-group_event-private_events" name="event_default[bp-group_event-private_events]" value="1" <?php print $private; ?> />
 			<span><?php echo $tips->add_tip(__('If you enable this option, users outside your groups will <b>not</b> be able to see your Group Events.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 	    </div>
+	    <div class="eab-settings-settings_item">
+	    	<label for="eab_event-bp-group_event-user_groups_only"><?php _e('Show only groups that user belongs to', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
+			<input type="checkbox" id="eab_event-bp-group_event-user_groups_only" name="event_default[bp-group_event-user_groups_only]" value="1" <?php print $user_groups_only; ?> />
+			<span><?php echo $tips->add_tip(__('If you enable this option, users will not be able to assign events outside the groups they already belong to.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+	    </div>
 	</div>
 </div>
 <?php
@@ -117,11 +168,12 @@ class Eab_BuddyPress_GroupEvents {
 	function save_settings ($options) {
 		$options['bp-group_event-auto_join_groups'] = $_POST['event_default']['bp-group_event-auto_join_groups'];
 		$options['bp-group_event-private_events'] = $_POST['event_default']['bp-group_event-private_events'];
+		$options['bp-group_event-user_groups_only'] = $_POST['event_default']['bp-group_event-user_groups_only'];
 		return $options;
 	}
 
 	function add_meta_box ($box) {
-		global $post;
+		global $post, $current_user;
 		if (!function_exists('groups_get_groups')) return $box;
 		$group_id = get_post_meta($post->ID, 'eab_event-bp-group_event', true);
 		
@@ -129,7 +181,9 @@ class Eab_BuddyPress_GroupEvents {
 			? EAB_BP_GROUPS_LIST_GROUP_LIMIT
 			: groups_get_total_group_count()
 		;
-		$groups = groups_get_groups(array('per_page' => $group_count , 'type' => 'alphabetical'));
+		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical');
+		if ($this->_data->get_option('bp-group_event-user_groups_only')) $group_params['user_id'] = $current_user->id;
+		$groups = groups_get_groups($group_params);
 		$groups = @$groups['groups'] ? $groups['groups'] : array();
 		
 		$ret = '';
@@ -161,7 +215,9 @@ class Eab_BuddyPress_GroupEvents {
 			? EAB_BP_GROUPS_LIST_GROUP_LIMIT
 			: groups_get_total_group_count()
 		;
-		$groups = groups_get_groups(array('per_page' => $group_count , 'type' => 'alphabetical'));
+		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical');
+		if ($this->_data->get_option('bp-group_event-user_groups_only')) $group_params['user_id'] = $current_user->id;
+		$groups = groups_get_groups($group_params);
 		$groups = @$groups['groups'] ? $groups['groups'] : array();
 		
 		$ret .= '<div class="eab-events-fpe-meta_box">';
@@ -270,7 +326,7 @@ class Eab_BuddyPress_GroupEvents {
 	
 	private function _get_requested_timestamp () {
 		global $bp;
-		if (!$bp->action_variables) return time();
+		if (!$bp->action_variables) return eab_current_time();
 		
 		$year = (int)(isset($bp->action_variables[0]) ? $bp->action_variables[0] : date('Y'));
 		$year = $year ? $year : date('Y');
@@ -285,6 +341,24 @@ class Eab_BuddyPress_GroupEvents {
 
 
 class Eab_BuddyPress_GroupEventsCollection extends Eab_UpcomingCollection {
+	
+	private $_group_id;
+		
+	public function __construct ($group_id, $timestamp=false, $args=array()) {
+		$this->_group_id = $group_id;
+		parent::__construct($timestamp, $args);
+	}
+	
+	public function build_query_args ($args) {
+		$args = parent::build_query_args($args);
+		$args['meta_query'][] = array(
+			'key' => 'eab_event-bp-group_event',
+			'value' => $this->_group_id,
+		);
+		return $args;
+	}
+}
+class Eab_BuddyPress_GroupEventsWeeksCollection extends Eab_UpcomingWeeksCollection {
 	
 	private $_group_id;
 		
@@ -329,6 +403,134 @@ class Eab_GroupEvents_Template extends Eab_Template {
 
 	public static function get_group_name ($event_id=false) {
 		$group = self::get_group($event_id);
-		return $group->name;
+		return (!empty($group->name))
+			? $group->name
+			: ''
+		;
 	}
 }
+
+
+class Eab_GroupEvents_Shortcodes extends Eab_Codec {
+
+	protected $_shortcodes = array(
+		'group_archives' => 'eab_group_archives',
+	);
+
+	public static function serve () {
+		$me = new Eab_GroupEvents_Shortcodes;
+		$me->_register();
+		add_filter('eab-shortcodes-shortcode_help', array($me, 'shortcodes_help'));
+	}
+
+	function process_group_archives_shortcode ($args=array(), $content=false) {
+		$args = $this->_preparse_arguments($args, array(
+		// Date arguments	
+			'date' => false, // Starting date - default to now
+			'lookahead' => false, // Don't use default monthly page - use weeks count instead
+			'weeks' => false, // Look ahead this many weeks
+		// Query arguments
+			'category' => false, // ID or slug
+			'limit' => false, // Show at most this many events
+			'order' => false,
+			'groups' => false, // Group ID, keyword or comma-separated list of group IDs
+			'user' => false, // User ID or keyword
+		// Appearance arguments
+			'class' => 'eab-group_events',
+			'template' => 'get_shortcode_archive_output', // Subtemplate file, or template class call
+			'override_styles' => false,
+			'override_scripts' => false,
+		));
+
+		if (is_numeric($args['user'])) {
+			$args['user'] = $this->_arg_to_int($args['user']);
+		} else {
+			if ('current' == trim($args['user'])) {
+				$user = wp_get_current_user();
+				$args['user'] = $user->ID;
+			} else {
+				$args['user'] = false;
+			}
+		}
+
+		if (is_numeric($args['groups'])) {
+			// Single group ID
+			$args['groups'] = $this->_arg_to_int($args['groups']);
+		} else if (strstr($args['groups'], ',')) {
+			// Comma-separated list of group IDs
+			$ids = array_map('intval', array_map('trim', explode(',', $args['groups'])));
+			if (!empty($ids)) $args['groups'] = $ids;
+		} else {
+			// Keyword
+			if (in_array(trim($args['groups']), array('my', 'my-groups', 'my_groups')) && $args['user']) {
+				if (!function_exists('groups_get_groups')) return $content;
+				$groups = groups_get_groups(array('user_id' => $args['user']));
+				$args['groups'] = array_map('intval', wp_list_pluck($groups['groups'], 'id'));
+			} else {
+				$args['groups'] = false;
+			}
+		}
+		if (!$args['groups']) return $content;
+
+		$events = array();
+		$query = $this->_to_query_args($args);
+		$query['meta_query'][] = array(
+			'key' => 'eab_event-bp-group_event',
+			'value' => $args['groups'],
+			'compare' => (is_array($args['groups']) ? 'IN' : '='),
+		);
+
+		$order_method = $args['order']
+			? create_function('', 'return "' . $args['order'] . '";')
+			: false
+		;
+		if ($order_method) add_filter('eab-collection-date_ordering_direction', $order_method);
+		
+		// Lookahead - depending on presence, use regular upcoming query, or poll week count
+		if ($args['lookahead']) {
+			$method = $args['weeks']
+				? create_function('', 'return ' . $args['weeks'] . ';')
+				: false;
+			;
+			if ($method) add_filter('eab-collection-upcoming_weeks-week_number', $method);
+			$collection = new Eab_BuddyPress_GroupEventsWeeksCollection($args['groups'], $args['date'], $query);
+			if ($method) remove_filter('eab-collection-upcoming_weeks-week_number', $method);
+		} else {
+			// No lookahead, get the full month only
+			$collection =  new Eab_BuddyPress_GroupEventsCollection($args['groups'], $args['date'], $query);
+		}
+		if ($order_method) remove_filter('eab-collection-date_ordering_direction', $order_method);
+		$events = $collection->to_collection();
+
+		$output = eab_call_template('util_apply_shortcode_template', $events, $args);
+		$output = $output ? $output : $content;
+
+		if (!$args['override_styles']) wp_enqueue_style('eab_front');
+		if (!$args['override_scripts']) wp_enqueue_script('eab_event_js');
+		return $output;
+	}
+
+	public function shortcodes_help ($help) {
+		$help[] = array(
+			'title' => __('BuddyPress group archives', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' => 'eab_group_archives',
+			'arguments' => array(
+				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'weeks' => array('help' => __('Look ahead this many weeks', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
+				'groups' => array('help' => __('Group ID, keyword "my-groups" or comma-separated list of group IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'user' => array('help' => __('User ID or keyword "current" - required if <code>groups</code> is set to "my-groups"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+    			'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+    			'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+    			'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+			),
+		);
+		return $help;
+	}
+}
+
+Eab_GroupEvents_Shortcodes::serve();

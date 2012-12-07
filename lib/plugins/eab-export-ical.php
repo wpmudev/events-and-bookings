@@ -37,6 +37,27 @@ class Eab_Export_iCal {
 			add_filter('eab-template-archive_after_view_link', array($this, 'append_export_link'), 10, 2);
 			add_filter('eab-events-after_single_event', array($this, 'append_export_link'), 10, 2);
 		}
+
+		add_action('eab-events-rsvp_email-codec-macros', array($this, 'rsvp_email_macro_addition'));
+		add_action('eab-events-rsvp_email-codec-expand', array($this, 'rsvp_email_macro_expansion'), 10, 2);
+	}
+
+	function rsvp_email_macro_addition ($macros) {
+		$macros[] = 'EVENT_ICAL_URL';
+		$macros[] = 'EVENT_ICAL_LINK';
+		$macros[] = 'EVENT_ICAL_DOWNLOAD_LINK';
+		return $macros;
+	}
+
+	function rsvp_email_macro_expansion ($str, $event) {
+		if (!$event) return $str;
+		$ical_url = get_permalink($event->get_id()) . '?eab_format=ical';
+		$ical_link = '<a href="' . $ical_url . '">' . $event->get_title() . '</a>';
+		$dload_link = '<a href="' . $ical_url . '&attachment">' . $event->get_title() . '</a>';
+		$str = preg_replace('/(?:^|\b)EVENT_ICAL_URL(?:\b|$)/', $ical_url, $str);
+		$str = preg_replace('/(?:^|\b)EVENT_ICAL_LINK(?:\b|$)/', $ical_link, $str);
+		$str = preg_replace('/(?:^|\b)EVENT_ICAL_DOWNLOAD_LINK(?:\b|$)/', $dload_link, $str);
+		return $str;
 	}
 
 	function save_settings ($options) {

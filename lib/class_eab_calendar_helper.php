@@ -335,17 +335,11 @@ EabEctEacJs;
 }
 
 
+class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventArchiveCalendar {
 
-class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable {
-		
-	protected $_data = array();
 	protected $_class;
-	protected $_id;
-	protected $_use_footer = true;
-	
-	public function get_calendar_id () { return $this->_id; }
-	public function get_calendar_class () { return $this->_class; }
-	public function reset_event_info_storage () { $this->_data = array(); }
+	protected $_use_footer = false;
+	protected $_use_scripts = true;
 	
 	public function set_class ($class) {
 		$this->_class = sanitize_html_class($class);
@@ -354,25 +348,18 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable {
 	public function set_footer ($use) {
 		$this->_use_footer = (bool)$use;
 	}
-	
+
+	public function set_scripts ($use) {
+		$this->_use_scripts = (bool)$use;
+	}
+
 	protected function _get_table_meta_row ($which) {
 		if ('tfoot' == $which && !$this->_use_footer) return '';
 		return parent::_get_table_meta_row($which);
 	}
-	
-	public function set_event_info ($event_tstamps, $current_tstamps, $event_info) {
-		$title = esc_attr($event_info['event_venue']);
-		$permalink = isset($event_info['blog_id']) ? get_blog_permalink($event_info['blog_id'], $event_info['id']) : get_permalink($event_info['id']);
-		$this->_data[] = '<a title="' . $title . '" class="wpmudevevents-calendar_shortcode-event ' . $event_info['status_class'] . '" href="' . $permalink . '">' . 
-			$event_info['title'] .
-		'</a>'; 
-	}
-	
-	public function get_event_info_as_string ($day) {
-		$activity = '';
-		if ($this->_data) {
-			$activity = '<p>' . $day . '<br />' . join('<br />', $this->_data) . '</p>';
-		}
-		return $activity;
+
+	protected function _get_js () {
+		if (!$this->_use_scripts) return false;
+		return parent::_get_js();
 	}
 }

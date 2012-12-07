@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.4.4
+ Version: 1.5
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.4.4';
+    const CURRENT_VERSION = '1.5';
     
     /**
      * Translation domain
@@ -319,7 +319,7 @@ class Eab_EventsHub {
 		}
 		
 		if (isset($_REQUEST['eab_step'])) {
-		    setcookie('eab_step', $_REQUEST['eab_step'], time()+(3600*24));
+		    setcookie('eab_step', $_REQUEST['eab_step'], eab_current_time()+(3600*24));
 		} else if (isset($_COOKIE['eab_step'])) {
 		    $_REQUEST['eab_step'] = $_COOKIE['eab_step'];
 		}
@@ -1052,7 +1052,7 @@ class Eab_EventsHub {
 		);
 		
 		$starts_ts = $event->get_recurrence_starts();
-		$starts_ts = $starts_ts ? $starts_ts : time();
+		$starts_ts = $starts_ts ? $starts_ts : eab_current_time();
 		$starts = date('Y-m-d', $starts_ts);
 		
 		$ends_ts = $event->get_recurrence_ends();
@@ -1275,8 +1275,8 @@ class Eab_EventsHub {
 		// Setting up recurring event
 		if ('incsub_event' == $post->post_type && isset($_POST['eab_repeat'])) {
 			$repeat = $_POST['eab_repeat'];
-			$start = $repeat['repeat_start'] ? strtotime($repeat['repeat_start']) : time();
-			$end =  $repeat['repeat_end'] ? strtotime($repeat['repeat_end']) : time();
+			$start = $repeat['repeat_start'] ? strtotime($repeat['repeat_start']) : eab_current_time();
+			$end =  $repeat['repeat_end'] ? strtotime($repeat['repeat_end']) : eab_current_time();
 			if ($end <= $start) {
 				// BAH! Wrong order
 			}
@@ -1359,8 +1359,8 @@ class Eab_EventsHub {
 		    
 		    $ptype = get_post_type_object($post->post_type);
 		    
-		    $start = time();
-		    $end = time();
+		    $start = eab_current_time();
+		    $end = eab_current_time();
 		    
 		    $meta = get_post_custom($post->ID);
 		    if (isset($meta["incsub_event_start"])) {// && isset($meta["incsub_event_start"][$event_variation[$post->ID]])) {
@@ -1662,7 +1662,8 @@ class Eab_EventsHub {
 				}
 		    }
 		}
-		add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array($this,'settings_render'));
+		add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array($this, 'settings_render'));
+		add_submenu_page('edit.php?post_type=incsub_event', __("Event Shortcodes", self::TEXT_DOMAIN), __("Shortcodes", self::TEXT_DOMAIN), 'edit_events', 'eab_shortcodes', array($this, 'shortcodes_render'));
 		if (isset($submenu['edit.php?post_type=incsub_event']) && is_array($submenu['edit.php?post_type=incsub_event'])) ksort($submenu['edit.php?post_type=incsub_event']);
     }
 	    
@@ -1965,6 +1966,120 @@ class Eab_EventsHub {
 	    </form>
 	</div>
 	<?php
+    }
+
+    function shortcodes_render () {
+    		$help = array(
+    			array(
+    				'title' => __('Archive shortcode', self::TEXT_DOMAIN),
+    				'tag' => 'eab_archive',
+    				'arguments' => array(
+    					'network' => array('help' => __('Query type', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'date' => array('help' => __('Starting date - default to now', self::TEXT_DOMAIN), 'type' => 'string:date'),
+    					'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'weeks' => array('help' => __('Look ahead this many weeks', self::TEXT_DOMAIN), 'type' => 'integer'),
+    					'category' => array('help' => __('Show events from this category (ID or slug)', self::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+    					'limit' => array('help' => __('Show at most this many events', self::TEXT_DOMAIN), 'type' => 'integer'),
+    					'order' => array('help' => __('Sort events in this direction', self::TEXT_DOMAIN), 'type' => 'string:sort'),
+    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    				),
+    			),
+    			array(
+    				'title' => __('Calendar shortcode', self::TEXT_DOMAIN),
+    				'tag' => 'eab_calendar',
+    				'arguments' => array(
+    					'network' => array('help' => __('Query type', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'date' => array('help' => __('Starting date - default to now', self::TEXT_DOMAIN), 'type' => 'string:date'),
+    					'footer' => array('help' => __('Show calendar table footer', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    				),
+    			),
+    			array(
+    				'title' => __('Expired events shortcode', self::TEXT_DOMAIN),
+    				'tag' => 'eab_expired',
+    				'arguments' => array(
+    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    				),
+    			),
+    			array(
+    				'title' => __('Single event shortcode', self::TEXT_DOMAIN),
+    				'tag' => 'eab_single',
+    				'arguments' => array(
+    					'id' => array('help' => __('Event ID to show', self::TEXT_DOMAIN), 'type' => 'integer'),
+    					'slug' => array('help' => __('Show event by this slug', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    				),
+    			),
+    			array(
+    				'title' => __('Event map shortcode', self::TEXT_DOMAIN),
+    				'tag' => 'eab_events_map',
+    				'note' => __('Requires Google Maps plugin.', self::TEXT_DOMAIN),
+    				'arguments' => array(
+    					'date' => array('help' => __('Starting date - default to now', self::TEXT_DOMAIN), 'type' => 'string:date'),
+    					'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', self::TEXT_DOMAIN), 'type' => 'boolean'),
+    					'weeks' => array('help' => __('Look ahead this many weeks', self::TEXT_DOMAIN), 'type' => 'integer'),
+    					'category' => array('help' => __('Show events from this category (ID or slug)', self::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+    					'limit' => array('help' => __('Show at most this many events', self::TEXT_DOMAIN), 'type' => 'integer'),
+    					'order' => array('help' => __('Sort events in this direction', self::TEXT_DOMAIN), 'type' => 'string:sort'),
+    					'featured_image' => array('help' => __('Use event featured image instead of map markers', self::TEXT_DOMAIN), 'type' => 'boolean '),
+    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
+    					'...' => array('help' => __('and Google Maps shortcode attributes', self::TEXT_DOMAIN)),
+    				),
+    			),
+
+    		);
+
+			// Filter the help....
+			$help = apply_filters('eab-shortcodes-shortcode_help', $help);
+
+			$out = '';
+			$count = 0;
+			$half = (int)(count($help) / 2);
+
+			$out .= '<div class="postbox-container">';
+			foreach ($help as $shortcode) {
+				$out .= '<div class="eab-metabox postbox"><h3 class="eab-hndle">' . $shortcode['title'] . '</h3>';
+				$out .= '<div class="eab-inside">';
+				$out .= '	<div class="eab-settings-settings_item">';
+				$out .= '		<strong>' . __('Tag:', self::TEXT_DOMAIN) . '</strong> <code>[' . $shortcode['tag'] . ']</code>';
+				if (!empty($shortcode['note'])) $out .= '<div class="eab-note">' . $shortcode['note'] . '</div>';
+			    $out .= '	</div>';
+				if (!empty($shortcode['arguments'])) {
+					$out .= ' <div class="eab-settings-settings_item" style="line-height:1.5em"><strong>' . __('Arguments:', self::TEXT_DOMAIN) . '</strong>';
+					foreach ($shortcode['arguments'] as $argument => $data) {
+						$type = !empty($data['type'])
+							? eab_call_template('util_shortcode_argument_type_string', $data['type'], $argument, $shortcode['tag'])
+							: false
+						;
+						$out .= "<div class='eab-shortcode-attribute_item'><code>{$argument}</code> - {$type} {$data['help']}</div>";
+					}
+					$out .= '</div><!-- Attributes -->';
+				}
+				$out .= '</div></div>';
+				$count++;
+				if ($count == $half) $out .= '</div><div class="postbox-container eab-postbox_container-last">';
+			}
+			$out .= '</div>';
+
+			echo '<div class="wrap">
+					<div id="icon-events-general" class="icon32"><br/></div>
+					<h2>' . __('Events Shortcodes', self::TEXT_DOMAIN) . '</h2>
+					<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center columns-2">';
+			echo $out;
+
+			echo '</div></div>';
     }
     
     function widgets_init() {
@@ -2476,7 +2591,8 @@ function eab_autoshow_map_off ($opts) {
     
 include_once 'template-tags.php';
 
-define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . basename( dirname( __FILE__ ) ) . '/');
+define('EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ), true);
+define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . EAB_PLUGIN_BASENAME . '/');
 
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_options.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_collection.php';
@@ -2495,6 +2611,8 @@ Eab_Scheduler::serve();
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_addon_handler.php';
 Eab_AddonHandler::serve();
 
+require_once EAB_PLUGIN_DIR . 'lib/default_filters.php';
+
 if (is_admin()) {
 	require_once dirname(__FILE__) . '/lib/contextual_help/class_eab_admin_help.php';
 	Eab_AdminHelp::serve();
@@ -2508,30 +2626,4 @@ if ( !function_exists( 'wdp_un_check' ) ) {
 		if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
 			echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', Eab_EventsHub::TEXT_DOMAIN) . '</a></p></div>';
 	}
-}
-
-// Core WP postmeta fetching functions don't order by meta_id - fix that...
-// ... unless explicitly told not to.
-if (!(defined('EAB_SKIP_FORCED_META_ID_ORDERING') && EAB_SKIP_FORCED_META_ID_ORDERING)) {
-
-	/**
-	 * Late-bound `$wpdb` query filter.
-	 */
-	function _eab_wpdb_filter_postmeta_query ($q) {
-		global $wpdb;
-		if (!preg_match('/^\s*SELECT/i', $q)) return $q;
-		$postmeta = preg_quote($wpdb->postmeta, '/');
-		if (preg_match("/\b{$postmeta}\b/", $q) && !preg_match('/\bORDER BY\b/i', $q)) $q .= " ORDER BY {$wpdb->postmeta}.meta_id";
-		remove_filter('query', '_eab_wpdb_filter_postmeta_query'); // Clean up
-		return $q;
-	}
-
-	/**
-	 * Late binding filter for forced query ordering on postmeta requests.
-	 */
-	function _eab_filter_meta_query ($check) {
-		add_filter('query', '_eab_wpdb_filter_postmeta_query');
-		return $check;
-	}
-	add_filter('get_post_metadata', '_eab_filter_meta_query');
 }

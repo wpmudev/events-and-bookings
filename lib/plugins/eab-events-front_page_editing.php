@@ -197,12 +197,15 @@ class Eab_Events_FrontPageEditing {
 	function check_page_location () {
 		global $wp_query;
 		$qobj = get_queried_object();
+		$object_id = is_object($qobj) && isset($qobj->ID) ? $qobj->ID : false;
+
 		//if (self::SLUG != $wp_query->query_vars['pagename']) return false;
 		if (
-			($this->_options['id'] && is_object($qobj) && isset($qobj->ID) && $this->_options['id'] != $qobj->ID)
+			($this->_options['id'] && $this->_options['id'] != $object_id)
 			||
 			(!$this->_options['id'] && self::SLUG != $wp_query->query_vars['name'])
 		) return false;
+		if (is_archive()) return false; // Do not hijack archive pages.
 		
 		add_filter('the_content', array($this, 'the_editor_content'), 99);
 		status_header( 200 );
@@ -361,7 +364,7 @@ class Eab_Events_FrontPageEditing {
 		$ret .= '<div class="eab-events-fpe-meta_box" id="eab-events-fpe-date_time">';
 		// Start date/time
 		$start = $event->get_start_timestamp();
-		$start = $start ? $start : time();
+		$start = $start ? $start : eab_current_time();
 		$ret .= '<div>';
 		$ret .= '<label>' . __('Starts on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
 		$ret .= ' <input type="text" name="" id="eab-events-fpe-start_date" value="' . date('Y-m-d', $start) . '" size="10" />';
@@ -370,7 +373,7 @@ class Eab_Events_FrontPageEditing {
 		
 		// End date/time
 		$end = $event->get_end_timestamp();
-		$end = $end ? $end : time() + 3600;
+		$end = $end ? $end : eab_current_time() + 3600;
 		$ret .= '<div>';
 		$ret .= '<label>' . __('Ends on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
 		$ret .= ' <input type="text" name="" id="eab-events-fpe-end_date" value="' . date('Y-m-d', $end) . '" size="10" />';

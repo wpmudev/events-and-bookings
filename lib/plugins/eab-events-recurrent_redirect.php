@@ -48,7 +48,7 @@ class Eab_Events_RecurrentRootRedirect {
 		$children = $collection->to_collection();
 		if (!$children) return false;
 
-		$now = time();
+		$now = eab_current_time();
 		$redirect_to = $active = false;
 		foreach ($children as $key => $child) {
 			if ($child->get_end_timestamp() < $now) continue; // Already passed, move on

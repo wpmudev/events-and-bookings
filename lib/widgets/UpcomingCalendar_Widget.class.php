@@ -58,7 +58,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$date = $instance['date'];
 		$network = (int)$instance['network'];
 		
-		$date = time(); // Refactor
+		$date = eab_current_time(); // Refactor
 		
 		echo $before_widget;
 		if ($title) echo $before_title . $title . $after_title;
@@ -78,7 +78,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	
 	function handle_calendar_request () {
 		$now = (int)@$_POST['now'];
-		$now = $now ? $now : time();
+		$now = $now ? $now : eab_current_time();
 		
 		$unit = ("year" == @$_POST['unit']) ? "year" : "month";
 		$operand = ("prev" == $_POST['direction']) ? "+1" : "-1";

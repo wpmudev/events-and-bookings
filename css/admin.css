@@ -225,7 +225,9 @@ input.error {
 
 .top{margin: 0 0 5px 0;}
 
-#wpbody-content .metabox-holder{
+.incsub_event_page_eab_settings #wpbody-content .metabox-holder
+.incsub_event_page_eab_welcome #wpbody-content .metabox-holder
+{
 	padding-top:0px;
 }
 
@@ -245,4 +247,16 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
     font-style: normal;
     padding-left: 2em;
     font-size: .8em;
+}
+
+.eab-metaboxcol.columns-2 .postbox-container {
+    float: left;
+    width: 49%;
+}
+.eab-metaboxcol.columns-2 .eab-postbox_container-last {
+    float: right;
+}
+
+.eab_deactivate_plugin {
+    color: #BC0B0B;
 }
