@@ -133,7 +133,7 @@ class WpmuDev_ContextualHelp {
 		$clear = (@$info['clear'] || $this->_auto_clear_wp_help);
 		if ($clear) $screen->remove_help_tabs();
 		
-		$screen->set_help_sidebar(@$info['sidebar']);
+		if (!empty($info['sidebar'])) $screen->set_help_sidebar(@$info['sidebar']);
 		
 		foreach ($info['tabs'] as $tab) {
 			$screen->add_help_tab($tab);

@@ -55,14 +55,11 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	function widget ($args, $instance) {
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
-		$date = $instance['date'];
-		$network = (int)$instance['network'];
-		
-		$date = eab_current_time(); // Refactor
+		$network = is_multisite() ? (int)$instance['network'] : false;
 		
 		echo $before_widget;
 		if ($title) echo $before_title . $title . $after_title;
-		echo $this->_render_calendar($date, $network);
+		echo $this->_render_calendar(eab_current_time(), $network);
 		echo $after_widget;	
 	}
 	

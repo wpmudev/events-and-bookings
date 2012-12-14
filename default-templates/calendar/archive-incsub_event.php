@@ -6,6 +6,11 @@ $month = $wp_query->query_vars['event_monthnum'];
 $month = $month ? $month : date_i18n('m');
 $time = strtotime("{$year}-{$month}-01");
 
+$events = defined('EAB_CALENDAR_ARCHIVE_TEMPLATE_USE_CUSTOM_QUERY') && EAB_CALENDAR_ARCHIVE_TEMPLATE_USE_CUSTOM_QUERY
+	? Eab_CollectionFactory::get_upcoming_events($time)
+	: $wp_query->posts
+;
+
 get_header( 'event' );
 ?>
 	<div id="primary">

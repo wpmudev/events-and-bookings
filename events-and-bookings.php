@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.5
+ Version: 1.5.1
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.5';
+    const CURRENT_VERSION = '1.5.1';
     
     /**
      * Translation domain
@@ -106,7 +106,7 @@ class Eab_EventsHub {
 		add_filter('archive_template', array($this, 'handle_archive_template'));
 		add_action('wp', array($this, 'load_events_from_query'), 20);
 		
-		add_filter('rewrite_rules_array', array($this, 'add_rewrite_rules'));
+		add_filter('rewrite_rules_array', array($this, 'add_rewrite_rules')); 
 		add_filter('post_type_link', array($this, 'post_type_link'), 10, 3);
 		
 		add_filter('query_vars', array($this, 'query_vars') );
@@ -267,7 +267,7 @@ class Eab_EventsHub {
 		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
 		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 		
-		wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
+		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
 		wp_register_script('eab_admin_js', plugins_url('events-and-bookings/js/eab-admin.js'), array('jquery'), self::CURRENT_VERSION);
 		wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), array('jquery'), self::CURRENT_VERSION);
 		wp_register_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), self::CURRENT_VERSION);
@@ -794,6 +794,7 @@ class Eab_EventsHub {
     function admin_enqueue_scripts() {
     	if (!$this->_check_admin_page_id()) return false;
 		wp_enqueue_script('eab_jquery_ui');
+		wp_enqueue_script('jquery-ui-datepicker');
 		wp_enqueue_script('eab_admin_js');
     }
     
@@ -1159,6 +1160,7 @@ class Eab_EventsHub {
 		$content .= '	<option value="closed" '.(($event->is_closed())?'selected="selected"':'').' >'.__('Closed', self::TEXT_DOMAIN).'</option>';
 		$content .= '	<option value="expired" '.(($event->is_expired())?'selected="selected"':'').' >'.__('Expired', self::TEXT_DOMAIN).'</option>';
 		$content .= '	<option value="archived" '.(($event->is_archived())?'selected="selected"':'').' >'.__('Archived', self::TEXT_DOMAIN).'</option>';
+		$content .= apply_filters('eab-event_meta-extra_event_status', $event);
 		$content .= '</select>';
 		$content .= '</div>';
 		$content .= '<div class="clear"></div>';
@@ -1386,6 +1388,10 @@ class Eab_EventsHub {
 
     private function _get_rewrite_rules () {
     	$slug = $this->_data->get_option('slug');
+    	return self::get_rewrite_rules($slug);
+    }
+
+    public static function get_rewrite_rules ($slug) {
     	return array(
 			"{$slug}/([0-9]{4})/?$" => 'index.php?event_year=$matches[1]&post_type=incsub_event',
 			"{$slug}/([0-9]{4})/([0-9]{1,2})/?$" => 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&post_type=incsub_event',
@@ -1573,7 +1579,7 @@ class Eab_EventsHub {
 			    ) ENGINE = InnoDB {$charset_collate};";
 		dbDelta($sql_main);
 	        
-	        $sql_main = "CREATE TABLE ".self::tablename(self::BOOKING_META_TABLE)." (
+	        $sql_main = "CREATE TABLE IF NOT EXISTS ".self::tablename(self::BOOKING_META_TABLE)." (
 				`id` BIGINT NOT NULL AUTO_INCREMENT,
 				`booking_id` BIGINT NOT NULL ,
 	                        `meta_key` VARCHAR(255) NOT NULL ,
@@ -1969,80 +1975,8 @@ class Eab_EventsHub {
     }
 
     function shortcodes_render () {
-    		$help = array(
-    			array(
-    				'title' => __('Archive shortcode', self::TEXT_DOMAIN),
-    				'tag' => 'eab_archive',
-    				'arguments' => array(
-    					'network' => array('help' => __('Query type', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'date' => array('help' => __('Starting date - default to now', self::TEXT_DOMAIN), 'type' => 'string:date'),
-    					'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'weeks' => array('help' => __('Look ahead this many weeks', self::TEXT_DOMAIN), 'type' => 'integer'),
-    					'category' => array('help' => __('Show events from this category (ID or slug)', self::TEXT_DOMAIN), 'type' => 'string:or_integer'),
-    					'limit' => array('help' => __('Show at most this many events', self::TEXT_DOMAIN), 'type' => 'integer'),
-    					'order' => array('help' => __('Sort events in this direction', self::TEXT_DOMAIN), 'type' => 'string:sort'),
-    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    				),
-    			),
-    			array(
-    				'title' => __('Calendar shortcode', self::TEXT_DOMAIN),
-    				'tag' => 'eab_calendar',
-    				'arguments' => array(
-    					'network' => array('help' => __('Query type', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'date' => array('help' => __('Starting date - default to now', self::TEXT_DOMAIN), 'type' => 'string:date'),
-    					'footer' => array('help' => __('Show calendar table footer', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    				),
-    			),
-    			array(
-    				'title' => __('Expired events shortcode', self::TEXT_DOMAIN),
-    				'tag' => 'eab_expired',
-    				'arguments' => array(
-    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    				),
-    			),
-    			array(
-    				'title' => __('Single event shortcode', self::TEXT_DOMAIN),
-    				'tag' => 'eab_single',
-    				'arguments' => array(
-    					'id' => array('help' => __('Event ID to show', self::TEXT_DOMAIN), 'type' => 'integer'),
-    					'slug' => array('help' => __('Show event by this slug', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'class' => array('help' => __('Apply this CSS class', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'override_styles' => array('help' => __('Toggle default styles usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'override_scripts' => array('help' => __('Toggle default scripts usage', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    				),
-    			),
-    			array(
-    				'title' => __('Event map shortcode', self::TEXT_DOMAIN),
-    				'tag' => 'eab_events_map',
-    				'note' => __('Requires Google Maps plugin.', self::TEXT_DOMAIN),
-    				'arguments' => array(
-    					'date' => array('help' => __('Starting date - default to now', self::TEXT_DOMAIN), 'type' => 'string:date'),
-    					'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', self::TEXT_DOMAIN), 'type' => 'boolean'),
-    					'weeks' => array('help' => __('Look ahead this many weeks', self::TEXT_DOMAIN), 'type' => 'integer'),
-    					'category' => array('help' => __('Show events from this category (ID or slug)', self::TEXT_DOMAIN), 'type' => 'string:or_integer'),
-    					'limit' => array('help' => __('Show at most this many events', self::TEXT_DOMAIN), 'type' => 'integer'),
-    					'order' => array('help' => __('Sort events in this direction', self::TEXT_DOMAIN), 'type' => 'string:sort'),
-    					'featured_image' => array('help' => __('Use event featured image instead of map markers', self::TEXT_DOMAIN), 'type' => 'boolean '),
-    					'template' => array('help' => __('Subtemplate file, or template class call', self::TEXT_DOMAIN), 'type' => 'string'),
-    					'...' => array('help' => __('and Google Maps shortcode attributes', self::TEXT_DOMAIN)),
-    				),
-    			),
-
-    		);
-
 			// Filter the help....
-			$help = apply_filters('eab-shortcodes-shortcode_help', $help);
+			$help = apply_filters('eab-shortcodes-shortcode_help', array());
 
 			$out = '';
 			$count = 0;
@@ -2059,6 +1993,9 @@ class Eab_EventsHub {
 				if (!empty($shortcode['arguments'])) {
 					$out .= ' <div class="eab-settings-settings_item" style="line-height:1.5em"><strong>' . __('Arguments:', self::TEXT_DOMAIN) . '</strong>';
 					foreach ($shortcode['arguments'] as $argument => $data) {
+						if (!empty($shortcode['advanced_arguments']) && !current_user_can('manage_options')) {
+							if (in_array($argument, $shortcode['advanced_arguments'])) continue;
+						}
 						$type = !empty($data['type'])
 							? eab_call_template('util_shortcode_argument_type_string', $data['type'], $argument, $shortcode['tag'])
 							: false
@@ -2544,6 +2481,19 @@ class Eab_EventsHub {
 	function load_events_from_query () {
 		if (is_admin()) return false;
 		global $wp_query;
+global $wp;
+//$wp->parse_request();
+//echo '<pre>'; die(var_export($wp));
+//echo '<pre>'; die(var_Export($wp->request));
+		/*
+$rules = $this->_get_rewrite_rules();
+$found = false;
+foreach ($rules as $rule => $match) {
+	if (preg_match('!' . $rule . '!i', $wp->request)) $found = WP_MatchesMapRegex::apply($wp->request, $match);
+}
+//$q = new WP_Query($match);
+die(var_ExporT($match));
+*/
 		if (Eab_EventModel::POST_TYPE == $wp_query->query_vars['post_type']) {
 			$original_year = isset($wp_query->query_vars['event_year']) ? (int)$wp_query->query_vars['event_year'] : false;
 			$year = $original_year ? $original_year : date('Y');

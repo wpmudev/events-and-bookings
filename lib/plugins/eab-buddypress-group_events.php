@@ -420,7 +420,6 @@ class Eab_GroupEvents_Shortcodes extends Eab_Codec {
 	public static function serve () {
 		$me = new Eab_GroupEvents_Shortcodes;
 		$me->_register();
-		add_filter('eab-shortcodes-shortcode_help', array($me, 'shortcodes_help'));
 	}
 
 	function process_group_archives_shortcode ($args=array(), $content=false) {
@@ -510,7 +509,7 @@ class Eab_GroupEvents_Shortcodes extends Eab_Codec {
 		return $output;
 	}
 
-	public function shortcodes_help ($help) {
+	public function add_group_archives_shortcode_help ($help) {
 		$help[] = array(
 			'title' => __('BuddyPress group archives', Eab_EventsHub::TEXT_DOMAIN),
 			'tag' => 'eab_group_archives',
@@ -528,6 +527,7 @@ class Eab_GroupEvents_Shortcodes extends Eab_Codec {
     			'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
     			'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 			),
+			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
 		);
 		return $help;
 	}

@@ -10,6 +10,8 @@ class Eab_AdminHelp {
 		'edit',
 		'settings',
 		'welcome',
+		'post',
+		'page',
 	);
 	
 	private function __construct () {
@@ -32,7 +34,7 @@ class Eab_AdminHelp {
 	}
 	
 	private function _set_up_sidebar () {
-		$this->_social_marketing_sidebar = '<h4>' . __('Events', Eab_EventsHub::TEXT_DOMAIN) . '</h4>';
+		$this->_sidebar = '<h4>' . __('Events +', Eab_EventsHub::TEXT_DOMAIN) . '</h4>';
 		if (defined('WPMUDEV_REMOVE_BRANDING') && constant('WPMUDEV_REMOVE_BRANDING')) {
 			$this->_sidebar .= '<p>' . __('Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.', Eab_EventsHub::TEXT_DOMAIN) . '</p>';
 		} else {
@@ -43,6 +45,53 @@ class Eab_AdminHelp {
 				'</ul>' . 
 			'';
 		}
+	}
+
+	private function _add_shortcodes_contextual_help ($screen_id) {
+		$help = apply_filters('eab-shortcodes-shortcode_help', array());
+		$out = '';
+
+		foreach ($help as $shortcode) {
+			$out .= '<div><h5>' . $shortcode['title'] . '</h5>';
+			$out .= '<div>';
+			$out .= '		<strong>' . __('Tag:', Eab_EventsHub::TEXT_DOMAIN) . '</strong> <code>[' . $shortcode['tag'] . ']</code>';
+			if (!empty($shortcode['note'])) $out .= '<div><em>' . $shortcode['note'] . '</em></div>';
+		    $out .= '	</div>';
+			if (!empty($shortcode['arguments'])) {
+				$out .= ' <div class="eab-shortcode_help-argument"><strong>' . __('Arguments:', Eab_EventsHub::TEXT_DOMAIN) . '</strong>';
+				foreach ($shortcode['arguments'] as $argument => $data) {
+					if (!empty($shortcode['advanced_arguments'])) {
+						if (in_array($argument, $shortcode['advanced_arguments'])) continue;
+					}
+					$type = !empty($data['type'])
+						? eab_call_template('util_shortcode_argument_type_string', $data['type'], $argument, $shortcode['tag'])
+						: false
+					;
+					$out .= "<div class='eab-shortcode-attribute_item'><code>{$argument}</code> - {$type} {$data['help']}</div>";
+				}
+				$out .= '</div><!-- argument -->';
+			}
+			$out .= '</div>';
+		}
+
+		$this->_help->add_page(
+			$screen_id,
+			array(
+				array(
+					'id' => 'eab_shortcodes',
+					'title' => __('Events shortcodes', Eab_EventsHub::TEXT_DOMAIN),
+					'content' => $out,
+				),
+			)
+		);
+	}
+
+	private function _add_post_page () {
+		$this->_add_shortcodes_contextual_help('post');
+	}
+
+	private function _add_page_page () {
+		$this->_add_shortcodes_contextual_help('page');
 	}
 	
 	private function _add_list_page () {

@@ -4,6 +4,12 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.5.1 - 2012-12-14
+----------------------------------------------------------------------
+- Full contextual help support for shortcodes.
+- Allowing for custom query in default calendar archive template.
+- Adding WPML rewrite filtering in default filters.
+
 1.5 - 2012-12-07
 ----------------------------------------------------------------------
 - Added RSVP email add-on.

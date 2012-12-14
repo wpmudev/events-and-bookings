@@ -30,6 +30,12 @@ abstract class Eab_Codec {
 	}
 
 	protected function _preparse_arguments ($raw, $accepted) {
+		$_template = false;
+		if (!empty($accepted['template']) && (defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES)) {
+			$_template = $accepted['template'];
+			unset($accepted['template']);
+		}
+
 		$args = wp_parse_args($raw, $accepted);
 		if (isset($accepted['network'])) $args['network'] = $this->_arg_to_bool($args['network']);
 		if (isset($accepted['date'])) $args['date'] = $this->_arg_to_time($args['date']);
@@ -51,6 +57,11 @@ abstract class Eab_Codec {
 
 		if (isset($accepted['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
 		if (isset($accepted['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
+
+		if ($_template && defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES) {
+			$args['template'] = $_template;
+		}
+
 		return $args;
 	}
 
@@ -76,7 +87,8 @@ abstract class Eab_Codec {
 	protected function _register () {
 		$shortcodes = $this->_shortcodes;
 		foreach ($shortcodes as $key => $shortcode) {
-			add_shortcode($shortcode, array($this, "process_{$key}_shortcode"));
+			if (is_callable(array($this, "process_{$key}_shortcode"))) add_shortcode($shortcode, array($this, "process_{$key}_shortcode"));
+			if (is_callable(array($this, "add_{$key}_shortcode_help"))) add_filter('eab-shortcodes-shortcode_help', array($this, "add_{$key}_shortcode_help"));
 		}
 	}
 }
@@ -160,7 +172,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			if (!$event) continue;
 
 			$map['markers'][0]['title'] = $event->get_title();
-			$map['markers'][0]['body'] = eab_call_template('util_apply_shortcode_template', $event, $args);
+			$map['markers'][0]['body'] = Eab_Template::util_apply_shortcode_template($event, $args);//eab_call_template('util_apply_shortcode_template', $event, $args);
 			if ($args['featured_image']) {
 				$icon = $event->get_featured_image_url();
 				if ($icon) $map['markers'][0]['icon'] = $icon;
@@ -172,6 +184,27 @@ class Eab_Shortcodes extends Eab_Codec {
 
 		$codec = new AgmMarkerReplacer;
 		return "<div {$class}>" . $codec->create_overlay_tag($maps, $map_args) . '</div>';
+	}
+
+	function add_events_map_shortcode_help ($help) {
+		$help[] = array(
+			'title' => __('Event map shortcode', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' => 'eab_events_map',
+			'note' => __('Requires Google Maps plugin.', Eab_EventsHub::TEXT_DOMAIN),
+			'arguments' => array(
+				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'weeks' => array('help' => __('Look ahead this many weeks', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
+				'featured_image' => array('help' => __('Use event featured image instead of map markers', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'...' => array('help' => __('and Google Maps shortcode attributes', Eab_EventsHub::TEXT_DOMAIN)),
+			),
+			'advanced_arguments' => array('template'),
+		);
+		return $help;
 	}
 	
 	/**
@@ -193,11 +226,29 @@ class Eab_Shortcodes extends Eab_Codec {
 			: Eab_CollectionFactory::get_upcoming_events($args['date'])
 		;
 
-		$output = eab_call_template('util_apply_shortcode_template', $events, $args);
+		$output = Eab_Template::util_apply_shortcode_template($events, $args);//eab_call_template('util_apply_shortcode_template', $events, $args);
 		$output = $output ? $output : $content;
 
 		if (!$args['override_styles']) wp_enqueue_style('eab_calendar_shortcode', eab_call_template('util_get_default_template_style', 'calendar'));
 		return $output;
+	}
+
+	function add_calendar_shortcode_help ($help) {
+		$help[] = array(
+			'title' => __('Calendar shortcode', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' => 'eab_calendar',
+			'arguments' => array(
+				'network' => array('help' => __('Query type', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'footer' => array('help' => __('Show calendar table footer', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+			),
+			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
+		);
+		return $help;
 	}
 	
 	/**
@@ -249,12 +300,34 @@ class Eab_Shortcodes extends Eab_Codec {
 			if ($order_method) remove_filter('eab-collection-date_ordering_direction', $order_method);
 		}
 
-		$output = eab_call_template('util_apply_shortcode_template', $events, $args);
+		$output = Eab_Template::util_apply_shortcode_template($events, $args);//eab_call_template('util_apply_shortcode_template', $events, $args);
 		$output = $output ? $output : $content;
 
 		if (!$args['override_styles']) wp_enqueue_style('eab_front');
 		if (!$args['override_scripts']) wp_enqueue_script('eab_event_js');
 		return $output;
+	}
+
+	function add_archive_shortcode_help ($help) {
+		$help[] = array(
+			'title' => __('Archive shortcode', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' => 'eab_archive',
+			'arguments' => array(
+				'network' => array('help' => __('Query type', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'weeks' => array('help' => __('Look ahead this many weeks', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
+				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+			),
+			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
+		);
+		return $help;
 	}
 
 	/**
@@ -271,12 +344,27 @@ class Eab_Shortcodes extends Eab_Codec {
 		
 		$events = Eab_CollectionFactory::get_expired_events();
 
-		$output = eab_call_template('util_apply_shortcode_template', $events, $args);
+		$output = Eab_Template::util_apply_shortcode_template($events, $args);//eab_call_template('util_apply_shortcode_template', $events, $args);
 		$output = $output ? $output : $content;
 
 		if (!$args['override_styles']) wp_enqueue_style('eab_front');
 		if (!$args['override_scripts']) wp_enqueue_script('eab_event_js');
 		return $output;
+	}
+
+	function add_expired_shortcode_help ($help) {
+		$help[] = array(
+			'title' => __('Expired events shortcode', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' => 'eab_expired',
+			'arguments' => array(
+				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+			),
+			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
+		);
+		return $help;
 	}
 	
 	/**
@@ -306,11 +394,28 @@ class Eab_Shortcodes extends Eab_Codec {
 		}
 		if (!$event) return $content;
 		
-		$output = eab_call_template('util_apply_shortcode_template', $event, $args);
+		$output = Eab_Template::util_apply_shortcode_template($event, $args);//eab_call_template('util_apply_shortcode_template', $event, $args);
 		$output = $output ? $output : $content;
 
 		if (!$args['override_styles']) wp_enqueue_style('eab_front');
 		if (!$args['override_scripts']) wp_enqueue_script('eab_event_js');
 		return $output;
+	}
+
+	function add_single_shortcode_help ($help) {
+		$help[] = array(
+			'title' => __('Single event shortcode', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' => 'eab_single',
+			'arguments' => array(
+				'id' => array('help' => __('Event ID to show', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'slug' => array('help' => __('Show event by this slug', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+			),
+			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
+		);
+		return $help;
 	}
 }

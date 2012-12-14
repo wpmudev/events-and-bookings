@@ -98,9 +98,18 @@ abstract class WpmuDev_CalendarTable {
 			} 
 			
 			$activity = $this->get_event_info_as_string($i);
-			$activity = $activity ? $activity : "<p>{$i}</p>";
-			$today = ($date == date('Y-m-d')) ? 'class="today"' : '';
-			$ret .= "<td {$today}>{$activity}</td>";
+			$class_names = array();
+			if ($activity) {
+				$class_names[] = 'eab-has_events';
+			} else {
+				$activity = "<p>{$i}</p>";
+			}
+			if ($date == date('Y-m-d')) $class_names[] = 'today';
+			$class_attribute = !empty($class_names) 
+				? 'class="' . esc_attr(join(' ', $class_names)) . '"'
+				: ''
+			;
+			$ret .= "<td {$class_attribute}>{$activity}</td>";
 		}
 		
 		if ( $last > $this->start_of_week )

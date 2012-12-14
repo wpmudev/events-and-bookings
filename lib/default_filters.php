@@ -126,3 +126,33 @@ if (!(defined('EAB_SKIP_DEFAULT_ULTIMATE_FACEBOOK_EVENT_FILTERING') && EAB_SKIP_
 	add_filter('wdfb-autopost-events-location', 'eab_to_wdfb__process_venue', 10, 2);
 }
 // End Ultimate Facebook Events posting
+
+
+// WPML translated Events content with directory URL setup
+if (!(defined('EAB_SKIP_DEFAULT_WPML_REWRITE_FILTERING') && EAB_SKIP_DEFAULT_WPML_REWRITE_FILTERING)) {
+	
+	function eab_to_wpml__rewrite_rules ($rules) {
+		global $sitepress;
+		$wpml_settings = $sitepress->get_settings();
+		if ($wpml_settings['language_negotiation_type']==1  && $sitepress->get_current_language()!=$sitepress->get_default_language()) {
+			$data = Eab_Options::get_instance();
+			$slug = $data->get_option('slug');
+			$rules = $sitepress->rewrite_rules_filter(
+				(array)$rules + Eab_EventsHub::get_rewrite_rules($slug)
+			);
+		}
+		return $rules;
+	}
+
+	function eab_to_wpml__rebind_rewrites () {
+		if (!class_exists('SitePress')) return false; // Do nothing if not required
+		global $sitepress;
+		if (!is_object($sitepress)) return false; // Yeah...
+
+		// Okay, now kill whatever it is that WPML does and rebind.
+		remove_filter('option_rewrite_rules', array($sitepress, 'rewrite_rules_filter'));
+		add_filter('option_rewrite_rules', 'eab_to_wpml__rewrite_rules');
+	}
+	add_action('init', 'eab_to_wpml__rebind_rewrites');
+}
+// End WPML translated Events content with directory URL setup
