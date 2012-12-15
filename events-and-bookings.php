@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.5.1
+ Version: 1.5.1.1
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.5.1';
+    const CURRENT_VERSION = '1.5.1.1';
     
     /**
      * Translation domain
@@ -1160,7 +1160,7 @@ class Eab_EventsHub {
 		$content .= '	<option value="closed" '.(($event->is_closed())?'selected="selected"':'').' >'.__('Closed', self::TEXT_DOMAIN).'</option>';
 		$content .= '	<option value="expired" '.(($event->is_expired())?'selected="selected"':'').' >'.__('Expired', self::TEXT_DOMAIN).'</option>';
 		$content .= '	<option value="archived" '.(($event->is_archived())?'selected="selected"':'').' >'.__('Archived', self::TEXT_DOMAIN).'</option>';
-		$content .= apply_filters('eab-event_meta-extra_event_status', $event);
+		$content .= apply_filters('eab-event_meta-extra_event_status', '', $event);
 		$content .= '</select>';
 		$content .= '</div>';
 		$content .= '<div class="clear"></div>';
