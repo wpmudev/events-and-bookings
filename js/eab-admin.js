@@ -6,10 +6,12 @@ jQuery(function() {
 		    "dateFormat": "yy-mm-dd",
 			"changeMonth": true,
 		    "changeYear": true,
+		    "defaultDate": new Date,
 		    "firstDay": parseInt(eab_event_localized.start_of_week) ? parseInt(eab_event_localized.start_of_week) : 0
 	    });
 	}
     
+    jQuery('[href*="preview=true"]').hide(); // Preview won't work
     jQuery("#eab-add-more").show();
     jQuery("#eab-add-more-button").click(function() {
 		row_id = jQuery('.eab-start-section').length-1;
@@ -82,25 +84,39 @@ jQuery(function() {
     }
     
     jQuery("#incsub-event").on("change", 'input.incsub_event', function () {
-		_c = jQuery(this).attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
+		var _c = jQuery(this).attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
 		_eab_validate_when(_c);
     });
 
     jQuery("#incsub-event").on("change", ".incsub_event_no_start_time", function () {
-    	var $me = jQuery(this);
-    	_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
+    	var $me = jQuery(this),
+    		_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '')
+    	;
     	if ($me.is(":checked")) jQuery("#incsub_event_start_time_" + _c).hide();
     	else jQuery("#incsub_event_start_time_" + _c).show();
     });
     jQuery(".incsub_event_no_start_time").each(function () { jQuery(this).trigger("change");});
 
     jQuery("#incsub-event").on("change", ".incsub_event_no_end_time", function () {
-    	var $me = jQuery(this);
-    	_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
+    	var $me = jQuery(this),
+    		_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '')
+    	;
     	if ($me.is(":checked")) jQuery("#incsub_event_end_time_" + _c).hide();
     	else jQuery("#incsub_event_end_time_" + _c).show();
     });
     jQuery(".incsub_event_no_end_time").each(function () { jQuery(this).trigger("change");});
+
+    jQuery("#incsub-event").on("change", ".incsub_event_start", function () {
+    	var $me = jQuery(this),
+    		$end = $me.parents(".eab-section-block").find(".incsub_event_end"),
+    		_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, ''),
+    		_start, _end
+    	;
+    	if (!$end.length) return true;
+    	[_start, _end] = _eab_get_stat_end_datetime(_c);
+    	if (!_start || !_start.getTime) return true;
+    	$end.datepicker("option", "defaultDate", _start);
+    });
 
 
     jQuery('form#post').submit(function () {
@@ -116,10 +132,41 @@ jQuery(function() {
 			return false;
 		}
     });
+
+    function _eab_get_stat_end_datetime (_c) {
+    	var _start, _end;
+    	_start = false;
+		if (jQuery('#incsub_event_start_'+_c).val() != '') {
+		    _start = new Date(jQuery('#incsub_event_start_'+_c).val());
+			if (jQuery('#incsub_event_start_time_'+_c).val() != '' || jQuery('#incsub_event_no_start_time_'+_c).is(":checked")) {
+			    var _start_time = (jQuery('#incsub_event_no_start_time_'+_c).is(":checked") ? '00:01' : jQuery('#incsub_event_start_time_'+_c).val()),
+			    	_start_time_parts = _start_time.split(/:/gi)
+			    ;
+
+			    _start.setHours(_start_time_parts[0]);
+			    _start.setMinutes(_start_time_parts[1]);
+			}
+		}
+		
+		_end = false;
+		if (jQuery('#incsub_event_end_'+_c).val() != '') {
+		    _end = new Date(jQuery('#incsub_event_end_'+_c).val());
+			if (jQuery('#incsub_event_end_time_'+_c).val() != '' || jQuery('#incsub_event_no_end_time_'+_c).is(":checked")) {
+			    var _end_time = (jQuery('#incsub_event_no_end_time_'+_c).is(":checked") ? '23:59' : jQuery('#incsub_event_end_time_'+_c).val()),
+			    	_end_time_parts = _end_time.split(/:/gi)
+			    ;
+			    
+			    _end.setHours(_end_time_parts[0]);
+			    _end.setMinutes(_end_time_parts[1]);
+			}
+		}
+		return [_start, _end];
+    }
     
     function _eab_validate_when(_c) {
     	if ("bank" == _c) return true; // Don't check bank dates - they're stubs
     	if (jQuery("#icl_translation_of").length) return true; // Assume translation
+    	/*
 		_start = false;
 		if (jQuery('#incsub_event_start_'+_c).val() != '') {
 		    _start = new Date(jQuery('#incsub_event_start_'+_c).val());
@@ -143,6 +190,9 @@ jQuery(function() {
 			    _end.setMinutes(_end_time_parts[1]);
 			}
 		}
+		*/
+		var _start, _end;
+		[_start, _end] = _eab_get_stat_end_datetime(_c);
 
 		if ((!_start || !_end) || _start.getTime() >= _end.getTime()) {
 		    jQuery('#incsub_event_start_'+_c).addClass('error');

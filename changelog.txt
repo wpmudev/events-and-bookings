@@ -4,6 +4,12 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.5.2 - 2013-01-04
+----------------------------------------------------------------------
+- Fix for maps existence check for subscribers.
+- Fix for Front-page editor jQuery UI dependencies.
+- Dynamically setting up default datepicker dates for new events.
+
 1.5.1.1 - 2012-12-15
 ----------------------------------------------------------------------
 - Fix for event filter argument ordering.

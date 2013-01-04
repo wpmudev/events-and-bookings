@@ -318,7 +318,7 @@ class Eab_Template {
 	public static function get_payment_forms ($post) {
 		global $blog_id, $current_user;
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
-		
+
 		$booking_id = $event->get_user_booking_id();
 		$data = Eab_Options::get_instance();
 		
@@ -467,9 +467,9 @@ class Eab_Template {
 		}
 		
 		$content .= '</div>';
-		
+	
 		$content = apply_filters('eab-rsvps-rsvp_form', $content);
-		
+
 		return $content;
 	}
 	
@@ -485,8 +485,9 @@ class Eab_Template {
 			$content .= "<div class='wpmudevevents-location'>{$venue}</div>";
 		}
 		if ($event->is_premium()) {
+			$price = $event->get_price();
 			$currency = $data->get_option('currency');
-			$amount = number_format($event->get_price(), 2);
+			$amount = is_numeric($price) ? number_format($price, 2) : $price;
 			$content .= "<div class='wpmudevevents-price'>{$currency} {$amount}</div>";
 		}
 		$data = apply_filters('eab-events-after_event_details', '', $event);

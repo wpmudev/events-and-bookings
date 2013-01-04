@@ -96,6 +96,25 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 }
 // End Category sorting in default WP requests
 
+// Admin side - ensure Maps availability for subscribers
+function eab_to_agm__ensure_subscribers_maps () {
+	global $post;
+	if (!class_exists('AgmAdminMaps')) return false;
+	if (empty($post->post_type)) return false;
+	if (Eab_EventModel::POST_TYPE != $post->post_type) return false;
+	echo <<<EO_EAB_AGM_SUBSCRIBER_SCRIPT
+<script type="text/javascript">
+(function ($) {
+	if ($('#media-buttons').length || $("#wp-content-media-buttons").length) return false;
+	$("body").append('<div id="wp-content-media-buttons" style="display:none" />');
+})(jQuery);
+</script>
+EO_EAB_AGM_SUBSCRIBER_SCRIPT;
+}
+add_action('admin_footer-post-new.php', 'eab_to_agm__ensure_subscribers_maps', 99);
+add_action('admin_footer-post.php', 'eab_to_agm__ensure_subscribers_maps', 99);
+// End Admin side - ensure Maps availability for subscribers
+
 
 /* ----- Plugins ----- */
 

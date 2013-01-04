@@ -5,6 +5,7 @@
 (function($){
 $(function() {
 
+
 /**
  * Creates tag markup.
  */
@@ -52,12 +53,17 @@ function insertMapItem () {
 }
 
 // Find Media Buttons strip and add the new one
-var eab_mbuttons_container = $('#eab_insert_map');
+var maps_url = ("undefined" != typeof _agm && _agm.root_url
+        ? _agm.root_url
+        : _agm_root_url
+    ),
+    eab_mbuttons_container = $('#eab_insert_map')
+;
 if (!eab_mbuttons_container.length) return;
 
 eab_mbuttons_container.append('' + 
 	'<a onclick="return openMapEditor();" title="' + eab_l10nEditor.add_map + '" class="thickbox" id="eab_add_map" href="#TB_inline?width=640&height=594&inlineId=map_container">' +
-		'<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + _agm_root_url + '/img/system/globe-button.gif">' +
+		'<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + maps_url + '/img/system/globe-button.gif">' +
 	'</a>'
 );
 

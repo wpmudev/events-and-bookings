@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.5.1.1
+ Version: 1.5.2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.5.1.1';
+    const CURRENT_VERSION = '1.5.2';
     
     /**
      * Translation domain
@@ -962,7 +962,7 @@ class Eab_EventsHub {
 			} else {
 			    $i=0;
 			    $content .= '<div class="eab-section-block">';
-			    $content .= '<div class="eab-section-heading">' . sprintf(__('Part %d', self::TEXT_DOMAIN), $key+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
+			    $content .= '<div class="eab-section-heading">' . sprintf(__('Part %d', self::TEXT_DOMAIN), $i+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 			    $content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$i.'">';
 			    $content .= __('Start', self::TEXT_DOMAIN).':</label>&nbsp;';
 			    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="" size="10" /> ';
@@ -986,7 +986,7 @@ class Eab_EventsHub {
 			
 			$content .= '<div id="eab-add-more-bank">';
 			$content .= '<div class="eab-section-block">';
-			$content .= '<div class="eab-section-heading">' . sprintf(__('Part bank', self::TEXT_DOMAIN), $key+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
+			$content .= '<div class="eab-section-heading">' . sprintf(__('Part bank', self::TEXT_DOMAIN), $i+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 			$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_bank" >';
 			$content .= __('Start', self::TEXT_DOMAIN).':</label>&nbsp;';
 			$content .= '<input type="text" name="incsub_event_start_b[bank]" id="incsub_event_start_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_start_b" value="" size="10" /> ';
@@ -1184,12 +1184,14 @@ class Eab_EventsHub {
 		$content .= '<option value="0" ' . ($event->is_premium() ? '' : 'selected="selected"') . '>'.__('No', self::TEXT_DOMAIN).'</option>';
 		$content .= '</select>';
 		$content .= '<div class="clear"></div>';
-		$content .= '<label class="incsub_event-fee_row" id="incsub_event-fee_row_label">'.__('Fee', self::TEXT_DOMAIN).':&nbsp;';
-		$content .= $this->_data->get_option('currency') .
+		$content .= '<label class="incsub_event-fee_row" id="incsub_event-fee_row_label">'.__('Fee', self::TEXT_DOMAIN).':&nbsp;</label>';
+		
+		$fee = $this->_data->get_option('currency') .
 			'&nbsp;<input type="text" name="incsub_event_fee" id="incsub_event_fee" class="incsub_event_fee" value="' .
 			$event->get_price() .
 		'" size="6" /> ';
-		$content .= '</label>';
+		$content .= apply_filters('eab-event_meta-event_price', $fee, $event->get_id());
+
 		$content .= '</div>';
 		$content .= '</div>';
 	
@@ -1264,9 +1266,10 @@ class Eab_EventsHub {
 		// Setting up event payments
 		if ( $post->post_type == "incsub_event" && isset( $_POST['incsub_event_payments_meta'] ) ) {
 		    $meta = get_post_custom($post_id);
-		    
+
 			$is_paid = (int)$_POST['incsub_event_paid'];
 			$fee = $is_paid ? strip_tags($_POST['incsub_event_fee']) : '';
+
 		    update_post_meta($post_id, 'incsub_event_paid', ($is_paid ? '1' : ''));
 		    update_post_meta($post_id, 'incsub_event_fee', $fee);
 		    

@@ -530,7 +530,8 @@ class Eab_Events_FrontPageEditing {
 			'missing_id' => __('Save failed', Eab_EventsHub::TEXT_DOMAIN),
 			'all_good' => __('All good!', Eab_EventsHub::TEXT_DOMAIN),
 		));
-		wp_enqueue_script('eab_jquery_ui');
+		wp_enqueue_script('eab_jquery_ui'); // This got deprecated, but let it ride
+		wp_enqueue_script('jquery-ui-datepicker');
 		
 		do_action('eab-events-fpe-enqueue_dependencies');
 	}
