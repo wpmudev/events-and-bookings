@@ -398,17 +398,19 @@ class Eab_Events_FrontPageEditing {
 		$ret .= '</div>';
 		
 		// Type
-		$ret .= '<div>';
-		$ret .= '<label>' . __('Is this a paid event?', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
-		$ret .= '<select name="" id="eab-events-fpe-is_premium">';
-		$ret .= '	<option value="1" ' . ($event->is_premium() ? 'selected="selected"' : '') . '>'.__('Yes', Eab_EventsHub::TEXT_DOMAIN).'</option>';
-		$ret .= '	<option value="0" ' . ($event->is_premium() ? '' : 'selected="selected"') . '>'.__('No', Eab_EventsHub::TEXT_DOMAIN).'</option>';
-		$ret .= '</select>';
-		$ret .= '<div id="eab-events-fpe-event_fee-wrapper">';
-		$ret .= '<label for="eab-events-fpe-event_fee">' . __('Fee', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-event_fee" size="6" value="' . esc_attr($event->get_price()) . '" />';
-		$ret .= '</div>'; // eab-events-fpe-event_fee-wrapper
-		$ret .= '</div>';
+		if ($this->_data->get_option('accept_payments')) {
+			$ret .= '<div>';
+			$ret .= '<label>' . __('Is this a paid event?', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
+			$ret .= '<select name="" id="eab-events-fpe-is_premium">';
+			$ret .= '	<option value="1" ' . ($event->is_premium() ? 'selected="selected"' : '') . '>'.__('Yes', Eab_EventsHub::TEXT_DOMAIN).'</option>';
+			$ret .= '	<option value="0" ' . ($event->is_premium() ? '' : 'selected="selected"') . '>'.__('No', Eab_EventsHub::TEXT_DOMAIN).'</option>';
+			$ret .= '</select>';
+			$ret .= '<div id="eab-events-fpe-event_fee-wrapper">';
+			$ret .= '<label for="eab-events-fpe-event_fee">' . __('Fee', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
+			$ret .= ' <input type="text" name="" id="eab-events-fpe-event_fee" size="6" value="' . esc_attr($event->get_price()) . '" />';
+			$ret .= '</div>'; // eab-events-fpe-event_fee-wrapper
+			$ret .= '</div>';
+		}
 
 		// End status, type, misc
 		$ret .= '</div>';

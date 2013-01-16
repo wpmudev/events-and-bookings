@@ -44,7 +44,7 @@ class Eab_Network {
 	 * Only the events that are not yet over will be returned.
 	 */
 	public static function get_upcoming_events ($limit=5) {
-		if (!function_exists('post_indexer_make_current')) return false;
+		if (!function_exists('post_indexer_make_current')) return array();
 		$limit = (int)$limit ? (int)$limit : 5;
 		
 		global $wpdb;

@@ -31,7 +31,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$html .= '<input type="text" name="' . $this->get_field_name('title') . '" id="' . $this->get_field_id('title') . '" class="widefat" value="' . $title . '"/>';
 		$html .= '</p>';
 
-		if (is_multisite()) {
+		if (is_multisite() && function_exists('post_indexer_make_current')) {
 			$html .= '<p>' .
 				'<label for="' . $this->get_field_id('network') . '">' . 
 				'<input type="checkbox" name="' . $this->get_field_name('network') . '" id="' . $this->get_field_id('network') . '" value="1" ' . $network . ' /> ' .

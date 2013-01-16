@@ -43,6 +43,8 @@ class Eab_BuddyPress_AutoUpdateActivity {
 		if (!$created) return false;
 
 		$event = new Eab_EventModel(get_post($post_id));
+		if (!$event->is_published()) return false;
+		
 		$user_link = bp_core_get_userlink($event->get_author());
 		$update = false;
 

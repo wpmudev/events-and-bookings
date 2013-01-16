@@ -4,6 +4,16 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.5.3 - 2013-01-16
+----------------------------------------------------------------------
+- Added event categories as CSS classes.
+- Added dates in feeds output.
+- Booking results ordered by timestamp.
+- Better networking prerequisites checks.
+- Fix for weekly calendar shortcode edge cases.
+- Fix for array return type collision.
+- Fix for membership level prices propagation.
+
 1.5.2 - 2013-01-04
 ----------------------------------------------------------------------
 - Fix for maps existence check for subscribers.

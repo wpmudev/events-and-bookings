@@ -51,7 +51,7 @@ abstract class WpmuDev_CalendarTable {
 		
 		
 		$post_info = array();
-		foreach ($this->_events as $event) {
+		if (is_array($this->_events)) foreach ($this->_events as $event) {
 			$post_info[] = $this->_get_item_data($event);
 		}
 
@@ -191,6 +191,7 @@ abstract class Eab_CalendarTable extends WpmuDev_CalendarTable {
 			'event_ends' => $event_ends,
 			'status_class' => Eab_Template::get_status_class($event),
 			'event_venue' => $event->get_venue_location(),
+			'categories' => $event->get_categories(),
 		);
 		if (isset($post->blog_id)) $res['blog_id'] = $post->blog_id;
 		return $res;
@@ -236,8 +237,9 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 
 	public function set_event_info ($event_tstamps, $current_tstamps, $event_info) {
 		$this->_titles[] = esc_attr($event_info['title']);
+		$css_classes = $event_info['status_class'];
 		$permalink = isset($event_info['blog_id']) ? get_blog_permalink($event_info['blog_id'], $event_info['id']) : get_permalink($event_info['id']);
-		$this->_data[] = '<a class="wpmudevevents-upcoming_calendar_widget-event ' . $event_info['status_class'] . '" href="' . $permalink . '">' . 
+		$this->_data[] = '<a class="wpmudevevents-upcoming_calendar_widget-event ' . $css_classes . '" href="' . $permalink . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-upcoming_calendar_widget-event-info">' . 
 				apply_filters('eab-calendar-upcoming_calendar_widget-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . 
@@ -299,7 +301,8 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 	public function reset_event_info_storage () { $this->_data = array(); }
 	
 	public function set_event_info ($event_tstamps, $current_tstamps, $event_info) {
-		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $event_info['status_class'] . '" href="' . get_permalink($event_info['id']) . '">' . 
+		$css_classes = $event_info['status_class'];
+		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . get_permalink($event_info['id']) . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' . 
 				apply_filters('eab-calendar-event_archive-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . 

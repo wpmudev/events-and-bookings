@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.5.2
+ Version: 1.5.3
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.5.2';
+    const CURRENT_VERSION = '1.5.3';
     
     /**
      * Translation domain
@@ -165,7 +165,7 @@ class Eab_EventsHub {
 		// End API login & form section	
 		add_action('wp_ajax_eab_restart_tutorial', array($this, 'handle_tutorial_restart'));
 		add_action('wp_ajax_eab_cancel_attendance', array($this, 'handle_attendance_cancel'));		
-		add_action('wp_ajax_eab_delete_attendance', array($this, 'handle_attendance_delete'));		
+		add_action('wp_ajax_eab_delete_attendance', array($this, 'handle_attendance_delete'));	
     }
 
 	function process_recurrent_trashing ($post_id) {
@@ -2484,7 +2484,7 @@ class Eab_EventsHub {
 	function load_events_from_query () {
 		if (is_admin()) return false;
 		global $wp_query;
-global $wp;
+//global $wp;
 //$wp->parse_request();
 //echo '<pre>'; die(var_export($wp));
 //echo '<pre>'; die(var_Export($wp->request));

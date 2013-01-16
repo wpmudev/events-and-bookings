@@ -142,7 +142,7 @@ class Eab_Template {
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
 		
-		$bookings = $wpdb->get_results($wpdb->prepare("SELECT user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s;", $event->get_id(), $status));
+		$bookings = $wpdb->get_results($wpdb->prepare("SELECT user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s ORDER BY timestamp;", $event->get_id(), $status));
 		if (!count($bookings)) return false;
 		
 		$content = '';		
@@ -182,7 +182,7 @@ class Eab_Template {
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
 		
-		$bookings = $wpdb->get_col($wpdb->prepare("SELECT event_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE user_id = %d AND status = %s;", $user_id, $status));
+		$bookings = $wpdb->get_col($wpdb->prepare("SELECT event_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE user_id = %d AND status = %s ORDER BY timestamp;", $user_id, $status));
 		if (!count($bookings)) return false;
 		
 		$ret = '<div class="wpmudevevents-user_bookings wpmudevevents-user_bookings-' . $status . '">';
@@ -229,7 +229,7 @@ class Eab_Template {
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
 		
-		$bookings = $wpdb->get_results($wpdb->prepare("SELECT id,user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s;", $event->get_id(), $status));
+		$bookings = $wpdb->get_results($wpdb->prepare("SELECT id,user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s ORDER BY timestamp;", $event->get_id(), $status));
 		if (!count($bookings)) return false;
 		
 		$content = '';		
@@ -561,7 +561,7 @@ class Eab_Template {
 	public static function get_status_class ($post) {
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
 		$status = $event->get_status();
-		return sanitize_html_class($status);
+		return apply_filters('eab-render-css_classes', sanitize_html_class($status), $event->get_id());
 	}
 
 	public static function get_success_message_code ($status=false) {

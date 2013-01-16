@@ -114,6 +114,33 @@ EO_EAB_AGM_SUBSCRIBER_SCRIPT;
 add_action('admin_footer-post-new.php', 'eab_to_agm__ensure_subscribers_maps', 99);
 add_action('admin_footer-post.php', 'eab_to_agm__ensure_subscribers_maps', 99);
 // End Admin side - ensure Maps availability for subscribers
+ 
+// Render event categories as CSS classes
+function eab__event_categories_to_classes ($cls, $event_id) {
+	$event = new Eab_EventModel(get_post($event_id));
+	$taxonomies = $event->get_categories();
+	if (empty($taxonomies)) return $cls;
+
+	$classes = array_values(wp_list_pluck($taxonomies, 'slug'));
+	if (empty($classes)) return $cls;
+
+	return trim($cls . ' ' . join(' ', array_map('sanitize_html_class', $classes)));
+}
+add_filter('eab-render-css_classes', 'eab__event_categories_to_classes', 10, 2);
+// End event categories rendering
+
+// Feeds - add Event dates
+if (!(defined('EAB_SKIP_FEED_DATES_INJECTION') && EAB_SKIP_FEED_DATES_INJECTION)) {
+	function eab_to_feed__add_feed_event_dates ($content) {
+    	global $post;
+    	if (empty($post->post_type) || Eab_EventModel::POST_TYPE != $post->post_type) return $content;
+    	return $content . '<br />' . eab_call_template('get_event_dates', $post);
+    }
+	add_filter('the_excerpt_rss', 'eab_to_feed__add_feed_event_dates');
+	add_filter('the_content_feed', 'eab_to_feed__add_feed_event_dates');
+}
+// End Feeds - Event date adding
+
 
 
 /* ----- Plugins ----- */

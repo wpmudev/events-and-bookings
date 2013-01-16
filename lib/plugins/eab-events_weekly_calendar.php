@@ -197,10 +197,12 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		if ( !is_object( $options ) )
 			$options = new Eab_Options;
 		
-		$year = date("Y", $this->get_local_time ());
-		$month = date("m",  $this->get_local_time ());
+		$timestamp = $timestamp ? $timestamp : $this->get_local_time();
+		$year = date("Y", $timestamp);
+		$month = date("m", $timestamp);
 		
-		$query = Eab_CollectionFactory::get_upcoming(strtotime("{$year}-{$month}-01 00:00"));
+		//$query = Eab_CollectionFactory::get_upcoming(strtotime("{$year}-{$month}-01 00:00"));
+		$query = Eab_CollectionFactory::get_upcoming_weeks(strtotime("{$year}-{$month}-01 00:00"));
 		$this->_events = $query->posts;
 		
 		$date = $timestamp ? $timestamp : $this->get_local_time();
@@ -257,7 +259,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 						for ($k = 0; $k < $count; $k++) {
 							$start = strtotime($ipost['event_starts'][$k]);
 							$end = strtotime($ipost['event_ends'][$k]);
-							if ($start < $current_cell_end && $end > $current_cell_start) {
+							if ($start <= $current_cell_end && $end >= $current_cell_start) {
 								if ( $options->get_option('weekly_calendar_display') )
 									$this->set_event_info_author(
 										array('start' => $start, 'end'=> $end), 

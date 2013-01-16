@@ -378,6 +378,10 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return ($this->_event->post_status == self::POST_STATUS_TRASH);
 	}
 
+	public function is_published () {
+		return in_array($this->_event->post_status, array('publish', self::RECURRENCE_STATUS));
+	}
+
 	public function get_categories () {
 		$list = get_the_terms($this->get_id(), 'eab_events_category');
 		return is_wp_error($list) ? false : $list;
@@ -687,8 +691,8 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		global $wpdb;
 
 		return $coming
-			? $wpdb->get_results($wpdb->prepare("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND status != 'no';", $this->get_id()))
-			: $wpdb->get_results($wpdb->prepare("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d;", $this->get_id()))
+			? $wpdb->get_results($wpdb->prepare("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND status != 'no' ORDER BY timestamp;", $this->get_id()))
+			: $wpdb->get_results($wpdb->prepare("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d ORDER BY timestamp;", $this->get_id()))
 		;
 	}
 
@@ -714,7 +718,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			: ''
 		;
 		global $wpdb;
-		return $wpdb->get_results("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE {$status} {$since}");
+		return $wpdb->get_results("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE {$status} {$since} ORDER BY timestamp");
 	}
 	
 	public function get_rsvps () {
@@ -724,7 +728,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			self::BOOKING_MAYBE => array(),
 			self::BOOKING_NO => array(),
 		);
-		$bookings = $wpdb->get_results($wpdb->prepare("SELECT user_id, status FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d;", $this->get_id()));
+		$bookings = $wpdb->get_results($wpdb->prepare("SELECT user_id, status FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d ORDER BY timestamp;", $this->get_id()));
 		foreach ($bookings as $booking) {
 			$user_data = get_userdata($booking->user_id);
 			$rsvps[$booking->status][] = $user_data->user_login;

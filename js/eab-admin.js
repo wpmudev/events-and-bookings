@@ -110,10 +110,12 @@ jQuery(function() {
     	var $me = jQuery(this),
     		$end = $me.parents(".eab-section-block").find(".incsub_event_end"),
     		_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, ''),
-    		_start, _end
+    		_start, _end, _tmp
     	;
     	if (!$end.length) return true;
-    	[_start, _end] = _eab_get_stat_end_datetime(_c);
+    	_tmp = _eab_get_stat_end_datetime(_c);
+    	_start = _tmp.length ? _tmp[0] : false;
+    	_end = _tmp.length ? _tmp[1] : false;
     	if (!_start || !_start.getTime) return true;
     	$end.datepicker("option", "defaultDate", _start);
     });
@@ -191,8 +193,10 @@ jQuery(function() {
 			}
 		}
 		*/
-		var _start, _end;
-		[_start, _end] = _eab_get_stat_end_datetime(_c);
+		var _start, _end, _tmp;
+		_tmp = _eab_get_stat_end_datetime(_c);
+    	_start = _tmp.length ? _tmp[0] : false;
+    	_end = _tmp.length ? _tmp[1] : false;
 
 		if ((!_start || !_end) || _start.getTime() >= _end.getTime()) {
 		    jQuery('#incsub_event_start_'+_c).addClass('error');

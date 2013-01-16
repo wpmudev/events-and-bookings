@@ -101,7 +101,7 @@ abstract class Eab_Exporter {
 
 	protected function _get_bookings ($status) {
 		global $wpdb;
-		return $wpdb->get_results($wpdb->prepare("SELECT id,user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s;", $this->_event_id, $status));
+		return $wpdb->get_results($wpdb->prepare("SELECT id,user_id,timestamp FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s ORDER BY timestamp;", $this->_event_id, $status));
 	}
 
 	protected function _get_statuses () {

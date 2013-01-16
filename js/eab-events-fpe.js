@@ -135,10 +135,12 @@ function send_save_request () {
 		"end": $end_date.val() + ' ' + end_time_parts.join(':'),
 		"venue": $("#eab-events-fpe-venue").val(),
 		"status": $("#eab-events-fpe-status").val(),
-		"is_premium": $("#eab-events-fpe-is_premium").val(),
-		"category": $("#eab-events-fpe-categories").val(),
-		"fee": $("#eab-events-fpe-event_fee").val()
+		"is_premium": ($("#eab-events-fpe-is_premium").length ? $("#eab-events-fpe-is_premium").val() : 0),
+		"category": $("#eab-events-fpe-categories").val()
 	};
+	if ($("#eab-events-fpe-event_fee").length) {
+		data["fee"] = $("#eab-events-fpe-event_fee").val();
+	}
 	$(document).trigger('eab-events-fpe-save_request', [data]);
 
 	// Start sending!!
@@ -188,8 +190,10 @@ $(function () {
 	});
 	
 	// Init Fee toggling
-	$("#eab-events-fpe-is_premium").change(toggle_fee);
-	toggle_fee();
+	if ($("#eab-events-fpe-is_premium")) {
+		$("#eab-events-fpe-is_premium").change(toggle_fee);
+		toggle_fee();
+	}
 	
 	// Init save request processing
 	$("#eab-events-fpe-ok").click(send_save_request);

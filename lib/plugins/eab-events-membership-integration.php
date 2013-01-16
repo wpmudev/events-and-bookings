@@ -43,6 +43,7 @@ class Eab_Events_MembershipIntegration {
 		add_action('plugins_loaded', array( &$this, 'check_membership_plugin'));
 		add_action('admin_notices', array($this, 'show_nags'));
 		add_action('eab-event_meta-save_meta', array(&$this, 'save_membership_meta'));
+		add_action('eab-events-recurrent_event_child-save_meta', array(&$this, 'save_membership_meta'));
 		add_filter('eab-event_meta-event_meta_box-after', array( &$this, 'event_meta_box'));
 		add_filter('eab-event-show_pay_note',array(&$this,'will_show_pay_note'), 10, 2);
 		add_filter('eab-event-payment_status',array(&$this,'status'), 10, 2);
