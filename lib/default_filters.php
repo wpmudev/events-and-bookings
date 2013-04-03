@@ -61,7 +61,7 @@ if (!(defined('EAB_SKIP_FORCED_META_ID_ORDERING') && EAB_SKIP_FORCED_META_ID_ORD
 		global $wpdb;
 		if (!preg_match('/^\s*SELECT/i', $q)) return $q;
 		$postmeta = preg_quote($wpdb->postmeta, '/');
-		if (preg_match("/\b{$postmeta}\b/", $q) && !preg_match('/\bORDER BY\b/i', $q)) $q .= " ORDER BY {$wpdb->postmeta}.meta_id";
+		if (preg_match("/\b{$postmeta}\b/", $q) && !preg_match('/\bORDER BY\b/i', $q) && !preg_match('/\bLIMIT\b/i', $q)) $q .= " ORDER BY {$wpdb->postmeta}.meta_id";
 		remove_filter('query', '_eab_wpdb_filter_postmeta_query'); // Clean up
 		return $q;
 	}

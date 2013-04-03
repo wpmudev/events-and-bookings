@@ -3,7 +3,7 @@
 	
 function rsvp_after_wordpress_login (data) {
 	var status = 0;
-	try { status = parseInt(data.status); } catch (e) { status = 0; }
+	try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
 	if (!status) { // ... handle error
 		return false;
 	}
@@ -55,7 +55,7 @@ function send_wordpress_login_request () {
 	
 function dispatch_login_register () {
 	if ($("#eab-wordpress_login-registration_wrapper").is(":visible")) return send_wordpress_registration_request();
-	else if ($("#eab-wordpress_login-login_wrapper").is(":visible")) return send_wordpress_login_request();	
+	else if ($("#eab-wordpress_login-login_wrapper").is(":visible")) return send_wordpress_login_request();
 	return false;
 }
 	
@@ -66,7 +66,7 @@ function create_wordpress_login_popup ($action, post_id) {
 			"<div id='eab-wordpress_login-wrapper' class='" + $action.removeClass("active").attr("class") + "' data-post_id='" + post_id + "'>" +
 				"<div id='eab-wordpress_login-registration_wrapper' class='eab-wordpress_login-element_wrapper'>" +
 					"<h4>" + l10nEabApi.wp_register + "</h4>" +
-					"<p class='eab-wordpress_login-element eab-wordpress_login-element-message'>" + 
+					"<p class='eab-wordpress_login-element eab-wordpress_login-element-message'>" +
 						l10nEabApi.wp_registration_msg +
 					"</p>" +
 					"<p class='eab-wordpress_login-element'>" +
@@ -80,7 +80,7 @@ function create_wordpress_login_popup ($action, post_id) {
 				"</div>" +
 				"<div id='eab-wordpress_login-login_wrapper' class='eab-wordpress_login-element_wrapper' style='display:none'>" +
 					"<h4>" + l10nEabApi.wp_login + "</h4>" +
-					"<p class='eab-wordpress_login-element eab-wordpress_login-element-message'>" + 
+					"<p class='eab-wordpress_login-element eab-wordpress_login-element-message'>" +
 						l10nEabApi.wp_login_msg +
 					"</p>" +
 					"<p class='eab-wordpress_login-element'>" +
@@ -105,10 +105,10 @@ function create_wordpress_login_popup ($action, post_id) {
 	
 	$background.css({
 		"width": $(document).width(),
-		"height": $(document).height(),
+		"height": $(document).height()
 	});
 	$wrapper.css({
-		"left": ($(document).width() - 300) / 2,
+		"left": ($(document).width() - 300) / 2
 	});
 	//$("#eab-wordpress_login-mode_toggle a").on('click', function () {
 	$("#eab-wordpress_login-mode_toggle a").click(function () {
@@ -121,7 +121,7 @@ function create_wordpress_login_popup ($action, post_id) {
 			$me.text($me.attr("data-on"));
 			$("#eab-wordpress_login-login_wrapper").hide();
 			$("#eab-wordpress_login-registration_wrapper").show();
-		}	
+		}
 		return false;
 	});
 	//$("#eab-wordpress_login-command-ok").on('click', dispatch_login_register);
@@ -143,10 +143,10 @@ function create_login_interface ($me) {
 	var post_id = $me.parents(".wpmudevevents-buttons").find('input:hidden[name="event_id"]').val();
 	$root.html(
 		'<ul class="wpmudevevents-login_links">' +
-			'<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-facebook">' + l10nEabApi.facebook + '</a></li>' +
-			'<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-twitter">' + l10nEabApi.twitter + '</a></li>' +
-			'<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-google">' + l10nEabApi.google + '</a></li>' +
-			'<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-wordpress">' + l10nEabApi.wordpress + '</a></li>' +
+			(l10nEabApi.show_facebook ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-facebook">' + l10nEabApi.facebook + '</a></li>' : '') +
+			(l10nEabApi.show_twitter ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-twitter">' + l10nEabApi.twitter + '</a></li>' : '') +
+			(l10nEabApi.show_google ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-google">' + l10nEabApi.google + '</a></li>' : '') +
+			(l10nEabApi.show_wordpress ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-wordpress">' + l10nEabApi.wordpress + '</a></li>' : '') +
 			'<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-cancel">' + l10nEabApi.cancel + '</a></li>' +
 		'</ul>'
 	);
@@ -167,7 +167,7 @@ function create_login_interface ($me) {
 							"token": FB.getAccessToken()
 						}, function (data) {
 							var status = 0;
-							try { status = parseInt(data.status); } catch (e) { status = 0; }
+							try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
 							if (!status) { // ... handle error
 								$root.remove();
 								$me.click();
@@ -214,7 +214,7 @@ function create_login_interface ($me) {
 									"data": search
 								}, function (data) {
 									var status = 0;
-									try { status = parseInt(data.status); } catch (e) { status = 0; }
+									try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
 									if (!status) { // ... handle error
 										$root.remove();
 										$me.click();
@@ -232,7 +232,7 @@ function create_login_interface ($me) {
 							}
 						} catch (e) {}
 					}, 300);
-				})
+				});
 				return false;
 			};
 		} else if ($lnk.is(".wpmudevevents-login_link-google")) {
@@ -256,7 +256,7 @@ function create_login_interface ($me) {
 									"action": "eab_google_login"
 								}, function (data) {
 									var status = 0;
-									try { status = parseInt(data.status); } catch (e) { status = 0; }
+									try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
 									if (!status) { // ... handle error
 										$root.remove();
 										$me.click();
@@ -274,7 +274,7 @@ function create_login_interface ($me) {
 							}
 						} catch (e) {}
 					}, 300);
-				})
+				});
 				return false;
 			};
 		}

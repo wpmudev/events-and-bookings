@@ -5,8 +5,8 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	function __construct () {
 		$widget_ops = array('classname' => __CLASS__, 'description' => __('Displays List of Upcoming Events from your entire network', $this->translation_domain));
 		
-		add_action('wp_print_styles', array($this, 'css_load_styles'));
-		add_action('wp_print_scripts', array($this, 'js_load_scripts'));
+		add_action('wp_enqueue_scripts', array($this, 'css_load_styles'));
+		add_action('wp_enqueue_scripts', array($this, 'js_load_scripts'));
 		add_action('wp_ajax_eab_cuw_get_calendar', array($this, 'handle_calendar_request'));
 		add_action('wp_ajax_nopriv_eab_cuw_get_calendar', array($this, 'handle_calendar_request'));
 		
@@ -31,7 +31,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$html .= '<input type="text" name="' . $this->get_field_name('title') . '" id="' . $this->get_field_id('title') . '" class="widefat" value="' . $title . '"/>';
 		$html .= '</p>';
 
-		if (is_multisite() && function_exists('post_indexer_make_current')) {
+		if (is_multisite() && eab_has_post_indexer()) {
 			$html .= '<p>' .
 				'<label for="' . $this->get_field_id('network') . '">' . 
 				'<input type="checkbox" name="' . $this->get_field_name('network') . '" id="' . $this->get_field_id('network') . '" value="1" ' . $network . ' /> ' .

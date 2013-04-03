@@ -13,7 +13,7 @@ abstract class Eab_Codec {
 	);
 
 	protected function _arg_to_bool ($val) {
-		return in_array($val, $this->_positive_values);
+		return in_array($val, $this->_positive_values, true);
 	}
 
 	protected function _arg_to_int ($val) {
@@ -54,6 +54,10 @@ abstract class Eab_Codec {
 				: array('type' => 'slug', 'value' => $args['category'])
 			;
 		}
+		if (isset($accepted['paged'])) $args['paged'] = $this->_arg_to_bool($args['paged']);
+		if (isset($accepted['page'])) $args['page'] = $this->_arg_to_int($args['page']);
+		
+		if (isset($accepted['navigation'])) $args['navigation'] = $this->_arg_to_bool($args['navigation']);
 
 		if (isset($accepted['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
 		if (isset($accepted['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
@@ -77,6 +81,9 @@ abstract class Eab_Codec {
 		}
 		if ($args['limit']) {
 			$query['posts_per_page'] = $args['limit'];
+		}
+		if ($args['paged']) {
+			$query['paged'] = $args['page'];
 		}
 		return $query;
 	}
@@ -215,18 +222,25 @@ class Eab_Shortcodes extends Eab_Codec {
 			'network' => false,
 			'date' => false,
 			'footer' => false,
-			'class' => false,
+			'class' => 'eab-shortcode_calendar',
+			'navigation' => false,
+			'title_format' => 'M Y',
 			'template' => 'get_shortcode_calendar_output', // Subtemplate file, or template class call
 			'override_styles' => false,
 			'override_scripts' => false,
 		));
+
+		if (!empty($_GET['date'])) {
+			$date = strtotime($_GET['date']);
+			if ($date) $args['date'] = $date;
+		}
 		
 		$events = ($args['network'] && is_multisite()) 
 			? Eab_Network::get_upcoming_events(30) 
 			: Eab_CollectionFactory::get_upcoming_events($args['date'])
 		;
 
-		$output = Eab_Template::util_apply_shortcode_template($events, $args);//eab_call_template('util_apply_shortcode_template', $events, $args);
+		$output = Eab_Template::util_apply_shortcode_template($events, $args);
 		$output = $output ? $output : $content;
 
 		if (!$args['override_styles']) wp_enqueue_style('eab_calendar_shortcode', eab_call_template('util_get_default_template_style', 'calendar'));
@@ -240,6 +254,8 @@ class Eab_Shortcodes extends Eab_Codec {
 			'arguments' => array(
 				'network' => array('help' => __('Query type', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'navigation' => array('help' => __('Show navigation', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'title_format' => array('help' => __('Date format used in the navigation title, defaults to "M Y"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
 				'footer' => array('help' => __('Show calendar table footer', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
@@ -265,12 +281,20 @@ class Eab_Shortcodes extends Eab_Codec {
 			'category' => false, // ID or slug
 			'limit' => false, // Show at most this many events
 			'order' => false,
+		// Paging arguments
+			'paged' => false,
+			'page' => 1,
 		// Appearance arguments
 			'class' => false,
 			'template' => 'get_shortcode_archive_output', // Subtemplate file, or template class call
 			'override_styles' => false,
 			'override_scripts' => false,
 		));
+
+		if ($args['paged']) {
+			$requested_page = get_query_var('page');
+			$args['page'] = $requested_page ? $requested_page : $args['page'];
+		}
 
 		$events = array();
 		if (is_multisite() && $args['network']) {
@@ -300,8 +324,18 @@ class Eab_Shortcodes extends Eab_Codec {
 			if ($order_method) remove_filter('eab-collection-date_ordering_direction', $order_method);
 		}
 
-		$output = Eab_Template::util_apply_shortcode_template($events, $args);//eab_call_template('util_apply_shortcode_template', $events, $args);
-		$output = $output ? $output : $content;
+		$output = Eab_Template::util_apply_shortcode_template($events, $args);
+		if ($output) {
+			if ($args['paged']) {
+				if ($method) add_filter('eab-collection-upcoming_weeks-week_number', $method);
+				$events_query = $args['lookahead']
+					? Eab_CollectionFactory::get_upcoming_weeks($args['date'], $query)
+					: Eab_CollectionFactory::get_upcoming($args['date'], $query)
+				;
+				if ($method) remove_filter('eab-collection-upcoming_weeks-week_number', $method);
+				$output .= eab_call_template('get_shortcode_paging', $events_query, $args);
+			}
+		} else $output = $content;
 
 		if (!$args['override_styles']) wp_enqueue_style('eab_front');
 		if (!$args['override_scripts']) wp_enqueue_script('eab_event_js');
@@ -320,6 +354,8 @@ class Eab_Shortcodes extends Eab_Codec {
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
 				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
+				'paged' => array('help' => __('Allow paging - use with "limit" argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'page' => array('help' => __('Start on this page', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),

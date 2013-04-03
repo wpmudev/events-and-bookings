@@ -352,9 +352,15 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 	protected $_class;
 	protected $_use_footer = false;
 	protected $_use_scripts = true;
+	protected $_navigation = false;
+	protected $_title_format = 'M Y';
 	
 	public function set_class ($class) {
 		$this->_class = sanitize_html_class($class);
+	}
+
+	public function get_calendar_class () {
+		return $this->_class;
 	}
 	
 	public function set_footer ($use) {
@@ -365,13 +371,84 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 		$this->_use_scripts = (bool)$use;
 	}
 
-	protected function _get_table_meta_row ($which) {
-		if ('tfoot' == $which && !$this->_use_footer) return '';
-		return parent::_get_table_meta_row($which);
+	public function set_title_format ($title_format) {
+		$this->_title_format = $title_format ? $title_format : $this->_title_format;
+	}
+
+	public function set_navigation ($navigation) {
+		$this->_navigation = (bool)$navigation;
 	}
 
 	protected function _get_js () {
 		if (!$this->_use_scripts) return false;
 		return parent::_get_js();
+	}
+
+	protected function _get_table_meta_row ($which) {
+		if ('tfoot' == $which && !$this->_use_footer) return '';
+		$day_names_array = $this->arrange( $this->get_day_names() );
+		$cells = '<th>' . join('</th><th>', $day_names_array) . '</th>';
+		$row = "<tr>{$cells}</tr>";
+		if ('thead' == $which) {
+			$row = $this->_get_navigation_row('top') . $row;
+		}
+		if ('tfoot' == $which) {
+			$row .= $this->_get_navigation_row('bottom');
+		}
+		return "<{$which}>{$row}</{$which}>";
+	}
+
+	protected function _get_navigation_row ($position) {
+		if (!$this->_navigation) return false;
+		
+		global $post;
+		
+		$time = $this->get_timestamp();
+		
+		$calendar_class = $this->get_calendar_class();
+		$row_class = "eab-calendar-title {$calendar_class}-title-{$position}";
+
+
+		$title_format = 'top' == $position
+			? '<h4>' . date_i18n($this->_title_format, $time) . '</h4>'
+			: '<b>' . date_i18n($this->_title_format, $time) . '</b>'
+		;
+		$title_link = '<a href="' . Eab_Template::get_archive_url($time, true) . '" class="' . $calendar_class . '-navigation-link eab-cuw-calendar_date">' .
+			$title_format . 
+		'</a>';
+		$title = 'top' == $position
+			? "<h4>{$title_link}</h4>"
+			: "<b>{$title_link}</b>"
+		;
+		return "<tr class='{$row_class}'>" .
+			'<td>' .
+				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 
+					add_query_arg('date', date('Y-m', $time - (366*86400))) . '">' . 
+					'&nbsp;&laquo;' .
+				'</a>' .
+			'</td>' .
+			'<td>' .
+				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-month" href="' . 
+					add_query_arg('date', date('Y-m', $time - (28*86400))) . '">' .
+					'&nbsp;&lsaquo;' .
+				'</a>' .
+			'</td>' .
+			'<td colspan="3" style="text-align:center;">' .
+				'<input type="hidden" class="eab-cuw-calendar_date" value="' . $time . '" />' .
+				$title .
+			'</td>' .
+			'<td>' .
+				'<a class="' . $calendar_class . '-navigation-link eab-navigation-next eab-time_unit-month" href="' . 
+					add_query_arg('date', date('Y-m', $time + (32*86400))) . '">' . 
+					'&rsaquo;&nbsp;' . 
+				'</a>' .
+			'</td>' .
+			'<td>' .
+				'<a class="' . $calendar_class . '-navigation-link eab-navigation-next eab-time_unit-year" href="' . 
+					add_query_arg('date', date('Y-m', $time + (366*86400))) . '">' . 
+					'&raquo;&nbsp;' . 
+				'</a>' .
+			'</td>' .
+		'</tr>';
 	}
 }

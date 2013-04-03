@@ -7,14 +7,14 @@ function append_meta_data (e, request) {
 function capacity_change () {
 	var $capacity = $("#eab_event_capacity");
 	var $unlimited = $("#eab_event_capacity-unlimited");
-	var cap = parseInt($capacity.val());
+	var cap = parseInt($capacity.val(), 10);
 	cap = cap ? cap : 0;
 	
 	if (cap > 0) {
 		$unlimited.attr("checked", false);
 	} else {
 		$unlimited.attr("checked", true);
-	}	
+	}
 }
 
 function unlimited_change () {

@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.5.3
+ Version: 1.6
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.5.3';
+    const CURRENT_VERSION = '1.6';
     
     /**
      * Translation domain
@@ -311,6 +311,11 @@ class Eab_EventsHub {
 			$options['twitter-app_id'] 				= $_POST['event_default']['twitter-app_id'];
 			$options['twitter-app_secret'] 			= $_POST['event_default']['twitter-app_secret'];
 			
+			$options['api_login-hide-facebook'] 	= @$_POST['event_default']['api_login-hide-facebook'];
+			$options['api_login-hide-twitter'] 		= @$_POST['event_default']['api_login-hide-twitter'];
+			$options['api_login-hide-google'] 		= @$_POST['event_default']['api_login-hide-google'];
+			$options['api_login-hide-wordpress'] 	= @$_POST['event_default']['api_login-hide-wordpress'];
+			
 		    //update_option('incsub_event_default', $this->_options['default']);
 			$options = apply_filters('eab-settings-before_save', $options);
 			$this->_data->set_options($options);
@@ -337,34 +342,35 @@ class Eab_EventsHub {
 		    
 		    $event_id = intval($_POST['event_id']);
 		    $booking_action = $booking_actions[$_POST['action_yes']];
+		    $user_id = apply_filters('eab-rsvp-user_id', $current_user->ID, $_POST['user_id']);
 		    
-		    do_action( 'incsub_event_booking', $event_id, $current_user->ID, $booking_action );
+		    do_action( 'incsub_event_booking', $event_id, $user_id, $booking_action );
 		    if (isset($_POST['action_yes'])) {
 				$wpdb->query(
-				    $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = 'yes';", $event_id, $current_user->ID)
+				    $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = 'yes';", $event_id, $user_id)
 				);
 				// --todo: Add to BP activity stream
-				do_action( 'incsub_event_booking_yes', $event_id, $current_user->ID );
+				do_action( 'incsub_event_booking_yes', $event_id, $user_id );
 				$this->recount_bookings($event_id);
 				wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES));
 				exit();
 		    }
 		    if (isset($_POST['action_maybe'])) {
 				$wpdb->query(
-				    $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'maybe') ON DUPLICATE KEY UPDATE `status` = 'maybe';", $event_id, $current_user->ID)
+				    $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'maybe') ON DUPLICATE KEY UPDATE `status` = 'maybe';", $event_id, $user_id)
 				);
 				// --todo: Add to BP activity stream
-				do_action( 'incsub_event_booking_maybe', $event_id, $current_user->ID );
+				do_action( 'incsub_event_booking_maybe', $event_id, $user_id );
 				$this->recount_bookings($event_id);
 				wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_MAYBE));
 				exit();
 		    }
 		    if (isset($_POST['action_no'])) {
 				$wpdb->query(
-				    $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'no') ON DUPLICATE KEY UPDATE `status` = 'no';", $event_id, $current_user->ID)
+				    $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'no') ON DUPLICATE KEY UPDATE `status` = 'no';", $event_id, $user_id)
 				);
 				// --todo: Remove from BP activity stream
-				do_action( 'incsub_event_booking_no', $event_id, $current_user->ID );
+				do_action( 'incsub_event_booking_no', $event_id, $user_id );
 				$this->recount_bookings($event_id);
 				wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_NO));
 				exit();
@@ -453,7 +459,7 @@ class Eab_EventsHub {
 		$req = 'cmd=_notify-validate';
 	
 		$request = $_REQUEST;
-		
+
 		$post_values = "";
 		$cart = array();
 		foreach ($request as $key => $value) {
@@ -483,6 +489,7 @@ class Eab_EventsHub {
 		$booking_id = (int)$request['booking_id'];
 		$blog_id = (int)$request['blog_id'];
 		
+		if (is_multisite()) switch_to_blog($blog_id);
 		$eab_options = get_option('incsub_event_default');
 	
 		if ((int)@$eab_options['paypal_sandbox'] == 1) {
@@ -491,7 +498,6 @@ class Eab_EventsHub {
 		    $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 		}
 		
-		if (is_multisite()) switch_to_blog($blog_id);
 		$booking_obj = Eab_EventModel::get_booking($booking_id);
 		
 		if (!$booking_obj || !$booking_obj->id) {
@@ -549,7 +555,7 @@ class Eab_EventsHub {
 			
 			if (strcmp ($res, "VERIFIED") == 0) {
 				if ($test_ipn == 1) {
-				    if ((int)@$eab_options['paypal_sandbox'] == 1) {
+				  	if ((int)@$eab_options['paypal_sandbox'] == 1) {
 						// Sandbox, it's allowed so do stuff
 				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_transaction_key', $transaction_id);
 				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_ticket_count', $ticket_count);
@@ -852,6 +858,11 @@ class Eab_EventsHub {
 				'wp_toggle_off' => __('Click here to register', self::TEXT_DOMAIN), 
 				'wp_submit' => __('Submit', self::TEXT_DOMAIN), 
 				'wp_cancel' => __('Cancel', self::TEXT_DOMAIN), 
+				// Vars
+				'show_facebook' => !$this->_data->get_option('api_login-hide-facebook'),
+				'show_twitter' => !$this->_data->get_option('api_login-hide-twitter'),
+				'show_google' => !$this->_data->get_option('api_login-hide-google'),
+				'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
 			));
 			if (!$this->_data->get_option('facebook-no_init')) {
 				add_action('wp_footer', create_function('', "echo '" .
@@ -1036,7 +1047,7 @@ class Eab_EventsHub {
 		if (!$event->is_recurring()) {
 			$content = '<div id="eab-start_recurrence">' .
 				'<input type="button" id="eab-eab-start_recurrence-button" class="button" value="' .
-					__('This is recurring event', self::TEXT_DOMAIN) .
+					__('This is a recurring event', self::TEXT_DOMAIN) .
 					'" data-eab-alter_label="' . __('This is a regular event', self::TEXT_DOMAIN) . '" ' .
 				' />' .
 			'</div>';
@@ -1117,6 +1128,40 @@ class Eab_EventsHub {
 			$content .= '</div>';
 		}
 
+		// ... DOW
+		if (in_array(Eab_EventModel::RECURRANCE_DOW, array_keys($supported_intervals))) {
+			$style = $event->is_recurring(Eab_EventModel::RECURRANCE_DOW) ? '' : 'style="display:none"';
+			$content .= '<div class="eab_event_recurrence_mode" id="eab_event-repeat_interval-' . Eab_EventModel::RECURRANCE_DOW . '" ' . $style . '>';
+			
+			$week_counts = array(
+				'first' => __('First', self::TEXT_DOMAIN),
+				'second' => __('Second', self::TEXT_DOMAIN),
+				'third' => __('Third', self::TEXT_DOMAIN),
+				'fourth' => __('Fourth', self::TEXT_DOMAIN),
+				'last' => __('Last', self::TEXT_DOMAIN),
+			);
+			$week = '<select name="eab_repeat[week]">';
+			foreach ($week_counts as $count => $label) {
+				$selected = $count == $parts['week'] ? 'selected="selected"' : '';
+				$week .= "<option value='{$count}' {$selected}>{$label}</option>";
+			}
+			$week .= '</select>';
+
+			$tmp = strtotime("this Sunday");
+			$weekday .= '<select name="eab_repeat[weekday]">';
+			for ($i=0; $i<=6; $i++) {
+				$day = date('l', $tmp);
+				$selected = $day == $parts['weekday'] ? 'selected="selected"' : '';
+				$weekday .= "<option value='{$day}' {$selected} /> " . date_i18n("l", $tmp) . "</option>";
+				$tmp += 86400;
+			}
+			$weekday .= '</select>';
+			
+			$content .= sprintf(__('Every %s %s', self::TEXT_DOMAIN), $week, $weekday) . '<br />';
+			$content .= __('At', self::TEXT_DOMAIN) . ' <input type="text" size="5" name="eab_repeat[time]" id="" value="' . $parts["time"] . '" /> <small>HH:mm</small>'; // Time
+			$content .= '</div>';
+		}
+
 		// ... Day
 		if (in_array(Eab_EventModel::RECURRANCE_DAILY, array_keys($supported_intervals))) {
 			$style = $event->is_recurring(Eab_EventModel::RECURRANCE_DAILY) ? '' : 'style="display:none"';
@@ -1184,13 +1229,13 @@ class Eab_EventsHub {
 		$content .= '<option value="0" ' . ($event->is_premium() ? '' : 'selected="selected"') . '>'.__('No', self::TEXT_DOMAIN).'</option>';
 		$content .= '</select>';
 		$content .= '<div class="clear"></div>';
-		$content .= '<label class="incsub_event-fee_row" id="incsub_event-fee_row_label">'.__('Fee', self::TEXT_DOMAIN).':&nbsp;</label>';
+		$content .= '<div class="incsub_event-fee_row" id="incsub_event-fee_row_label">';
 		
-		$fee = $this->_data->get_option('currency') .
+		$fee = __('Fee', self::TEXT_DOMAIN) . ':&nbsp;' . $this->_data->get_option('currency') .
 			'&nbsp;<input type="text" name="incsub_event_fee" id="incsub_event_fee" class="incsub_event_fee" value="' .
 			$event->get_price() .
 		'" size="6" /> ';
-		$content .= apply_filters('eab-event_meta-event_price', $fee, $event->get_id());
+		$content .= apply_filters('eab-event_meta-event_price', $fee, $event->get_id()) . '</div>';
 
 		$content .= '</div>';
 		$content .= '</div>';
@@ -1290,6 +1335,7 @@ class Eab_EventsHub {
 				'month' => @$repeat['month'],
 				'day' => @$repeat['day'],
 				'weekday' => @$repeat['weekday'],
+				'week' => @$repeat['week'],
 				'time' => @$repeat['time'],
 				'duration' => @$repeat['duration'],
 			);
@@ -1569,8 +1615,8 @@ class Eab_EventsHub {
 		
 		$sql_main = "CREATE TABLE IF NOT EXISTS ".self::tablename(self::BOOKING_TABLE)." (
 				`id` BIGINT NOT NULL AUTO_INCREMENT,
-	                        `event_id` BIGINT NOT NULL ,
-	                        `user_id` BIGINT NOT NULL ,
+	            `event_id` BIGINT NOT NULL ,
+	            `user_id` BIGINT NOT NULL ,
 				`timestamp` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' ,
 				`status` ENUM( 'paid', 'yes', 'maybe', 'no' ) NOT NULL DEFAULT 'no' ,
 		    		PRIMARY KEY (`id`),
@@ -1585,12 +1631,12 @@ class Eab_EventsHub {
 	        $sql_main = "CREATE TABLE IF NOT EXISTS ".self::tablename(self::BOOKING_META_TABLE)." (
 				`id` BIGINT NOT NULL AUTO_INCREMENT,
 				`booking_id` BIGINT NOT NULL ,
-	                        `meta_key` VARCHAR(255) NOT NULL ,
-	                        `meta_value` TEXT NOT NULL DEFAULT '',
+	            `meta_key` VARCHAR(255) NOT NULL ,
+	            `meta_value` TEXT NOT NULL,
 		    		PRIMARY KEY (`id`),
 				KEY `booking_id` (`booking_id`),
 				KEY `meta_key` (`meta_key`)
-			    ) ENGINE = InnoDB {$charset_collate};";
+			    ) ENGINE = InnoDB {$charset_collate};"; // MySQL strict mode fix, thanks @KJA!
 		dbDelta($sql_main);
 
         
@@ -1951,6 +1997,23 @@ class Eab_EventsHub {
 					    <label for="incsub_event-twitter-app_secret" id="incsub_event_label-twitter-app_secret"><?php _e('Twitter Consumer Secret', self::TEXT_DOMAIN); ?></label>
 						<input type="text" id="incsub_event-twitter-app_secret" name="event_default[twitter-app_secret]" value="<?php print $this->_data->get_option('twitter-app_secret'); ?>" />
 						<span><?php echo $tips->add_tip(__('Enter your Twitter App secret here.', self::TEXT_DOMAIN)); ?></span>
+					</div>
+
+					<div class="eab-settings-settings_item">
+						<label><?php _e('Hide login buttons', self::TEXT_DOMAIN); ?></label>
+						<br />
+						<input type="checkbox" name="event_default[api_login-hide-facebook]" id="eab-api_login-hide-facebook" value="1" <?php echo ($this->_data->get_option('api_login-hide-facebook') ? 'checked="checked"' : '') ?> />
+						<label for="eab-api_login-hide-facebook"><?php _e('Hide Facebook login button', self::TEXT_DOMAIN); ?></label>
+						<br />
+						<input type="checkbox" name="event_default[api_login-hide-twitter]" id="eab-api_login-hide-twitter" value="1" <?php echo ($this->_data->get_option('api_login-hide-twitter') ? 'checked="checked"' : '') ?> />
+						<label for="eab-api_login-hide-twitter"><?php _e('Hide Twitter login button', self::TEXT_DOMAIN); ?></label>
+						<br />
+						<input type="checkbox" name="event_default[api_login-hide-google]" id="eab-api_login-hide-google" value="1" <?php echo ($this->_data->get_option('api_login-hide-google') ? 'checked="checked"' : '') ?> />
+						<label for="eab-api_login-hide-google"><?php _e('Hide Google login button', self::TEXT_DOMAIN); ?></label>
+						<br />
+						<input type="checkbox" name="event_default[api_login-hide-wordpress]" id="eab-api_login-hide-wordpress" value="1" <?php echo ($this->_data->get_option('api_login-hide-wordpress') ? 'checked="checked"' : '') ?> />
+						<label for="eab-api_login-hide-wordpress"><?php _e('Hide WordPress login button', self::TEXT_DOMAIN); ?></label>
+						
 					</div>
 				</div>
 		    </div>
@@ -2484,19 +2547,7 @@ class Eab_EventsHub {
 	function load_events_from_query () {
 		if (is_admin()) return false;
 		global $wp_query;
-//global $wp;
-//$wp->parse_request();
-//echo '<pre>'; die(var_export($wp));
-//echo '<pre>'; die(var_Export($wp->request));
-		/*
-$rules = $this->_get_rewrite_rules();
-$found = false;
-foreach ($rules as $rule => $match) {
-	if (preg_match('!' . $rule . '!i', $wp->request)) $found = WP_MatchesMapRegex::apply($wp->request, $match);
-}
-//$q = new WP_Query($match);
-die(var_ExporT($match));
-*/
+
 		if (Eab_EventModel::POST_TYPE == $wp_query->query_vars['post_type']) {
 			$original_year = isset($wp_query->query_vars['event_year']) ? (int)$wp_query->query_vars['event_year'] : false;
 			$year = $original_year ? $original_year : date('Y');
@@ -2506,6 +2557,13 @@ die(var_ExporT($match));
 			do_action('eab-query_rewrite-before_query_replacement', $original_year, $original_month);
 			$wp_query = Eab_CollectionFactory::get_upcoming(strtotime("{$year}-{$month}-01 00:00"), $wp_query->query);
 			do_action('eab-query_rewrite-after_query_replacement');
+		} else if (!empty($wp_query->query_vars['eab_events_category']) && empty($wp_query->query_vars['paged']) && !empty($_GET['date'])) {
+			$date = strtotime($_GET['date']);
+			if (!$date) return false;
+
+			do_action('eab-query_rewrite-before_query_replacement', false, false);
+			$wp_query = Eab_CollectionFactory::get_upcoming($date, $wp_query->query);
+			do_action('eab-query_rewrite-after_query_replacement');	
 		}
 	}
 	
@@ -2546,6 +2604,9 @@ include_once 'template-tags.php';
 
 define('EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ), true);
 define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . EAB_PLUGIN_BASENAME . '/');
+
+require_once EAB_PLUGIN_DIR . 'lib/class_eab_error_reporter.php';
+Eab_ErrorReporter::serve();
 
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_options.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_collection.php';

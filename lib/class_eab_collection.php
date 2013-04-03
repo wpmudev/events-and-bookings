@@ -347,6 +347,7 @@ class Eab_AllRecurringChildrenCollection extends Eab_Collection {
 			'post_status' => $status,
 			'post_parent' => $arg->get_id(),
 			'posts_per_page' => -1,
+			'orderby' => 'ID',
 		);
 		return $args;
 	}

@@ -125,7 +125,7 @@ class Eab_Exporter_Ical extends Eab_Exporter {
 	}
 
 	public function get_file_extension () {
-		return 'ical';
+		return 'ics';
 	}
 
 	public function export_event () {
@@ -155,11 +155,11 @@ class Eab_Exporter_Ical extends Eab_Exporter {
 	}
 
 	private function _get_header () {
-		return <<<EOiCalHeaderFluff
-BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//hacksw/handcal//NONSGML v1.0//EN
-EOiCalHeaderFluff;
+		return '' .
+			"BEGIN:VCALENDAR\n" .
+			"VERSION:2.0\n" .
+			"PRODID:-//hacksw/handcal//NONSGML v1.0//EN\n" .
+		'';
 	}
 
 	private function _get_event_as_ical ($post, $recurring_instances=false) {

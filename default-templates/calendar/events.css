@@ -59,4 +59,33 @@ a.wpmudevevents-calendar-event:hover {
 	border-radius: 5px;
 }
 
-/* 67022-1334033597 */
+/* ----- Shortcode ----- */
+
+.eab-shortcode_calendar .eab-shortcode_calendar-title-top, 
+.eab-shortcode_calendar .eab-shortcode_calendar-title-bottom
+{
+	background: transparent;
+	height: auto;
+	border: none;
+}
+.eab-shortcode_calendar .eab-shortcode_calendar-title-top td,
+.eab-shortcode_calendar .eab-shortcode_calendar-title-bottom td 
+{
+	height: auto;
+	border: none;
+	text-align: center;
+}
+.eab-shortcode_calendar .eab-shortcode_calendar-title-top td a,
+.eab-shortcode_calendar .eab-shortcode_calendar-title-bottom td a 
+{
+	text-decoration: none;
+}
+.eab-shortcode_calendar .eab-shortcode_calendar-title-top h4 {
+	margin: 0;
+	padding: 0;
+}
+.eab-shortcode_calendar .eab-shortcode_calendar-title-top .eab-navigation-prev, 
+.eab-shortcode_calendar .eab-shortcode_calendar-title-top .eab-navigation-next
+{
+	font-size: 1.6em;
+}

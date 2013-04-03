@@ -82,6 +82,11 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 	            </div>
 	        <?php echo $after_widget; ?>
 		<?php
+		} else {
+			echo $before_widget .
+				$before_title . $title . $after_title .
+				'<p class="eab-widget-no_events">' . __('No upcoming events.', Eab_EventsHub::TEXT_DOMAIN) . '</p>' .
+			$after_widget;
 		}
     }
     

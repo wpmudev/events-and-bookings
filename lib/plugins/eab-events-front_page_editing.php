@@ -161,6 +161,9 @@ class Eab_Events_FrontPageEditing {
 	function admin_bar_add_menu_links () {
 		global $wp_admin_bar, $post;
 
+		$post_type = get_post_type_object(Eab_EventModel::POST_TYPE);
+		if (!current_user_can($post_type->cap->edit_posts)) return false;
+
 		$wp_admin_bar->add_menu(array(
 			'id' => 'eab-events-fpe-admin_bar',
 			'title' => __('Events', Eab_EventsHub::TEXT_DOMAIN),

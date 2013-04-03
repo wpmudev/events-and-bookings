@@ -46,3 +46,20 @@ function eab_has_template_method ($method) {
 function eab_current_time () {
 	return current_time('timestamp');
 }
+
+/* ----- PI compatibility layer ----- */
+function eab_has_post_indexer () {
+	return class_exists('postindexermodel') || function_exists('post_indexer_make_current');
+}
+function eab_pi_get_table () {
+	return class_exists('postindexermodel') ? 'network_posts' : 'site_posts';
+}
+function eab_pi_get_post_date () {
+	return class_exists('postindexermodel') ? 'post_date' : 'post_published_stamp';
+}
+function eab_pi_get_blog_id () {
+	return class_exists('postindexermodel') ? 'BLOG_ID' : 'blog_id';
+}
+function eab_pi_get_post_id () {
+	return class_exists('postindexermodel') ? 'ID' : 'post_id';
+}

@@ -156,14 +156,14 @@ class Eab_Exporter_Csv extends Eab_Exporter {
 						$payment_status = $event->user_paid($booking->user_id) ? __('Yes', Eab_EventsHub::TEXT_DOMAIN) : __('No', Eab_EventsHub::TEXT_DOMAIN);
 					}
 				}
-				$attendees[] = array(
+				$attendees[] = apply_filters('eab-exporter-csv-row', array(
 					__('User ID', Eab_EventsHub::TEXT_DOMAIN) => $user_data->id,
 					__('User Name', Eab_EventsHub::TEXT_DOMAIN) => $user_data->display_name,
 					__('User Email', Eab_EventsHub::TEXT_DOMAIN) => $user_data->user_email,
 					__('Attending', Eab_EventsHub::TEXT_DOMAIN) => $title,
 					__('Ticket Count', Eab_EventsHub::TEXT_DOMAIN) => $ticket_count,
 					__('Payment Status', Eab_EventsHub::TEXT_DOMAIN) => $payment_status,
-				);
+				), $event, $booking, $user_data);
 			}
 		}
 		$delimiter = apply_filters('eab-exporter-csv-field_delimiter', $this->_delimiter);

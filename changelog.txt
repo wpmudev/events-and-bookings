@@ -4,6 +4,14 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.6 - 2013-04-03
+----------------------------------------------------------------------
+- Added "day of the week" recurrence model.
+- Added shortcode paging arguments.
+- Added MarketPress integration add-on.
+- Added separate granular settings for login button toggling.
+- Fix for counter updates for simple limited attendance checks.
+
 1.5.3 - 2013-01-16
 ----------------------------------------------------------------------
 - Added event categories as CSS classes.

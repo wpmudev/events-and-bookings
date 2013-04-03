@@ -80,6 +80,7 @@ abstract class WpmuDev_RecurringDatedItem extends WpmuDev_DatedItem {
 	
 	const RECURRANCE_DAILY = 'daily';
 	const RECURRANCE_WEEKLY = 'weekly';
+	const RECURRANCE_DOW = 'dow';
 	const RECURRANCE_MONTHLY = 'monthly';
 	const RECURRANCE_YEARLY = 'yearly';
 	
@@ -444,6 +445,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return array (
 			self::RECURRANCE_DAILY => __('Day', Eab_EventsHub::TEXT_DOMAIN),
 			self::RECURRANCE_WEEKLY => __('Week', Eab_EventsHub::TEXT_DOMAIN),
+			self::RECURRANCE_DOW => __('Day of the Week', Eab_EventsHub::TEXT_DOMAIN),
 			self::RECURRANCE_MONTHLY => __('Month', Eab_EventsHub::TEXT_DOMAIN),
 			self::RECURRANCE_YEARLY => __('Year', Eab_EventsHub::TEXT_DOMAIN),
 		);
@@ -497,9 +499,27 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	}
 	
 	public function spawn_recurring_instances ($start, $end, $interval, $time_parts) {
+		$old_post_ids = false;
 		if ($this->is_recurring()) {
+			$old_post_ids = $this->_get_recurring_children_ids();
 			$this->delete_recurring_instances();
+			do_action('eab-events-recurring_instances-deleted', $this->get_id(), $this);
 		}
+
+		$check_start = $start && checkdate((int)date('n', $start), (int)date('j', $start), (int)date('Y', $start));
+		if (!$check_start) do_action('eab-debug-log_error', sprintf(
+			__('Invalid interval start boundary timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
+			$check_start
+		));
+		$check_end = $end && checkdate((int)date('n', $end), (int)date('j', $end), (int)date('Y', $end));
+		if (!$check_end) do_action('eab-debug-log_error', sprintf(
+			__('Invalid interval end boundary timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
+			$check_end
+		));
+		if ($end < $start) do_action('eab-debug-log_error', sprintf(
+			__('Invalid end boundary after start: [%s] - [%s]', Eab_EventsHub::TEXT_DOMAIN),
+			$start, $end
+		));
 		
 		$instances = $this->_get_recurring_instances_timestamps($start, $end, $interval, $time_parts);
 	
@@ -507,12 +527,15 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$duration = $duration ? $duration : 1;
 		
 		$venue = $this->get_venue();
+		$creation_time = date("Y-m-d H:i:s", eab_current_time());
 		foreach ($instances as $key => $instance) {
 			$post = array(
 				'post_type' => self::POST_TYPE,
 				'post_status' => self::RECURRENCE_STATUS,
 				'post_parent' => $this->get_id(),
 				'post_name' => "{$this->_event->post_name}-{$key}",
+				'post_date' => $creation_time,
+				'post_modified' => $creation_time,
 				'post_title' => $this->get_title(),
 				'post_author' => $this->get_author(),
 				'post_excerpt' => $this->get_excerpt(),
@@ -543,15 +566,50 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		update_post_meta($this->get_id(), 'eab_event_recurrence_parts', $time_parts);
 		update_post_meta($this->get_id(), 'eab_event_recurrence_starts', $start);
 		update_post_meta($this->get_id(), 'eab_event_recurrence_ends', $end);
+
+		if ($old_post_ids) {
+			$new_post_ids = $this->_get_recurring_children_ids();
+			$this->_remap_bookings($old_post_ids, $new_post_ids);
+		}
+	}
+
+	protected function _remap_bookings ($old, $new) {
+		if (!$old || !$new || !is_array($old) || !is_array($new)) return false;
+		$sql = 'UPDATE ' . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " SET event_id= CASE\n";
+		foreach ($old as $idx => $value) {
+			$new_value = !empty($new[$idx]) ? $new[$idx] : false;
+			if (!$new_value) continue;
+			$sql .= sprintf("WHEN event_id=%d THEN %d\n", (int)$value, (int)$new_value);
+		}
+		$sql .= "END\n";
+		$sql .= "WHERE event_id IN(" . join(',', $old) . ")";
+
+		global $wpdb;
+		return $wpdb->query($sql);
 	}
 	
 	protected function _get_recurring_instances_timestamps ($start, $end, $interval, $time_parts) {
 		$instances = array();
 
+		// Validate time
+		if (!empty($time_parts['time'])) {
+			$time_parts['time'] = preg_match('/\d+:\d+/i', $time_parts['time'])
+				? $time_parts['time']
+				: (int)$time_parts['time'] . ':00'
+			;
+		}
+
 		if (self::RECURRANCE_DAILY == $interval) {
 			for ($i = $start; $i <= $end; $i+=86400) {
 				$timestamp = date("Y-m-d", $i) . ' ' . $time_parts['time'];
-				$instances[] = strtotime($timestamp);
+				$unix_timestamp = strtotime($timestamp);
+				$check = $unix_timestamp >= $start && checkdate((int)date('n', $unix_timestamp), (int)date('j', $unix_timestamp), (int)date('Y', $unix_timestamp));
+				if (!$unix_timestamp || !$check) do_action('eab-debug-log_error', sprintf(
+					__('Invalid %s instance timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
+					$interval,
+					$timestamp
+				));
+				$instances[] = $unix_timestamp;
 			}
 		}
 
@@ -567,8 +625,30 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				$increment = 7*86400;
 				for ($j = $begin; $j<=$end; $j+=$increment) {
 					$timestamp = date('Y-m-d', $j) . ' ' . $time_parts['time'];
-					$instances[] = strtotime($timestamp);
+					$unix_timestamp = strtotime($timestamp);
+					$check = $unix_timestamp >= $start && checkdate((int)date('n', $unix_timestamp), (int)date('j', $unix_timestamp), (int)date('Y', $unix_timestamp));
+					if (!$unix_timestamp || !$check) do_action('eab-debug-log_error', sprintf(
+						__('Invalid %s instance timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
+						$interval,
+						$timestamp
+					));
+					$instances[] = $unix_timestamp;
 				}
+			}
+		}
+
+		if (self::RECURRANCE_DOW == $interval) {
+			$week_count = !empty($time_parts["week"]) ? $time_parts["week"] : 'first';
+			$weekday = !empty($time_parts["weekday"]) ? $time_parts["weekday"] : 'Monday';
+
+			$month_days = date('t', $start)*86400;
+
+			for ($i = $start; $i <= $end; $i+=$month_days) {
+				$month_days = date('t', $i)*86400;
+				$first = strtotime(date("Y-m-01", $i));
+				$day = strtotime("{$week_count} {$weekday} of this month {$time_parts['time']}", $first);
+				if ($day < $start) continue;
+				$instances[] = $day;
 			}
 		}
 		
@@ -577,7 +657,14 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			for ($i = $start; $i <= $end; $i+=$month_days) {
 				$month_days = date('t', $i)*86400;
 				$timestamp = date("Y-m-" . $time_parts['day'], $i) . ' ' . $time_parts['time'];
-				$instances[] = strtotime($timestamp);
+				$unix_timestamp = strtotime($timestamp);
+				$check = $unix_timestamp >= $start && checkdate((int)date('n', $unix_timestamp), (int)date('j', $unix_timestamp), (int)date('Y', $unix_timestamp));
+				if (!$unix_timestamp || !$check) do_action('eab-debug-log_error', sprintf(
+					__('Invalid %s instance timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
+					$interval,
+					$timestamp
+				));
+				$instances[] = $unix_timestamp;
 			}
 		}
 		
@@ -586,7 +673,14 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			for ($i = $start; $i <= $end; $i+=$year_days) {
 				$year_days = (date('L', $i) ? 366 : 365) * 86400;
 				$timestamp = date("Y-" . $time_parts['month'] . "-" . $time_parts['day'], $i) . ' ' . $time_parts['time'];
-				$instances[] = strtotime($timestamp);
+				$unix_timestamp = strtotime($timestamp);
+				$check = $unix_timestamp >= $start && checkdate((int)date('n', $unix_timestamp), (int)date('j', $unix_timestamp), (int)date('Y', $unix_timestamp));
+				if (!$unix_timestamp || !$check) do_action('eab-debug-log_error', sprintf(
+					__('Invalid %s instance timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
+					$interval,
+					$timestamp
+				));
+				$instances[] = $unix_timestamp;
 			}
 		}	
 		return $instances;	

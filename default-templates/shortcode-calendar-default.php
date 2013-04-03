@@ -6,6 +6,9 @@ $renderer = new Eab_CalendarTable_EventShortcodeCalendar($events);
 $renderer->set_class($args['class']);
 $renderer->set_footer($args['footer']);
 $renderer->set_scripts(!$args['override_scripts']);
+$renderer->set_navigation($args['navigation']);
+$renderer->set_title_format($args['title_format']);
+
 echo $renderer->get_month_calendar($args['date']);
 ?>
 </section>

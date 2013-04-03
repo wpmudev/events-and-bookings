@@ -3,7 +3,7 @@
 Plugin Name: Limited capacity Events
 Description: Allows you to limit the number of attendees for each of your events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 1.0
+Version: 1.0.1
 Author: Ve Bailovity (Incsub)
 */
 
@@ -40,14 +40,14 @@ class Eab_Addon_LimitCapacity {
 		$event_id = (int)$event_id;
 		$meta = $wpdb->get_col("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id={$event_id} AND status='" . Eab_EventModel::BOOKING_YES . "'");
 		if (!$meta) return 0;
-		
+
 		$booked = join(',', $meta);
-		$multiples_this_far = $wpdb->get_col("SELECT booking_ticket_count FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_META_TABLE) . " where booking_id IN({$booked})");
-		if (!$multiples_this_far) return count($booked);
-		
-		$this_far = count($booked) - count($multiples_this_far);
+		$multiples_this_far = $wpdb->get_col("SELECT meta_value FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_META_TABLE) . " WHERE booking_id IN({$booked}) AND meta_key='booking_ticket_count'");
+		if (!$multiples_this_far) return count($meta);
+
+		$this_far = count($meta) - count($multiples_this_far);
 		foreach ($multiples_this_far as $count) $this_far += $count;
-		
+
 		return $this_far;
 	}
 	
@@ -64,20 +64,21 @@ class Eab_Addon_LimitCapacity {
 	function handle_rsvp_form ($content) {
 		global $post;
 		$post_id = (int)@$post->ID;
-		
+
 		$capacity = (int)get_post_meta($post_id, 'eab_capacity', true);
 		if (!$capacity) return $content; // No capacity set, we're good to show
 		
-		$total = $this->_get_event_total_attendance($event_id);
-		/*
+		$total = $this->_get_event_total_attendance($post_id);
+		
 		global $wpdb, $current_user;
 		$users = $wpdb->get_col("SELECT user_id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id={$post_id} AND status='yes';");
 		
-		if ($capacity > count($users)) return $content;
-		return (in_array($current_user->id, $users)) ? $content : $this->_get_overbooked_message();
-		 */ 
 		if ($capacity > $total) return $content;
 		return (in_array($current_user->id, $users)) ? $content : $this->_get_overbooked_message();
+		/*
+		if ($capacity > $total) return $content;
+		return (in_array($current_user->id, $users)) ? $content : $this->_get_overbooked_message();
+		 */ 
 	}
 	
 	function show_remaining_tickets ($content, $event_id) {

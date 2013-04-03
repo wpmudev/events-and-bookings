@@ -69,22 +69,22 @@ function show_message (msg, is_error) {
 /**
  * Normalizes a time string into 24-hours format array.
  * @param string Time string to normalilze
- * @return array [HH,mm] 
+ * @return array [HH,mm]
  */
 function _time_string_to_array (time_string) {
 	var time_parts = false;
 	if (time_string.match(/[ap]m/i)) { // Yanks have been here
 		var is_night = time_string.match(/pm/i);
 		var normalized = time_string.replace(/[ap]m/i, '');
-		time_parts = (normalized.indexOf(':') >= 0) 
-			? normalized.split(':') 
+		time_parts = (normalized.indexOf(':') >= 0)
+			? normalized.split(':')
 			: [normalized, '00']
 		;
 		if (is_night) {
-			time_parts[0] = 12 + parseInt(time_parts[0]);
+			time_parts[0] = 12 + parseInt(time_parts[0], 10);
 		}
-	} else { 	
-		time_parts = (time_string.indexOf(':') >= 0) 
+	} else {
+		time_parts = (time_string.indexOf(':') >= 0)
 			? time_string.split(':') 
 			: [time_string, '00']
 		;
@@ -121,11 +121,11 @@ function send_save_request () {
 	end.setHours(end_time_parts[0]);
 	end.setMinutes(end_time_parts[1]);
 	
-	if (start >= end) return invalid_datetime_error();  
+	if (start >= end) return invalid_datetime_error();
 	
 	$("#eab-events-fpe-ok").after(
 		'<img src="' + _eab_events_fpe_data.root_url + '/waiting.gif" id="eab-events-fpe-waiting_indicator" />'
-	)
+	);
 	var content = $("#eab-events-fpe-content").is(":visible") ? $("#eab-events-fpe-content").val() : tinyMCE.activeEditor.getContent();
 	var data = {
 		"id": $("#eab-events-fpe-event_id").val(),
@@ -151,18 +151,21 @@ function send_save_request () {
 		$("#eab-events-fpe-waiting_indicator").remove();
 		var status = false;
 		var message = false;
-		try { status = parseInt(response.status); } catch (e) { status = 0; }
+		try { status = parseInt(response.status, 10); } catch (e) { status = 0; }
 		try { message = response.message; } catch (e) { message = false; }
 		if (!status) return show_message((message ? message : l10nFpe.general_error), true);
 		
 		var post_id = false;
-		try { post_id = parseInt(response.post_id); } catch (e) { post_id = 0; }
+		try { post_id = parseInt(response.post_id, 10); } catch (e) { post_id = 0; }
 		if (!post_id) return show_message((message ? message : l10nFpe.missing_id), true);
 		
 		var link = false;
 		try { link = response.permalink; } catch (e) { link = false; }
 		if (link) {
 			$("#eab-events-fpe-back_to_event").attr("href", link).show();
+			$("#eab-events-fpe-cancel").off("click").on("click", function () {
+				window.location = link;
+			}).show();
 		}
 		
 		$("#eab-events-fpe-event_id").val(post_id);
@@ -197,6 +200,14 @@ $(function () {
 	
 	// Init save request processing
 	$("#eab-events-fpe-ok").click(send_save_request);
+
+	var link = $("#eab-events-fpe-back_to_event").is(":visible") && $("#eab-events-fpe-back_to_event").attr("href");
+	if (link) {
+		console.log(link);
+		$("#eab-events-fpe-cancel").off("click").on("click", function () {
+			window.location = link;
+		}).show();
+	} else $("#eab-events-fpe-cancel").hide();
 });
 	
 	

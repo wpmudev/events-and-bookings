@@ -141,6 +141,7 @@ class Eab_BuddyPress_GroupEvents {
 		$checked = $this->_data->get_option('bp-group_event-auto_join_groups') ? 'checked="checked"' : '';
 		$private = $this->_data->get_option('bp-group_event-private_events') ? 'checked="checked"' : '';
 		$user_groups_only = $this->_data->get_option('bp-group_event-user_groups_only') ? 'checked="checked"' : '';
+		$user_groups_only_unless_superadmin = $this->_data->get_option('bp-group_event-user_groups_only-unless_superadmin') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-group_events" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Group Events settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -159,6 +160,10 @@ class Eab_BuddyPress_GroupEvents {
 	    	<label for="eab_event-bp-group_event-user_groups_only"><?php _e('Show only groups that user belongs to', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
 			<input type="checkbox" id="eab_event-bp-group_event-user_groups_only" name="event_default[bp-group_event-user_groups_only]" value="1" <?php print $user_groups_only; ?> />
 			<span><?php echo $tips->add_tip(__('If you enable this option, users will not be able to assign events outside the groups they already belong to.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+			<br />
+	    	<label for="eab_event-bp-group_event-user_groups_only-unless_superadmin"><?php _e('... except for Super-admins', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
+			<input type="checkbox" id="eab_event-bp-group_event-user_groups_only-unless_superadmin" name="event_default[bp-group_event-user_groups_only-unless_superadmin]" value="1" <?php print $user_groups_only_unless_superadmin; ?> />
+			<span><?php echo $tips->add_tip(__('If you enable this option, your super-admins will be able to assign events to any group.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 	    </div>
 	</div>
 </div>
@@ -169,6 +174,7 @@ class Eab_BuddyPress_GroupEvents {
 		$options['bp-group_event-auto_join_groups'] = $_POST['event_default']['bp-group_event-auto_join_groups'];
 		$options['bp-group_event-private_events'] = $_POST['event_default']['bp-group_event-private_events'];
 		$options['bp-group_event-user_groups_only'] = $_POST['event_default']['bp-group_event-user_groups_only'];
+		$options['bp-group_event-user_groups_only-unless_superadmin'] = $_POST['event_default']['bp-group_event-user_groups_only-unless_superadmin'];
 		return $options;
 	}
 
@@ -182,7 +188,9 @@ class Eab_BuddyPress_GroupEvents {
 			: groups_get_total_group_count()
 		;
 		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical');
-		if ($this->_data->get_option('bp-group_event-user_groups_only')) $group_params['user_id'] = $current_user->id;
+		if ($this->_data->get_option('bp-group_event-user_groups_only')) {
+			if (!(is_super_admin() && $this->_data->get_option('bp-group_event-user_groups_only-unless_superadmin'))) $group_params['user_id'] = $current_user->id;
+		}
 		$groups = groups_get_groups($group_params);
 		$groups = @$groups['groups'] ? $groups['groups'] : array();
 		
@@ -208,6 +216,7 @@ class Eab_BuddyPress_GroupEvents {
 	}
 
 	function add_fpe_meta_box ($box, $event) {
+		global $current_user;
 		if (!function_exists('groups_get_groups')) return $box;
 		$group_id = get_post_meta($event->get_id(), 'eab_event-bp-group_event', true);
 		
@@ -216,7 +225,9 @@ class Eab_BuddyPress_GroupEvents {
 			: groups_get_total_group_count()
 		;
 		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical');
-		if ($this->_data->get_option('bp-group_event-user_groups_only')) $group_params['user_id'] = $current_user->id;
+		if ($this->_data->get_option('bp-group_event-user_groups_only')) {
+			if (!(is_super_admin() && $this->_data->get_option('bp-group_event-user_groups_only-unless_superadmin'))) $group_params['user_id'] = $current_user->id;
+		}
 		$groups = groups_get_groups($group_params);
 		$groups = @$groups['groups'] ? $groups['groups'] : array();
 		

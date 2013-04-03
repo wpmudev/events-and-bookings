@@ -29,7 +29,10 @@ class Eab_Scheduler {
 		$time = eab_current_time();
 		$events = Eab_CollectionFactory::get_old_events($time);
 		foreach ($events as $event) {
-			if ($event->get_last_end_timestamp() < $time) $event->set_status(Eab_EventModel::STATUS_ARCHIVED);
+			if ($event->get_last_end_timestamp() < $time) {
+				$event->set_status(Eab_EventModel::STATUS_ARCHIVED);
+				do_action('eab-scheduler-event_archived', $event);
+			}
 		}
 	}
 }

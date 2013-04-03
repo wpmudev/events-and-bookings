@@ -54,7 +54,7 @@ class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 			}
 			echo '</ul>';
 		} else {
-			echo '<p>' . __('No upcoming events on network', $this->translation_domain) . '</p>';
+			echo '<p class="eab-widget-no_events">' . __('No upcoming events on network', $this->translation_domain) . '</p>';
 		}
 		echo $after_widget;	
 	}

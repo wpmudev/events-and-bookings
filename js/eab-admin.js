@@ -1,14 +1,13 @@
 
 jQuery(function() {
 	if (!("ontouchstart" in window)) {
-	    jQuery(".incsub_event_picker").datepicker({
-			//minDate: 0,
-		    "dateFormat": "yy-mm-dd",
+		jQuery(".incsub_event_picker").datepicker({
+			"dateFormat": "yy-mm-dd",
 			"changeMonth": true,
-		    "changeYear": true,
-		    "defaultDate": new Date,
-		    "firstDay": parseInt(eab_event_localized.start_of_week) ? parseInt(eab_event_localized.start_of_week) : 0
-	    });
+			"changeYear": true,
+			"defaultDate": new Date(),
+			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
+		});
 	}
     
     jQuery('[href*="preview=true"]').hide(); // Preview won't work
@@ -18,28 +17,27 @@ jQuery(function() {
 		jQuery("#eab-add-more-rows").append(jQuery("#eab-add-more-bank").html().replace(/_bank/gi, '_'+row_id).replace(/bank/gi, row_id+1).replace(/_b/gi, ''));
 	
 		jQuery( "#incsub_event_start_"+row_id+" , #incsub_event_end_"+row_id ).datepicker({
-		    //minDate: 0,
-		    "dateFormat": "yy-mm-dd",
-		    "changeMonth": true,
-		    "changeYear": true,
-		    "firstDay": parseInt(eab_event_localized.start_of_week) ? parseInt(eab_event_localized.start_of_week) : 0
+			"dateFormat": "yy-mm-dd",
+			"changeMonth": true,
+			"changeYear": true,
+			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
 		});
 		
 		if (jQuery('.eab-section-block').length > 2) {
-		    jQuery('.eab-section-heading').show();
+			jQuery('.eab-section-heading').show();
 		}
     });
 
     jQuery(".eab-event-remove_time").live("click", function () {
-    	var $remove = jQuery(this),
-    		$parent = $remove.parents("#eab-add-more-rows"),
-    		$starts = $parent.find(".eab-start-section"),
-    		$target = $remove.parents(".eab-section-block")
-    	;
-    	if ($starts.length <= 1) return false; // Can't remove last one
-    	if (!$target.length) return false; // Don't know what to remove
-    	$target.remove();
-    	return false;
+		var $remove = jQuery(this),
+			$parent = $remove.parents("#eab-add-more-rows"),
+			$starts = $parent.find(".eab-start-section"),
+			$target = $remove.parents(".eab-section-block")
+		;
+		if ($starts.length <= 1) return false; // Can't remove last one
+		if (!$target.length) return false; // Don't know what to remove
+		$target.remove();
+		return false;
     });
     
     if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
@@ -48,9 +46,9 @@ jQuery(function() {
     
     jQuery("#incsub_event-accept_payments").change(function () {
 		if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
-		    jQuery("#eab-settings-paypal").hide();
+			jQuery("#eab-settings-paypal").hide();
 		} else {
-		    jQuery("#eab-settings-paypal").show();
+			jQuery("#eab-settings-paypal").show();
 		}
     });
     
@@ -59,9 +57,9 @@ jQuery(function() {
     }
     jQuery("#incsub_event_paid").change(function () {
 		if (jQuery("#incsub_event_paid").val() == 0) {
-		    jQuery(".incsub_event-fee_row").hide();
+			jQuery(".incsub_event-fee_row").hide();
 		} else {
-		    jQuery(".incsub_event-fee_row").show();
+			jQuery(".incsub_event-fee_row").show();
 		}
     });
     
@@ -89,35 +87,35 @@ jQuery(function() {
     });
 
     jQuery("#incsub-event").on("change", ".incsub_event_no_start_time", function () {
-    	var $me = jQuery(this),
-    		_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '')
-    	;
-    	if ($me.is(":checked")) jQuery("#incsub_event_start_time_" + _c).hide();
-    	else jQuery("#incsub_event_start_time_" + _c).show();
+		var $me = jQuery(this),
+			_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '')
+		;
+		if ($me.is(":checked")) jQuery("#incsub_event_start_time_" + _c).hide();
+		else jQuery("#incsub_event_start_time_" + _c).show();
     });
     jQuery(".incsub_event_no_start_time").each(function () { jQuery(this).trigger("change");});
 
     jQuery("#incsub-event").on("change", ".incsub_event_no_end_time", function () {
-    	var $me = jQuery(this),
-    		_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '')
-    	;
-    	if ($me.is(":checked")) jQuery("#incsub_event_end_time_" + _c).hide();
-    	else jQuery("#incsub_event_end_time_" + _c).show();
+		var $me = jQuery(this),
+			_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, '')
+		;
+		if ($me.is(":checked")) jQuery("#incsub_event_end_time_" + _c).hide();
+		else jQuery("#incsub_event_end_time_" + _c).show();
     });
     jQuery(".incsub_event_no_end_time").each(function () { jQuery(this).trigger("change");});
 
     jQuery("#incsub-event").on("change", ".incsub_event_start", function () {
-    	var $me = jQuery(this),
-    		$end = $me.parents(".eab-section-block").find(".incsub_event_end"),
-    		_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, ''),
-    		_start, _end, _tmp
-    	;
-    	if (!$end.length) return true;
-    	_tmp = _eab_get_stat_end_datetime(_c);
-    	_start = _tmp.length ? _tmp[0] : false;
-    	_end = _tmp.length ? _tmp[1] : false;
-    	if (!_start || !_start.getTime) return true;
-    	$end.datepicker("option", "defaultDate", _start);
+		var $me = jQuery(this),
+			$end = $me.parents(".eab-section-block").find(".incsub_event_end"),
+			_c = $me.attr('id').replace(/incsub_event_[a-z_]+_/gi, ''),
+			_start, _end, _tmp
+		;
+		if (!$end.length) return true;
+		_tmp = _eab_get_stat_end_datetime(_c);
+		_start = _tmp.length ? _tmp[0] : false;
+		_end = _tmp.length ? _tmp[1] : false;
+		if (!_start || !_start.getTime) return true;
+		$end.datepicker("option", "defaultDate", _start);
     });
 
 
@@ -136,81 +134,57 @@ jQuery(function() {
     });
 
     function _eab_get_stat_end_datetime (_c) {
-    	var _start, _end;
-    	_start = false;
+		var _start, _end;
+		_start = false;
 		if (jQuery('#incsub_event_start_'+_c).val() != '') {
-		    _start = new Date(jQuery('#incsub_event_start_'+_c).val());
+			_start = new Date(jQuery('#incsub_event_start_'+_c).val());
 			if (jQuery('#incsub_event_start_time_'+_c).val() != '' || jQuery('#incsub_event_no_start_time_'+_c).is(":checked")) {
-			    var _start_time = (jQuery('#incsub_event_no_start_time_'+_c).is(":checked") ? '00:01' : jQuery('#incsub_event_start_time_'+_c).val()),
-			    	_start_time_parts = _start_time.split(/:/gi)
-			    ;
+				var _start_time = (jQuery('#incsub_event_no_start_time_'+_c).is(":checked") ? '00:01' : jQuery('#incsub_event_start_time_'+_c).val()),
+					_start_time_parts = _start_time.split(/:/gi)
+				;
 
-			    _start.setHours(_start_time_parts[0]);
-			    _start.setMinutes(_start_time_parts[1]);
+				_start.setHours(_start_time_parts[0]);
+				_start.setMinutes(_start_time_parts[1]);
 			}
 		}
 		
 		_end = false;
 		if (jQuery('#incsub_event_end_'+_c).val() != '') {
-		    _end = new Date(jQuery('#incsub_event_end_'+_c).val());
+			_end = new Date(jQuery('#incsub_event_end_'+_c).val());
 			if (jQuery('#incsub_event_end_time_'+_c).val() != '' || jQuery('#incsub_event_no_end_time_'+_c).is(":checked")) {
-			    var _end_time = (jQuery('#incsub_event_no_end_time_'+_c).is(":checked") ? '23:59' : jQuery('#incsub_event_end_time_'+_c).val()),
-			    	_end_time_parts = _end_time.split(/:/gi)
-			    ;
-			    
-			    _end.setHours(_end_time_parts[0]);
-			    _end.setMinutes(_end_time_parts[1]);
+				var _end_time = (jQuery('#incsub_event_no_end_time_'+_c).is(":checked") ? '23:59' : jQuery('#incsub_event_end_time_'+_c).val()),
+					_end_time_parts = _end_time.split(/:/gi)
+				;
+
+				_end.setHours(_end_time_parts[0]);
+				_end.setMinutes(_end_time_parts[1]);
 			}
 		}
 		return [_start, _end];
     }
     
     function _eab_validate_when(_c) {
-    	if ("bank" == _c) return true; // Don't check bank dates - they're stubs
-    	if (jQuery("#icl_translation_of").length) return true; // Assume translation
-    	/*
-		_start = false;
-		if (jQuery('#incsub_event_start_'+_c).val() != '') {
-		    _start = new Date(jQuery('#incsub_event_start_'+_c).val());
-			if (jQuery('#incsub_event_start_time_'+_c).val() != '' || jQuery('#incsub_event_no_start_time_'+_c).is(":checked")) {
-			    _start_time = jQuery('#incsub_event_no_start_time_'+_c).is(":checked") ? '00:01' : jQuery('#incsub_event_start_time_'+_c).val();
-			    _start_time_parts = _start_time.split(/:/gi);
-			    
-			    _start.setHours(_start_time_parts[0]);
-			    _start.setMinutes(_start_time_parts[1]);
-			}
-		}
-		
-		_end = false;
-		if (jQuery('#incsub_event_end_'+_c).val() != '') {
-		    _end = new Date(jQuery('#incsub_event_end_'+_c).val());
-			if (jQuery('#incsub_event_end_time_'+_c).val() != '' || jQuery('#incsub_event_no_end_time_'+_c).is(":checked")) {
-			    _end_time = jQuery('#incsub_event_no_end_time_'+_c).is(":checked") ? '23:59' : jQuery('#incsub_event_end_time_'+_c).val();
-			    _end_time_parts = _end_time.split(/:/gi);
-			    
-			    _end.setHours(_end_time_parts[0]);
-			    _end.setMinutes(_end_time_parts[1]);
-			}
-		}
-		*/
+		if ("bank" == _c) return true; // Don't check bank dates - they're stubs
+		if (jQuery("#icl_translation_of").length) return true; // Assume translation
+
 		var _start, _end, _tmp;
 		_tmp = _eab_get_stat_end_datetime(_c);
-    	_start = _tmp.length ? _tmp[0] : false;
-    	_end = _tmp.length ? _tmp[1] : false;
+		_start = _tmp.length ? _tmp[0] : false;
+		_end = _tmp.length ? _tmp[1] : false;
 
 		if ((!_start || !_end) || _start.getTime() >= _end.getTime()) {
-		    jQuery('#incsub_event_start_'+_c).addClass('error');
-		    jQuery('#incsub_event_start_time_'+_c).addClass('error');
-		    jQuery('#incsub_event_end_'+_c).addClass('error');
-		    jQuery('#incsub_event_end_time_'+_c).addClass('error');
-		    jQuery('input.button-primary').attr('disabled', true);
-		    return false;
+			jQuery('#incsub_event_start_'+_c).addClass('error');
+			jQuery('#incsub_event_start_time_'+_c).addClass('error');
+			jQuery('#incsub_event_end_'+_c).addClass('error');
+			jQuery('#incsub_event_end_time_'+_c).addClass('error');
+			jQuery('input.button-primary').attr('disabled', true);
+			return false;
 		} else {
-		    jQuery('#incsub_event_start_'+_c).removeClass('error');
-		    jQuery('#incsub_event_start_time_'+_c).removeClass('error');
-		    jQuery('#incsub_event_end_'+_c).removeClass('error');
-		    jQuery('#incsub_event_end_time_'+_c).removeClass('error');
-		    jQuery('input.button-primary').removeAttr('disabled');
+			jQuery('#incsub_event_start_'+_c).removeClass('error');
+			jQuery('#incsub_event_start_time_'+_c).removeClass('error');
+			jQuery('#incsub_event_end_'+_c).removeClass('error');
+			jQuery('#incsub_event_end_time_'+_c).removeClass('error');
+			jQuery('input.button-primary').removeAttr('disabled');
 		}
 		return true;
     }
@@ -231,7 +205,7 @@ function toggle_appearance_settings () {
 		$("#incsub_event-single_template").attr("disabled", false);
 	} else {
 		$("#incsub_event-archive_template").attr("disabled", true);
-		$("#incsub_event-single_template").attr("disabled", true);		
+		$("#incsub_event-single_template").attr("disabled", true);
 	}
 }
 
@@ -250,6 +224,15 @@ function show_event_recurrence () {
 	
 	$("#eab-add-more-rows").hide();
 	$("#eab-add-more").hide();
+
+	// Init jQuery UI date selectors
+	$("#eab_event-repeat_start,#eab_event-repeat_end").datepicker({
+		"dateFormat": "yy-mm-dd",
+		"changeMonth": true,
+		"changeYear": true,
+		"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
+	});
+
 	// Kill WP stuff
 	$("#edit-slug-box").hide();
 }
@@ -272,8 +255,16 @@ function toggle_recurrence_mode () {
 	if (!$el.length) return false;
 
 	$(".eab_event_recurrence_mode").find("input,select").attr("disabled", true);
-	$el.find("input,select").attr("disabled", false);	
+	$el.find("input,select").attr("disabled", false);
 	$el.show();
+
+	// Init jQuery UI date selectors
+	$("#eab_event-repeat_start,#eab_event-repeat_end").datepicker({
+		"dateFormat": "yy-mm-dd",
+		"changeMonth": true,
+		"changeYear": true,
+		"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
+	});
 }
 
 // Recurrence instance editing toggling
@@ -300,7 +291,7 @@ $(function () {
 			"step": $me.attr("data-eab_tutorial")
 		}, function () {
 			window.location.reload();
-		})
+		});
 		return false;
 	});
 	
@@ -322,10 +313,10 @@ $(function () {
 		$.post(ajaxurl, {
 			"action": "eab_cancel_attendance",
 			"user_id": user_id,
-			"post_id": post_id,
+			"post_id": post_id
 		}, function (data) {
 			$("#eab-bookings-response").html(data);
-		})
+		});
 		return false;
 	});
 	// Attendance deleting
@@ -336,10 +327,10 @@ $(function () {
 		$.post(ajaxurl, {
 			"action": "eab_delete_attendance",
 			"user_id": user_id,
-			"post_id": post_id,
+			"post_id": post_id
 		}, function (data) {
 			$("#eab-bookings-response").html(data);
-		})
+		});
 		return false;
 	});
 

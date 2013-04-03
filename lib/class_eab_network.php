@@ -25,7 +25,7 @@ class Eab_Network {
 	 * Check if PI is available, and proceed if it is.
 	 */
 	function load_dependencies () {
-		if (!function_exists('post_indexer_make_current')) return false;
+		if (!eab_has_post_indexer()) return false;
 		add_action('widgets_init', array($this, 'load_widgets'), 20);
 	}
 	
@@ -44,22 +44,26 @@ class Eab_Network {
 	 * Only the events that are not yet over will be returned.
 	 */
 	public static function get_upcoming_events ($limit=5) {
-		if (!function_exists('post_indexer_make_current')) return array();
+		if (!eab_has_post_indexer()) return array();
 		$limit = (int)$limit ? (int)$limit : 5;
 		
 		global $wpdb;
 		$result = array();
 		$count = 0;
-		$raw_network_events = $wpdb->get_results("SELECT * FROM {$wpdb->base_prefix}site_posts WHERE post_type='incsub_event' ORDER BY post_published_stamp DESC");
+		$pi_table = eab_pi_get_table();
+		$pi_published = eab_pi_get_post_date();
+		$pi_blog_id = eab_pi_get_blog_id();
+		$pi_post_id = eab_pi_get_post_id();
+		$raw_network_events = $wpdb->get_results("SELECT * FROM {$wpdb->base_prefix}{$pi_table} WHERE post_type='incsub_event' ORDER BY {$pi_published} DESC");
 		if (!$raw_network_events) return $result;
 		
 		foreach ($raw_network_events as $event) {
 			if ($count == $limit) break;
-			switch_to_blog($event->blog_id);
-			$post = get_post($event->post_id);
+			switch_to_blog($event->$pi_blog_id);
+			$post = get_post($event->$pi_post_id);
 			$tmp_event_instance = new Eab_EventModel($post);
 			if ($tmp_event_instance->is_expired()) continue;
-			$post->blog_id = $event->blog_id;
+			$post->blog_id = $event->$pi_blog_id;
 			$result[] = $post;
 			$count++;
 			restore_current_blog();

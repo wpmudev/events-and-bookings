@@ -340,6 +340,7 @@ class Eab_Template {
 		$content .= '<input type="hidden" name="cmd" value="_xclick" />';
 		
 		// Add multiple tickets
+		$extra_attributes = '';
 		$extra_attributes = apply_filters('eab-payment-paypal_tickets-extra_attributes', $extra_attributes, $event->get_id(), $booking_id);
 		$content .= '' .// '<a href="#buy-tickets" class="eab-buy_tickets-trigger" style="display:none">' . __('Buy tickets', Eab_EventsHub::TEXT_DOMAIN) . '</a>' . 
 			sprintf(
@@ -488,7 +489,7 @@ class Eab_Template {
 			$price = $event->get_price();
 			$currency = $data->get_option('currency');
 			$amount = is_numeric($price) ? number_format($price, 2) : $price;
-			$content .= "<div class='wpmudevevents-price'>{$currency} {$amount}</div>";
+			$content .= apply_filters('eab-events-event_details-price', "<div class='wpmudevevents-price'>{$currency} {$amount}</div>", $event->get_id());
 		}
 		$data = apply_filters('eab-events-after_event_details', '', $event);
 		if ($data) {
@@ -593,6 +594,23 @@ class Eab_Template {
 		;
 	}
 
+	public static function get_pagination ($permalink, $total, $current) {
+		$pagination = paginate_links(array(
+			'base' => "{$permalink}%_%",
+			'total' => $total,
+			'current' => $current,
+		));
+		return "<div class='eab-pagination'>{$pagination}</div>";
+	}
+
+	public static function get_shortcode_paging ($events_query, $args) {
+		global $post;
+
+		$current = $args['page'];
+		$total = $events_query->max_num_pages;
+		return eab_call_template('get_pagination', get_permalink($post->ID), $total, $current);
+	}
+
 	public static function get_shortcode_archive_output ($events, $args) {
 		$out = '<section class="eab-events-archive ' . $args['class'] . '">';
 		foreach ($events as $event) {
@@ -614,6 +632,8 @@ class Eab_Template {
 		$renderer->set_class($args['class']);
 		$renderer->set_footer($args['footer']);
 		$renderer->set_scripts(!$args['override_scripts']);
+		$renderer->set_navigation($args['navigation']);
+		$renderer->set_title_format($args['title_format']);
 
 		return '<section class="wpmudevevents-list">' . $renderer->get_month_calendar($args['date']) . '</section>';
 	}
@@ -745,6 +765,11 @@ class Eab_Template {
 				'type' => __('date', Eab_EventsHub::TEXT_DOMAIN),
 				'value' => __('date format string', Eab_EventsHub::TEXT_DOMAIN),
 				'example' => sprintf(__('%s="2011-11-18"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string:date_format' => array(
+				'type' => __('date format', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('format string for dates', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="Y-m-d"', Eab_EventsHub::TEXT_DOMAIN), $argument),
 			),
 			'string:or_integer' => array(
 				'type' => __('string or integer', Eab_EventsHub::TEXT_DOMAIN),
