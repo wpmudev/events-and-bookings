@@ -102,6 +102,7 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 		if (!isset($args['incsub_event'])) { // If not single
 			$forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
 		}
+		$forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
 		
 		$start_month = $month ? sprintf("%02d", $month) : date('m');
 		if ($start_month < 12) {
@@ -176,6 +177,7 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 		if (!isset($args['incsub_event'])) { // If not single
 			$forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
 		}
+		$forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
 
 		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;	
 
@@ -267,7 +269,7 @@ class Eab_OldCollection extends Eab_TimedCollection {
 			array(
 			 	'post_type' => 'incsub_event',
 				'suppress_filters' => false, 
-				'posts_per_page' => -1,
+				'posts_per_page' => EAB_OLD_EVENTS_EXPIRY_LIMIT,
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_status',
@@ -315,10 +317,10 @@ class Eab_ArchivedCollection extends Eab_Collection {
  */
 class Eab_ExpiredCollection extends Eab_Collection {
 	
-	public function build_query_args ($args) {
+	public function build_query_args ($original) {
 		
 		$args = array_merge(
-			$args,
+			$original,
 			array(
 			 	'post_type' => 'incsub_event',
 				'posts_per_page' => -1,
@@ -330,6 +332,7 @@ class Eab_ExpiredCollection extends Eab_Collection {
 				)
 			)
 		);
+		if (!empty($original['posts_per_page'])) $args['posts_per_page'] = $original['posts_per_page'];
 		return $args;
 	}
 }

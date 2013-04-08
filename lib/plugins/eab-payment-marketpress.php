@@ -24,6 +24,7 @@ class Eab_Payments_PaymentViaProducts {
 	private function _add_hooks () {
 		// Payment processing, bind to events
 		add_action('order_received_to_order_paid', array($this, 'mp_product_order_paid'));
+		add_action('mp_new_order', array($this, 'dispatch_mp_product_if_order_paid'));
 
 		// Admin
 		add_action('admin_notices', array($this, 'show_event_relationship_for_products'));
@@ -335,6 +336,11 @@ class Eab_Payments_PaymentViaProducts {
 		if (!$product_id) return $form;
 
 		return strip_shortcodes(mp_product(false, $product_id, false, 'excerpt'));
+	}
+
+	function dispatch_mp_product_if_order_paid ($order) {
+		if ('mp_order' != $order->post_type || 'order_paid' != $order->post_status) return false;
+		$this->mp_product_order_paid($order);
 	}
 
 	/**

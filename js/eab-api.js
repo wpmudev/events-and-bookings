@@ -1,6 +1,6 @@
 /* ----- Login with Fb/Tw ----- */
 (function ($) {
-	
+
 function rsvp_after_wordpress_login (data) {
 	var status = 0;
 	try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
@@ -18,7 +18,7 @@ function rsvp_after_wordpress_login (data) {
 		$("#eab-wordpress_form").find("." + $me.attr("class")).click();
 	});
 }
-	
+
 function send_wordpress_registration_request () {
 	// Client-side validation first
 	var username = $("#eab-wordpress_login-registration_username").val();
@@ -52,13 +52,13 @@ function send_wordpress_login_request () {
 		rsvp_after_wordpress_login(data);
 	});
 }
-	
+
 function dispatch_login_register () {
 	if ($("#eab-wordpress_login-registration_wrapper").is(":visible")) return send_wordpress_registration_request();
 	else if ($("#eab-wordpress_login-login_wrapper").is(":visible")) return send_wordpress_login_request();
 	return false;
 }
-	
+
 function create_wordpress_login_popup ($action, post_id) {
 	if (!$("#eab-wordpress_login-background").length) {
 		$("body").append(
@@ -102,7 +102,7 @@ function create_wordpress_login_popup ($action, post_id) {
 	}
 	var $background = $("#eab-wordpress_login-background");
 	var $wrapper = $("#eab-wordpress_login-wrapper");
-	
+
 	$background.css({
 		"width": $(document).width(),
 		"height": $(document).height()

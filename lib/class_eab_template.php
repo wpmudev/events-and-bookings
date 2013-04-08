@@ -469,7 +469,7 @@ class Eab_Template {
 		
 		$content .= '</div>';
 	
-		$content = apply_filters('eab-rsvps-rsvp_form', $content);
+		$content = apply_filters('eab-rsvps-rsvp_form', $content, $event);
 
 		return $content;
 	}
@@ -780,6 +780,11 @@ class Eab_Template {
 				'type' => __('ordering keyword', Eab_EventsHub::TEXT_DOMAIN),
 				'value' => __('"ASC" or "DESC"', Eab_EventsHub::TEXT_DOMAIN),
 				'example' => sprintf(__('%s="ASC"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string:id_list' => array(
+				'type' => __('list of comma-separated IDs', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('"52,26,18"', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="52,26,18"', Eab_EventsHub::TEXT_DOMAIN), $argument),
 			),
 		);
 		if (empty($type_map[$raw_type])) return "<code>({$raw_type})</code>";

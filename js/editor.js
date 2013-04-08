@@ -67,8 +67,10 @@ eab_mbuttons_container.append('' +
 	'</a>'
 );
 
-$('li.existing_map_item a.add_map_item').die('click');
-$('li.existing_map_item a.add_map_item').live('click', insertMapItem);
+//$('li.existing_map_item a.add_map_item').die('click');
+$("li.existing_map_item").off("click", "a.add_map_item");
+//$('li.existing_map_item a.add_map_item').live('click', insertMapItem);
+$("li.existing_map_item").on("click", "a.add_map_item", insertMapItem);
 
 $('#map_preview_container').unbind('agm_map_insert');
 $('#map_preview_container').bind('agm_map_insert', function (e, id) {
@@ -78,6 +80,6 @@ $('#map_preview_container').bind('agm_map_insert', function (e, id) {
 });
 
 $('#add_map').hide();
-	
+
 });
 })(jQuery);

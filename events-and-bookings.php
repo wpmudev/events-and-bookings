@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.6
+ Version: 1.6.1
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.6';
+    const CURRENT_VERSION = '1.6.1';
     
     /**
      * Translation domain
@@ -805,6 +805,7 @@ class Eab_EventsHub {
     }
     
     function admin_print_styles() {
+    	if (!$this->_check_admin_page_id()) return false;
 		wp_enqueue_style('eab_jquery_ui');
 		wp_enqueue_style('eab_admin');
     }
@@ -1207,6 +1208,7 @@ class Eab_EventsHub {
 		$content .= '	<option value="archived" '.(($event->is_archived())?'selected="selected"':'').' >'.__('Archived', self::TEXT_DOMAIN).'</option>';
 		$content .= apply_filters('eab-event_meta-extra_event_status', '', $event);
 		$content .= '</select>';
+		$content .= apply_filters('eab-event_meta-after_event_status', '', $event);
 		$content .= '</div>';
 		$content .= '<div class="clear"></div>';
 		$content .= '</div>';
@@ -2605,11 +2607,14 @@ include_once 'template-tags.php';
 define('EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ), true);
 define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . EAB_PLUGIN_BASENAME . '/');
 
+if (!defined('EAB_OLD_EVENTS_EXPIRY_LIMIT')) define('EAB_OLD_EVENTS_EXPIRY_LIMIT', 100, true);
+
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_error_reporter.php';
 Eab_ErrorReporter::serve();
 
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_options.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_collection.php';
+require_once EAB_PLUGIN_DIR . 'lib/class_eab_codec.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_event_model.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_template.php';
 

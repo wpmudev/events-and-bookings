@@ -8,99 +8,15 @@ Author: Ve Bailovity (Incsub)
 */
 
 
-class Eab_Events_RsvpEmail_Codec {
-	
-	private $_macros = array(
-		'EVENT_NAME',
-		'EVENT_START_DATE',
-		'EVENT_END_DATE',
-		'EVENT_DATE_INFO',
-		'EVENT_BODY',
-		'EVENT_BODY_HTML',
-		'EVENT_VENUE',
-		'EVENT_URL',
-		'EVENT_LINK',
-		'EVENT_HOST',
-		'USER_NAME',
-	);
-
-	private $_event;
-	private $_user;
+class Eab_Events_RsvpEmail_Codec extends Eab_Macro_Codec {
 
 	public function __construct ($event_id=false, $user_id=false) {
+		parent::__construct($event_id, $user_id);
 		$this->_macros = apply_filters('eab-events-rsvp_email-codec-macros', $this->_macros);
-		$this->_event = $event_id ? new Eab_EventModel(get_post($event_id)) : false;
-		$this->_user = $user_id ? get_user_by('id', $user_id) : false;
-	}
-
-	public function get_macros () {
-		return $this->_macros;
 	}
 
 	public function expand ($str) {
-		if (!$str) return $str;
-		foreach ($this->_macros as $macro) {
-			$callback = false;
-			$method = 'replace_' . strtolower($macro);
-			if (is_callable(array($this, $method))) {
-				$callback = array($this, $method);
-				$str = preg_replace_callback(
-					'/(?:^|\b)' . preg_quote($macro, '/') . '(?:\b|$)/', 
-					$callback, $str
-				);
-			}
-		}
-		return apply_filters('eab-events-rsvp_email-codec-expand', $str, $this->_event);
-	}
-
-	public function replace_event_name () {
-		return $this->_event->get_title();
-	}
-
-	public function replace_event_start_date () {
-		return date_i18n(
-			get_option('date_format') . ' ' . get_option('time_format'),
-			$this->_event->get_start_timestamp()
-		);
-	}
-
-	public function replace_event_end_date () {
-		return date_i18n(
-			get_option('date_format') . ' ' . get_option('time_format'),
-			$this->_event->get_end_timestamp()
-		);
-	}
-
-	public function replace_event_date_info () {
-		return wp_strip_all_tags(eab_call_template('get_event_dates', $this->_event));
-	}
-
-	public function replace_event_url () {
-		return get_permalink($this->_event->get_id());
-	}
-
-	public function replace_event_link () {
-		return eab_call_template('get_event_link', $this->_event);
-	}
-
-	public function replace_event_host () {
-		return wp_strip_all_tags(eab_call_template('get_event_author_link', $this->_event));
-	}
-	
-	public function replace_event_venue () {
-		return $this->_event->get_venue_location(Eab_EventModel::VENUE_AS_ADDRESS);
-	}
-
-	public function replace_event_body () {
-		return wp_strip_all_tags($this->_event->get_content());
-	}
-
-	public function replace_event_body_html () {
-		return $this->_event->get_content();
-	}
-
-	public function replace_user_name () {
-		return $this->_user->display_name;
+		return apply_filters('eab-events-rsvp_email-codec-expand', parent::expand($str), $this->_event);
 	}
 
 }

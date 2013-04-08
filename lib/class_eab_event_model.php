@@ -814,6 +814,25 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		global $wpdb;
 		return $wpdb->get_results("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE {$status} {$since} ORDER BY timestamp");
 	}
+
+	public function get_event_bookings ($status=false, $since=false) {
+		$rsvps = array(
+			self::BOOKING_YES,
+			self::BOOKING_MAYBE,
+			self::BOOKING_NO,
+		);
+		$status = $status && in_array($status, $rsvps)
+			? "status='" . $status . "'"
+			: "status IN('" . join("', '", $rsvps) . "')"
+		;
+
+		$since = $since
+			? "AND timestamp > '" . date('Y-m-d H:i:s', $since) . "'"
+			: ''
+		;
+		global $wpdb;
+		return $wpdb->get_results($wpdb->prepare("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE {$status} {$since} AND event_id = %d ORDER BY timestamp", $this->get_id()));
+	}
 	
 	public function get_rsvps () {
 		global $wpdb;

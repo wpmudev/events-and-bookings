@@ -4,6 +4,13 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.6.1 - 2013-04-08
+----------------------------------------------------------------------
+- Fix for immediately processed orders.
+- Fix for admin side stylesheet inclusion.
+- Added multiple categories filtering in shortcodes.
+- Added event cancellation add-on.
+
 1.6 - 2013-04-03
 ----------------------------------------------------------------------
 - Added "day of the week" recurrence model.

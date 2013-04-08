@@ -30,7 +30,8 @@ get_header( 'event' );
                     </div>
                 <?php endif; ?>
             </div>
-		</div>
+            <?php posts_nav_link(); ?>
+        </div>
 	</div>
 <?php get_sidebar( 'event' ); ?>
 <?php get_footer( 'event' ); ?>

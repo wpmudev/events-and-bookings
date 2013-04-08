@@ -60,7 +60,7 @@ class Eab_LastMonthArchivedCollection extends Eab_TimedCollection {
 			array(
 			 	'post_type' => 'incsub_event',
 				'suppress_filters' => false, 
-				'posts_per_page' => -1,
+				'posts_per_page' => EAB_OLD_EVENTS_EXPIRY_LIMIT,
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_status',

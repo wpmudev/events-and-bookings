@@ -9,26 +9,27 @@ jQuery(function() {
 			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
 		});
 	}
-    
+
     jQuery('[href*="preview=true"]').hide(); // Preview won't work
     jQuery("#eab-add-more").show();
     jQuery("#eab-add-more-button").click(function() {
 		row_id = jQuery('.eab-start-section').length-1;
 		jQuery("#eab-add-more-rows").append(jQuery("#eab-add-more-bank").html().replace(/_bank/gi, '_'+row_id).replace(/bank/gi, row_id+1).replace(/_b/gi, ''));
-	
+
 		jQuery( "#incsub_event_start_"+row_id+" , #incsub_event_end_"+row_id ).datepicker({
 			"dateFormat": "yy-mm-dd",
 			"changeMonth": true,
 			"changeYear": true,
 			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
 		});
-		
+
 		if (jQuery('.eab-section-block').length > 2) {
 			jQuery('.eab-section-heading').show();
 		}
     });
 
-    jQuery(".eab-event-remove_time").live("click", function () {
+    //jQuery(".eab-event-remove_time").live("click", function () {
+    jQuery("body").on("click", ".eab-event-remove_time", function () {
 		var $remove = jQuery(this),
 			$parent = $remove.parents("#eab-add-more-rows"),
 			$starts = $parent.find(".eab-start-section"),
@@ -39,11 +40,11 @@ jQuery(function() {
 		$target.remove();
 		return false;
     });
-    
+
     if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
 		jQuery(".incsub_event-payment_method_row").hide();
     }
-    
+
     jQuery("#incsub_event-accept_payments").change(function () {
 		if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
 			jQuery("#eab-settings-paypal").hide();
@@ -51,7 +52,7 @@ jQuery(function() {
 			jQuery("#eab-settings-paypal").show();
 		}
     });
-    
+
     if (jQuery("#incsub_event_paid").val() == 0) {
 		jQuery(".incsub_event-fee_row").hide();
     }
@@ -62,12 +63,12 @@ jQuery(function() {
 			jQuery(".incsub_event-fee_row").show();
 		}
     });
-    
+
     jQuery('a.eab-info').click(function () {
 		jQuery(jQuery(this).attr('href')).toggle();
 		return false;
     });
-    
+
     if (!jQuery('#incsub-event-bookings').hasClass('closed')) {
 		jQuery('#incsub-event-bookings').addClass('closed');
     }
@@ -80,7 +81,7 @@ jQuery(function() {
     if (jQuery('.eab-section-block').length == 2) {
 		jQuery('.eab-section-heading').hide();
     }
-    
+
     jQuery("#incsub-event").on("change", 'input.incsub_event', function () {
 		var _c = jQuery(this).attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
 		_eab_validate_when(_c);
@@ -147,7 +148,7 @@ jQuery(function() {
 				_start.setMinutes(_start_time_parts[1]);
 			}
 		}
-		
+
 		_end = false;
 		if (jQuery('#incsub_event_end_'+_c).val() != '') {
 			_end = new Date(jQuery('#incsub_event_end_'+_c).val());
@@ -162,7 +163,7 @@ jQuery(function() {
 		}
 		return [_start, _end];
     }
-    
+
     function _eab_validate_when(_c) {
 		if ("bank" == _c) return true; // Don't check bank dates - they're stubs
 		if (jQuery("#icl_translation_of").length) return true; // Assume translation
@@ -188,9 +189,9 @@ jQuery(function() {
 		}
 		return true;
     }
-    
+
     _eab_location = window.location;
-    
+
 (function ($) {
 // API toggling
 function toggle_api_settings () {
@@ -221,7 +222,7 @@ function toggle_recurrence_settings () {
 }
 function show_event_recurrence () {
 	$("#eab_event-recurring_event").show();
-	
+
 	$("#eab-add-more-rows").hide();
 	$("#eab-add-more").hide();
 
@@ -247,10 +248,10 @@ function hide_event_recurrence () {
 // Recurrence mode toggling
 function toggle_recurrence_mode () {
 	$(".eab_event_recurrence_mode").hide();
-	
+
 	var val = $("#eab_event-repeat_every").val();
 	if (!val) return false;
-	
+
 	var $el = $("#eab_event-repeat_interval-" + val);
 	if (!$el.length) return false;
 
@@ -278,11 +279,11 @@ $(function () {
 	// Init API toggle
 	$("#incsub_event-accept_api_logins").change(toggle_api_settings);
 	toggle_api_settings();
-	
+
 	// Init Appearance toggle
 	$("#incsub_event-override_appearance_defaults").change(toggle_appearance_settings);
 	toggle_appearance_settings();
-	
+
 	// Tutorial restart
 	$(".eab-restart_tutorial").click(function () {
 		var $me = $(this);
@@ -294,7 +295,7 @@ $(function () {
 		});
 		return false;
 	});
-	
+
 	// Init recurrence toggle
 	$("#eab-eab-start_recurrence-button").click(toggle_recurrence_settings);
 	// Init recurrence mode toggle
@@ -304,9 +305,10 @@ $(function () {
 	$("#eab_event-edit_recurring_instances").click(toggle_recurrence_instances);
 	// Initialize slug box
 	if ($("#eab_event-repeat_every").is(":visible")) $("#edit-slug-box").hide();
-	
+
 	// Attendance canceling
-	$(".eab-guest-cancel_attendance").live('click', function () {
+	//$(".eab-guest-cancel_attendance").live('click', function () {
+	$("body").on("click", ".eab-guest-cancel_attendance", function () {
 		var $me = $(this);
 		var user_id = $me.attr("data-eab-user_id");
 		var post_id = $me.attr("data-eab-event_id");
@@ -320,7 +322,8 @@ $(function () {
 		return false;
 	});
 	// Attendance deleting
-	$(".eab-guest-delete_attendance").live('click', function () {
+	//$(".eab-guest-delete_attendance").live('click', function () {
+	$("body").on("click", ".eab-guest-delete_attendance", function () {
 		var $me = $(this);
 		var user_id = $me.attr("data-eab-user_id");
 		var post_id = $me.attr("data-eab-event_id");
@@ -336,5 +339,5 @@ $(function () {
 
 });
 })(jQuery);
-    
+
 });

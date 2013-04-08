@@ -1,105 +1,5 @@
 <?php
 
-abstract class Eab_Codec {
-	
-	protected $_shortcodes = array();
-	
-	private $_positive_values = array(
-		true, 'true', 'yes', 'on', '1'
-	);
-	
-	private $_negative_values = array(
-		false, 'false', 'no', 'off', '0'
-	);
-
-	protected function _arg_to_bool ($val) {
-		return in_array($val, $this->_positive_values, true);
-	}
-
-	protected function _arg_to_int ($val) {
-		if (!is_numeric($val)) return 0;
-		return (int)$val;
-	}
-
-	protected function _arg_to_time ($val) {
-		$timestamp = strtotime($val);
-		return $timestamp
-			? $timestamp
-			: eab_current_time()
-		;
-	}
-
-	protected function _preparse_arguments ($raw, $accepted) {
-		$_template = false;
-		if (!empty($accepted['template']) && (defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES)) {
-			$_template = $accepted['template'];
-			unset($accepted['template']);
-		}
-
-		$args = wp_parse_args($raw, $accepted);
-		if (isset($accepted['network'])) $args['network'] = $this->_arg_to_bool($args['network']);
-		if (isset($accepted['date'])) $args['date'] = $this->_arg_to_time($args['date']);
-		
-		if (isset($accepted['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
-		if (isset($accepted['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
-		
-		if (isset($accepted['limit'])) $args['limit'] = $this->_arg_to_int($args['limit']);
-		if (isset($accepted['order'])) $args['order'] = $args['order'] && in_array(strtoupper($args['order']), array('ASC', 'DESC'))
-			? strtoupper($args['order'])
-			: false
-		;
-		if (isset($accepted['category']) && $args['category']) {
-			$args['category'] = $this->_arg_to_int($args['category'])
-				? array('type' => 'id', 'value' => $this->_arg_to_int($args['category']))
-				: array('type' => 'slug', 'value' => $args['category'])
-			;
-		}
-		if (isset($accepted['paged'])) $args['paged'] = $this->_arg_to_bool($args['paged']);
-		if (isset($accepted['page'])) $args['page'] = $this->_arg_to_int($args['page']);
-		
-		if (isset($accepted['navigation'])) $args['navigation'] = $this->_arg_to_bool($args['navigation']);
-
-		if (isset($accepted['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
-		if (isset($accepted['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
-
-		if ($_template && defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES) {
-			$args['template'] = $_template;
-		}
-
-		return $args;
-	}
-
-	protected function _to_query_args ($args) {
-		$query = array();
-		// Parse query arguments
-		if ($args['category'] && is_array($args['category'])) {
-			$query['tax_query'] = array(array(
-				'taxonomy' => 'eab_events_category',
-				'field' => $args['category']['type'],
-				'terms' => $args['category']['value'],
-			));
-		}
-		if ($args['limit']) {
-			$query['posts_per_page'] = $args['limit'];
-		}
-		if ($args['paged']) {
-			$query['paged'] = $args['page'];
-		}
-		return $query;
-	}
-	
-	/**
-	 * Registers shortcode handlers.
-	 */
-	protected function _register () {
-		$shortcodes = $this->_shortcodes;
-		foreach ($shortcodes as $key => $shortcode) {
-			if (is_callable(array($this, "process_{$key}_shortcode"))) add_shortcode($shortcode, array($this, "process_{$key}_shortcode"));
-			if (is_callable(array($this, "add_{$key}_shortcode_help"))) add_filter('eab-shortcodes-shortcode_help', array($this, "add_{$key}_shortcode_help"));
-		}
-	}
-}
-
 class Eab_Shortcodes extends Eab_Codec {
 	
 	protected $_shortcodes = array (
@@ -132,6 +32,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'weeks' => false, // Look ahead this many weeks
 		// Query arguments
 			'category' => false, // ID or slug
+			'categories' => false, // Comma-separated list of IDs
 			'limit' => false, // Show at most this many events
 			'order' => false,
 		// Appearance arguments
@@ -203,6 +104,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'weeks' => array('help' => __('Look ahead this many weeks', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'categories' => array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
 				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
 				'featured_image' => array('help' => __('Use event featured image instead of map markers', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
@@ -279,6 +181,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'weeks' => false, // Look ahead this many weeks
 		// Query arguments
 			'category' => false, // ID or slug
+			'categories' => false, // Comma-separated list of category IDs
 			'limit' => false, // Show at most this many events
 			'order' => false,
 		// Paging arguments
@@ -352,6 +255,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'weeks' => array('help' => __('Look ahead this many weeks', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'categories' => array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
 				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
 				'paged' => array('help' => __('Allow paging - use with "limit" argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
@@ -373,12 +277,19 @@ class Eab_Shortcodes extends Eab_Codec {
 		$args = $this->_preparse_arguments($args, array(
 		// Appearance arguments
 			'class' => false,
+		// Query arguments
+			'category' => false, // ID or slug
+			'categories' => false, // Comma-separated list of category IDs
+			'limit' => false, // Show at most this many events
+			'order' => false,
+		// Template options
 			'template' => 'get_shortcode_archive_output', // Subtemplate file, or template class call
 			'override_styles' => false,
 			'override_scripts' => false,
 		));
 		
-		$events = Eab_CollectionFactory::get_expired_events();
+		$query = $this->_to_query_args($args);
+		$events = Eab_CollectionFactory::get_expired_events($query);
 
 		$output = Eab_Template::util_apply_shortcode_template($events, $args);//eab_call_template('util_apply_shortcode_template', $events, $args);
 		$output = $output ? $output : $content;
@@ -394,6 +305,10 @@ class Eab_Shortcodes extends Eab_Codec {
 			'tag' => 'eab_expired',
 			'arguments' => array(
 				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'categories' => array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
+				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
 				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
