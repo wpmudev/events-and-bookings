@@ -1,6 +1,7 @@
 <?php
 global $blog_id, $wp_query, $booking, $post, $current_user;
 $event = new Eab_EventModel($post);
+
 get_header( );
 ?>
 	<div id="primary">

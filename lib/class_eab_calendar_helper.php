@@ -73,6 +73,8 @@ abstract class WpmuDev_CalendarTable {
 			$ret .= '<tr><td class="no-left-border" colspan="' . (7 + $first - $this->start_of_week) . '">&nbsp;</td>';
 		else
 			$ret .= '<tr>';
+
+		$today_timestamp = date('Y-m-d', eab_current_time());
 		
 		
 		for ($i=1; $i<=$days; $i++) {
@@ -104,7 +106,7 @@ abstract class WpmuDev_CalendarTable {
 			} else {
 				$activity = "<p>{$i}</p>";
 			}
-			if ($date == date('Y-m-d')) $class_names[] = 'today';
+			if ($date == $today_timestamp) $class_names[] = 'today';
 			$class_attribute = !empty($class_names) 
 				? 'class="' . esc_attr(join(' ', $class_names)) . '"'
 				: ''

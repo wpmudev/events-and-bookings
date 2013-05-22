@@ -128,8 +128,18 @@ jQuery(function() {
 			jQuery('#publish').removeClass('button-primary-disabled');
 			return true;
 		} else {
+			var $times = jQuery("#incsub_event_times_label"),
+				top = $times.length ? $times.offset().top : 0
+			;
 			jQuery('#ajax-loading').hide();
 			jQuery('#publish').removeClass('button-primary-disabled');
+			jQuery("html,body").scrollTop(top);
+			for (var pulse=0; pulse<3; pulse++) {
+				jQuery(".incsub_event_date.error")
+					.animate({"border-width": 3})
+					.animate({"border-width": 1})
+				;
+			}
 			return false;
 		}
     });

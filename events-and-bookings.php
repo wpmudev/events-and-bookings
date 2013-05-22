@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.6.1
+ Version: 1.6.2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.6.1';
+    const CURRENT_VERSION = '1.6.2';
     
     /**
      * Translation domain
@@ -1118,8 +1118,13 @@ class Eab_EventsHub {
 		if (in_array(Eab_EventModel::RECURRANCE_WEEKLY, array_keys($supported_intervals))) {
 			$style = $event->is_recurring(Eab_EventModel::RECURRANCE_WEEKLY) ? '' : 'style="display:none"';
 			$content .= '<div class="eab_event_recurrence_mode" id="eab_event-repeat_interval-' . Eab_EventModel::RECURRANCE_WEEKLY . '" ' . $style . '>';
-			$tmp = strtotime("this Sunday");
-			for ($i=0; $i<=6; $i++) {
+			$all_weekdays = range(0,6);
+			$start_of_week = get_option('start_of_week', 0);
+			if ($start_of_week) {
+				for ($n = 1; $n<=$start_of_week; $n++) array_push($all_weekdays, array_shift($all_weekdays));
+			}
+			$tmp = strtotime("this Sunday") + ($start_of_week * 86400);
+			foreach ($all_weekdays as $i) {
 				$checked = (is_array($parts['weekday']) && in_array($i, $parts['weekday'])) ? 'checked="checked"' : '';
 				$content .= "<input type='checkbox' name='eab_repeat[weekday][]' id='' value='{$i}' {$checked} /> ";
 				$content .= "<label for=''>" . date("D", $tmp) . '</label><br />';
@@ -1148,9 +1153,14 @@ class Eab_EventsHub {
 			}
 			$week .= '</select>';
 
-			$tmp = strtotime("this Sunday");
-			$weekday .= '<select name="eab_repeat[weekday]">';
-			for ($i=0; $i<=6; $i++) {
+			$all_weekdays = range(0,6);
+			$start_of_week = get_option('start_of_week', 0);
+			if ($start_of_week) {
+				for ($n = 1; $n<=$start_of_week; $n++) array_push($all_weekdays, array_shift($all_weekdays));
+			}
+			$tmp = strtotime("this Sunday") + ($start_of_week * 86400);
+			$weekday = '<select name="eab_repeat[weekday]">';
+			foreach ($all_weekdays as $i) {
 				$day = date('l', $tmp);
 				$selected = $day == $parts['weekday'] ? 'selected="selected"' : '';
 				$weekday .= "<option value='{$day}' {$selected} /> " . date_i18n("l", $tmp) . "</option>";
@@ -1159,6 +1169,38 @@ class Eab_EventsHub {
 			$weekday .= '</select>';
 			
 			$content .= sprintf(__('Every %s %s', self::TEXT_DOMAIN), $week, $weekday) . '<br />';
+			$content .= __('At', self::TEXT_DOMAIN) . ' <input type="text" size="5" name="eab_repeat[time]" id="" value="' . $parts["time"] . '" /> <small>HH:mm</small>'; // Time
+			$content .= '</div>';
+		}
+
+		// ... Week Count
+		if (in_array(Eab_EventModel::RECURRANCE_WEEK_COUNT, array_keys($supported_intervals))) {
+			$style = $event->is_recurring(Eab_EventModel::RECURRANCE_WEEK_COUNT) ? '' : 'style="display:none"';
+			$content .= '<div class="eab_event_recurrence_mode" id="eab_event-repeat_interval-' . Eab_EventModel::RECURRANCE_WEEK_COUNT . '" ' . $style . '>';
+
+			$week = '<select name="eab_repeat[week]">';
+			foreach (range(1,25) as $count) {
+				$selected = $count == $parts['week'] ? 'selected="selected"' : '';
+				$week .= "<option value='{$count}' {$selected}>{$count}</option>";
+			}
+			$week .= '</select>';
+
+			$all_weekdays = range(0,6);
+			$start_of_week = get_option('start_of_week', 0);
+			if ($start_of_week) {
+				for ($n = 1; $n<=$start_of_week; $n++) array_push($all_weekdays, array_shift($all_weekdays));
+			}
+			$tmp = strtotime("this Sunday") + ($start_of_week * 86400);
+			$weekday = '<select name="eab_repeat[weekday]">';
+			foreach ($all_weekdays as $i) {
+				$day = date('l', $tmp);
+				$selected = $day == $parts['weekday'] ? 'selected="selected"' : '';
+				$weekday .= "<option value='{$day}' {$selected} /> " . date_i18n("l", $tmp) . "</option>";
+				$tmp += 86400;
+			}
+			$weekday .= '</select>';
+
+			$content .= sprintf(__('Every %s weeks, on %s', self::TEXT_DOMAIN), $week, $weekday) . '<br />';
 			$content .= __('At', self::TEXT_DOMAIN) . ' <input type="text" size="5" name="eab_repeat[time]" id="" value="' . $parts["time"] . '" /> <small>HH:mm</small>'; // Time
 			$content .= '</div>';
 		}

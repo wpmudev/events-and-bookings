@@ -62,20 +62,22 @@ class Eab_Events_RsvpEmail {
 	}
 
 	function ajax_preview_email () {
-		$event_id = !empty($_POST['event_id']) ? $_POST['event_id'] : false;
+		$data = stripslashes_deep($_POST);
+		$event_id = !empty($data['event_id']) ? $data['event_id'] : false;
 		if (!$event_id) die;
 		$user = wp_get_current_user();
 		$codec = new Eab_Events_RsvpEmail_Codec($event_id, $user->ID);
 		die(
-			'<strong>' . $codec->expand($_POST['subject']) . '</strong>' .
-			'<div>' . $codec->expand($_POST['body']) . '</div>'
+			'<strong>' . $codec->expand($data['subject']) . '</strong>' .
+			'<div>' . $codec->expand($data['body']) . '</div>'
 		);
 	}
 
 	function save_settings ($options) {
-		$options['eab_rsvps-email-from'] = @$_POST['eab_rsvps']['email-from'];
-		$options['eab_rsvps-email-subject'] = @$_POST['eab_rsvps']['email-subject'];
-		$options['eab_rsvps-email-body'] = @$_POST['eab_rsvps-email-body'];
+		$data = stripslashes_deep($_POST);
+		$options['eab_rsvps-email-from'] = @$data['eab_rsvps']['email-from'];
+		$options['eab_rsvps-email-subject'] = @$data['eab_rsvps']['email-subject'];
+		$options['eab_rsvps-email-body'] = @$data['eab_rsvps-email-body'];
 		return $options;
 	}
 

@@ -37,7 +37,14 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 				'terms' => (int)$options['category'],
 			));
 		}
+		if ($options['lookahead'] && is_numeric($options['lookahead'])) {
+			$lookahead_func = create_function('', 'return ' . $options['lookahead'] . ';');
+			add_filter('eab-collection-upcoming_weeks-week_number', $lookahead_func);
+		}
 		$_events = Eab_CollectionFactory::get_upcoming_weeks_events(eab_current_time(), $query_args);
+		if (!empty($lookahead_func)) {
+			remove_filter('eab-collection-upcoming_weeks-week_number', $lookahead_func);	
+		}
 	
 		if (is_array($_events) && count($_events) > 0) {
 		?>
@@ -99,6 +106,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
         $instance['excerpt_words_limit'] = (int)$new_instance['excerpt_words_limit'];
         $instance['thumbnail'] = (int)$new_instance['thumbnail'];
         $instance['limit'] = (int)$new_instance['limit'];
+        $instance['lookahead'] = (int)$new_instance['lookahead'];
         $instance['dates'] = (int)$new_instance['dates'];
         $instance['category'] = (int)$new_instance['category'];
 
@@ -164,6 +172,15 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 						<option value="<?php echo $i; ?>" <?php echo $selected;?>><?php echo $i;?></option>
 					<?php } ?>
 				</select> 
+           </label>
+           <label for="<?php echo $this->get_field_id('lookahead'); ?>" style="line-height:35px;display:block;">
+            	<?php _e('Lookahead', $this->translation_domain); ?>:
+				<select id="<?php echo $this->get_field_id('lookahead'); ?>" name="<?php echo $this->get_field_name('lookahead'); ?>">
+					<?php for ($i=1; $i<=52; $i++) { ?>
+						<?php $selected = ($i == $options['lookahead']) ? 'selected="selected"' : ''; ?>
+						<option value="<?php echo $i; ?>" <?php echo $selected;?>><?php printf(__('%d weeks', Eab_EventsHub::TEXT_DOMAIN), $i);?></option>
+					<?php } ?>
+				</select>
            </label>
            <label for="<?php echo $this->get_field_id('category'); ?>" style="line-height:35px;display:block;">
             	<?php _e('Only Events from this category', $this->translation_domain); ?>:

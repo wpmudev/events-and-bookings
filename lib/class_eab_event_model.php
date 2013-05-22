@@ -80,6 +80,7 @@ abstract class WpmuDev_RecurringDatedItem extends WpmuDev_DatedItem {
 	
 	const RECURRANCE_DAILY = 'daily';
 	const RECURRANCE_WEEKLY = 'weekly';
+	const RECURRANCE_WEEK_COUNT = 'week_count';
 	const RECURRANCE_DOW = 'dow';
 	const RECURRANCE_MONTHLY = 'monthly';
 	const RECURRANCE_YEARLY = 'yearly';
@@ -445,6 +446,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return array (
 			self::RECURRANCE_DAILY => __('Day', Eab_EventsHub::TEXT_DOMAIN),
 			self::RECURRANCE_WEEKLY => __('Week', Eab_EventsHub::TEXT_DOMAIN),
+			self::RECURRANCE_WEEK_COUNT => __('Week Count', Eab_EventsHub::TEXT_DOMAIN),
 			self::RECURRANCE_DOW => __('Day of the Week', Eab_EventsHub::TEXT_DOMAIN),
 			self::RECURRANCE_MONTHLY => __('Month', Eab_EventsHub::TEXT_DOMAIN),
 			self::RECURRANCE_YEARLY => __('Year', Eab_EventsHub::TEXT_DOMAIN),
@@ -646,7 +648,26 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			for ($i = $start; $i <= $end; $i+=$month_days) {
 				$month_days = date('t', $i)*86400;
 				$first = strtotime(date("Y-m-01", $i));
-				$day = strtotime("{$week_count} {$weekday} of this month {$time_parts['time']}", $first);
+				//$day = strtotime("{$week_count} {$weekday} of this month {$time_parts['time']}", $first);
+				$day = strtotime("{$week_count} {$weekday} this month {$time_parts['time']}", $first);
+				if (!$day) do_action('eab-debug-log_error', sprintf(
+					__('Invalid %s instance timestamp: [%s %s for %s]', Eab_EventsHub::TEXT_DOMAIN),
+					$interval,
+					$week_count, $weekday, $first
+				));
+				if ($day < $start) continue;
+				$instances[] = $day;
+			}
+		}
+
+		if (self::RECURRANCE_WEEK_COUNT == $interval) {
+			$week_count = !empty($time_parts["week"]) && is_numeric($time_parts["week"]) ? (int)$time_parts["week"] : '1';
+			$weekday = !empty($time_parts["weekday"]) ? $time_parts["weekday"] : 'Monday';
+
+			$interval_days = $week_count * 7 * 86400;
+
+			for ($i = $start; $i <= $end; $i+=$interval_days) {
+				$day = strtotime("this {$weekday} {$time_parts['time']}", $i);
 				if ($day < $start) continue;
 				$instances[] = $day;
 			}

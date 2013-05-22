@@ -4,6 +4,13 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.6.2 - 2013-05-22
+----------------------------------------------------------------------
+- Countdown shortcodes fixes and improvements.
+- Fixes for previews and today processing for calendar-based views.
+- Added the week count recurrence model.
+- Added the lookahead parameter to upcoming widget.
+
 1.6.1 - 2013-04-08
 ----------------------------------------------------------------------
 - Fix for immediately processed orders.

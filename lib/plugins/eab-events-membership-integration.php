@@ -98,7 +98,7 @@ class Eab_Events_MembershipIntegration {
 			$price = get_post_meta($event_id, 'eab_events_mi_price', true);
 			$price = $price ? $price : array();
 			$member = new M_Membership($current_user->ID);
-			if( $meta["sel"] AND $current_user->ID > 0 AND $member->has_levels()) {
+			if( isset($meta["sel"]) AND $current_user->ID > 0 AND $member->has_levels()) {
 				// Load the levels for this member
 				$levels = $member->get_level_ids( );
 				if ( is_array( $levels ) AND is_array( $meta["level"] ) ) {

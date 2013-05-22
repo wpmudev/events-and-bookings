@@ -270,6 +270,6 @@ class Eab_AdminHelp {
 	}
 	
 	function show_screen () {
-		echo '<pre>'; var_export(get_current_screen());
+		//echo '<pre>'; var_export(get_current_screen());
 	}
 }

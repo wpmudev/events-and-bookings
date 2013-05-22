@@ -69,11 +69,13 @@ if (!(defined('EAB_SKIP_FORCED_META_ID_ORDERING') && EAB_SKIP_FORCED_META_ID_ORD
 	/**
 	 * Late binding filter for forced query ordering on postmeta requests.
 	 */
-	function _eab_filter_meta_query ($check) {
+	function _eab_filter_meta_query ($check, $object_id, $meta_key) {
+		if (!preg_match('/incsub_event/', $meta_key)) return $check;
+		wp_cache_delete($object_id, 'post_meta'); // Throw away the caches!
 		add_filter('query', '_eab_wpdb_filter_postmeta_query');
 		return $check;
 	}
-	add_filter('get_post_metadata', '_eab_filter_meta_query');
+	add_filter('get_post_metadata', '_eab_filter_meta_query', 10, 3);
 }
 // End Core WP postmeta filtering
 

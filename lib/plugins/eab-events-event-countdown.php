@@ -48,6 +48,8 @@ the language is set on a per-blog basis through the "Site language" option in th
 
 class Eab_Events_EventCountdown {
 
+	private static $_scripts;
+
 	/**
 	 * Constructor
 	 */	
@@ -147,6 +149,7 @@ class Eab_Events_EventCountdown {
 		'type'		=> '',
 		'size'		=> 70,
 		'add'		=> 0,
+		'footer_script' => false,
 		'expired'	=> __('Closed', Eab_EventsHub::TEXT_DOMAIN)
 		), $atts ) );
 		
@@ -182,7 +185,7 @@ class Eab_Events_EventCountdown {
 			default:	$size = 70; $height = 72; break;
 		}
 		
-		$sprite_file = plugins_url('/events-and-bookings/img/sprite_'.$size.'x'.$height.'.png');
+		$sprite_file = esc_js(plugins_url('/events-and-bookings/img/sprite_'.$size.'x'.$height.'.png'));
 		
 		$result = $wpdb->get_row(
 			"SELECT estart.* 
@@ -210,43 +213,68 @@ class Eab_Events_EventCountdown {
 					format: '".$format."',
 					expiryText: '".$expired."',
 					until: ".$secs.",";
+
 		if ( $goto )
-			$script .= "onExpiry: eab_event_refresh".$id.",";
+			$script .= "onExpiry: eab_event_refresh,";
 		if ( $type == 'flip' )
-			$script .= "onTick: eab_event_update_flip".$id.",";
+			$script .= "onTick: function () { $(document).trigger('eab-event_countdown-tick', [$(this), '{$sprite_file}']);},";
 		$script .= "alwaysExpire: true
 					});";
 		if ( $goto )
-			$script .= "function eab_event_refresh".$id."() {window.location.href=".$goto.";}";
+			$script .= "function eab_event_refresh() {window.location.href=".$goto.";}";
+/*
 		if ( $type == 'flip' ) {
-			$script .= "function eab_event_update_flip".$id."(periods) {
-						$(this).find('.countdown_amount').css('height','".$height."').css('width','".($size*2)."').css('display','inline-block');
-						$(this).find('.countdown_amount').each(function(index) {
-							var value = parseInt($(this).text());
-							var tens = parseInt( value/10 );
-							var ones = value - tens*10;
-							$(this).empty();
-							$(this).append('<span class=\'eab_event_flip_tens\'/><span class=\'eab_event_flip_ones\'/><div style=\'clear:both\'/>');
-							$(this).find('span').css('background','url(".$sprite_file.") no-repeat' ).css('height','".$height."').css('width','".$size."').css('float','left').css('display','inline-block');
-							$(this).find('.eab_event_flip_ones').css('background-position', '-'+(ones+1)*".$size."+'px 0');
-							if ( tens < 1 ) {
-								$(this).find('.eab_event_flip_tens').css('background-position', '0 0');
-							}
-							else{
-								$(this).find('.eab_event_flip_tens').css('background-position', '-'+(tens+1)*".$size."+'px 0');
-							}
-						});
-			}";
+			$script .= "function eab_event_update_flip(periods) {" .
+						"$(this).find('.countdown_amount').css('height','".$height."').css('width','".($size*2)."').css('display','inline-block');" .
+						"$(this).find('.countdown_amount').each(function(index) {" .
+							"var value = parseInt($(this).text());" .
+							"var tens = parseInt( value/10 );" .
+							"var ones = value - tens*10;" .
+							"$(this).empty();" .
+							"$(this).append('<span class=\'eab_event_flip_tens\'/><span class=\'eab_event_flip_ones\'/><div style=\'clear:both\'/>');" .
+							"$(this).find('span').css('background','url(".$sprite_file.") no-repeat' ).css('height','".$height."').css('width','".$size."').css('float','left').css('display','inline-block');" .
+							"$(this).find('.eab_event_flip_ones').css('background-position', '-'+(ones+1)*".$size."+'px 0');" .
+							"if ( tens < 1 ) {" .
+							"	$(this).find('.eab_event_flip_tens').css('background-position', '0 0');" .
+							"}" .
+							"else{" .
+							"	$(this).find('.eab_event_flip_tens').css('background-position', '-'+(tens+1)*".$size."+'px 0');" .
+							"}" .
+						"});" .
+			"}";
 		}
+*/
 		$script .= "});</script>";
+
+		if ('flip' == $type) {
+			$script .= '<script type="text/javascript" src="' . plugins_url(basename(EAB_PLUGIN_DIR) . "/js/event_countdown_flip.js") . '"></script>';
+		}
 		
 		// remove line breaks to prevent wpautop break the script
-		$script = str_replace( array("\r","\n","\t","<br>","<br />"), "", $script );
+		$script = str_replace( array("\r","\n","\t","<br>","<br />"), "", preg_replace('/\s+/m', ' ', $script) );
 		
-		
-		
-		return "<div id='eab_event_countdown".$id."'" . $class ."></div>". $script;
+		$markup = "<div id='eab_event_countdown{$id}' {$class} data-height='{$height}' data-size='{$size}'></div>";
+		if ($footer_script && in_array($footer_script, array('yes', 'true', '1'))) {
+			self::add_script($script);
+			add_action('wp_footer', array($this, 'inject_queued_scripts'), 99);
+		} else {
+			$markup .= $script;
+		}
+		return $markup;
 	}
+	
+	private static function add_script ($script) {
+		if (is_array(self::$_scripts)) self::$_scripts[] = $script;
+		else self::$_scripts = array($script);
+	}
+
+	function inject_queued_scripts () {
+		if (defined('EAB_COUNTDOWN_FLAG_SCRIPTS_INJECTED')) return false;
+		if (empty(self::$_scripts)) return false;
+		foreach (self::$_scripts as $script) echo $script;
+		define('EAB_COUNTDOWN_FLAG_SCRIPTS_INJECTED', true);
+	}
+
 }
 
 Eab_Events_EventCountdown::serve();

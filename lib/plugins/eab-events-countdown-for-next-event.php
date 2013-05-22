@@ -8,7 +8,7 @@ Author: Hakan Evin
 */
 
 /*
-Detail: Minimal usage: [next_event_countdown]<br />Extended Usage: [next_event_countdown id="1" format="dHMS" goto="http://example.com" class="countdown-class" type="flip" size="70" add="-120" expired="Too late!"]<br />For explanation of the parameters, please see Event Countdown.
+Detail: Minimal usage: [next_event_countdown]<br />Extended Usage: [next_event_countdown id="1" format="dHMS" goto="http://example.com" class="countdown-class" type="flip" size="70" add="-120" expired="Too late!" title="yes"]<br />For explanation of the parameters, please see Event Countdown.
 
 
 Minimal usage:
@@ -40,6 +40,9 @@ Note that if the content width is not wide enough, digits may overlap.
 @add: How many minutes to add to the countdown. Default is naturally zero. It can take negative values.
 For example, if you have a "Doors open time" of 2 hours before the event, enter -120 (=>2 hours) here.
 
+@title: Show event title. Supported values: "yes" or "no"
+If set to "yes", the event countdown will also include the event title.
+
 Localization: Download the language pack from http://keith-wood.name/countdown.html and upload it in events-and-bookings/js/ folder.
 Countdown will automatically switch to your local settings as defined in locale setting or WPLANG of wp-config.php. 
 If this language javascript file does not exist, English will be used.
@@ -49,6 +52,8 @@ the language is set on a per-blog basis through the "Site language" option in th
 */
 
 class Eab_Events_CountdownforNextEvent {
+
+	private static $_scripts;
 
 	/**
 	 * Constructor
@@ -146,6 +151,8 @@ class Eab_Events_CountdownforNextEvent {
 		'type'		=> '',
 		'size'		=> 70,
 		'add'		=> 0,
+		'title'		=> false,
+		'footer_script' => false,
 		'expired'	=> __('Closed', Eab_EventsHub::TEXT_DOMAIN)
 		), $atts ) );
 		
@@ -189,51 +196,65 @@ class Eab_Events_CountdownforNextEvent {
 			$secs = -1; 
 		else
 			$secs = strtotime( $result->meta_value ) - current_time('timestamp') + 60 * (int)$add;
-		
+
 		$script  = '';
 		$script .= "<script type='text/javascript'>";
 		$script .= "jQuery(document).ready(function($) {";
 		$script .= "$('#eab_next_event_countdown".$id."').countdown({
 					format: '".$format."',
 					expiryText: '".$expired."',
-					until: ".$secs.",";
-		if ( $goto )
+					until: ".$secs.","
+		;
+		if ($goto) {
 			$script .= "onExpiry: eab_next_event_refresh".$id.",";
-		if ( $type == 'flip' )
-			$script .= "onTick: eab_next_event_update_flip".$id.",";
-		$script .= "alwaysExpire: true
-					});";
-		if ( $goto )
+		}
+		if ($type == 'flip') {
+			$script .= "onTick: function () { $(document).trigger('eab-event_countdown-tick', [$(this), '{$sprite_file}']);},";
+		}
+		$script .= "alwaysExpire: true});";
+		if ($goto) {
 			$script .= "function eab_next_event_refresh".$id."() {window.location.href=".$goto.";}";
-		if ( $type == 'flip' ) {
-			$script .= "function eab_next_event_update_flip".$id."(periods) {
-						$(this).find('.countdown_amount').css('height','".$height."').css('width','".($size*2)."').css('display','inline-block');
-						$(this).find('.countdown_amount').each(function(index) {
-							var value = parseInt($(this).text());
-							var tens = parseInt( value/10 );
-							var ones = value - tens*10;
-							$(this).empty();
-							$(this).append('<span class=\'eab_event_flip_tens\'/><span class=\'eab_event_flip_ones\'/><div style=\'clear:both\'/>');
-							$(this).find('span').css('background','url(".$sprite_file.") 0 0 no-repeat' ).css('height','".$height."').css('width','".$size."').css('float','left').css('display','inline-block');
-							$(this).find('.eab_event_flip_ones').css('background-position', '-'+(ones+1)*".$size."+'px 0');
-							if ( tens < 1 ) {
-								$(this).find('.eab_event_flip_tens').css('background-position', '0 0');
-							}
-							else{
-								$(this).find('.eab_event_flip_tens').css('background-position', '-'+(tens+1)*".$size."+'px 0');
-							}
-						});
-			}";
 		}
 
 		$script .= "});</script>";
+
+		if ('flip' == $type) {
+			$script .= '<script type="text/javascript" src="' . plugins_url(basename(EAB_PLUGIN_DIR) . "/js/event_countdown_flip.js") . '"></script>';
+		}
 		
 		// remove line breaks to prevent wpautop break the script
-		$script = str_replace( array("\r","\n","\t","<br>","<br />"), "", $script );
+		$script = str_replace( array("\r","\n","\t","<br>","<br />"), "", preg_replace('/\s+/m', ' ', $script) );
 		
 		$this->add_countdown = true;
-		
-		return "<div id='eab_next_event_countdown".$id."'" . $class ."></div>". $script;
+
+		$markup = '<div class="eab_next_event_countdown-wrapper">' .
+			($title && in_array($title, array('yes', 'true', '1'))
+				? '<h4><a href="' . get_permalink($result->post_id) . '">' . get_the_title($result->post_id) . '</a></h4>'
+				: ''
+			) . 
+			"<div id='eab_next_event_countdown{$id}' {$class} data-height='{$height}' data-size='{$size}'></div>" . 
+		'</div>';
+
+		if ($footer_script && in_array($footer_script, array('yes', 'true', '1'))) {
+			self::add_script($script);
+			add_action('wp_footer', array($this, 'inject_queued_scripts'), 99);
+		} else {
+			$markup .= $script;
+		}
+
+		return $markup;
+	}
+
+	private static function add_script ($script) {
+		if (is_array(self::$_scripts)) self::$_scripts[] = $script;
+		else self::$_scripts = array($script);
+	}
+
+	function inject_queued_scripts () {
+		if (defined('EAB_COUNTDOWN_FLAG_SCRIPTS_INJECTED')) return false;
+		if (empty(self::$_scripts)) return false;
+		foreach (self::$_scripts as $script) echo $script;
+		define('EAB_COUNTDOWN_FLAG_SCRIPTS_INJECTED', true);
 	}
 }
 
