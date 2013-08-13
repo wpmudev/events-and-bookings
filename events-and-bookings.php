@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.6.2
+ Version: 1.6.3
  Author URI: http://premium.wpmudev.org
 */
 
@@ -1665,8 +1665,6 @@ class Eab_EventsHub {
 				`status` ENUM( 'paid', 'yes', 'maybe', 'no' ) NOT NULL DEFAULT 'no' ,
 		    		PRIMARY KEY (`id`),
 				UNIQUE KEY `event_id_2` (`event_id`,`user_id`),
-				KEY `event_id` (`event_id`),
-				KEY `user_id` (`user_id`),
 				KEY `timestamp` (`timestamp`),
 				KEY `status` (`status`)
 			    ) ENGINE = InnoDB {$charset_collate};";
