@@ -62,6 +62,7 @@ class Eab_Network {
 			switch_to_blog($event->$pi_blog_id);
 			$post = get_post($event->$pi_post_id);
 			$tmp_event_instance = new Eab_EventModel($post);
+			$tmp_event_instance->cache_data();
 			if ($tmp_event_instance->is_expired()) continue;
 			$post->blog_id = $event->$pi_blog_id;
 			$result[] = $post;

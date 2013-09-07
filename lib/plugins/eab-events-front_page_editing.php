@@ -191,7 +191,7 @@ class Eab_Events_FrontPageEditing {
 	function _get_front_editor_link ($event_id=false) {
 		$url = $this->_options['id']
 			? get_permalink($this->_options['id'])
-			: site_url(self::SLUG)
+			: home_url(self::SLUG)
 		;
 		$event_id = (int)$event_id ? "?event_id={$event_id}" : '';
 		return "{$url}{$event_id}"; 

@@ -1,10 +1,12 @@
 <?php
 // vim: foldmethod=marker
 
-/* Generic exception class
- */
-class OAuthException extends Exception {
-  // pass
+if (!class_exists('OAuthException')) {
+  /* Generic exception class
+   */
+  class OAuthException extends Exception {
+    // pass
+  }
 }
 
 class OAuthConsumer {
@@ -418,7 +420,7 @@ class OAuthRequest {
    */
   public function to_header($realm=null) {
     $first = true;
-	if($realm) {
+  if($realm) {
       $out = 'Authorization: OAuth realm="' . OAuthUtil::urlencode_rfc3986($realm) . '"';
       $first = false;
     } else
@@ -463,7 +465,11 @@ class OAuthRequest {
   /**
    * util function: current timestamp
    */
-  private static function generate_timestamp() {
+  /*private */static function generate_timestamp() {
+    return apply_filters('eab-oauth-twitter-generate_timestamp', self::generate_raw_timestamp());
+  }
+
+  static function generate_raw_timestamp () {
     return time();
   }
 

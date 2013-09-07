@@ -188,7 +188,7 @@ function create_login_interface ($me) {
 			};
 		} else if ($lnk.is(".wpmudevevents-login_link-twitter")) {
 			callback = function () {
-				var init_url = $.browser.opera ? '' : 'https://api.twitter.com/';
+				var init_url = '//api.twitter.com/';
 				var twLogin = window.open(init_url, "twitter_login", "scrollbars=no,resizable=no,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,height=400,width=600");
 				$.post(_eab_data.ajax_url, {
 					"action": "eab_get_twitter_auth_url",

@@ -34,33 +34,30 @@ class Eab_BuddyPress_MyEvents {
 			'</p></div>';
 		}
 	}
+
+	private function _check_permissions () {
+		$post_type = get_post_type_object(Eab_EventModel::POST_TYPE);
+		return current_user_can($post_type->cap->edit_posts);
+	}
 	
 	function add_bp_profile_entry () {
 		global $bp;
-		/*
-		bp_core_new_subnav_item(array(
-			'name' => __('My Events', Eab_EventsHub::TEXT_DOMAIN),
-			'slug' => 'my-events',
-			'parent_url' => $bp->loggedin_user->domain . $bp->profile->slug . '/',
-			'parent_slug' => $bp->profile->slug,
-			'screen_function' => array($this, 'bind_bp_profile_page'),
-			'position' => 40 
-		));
-		 */
 		bp_core_new_nav_item(array(
 			'name' => __('Events', Eab_EventsHub::TEXT_DOMAIN),
 			'slug' => 'my-events',
 			'show_for_displayed_user' => true,
-			'default_subnav_slug' => 'organized',
-			'screen_function' => '__return_false',//array($this, 'bind_bp_profile_page'),
+			'default_subnav_slug' => ($this->_check_permissions() ? 'organized' : 'attending'),
+			'screen_function' => '__return_false',
 		));
-		bp_core_new_subnav_item(array(
-			'name' => __('Organized', Eab_EventsHub::TEXT_DOMAIN),
-			'slug' => 'organized',
-			'parent_url' => $bp->displayed_user->domain . 'my-events' . '/',
-			'parent_slug' => 'my-events',
-			'screen_function' => array($this, 'bind_bp_organized_page'),
-		));
+		if ($this->_check_permissions()) {
+			bp_core_new_subnav_item(array(
+				'name' => __('Organized', Eab_EventsHub::TEXT_DOMAIN),
+				'slug' => 'organized',
+				'parent_url' => $bp->displayed_user->domain . 'my-events' . '/',
+				'parent_slug' => 'my-events',
+				'screen_function' => array($this, 'bind_bp_organized_page'),
+			));
+		}
 		bp_core_new_subnav_item(array(
 			'name' => __('Attending', Eab_EventsHub::TEXT_DOMAIN),
 			'slug' => 'attending',
@@ -164,3 +161,94 @@ class Eab_BuddyPress_MyEvents {
 }
 
 Eab_BuddyPress_MyEvents::serve();
+
+
+class Eab_MyEvents_Shortcodes extends Eab_Codec {
+
+	protected $_shortcodes = array(
+		'my_events' => 'eab_my_events',
+	);
+
+	public static function serve () {
+		$me = new Eab_MyEvents_Shortcodes;
+		$me->_register();
+	}
+
+	function process_my_events_shortcode ($args=array(), $content=false) {
+		$args = $this->_preparse_arguments($args, array(
+		// Query arguments
+			'user' => false, // User ID or keyword
+		// Appearance arguments
+			'class' => 'eab-my_events',
+			'show_titles' => 'yes',
+			'sections' => 'organized,yes,maybe,no',
+		));
+
+		if (is_numeric($args['user'])) {
+			$args['user'] = $this->_arg_to_int($args['user']);
+		} else {
+			if ('current' == trim($args['user'])) {
+				$user = wp_get_current_user();
+				$args['user'] = $user->ID;
+			} else {
+				$args['user'] = false;
+			}
+		}
+		if (empty($args['user'])) return $content;
+
+		$args['sections'] = $this->_arg_to_str_list($args['sections']);
+		$args['show_titles'] = $this->_arg_to_bool($args['show_titles']);
+
+		$output = '';
+
+		// Check if the user can organize events
+		$post_type = get_post_type_object(Eab_EventModel::POST_TYPE);
+		if (in_array('organized', $args['sections']) && user_can($args['user'], $post_type->cap->edit_posts)) {
+			$output .= '<div class="' . $args['class'] . ' eab-bp-organized">' . 
+				($args['show_titles'] ? '<h4>' . __('Organized Events', Eab_EventsHub::TEXT_DOMAIN) . '</h4>' : '') .
+				Eab_Template::get_user_organized_events($args['user']) .
+			'</div>';
+		}
+
+		if (in_array('yes', $args['sections'])) {
+			$output .= '<div class="' . $args['class'] . ' eab-bp-rsvp_yes">' . 
+				($args['show_titles'] ? '<h4>' . __('Attending Events', Eab_EventsHub::TEXT_DOMAIN) . '</h4>' : '') .
+				Eab_Template::get_user_events(Eab_EventModel::BOOKING_YES, $args['user']) .
+			'</div>';
+		}
+	
+		if (in_array('maybe', $args['sections'])) {
+			$output .= '<div class="' . $args['class'] . ' eab-bp-rsvp_maybe">' . 
+				($args['show_titles'] ? '<h4>' . __('Maybe attending Events', Eab_EventsHub::TEXT_DOMAIN) . '</h4>' : '') .
+				Eab_Template::get_user_events(Eab_EventModel::BOOKING_MAYBE, $args['user']) .
+			'</div>';
+		}
+		
+		if (in_array('no', $args['sections'])) {
+			$output .= '<div class="' . $args['class'] . ' eab-bp-rsvp_no">' . 
+				($args['show_titles'] ? '<h4>' . __('Not attending Events', Eab_EventsHub::TEXT_DOMAIN) . '</h4>' : '') .
+				Eab_Template::get_user_events(Eab_EventModel::BOOKING_NO, $args['user']) .
+			'</div>';
+		}
+
+		$output = $output ? $output : $content;
+
+		return $output;
+	}
+
+	public function add_my_events_shortcode_help ($help) {
+		$help[] = array(
+			'title' => __('My Events archives', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' => 'eab_my_events',
+			'arguments' => array(
+				'user' => array('help' => __('User ID or keyword "current".', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'show_titles' => array('help' => __('Show section titles', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'sections' => array('help' => __('Show these sections. Possible values: "organized", "yes", "maybe", "no".', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:list'),
+			),
+		);
+		return $help;
+	}
+}
+
+Eab_MyEvents_Shortcodes::serve();

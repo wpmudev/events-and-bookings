@@ -37,6 +37,11 @@ abstract class Eab_Codec {
 		return array_filter(array_map('intval', array_map('trim', explode(',', $val))));
 	}
 
+	protected function _arg_to_str_list ($val) {
+		if (!strpos($val, ',')) return array();
+		return array_filter(array_map('trim', explode(',', $val)));
+	}
+
 	protected function _preparse_arguments ($raw, $accepted) {
 		$_template = false;
 		if (!empty($accepted['template']) && (defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES)) {

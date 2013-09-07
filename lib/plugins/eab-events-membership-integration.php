@@ -259,7 +259,21 @@ class Eab_Events_MembershipIntegration {
 	
 	function memeber_event_price_for_user ($price, $event_id, $user_id) {
 		$mi_price = get_post_meta($event_id, 'eab_events_mi_price', true);
-		if (empty($mi_price)) return $price;
+		if (empty($mi_price)) { // Event price
+			// Check if the user is free to enter
+			$meta = get_post_meta($event_id, 'eab_events_mi', true);
+			if (empty($meta['level'])) return $price;
+			
+			global $current_user;
+			$member = new M_Membership($user_id);
+			$levels = $member->get_level_ids();
+			if ( is_array( $levels ) AND is_array( $meta["level"] ) ) {
+				foreach ( $levels as $level ) {
+					if ( in_array( $level->level_id, $meta["level"] )) return 0; // Free for this level
+				}
+			}
+			return $price; // Not free for this guy
+		}
 
 		global $current_user;
 		$member = new M_Membership($user_id);

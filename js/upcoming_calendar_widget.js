@@ -25,7 +25,7 @@ $(function () {
 		});
 	});
 	//$(".eab-upcoming_calendar_widget-navigation-link:not(.eab-cuw-calendar_date)").live('click', function () {
-	$(".eab-upcoming_calendar_widget").on("click", ".eab-upcoming_calendar_widget-navigation-link:not(.eab-cuw-calendar_date)", function () {
+	$(document).on("click", ".eab-upcoming_calendar_widget .eab-upcoming_calendar_widget-navigation-link:not(.eab-cuw-calendar_date)", function () {
 		var $me = $(this);
 		var now = $me.parents("tr").find("input.eab-cuw-calendar_date").val();
 		var direction = $me.is(".eab-navigation-prev") ? "prev" : "next";

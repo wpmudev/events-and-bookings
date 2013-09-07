@@ -7,11 +7,17 @@ class Eab_Template {
 		if ('incsub_event' != $event->get_type()) return $content;
 		
 		$start_day = date_i18n('m', $event->get_start_timestamp());
+
+		$network = $event->from_network();
+		$link = $network 
+			? get_blog_permalink($network, $event->get_id())
+			: get_permalink($event->get_id())
+		;
 		
 		$new_content  = '';
 		
 		$new_content .= '<div class="event ' . self::get_status_class($event) . '">';
-		$new_content .= '<a href="' . get_permalink($event->get_id()) . '" class="wpmudevevents-viewevent">' .
+		$new_content .= '<a href="' . $link . '" class="wpmudevevents-viewevent">' .
 			__('View event', Eab_EventsHub::TEXT_DOMAIN) . 
 		'</a>';
 		$new_content .= apply_filters('eab-template-archive_after_view_link', '', $event);
@@ -200,8 +206,8 @@ class Eab_Template {
 	}
 
 	public static function get_user_organized_events ($user_id) {
-		$events = Eab_CollectionFactory::get_user_organized_events($user_id); 
-		
+		$events = Eab_CollectionFactory::get_user_organized_events($user_id);
+
 		$ret = '<div class="wpmudevevents-user_bookings wpmudevevents-events-user_organized">';
 		foreach ($events as $event) {
 			if ($event->is_recurring()) continue;
@@ -366,7 +372,7 @@ class Eab_Template {
 	public function get_root_url () {
 		global $blog_id;
 		$data = Eab_Options::get_instance();
-		return get_site_url($blog_id, $data->get_option('slug'));
+		return get_home_url($blog_id, $data->get_option('slug'));
 	}
 
 	public static function get_archive_url ($timestamp=false, $full=false) {
@@ -374,23 +380,27 @@ class Eab_Template {
 		$data = Eab_Options::get_instance();
 		$timestamp = $timestamp ? $timestamp : eab_current_time();
 		$format = $full ? 'Y/m' : 'Y';
-		return get_site_url(
+		return get_home_url(
 			$blog_id, 
 			$data->get_option('slug') . '/' . date($format, $timestamp) . '/'
 		);
 	} 
 
 	public static function get_archive_url_next ($timestamp=false, $full=false) {
-		return self::get_archive_url($timestamp + (32*86400), $full);
+		//return self::get_archive_url($timestamp + (32*86400), $full);
+		return self::get_archive_url(strtotime("next month", $timestamp), $full);
 	} 
 	public static function get_archive_url_next_year ($timestamp=false, $full=false) {
-		return self::get_archive_url($timestamp + (366*86400), $full);
+		//return self::get_archive_url($timestamp + (366*86400), $full);
+		return self::get_archive_url(strtotime("next year", $timestamp), $full);
 	} 
 	public static function get_archive_url_prev ($timestamp=false, $full=false) {
-		return self::get_archive_url($timestamp - (28*86400), $full);
+		//return self::get_archive_url($timestamp - (28*86400), $full);
+		return self::get_archive_url(strtotime("previous month", $timestamp), $full);
 	} 
 	public static function get_archive_url_prev_year ($timestamp=false, $full=false) {
-		return self::get_archive_url($timestamp - (366*86400), $full);
+		//return self::get_archive_url($timestamp - (366*86400), $full);
+		return self::get_archive_url(strtotime("previous year", $timestamp), $full);
 	} 
 
 	public static function get_event_link ($post) {
@@ -436,7 +446,7 @@ class Eab_Template {
 				$booking_status = $event->get_user_booking_status();
 				$default_class = $booking_status ? 'ncurrent' : '';
 
-				$content .= '<form action="" method="post" id="eab_booking_form">';
+				$content .= '<form action="' . get_permalink($event->get_id()) . '" method="post" id="eab_booking_form">';
 				$content .= '<input type="hidden" name="event_id" value="' . $event->get_id() . '" />';
 				$content .= '<input type="hidden" name="user_id" value="' . $booking_id . '" />';
 				$content .= '<input class="' .
@@ -614,6 +624,7 @@ class Eab_Template {
 	public static function get_shortcode_archive_output ($events, $args) {
 		$out = '<section class="eab-events-archive ' . $args['class'] . '">';
 		foreach ($events as $event) {
+			$event = $event instanceof Eab_EventModel ? $event : new Eab_EventModel($event);
 			$out .= '<article class="eab-event ' . eab_call_template('get_status_class', $event) . '" id="eab-event-' . $event->get_id() . '">' .
 				'<h4>' . $event->get_title() . '</h4>' .
 				'<div class="eab-event-body">' .
@@ -640,12 +651,15 @@ class Eab_Template {
 
 	public static function get_shortcode_events_map_marker_body_output ($event, $args) {
 		$class_pfx = !empty($args['class']) ? $args['class'] : 'eab-events_map';
+		$content = '';
+		if ($args['show_date']) $content .= eab_call_template('get_event_dates', $event);
+		if ($args['show_excerpt']) $content .= '<div class="eab-event-excerpt">' . $event->get_excerpt_or_fallback($args['excerpt_length']) . '</div>';
 		return "<div class='{$class_pfx}-venue'>" .
 			'<a href="' . get_permalink($event->get_id()) . '">' .
 				$event->get_venue_location() .
 			'</a>' .
 		"</div><div class='{$class_pfx}-dates'>" .
-			eab_call_template('get_event_dates', $event) .
+			$content .
 		'</div>';
 	}
 
@@ -785,6 +799,11 @@ class Eab_Template {
 				'type' => __('list of comma-separated IDs', Eab_EventsHub::TEXT_DOMAIN),
 				'value' => __('"52,26,18"', Eab_EventsHub::TEXT_DOMAIN),
 				'example' => sprintf(__('%s="52,26,18"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string:list' => array(
+				'type' => __('list of comma-separated strings', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('"foo,bar,baz"', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="foo,bar,baz"', Eab_EventsHub::TEXT_DOMAIN), $argument),
 			),
 		);
 		if (empty($type_map[$raw_type])) return "<code>({$raw_type})</code>";

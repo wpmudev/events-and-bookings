@@ -20,6 +20,9 @@
 	border: 1px solid #ddd;
 	height: 120px;
 }
+.wpmudevevents-list table td .eab-date-full {
+	display: none;
+}
 
 .wpmudevevents-list table td.no-left-border {
 	border-left: none;
@@ -89,3 +92,48 @@ a.wpmudevevents-calendar-event:hover {
 {
 	font-size: 1.6em;
 }
+
+/* ----- Breakpoints ----- */
+
+@media screen and (max-width : 768px) {
+
+	.wpmudevevents-list table.eab-monthly_calendar td {
+		display: block;
+		height: auto;
+		padding: 5px;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar tbody td[colspan], 
+	.wpmudevevents-list table.eab-monthly_calendar thead th,
+	.wpmudevevents-list table.eab-monthly_calendar tfoot th
+	{
+		display: none;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar thead td,
+	.wpmudevevents-list table.eab-monthly_calendar tfoot td
+	{
+		float: left;
+		width: 20%;
+		padding: 0;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar .wpmudevevents-calendar-event {
+		font-weight: bold;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar .wpmudevevents-calendar-event-info {
+		position: static;
+		display: inline!important;
+		background: none;
+		border: none;
+		font-weight: normal;
+		font-size: .9em;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar .wpmudevevents-calendar-event-info:before {
+		content: ' ';
+		display: block;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar td .eab-date-full {
+		display: block !important;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar td .eab-date-ordinal {
+		display: none;
+	}
+} /* end 768px break */

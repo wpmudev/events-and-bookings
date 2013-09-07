@@ -199,7 +199,12 @@ EOPublicCancellationCss;
 		$counter = 0;
 
 		$codec = new Eab_Macro_Codec($event_id);
+		$headers = array(
+			'From: ' . $from,
+			'Content-Type: ' . $this->email_charset() . '; charset="' . get_option('blog_charset') . '"'
+		);
 
+		add_filter('wp_mail_content_type', array($this, 'email_charset'));
 		foreach ($rsvps as $rsvp) {
 			if (in_array($rsvp->user_id, $already_sent)) continue; // Don't send email twice
 			$user = get_user_by('id', $rsvp->user_id);
@@ -209,16 +214,20 @@ EOPublicCancellationCss;
 				$user->user_email, 
 				$codec->expand($subject),
 				$codec->expand($body),
-				"From: {$from}\r\n"
+				$headers
 			);
 			$already_sent[] = $rsvp->user_id;
 			$counter++; if ($counter == $limit) break;
 		}
+		remove_filter('wp_mail_content_type', array($this, 'email_charset'));
+
 		$this->_set_users_notification_queue($event->get_id(), $already_sent);
 		if (count($rsvps) == count($already_sent)) $this->_remove_event_from_schedule_queue($event->get_id());
 
 		return $counter;
 	}
+
+	function email_charset () { return 'text/html'; }
 
 	function ajax_preview_email () {
 		$data = stripslashes_deep($_POST);

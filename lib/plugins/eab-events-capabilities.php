@@ -44,9 +44,9 @@ class Eab_Events_Capabilities {
 		$capabilities = $tmp = array();
 		foreach ($user->roles as $role) {
 			$tmp = isset($roles_map[$role]) ? $roles_map[$role] : array();
-			$capabilities = array_merge($capabilities, $tmp);
+			//$capabilities = array_merge($capabilities, $tmp);
+			$capabilities = wp_parse_args($capabilities, $tmp);
 		}
-		
 		if (!$capabilities) {
 			$capabilities = $user->allcaps;
 			$capability = preg_replace('/_event/', '_post', $capability);

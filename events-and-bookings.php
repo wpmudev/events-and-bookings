@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.6.3
+ Version: 1.7
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.6.2';
+    const CURRENT_VERSION = '1.7';
     
     /**
      * Translation domain
@@ -252,6 +252,12 @@ class Eab_EventsHub {
 					'slug' => $this->_data->get_option('slug'),
 					'with_front' => true,
 				),
+				'capabilities' => array(
+					'manage_terms' => 'manage_categories',
+					'edit_terms' => 'manage_categories',
+					'delete_terms' => 'manage_categories',
+					'assign_terms' => 'edit_events',
+				),
 			)
 		);
 		
@@ -266,7 +272,7 @@ class Eab_EventsHub {
 		$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
 		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
 		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
-		
+
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
 		wp_register_script('eab_admin_js', plugins_url('events-and-bookings/js/eab-admin.js'), array('jquery'), self::CURRENT_VERSION);
 		wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), array('jquery'), self::CURRENT_VERSION);
@@ -375,7 +381,7 @@ class Eab_EventsHub {
 				wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_NO));
 				exit();
 		    }
-		}	
+		}
 	}
     
     function admin_init() {
@@ -826,72 +832,74 @@ class Eab_EventsHub {
 			'root_url' => plugins_url('events-and-bookings/img/'),
 			'fb_scope' => 'email',
 		))) . ';</script>';
-		/*
-		printf(
-			'<script type="text/javascript">var _eab_data=;</script>',
-			//{"ajax_url": "%s", "root_url": "%s"};</script>',
-			admin_url('admin-ajax.php'), plugins_url('events-and-bookings/img/')
-		);
-		*/
+
 		if (isset($wp_query->query_vars['post_type']) && $wp_query->query_vars['post_type'] == 'incsub_event') {
 		    wp_enqueue_script('eab_event_js');
-			if (!$this->_data->get_option('accept_api_logins')) return false;
-			$domain = get_bloginfo('name');
-			$domain = $domain ? $domain : __('WordPress', self::TEXT_DOMAIN);
-			
-		    wp_enqueue_script('eab_api_js');
-			wp_localize_script('eab_api_js', 'l10nEabApi', array(
-				'facebook' => __('Login with Facebook', self::TEXT_DOMAIN),
-				'twitter' => __('Login with Twitter', self::TEXT_DOMAIN),
-				'google' => __('Login with Google', self::TEXT_DOMAIN),
-				'wordpress' => sprintf(__('Login with %s', self::TEXT_DOMAIN), $domain),
-				'cancel' => __('Cancel', self::TEXT_DOMAIN),
-				'please_wait' => __('Please, wait...', self::TEXT_DOMAIN),
-				
-				'wp_register' => __('Register', self::TEXT_DOMAIN), 
-				'wp_registration_msg' => __('Create a username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
-				'wp_login' => __('Log in', self::TEXT_DOMAIN), 
-				'wp_login_msg' => __('Login with your existing username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
-				'wp_username' => __('Username', self::TEXT_DOMAIN), 
-				'wp_password' => __('Password', self::TEXT_DOMAIN), 
-				'wp_email' => __('Email', self::TEXT_DOMAIN), 
-				'wp_toggle_on' => __('Already a member? Log in here', self::TEXT_DOMAIN), 
-				'wp_toggle_off' => __('Click here to register', self::TEXT_DOMAIN), 
-				'wp_submit' => __('Submit', self::TEXT_DOMAIN), 
-				'wp_cancel' => __('Cancel', self::TEXT_DOMAIN), 
-				// Vars
-				'show_facebook' => !$this->_data->get_option('api_login-hide-facebook'),
-				'show_twitter' => !$this->_data->get_option('api_login-hide-twitter'),
-				'show_google' => !$this->_data->get_option('api_login-hide-google'),
-				'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
-			));
-			if (!$this->_data->get_option('facebook-no_init')) {
-				add_action('wp_footer', create_function('', "echo '" .
-				sprintf(
-					'<div id="fb-root"></div><script type="text/javascript">
-					window.fbAsyncInit = function() {
-						FB.init({
-						  appId: "%s",
-						  status: true,
-						  cookie: true,
-						  xfbml: true
-						});
-					};
-					// Load the FB SDK Asynchronously
-					(function(d){
-						var js, id = "facebook-jssdk"; if (d.getElementById(id)) {return;}
-						js = d.createElement("script"); js.id = id; js.async = true;
-						js.src = "//connect.facebook.net/en_US/all.js";
-						d.getElementsByTagName("head")[0].appendChild(js);
-					}(document));
-					</script>',
-					$this->_data->get_option('facebook-app_id')
-				) .
-				"';"));
-			}
+		    $this->enqueue_api_scripts();
 			do_action('eab-javascript-enqueue_scripts');
 		}
+
+		add_action('eab-javascript-do_enqueue_api_scripts', array($this, 'enqueue_api_scripts'));
 	
+    }
+
+    public function enqueue_api_scripts () {
+		if (!$this->_data->get_option('accept_api_logins')) return false;
+		$domain = get_bloginfo('name');
+		$domain = $domain ? $domain : __('WordPress', self::TEXT_DOMAIN);
+		
+	    wp_enqueue_script('eab_api_js');
+		wp_localize_script('eab_api_js', 'l10nEabApi', array(
+			'facebook' => __('Login with Facebook', self::TEXT_DOMAIN),
+			'twitter' => __('Login with Twitter', self::TEXT_DOMAIN),
+			'google' => __('Login with Google', self::TEXT_DOMAIN),
+			'wordpress' => sprintf(__('Login with %s', self::TEXT_DOMAIN), $domain),
+			'cancel' => __('Cancel', self::TEXT_DOMAIN),
+			'please_wait' => __('Please, wait...', self::TEXT_DOMAIN),
+			
+			'wp_register' => __('Register', self::TEXT_DOMAIN), 
+			'wp_registration_msg' => __('Create a username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
+			'wp_login' => __('Log in', self::TEXT_DOMAIN), 
+			'wp_login_msg' => __('Login with your existing username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
+			'wp_username' => __('Username', self::TEXT_DOMAIN), 
+			'wp_password' => __('Password', self::TEXT_DOMAIN), 
+			'wp_email' => __('Email', self::TEXT_DOMAIN), 
+			'wp_toggle_on' => __('Already a member? Log in here', self::TEXT_DOMAIN), 
+			'wp_toggle_off' => __('Click here to register', self::TEXT_DOMAIN), 
+			'wp_submit' => __('Submit', self::TEXT_DOMAIN), 
+			'wp_cancel' => __('Cancel', self::TEXT_DOMAIN), 
+			// Vars
+			'show_facebook' => !$this->_data->get_option('api_login-hide-facebook'),
+			'show_twitter' => !$this->_data->get_option('api_login-hide-twitter'),
+			'show_google' => !$this->_data->get_option('api_login-hide-google'),
+			'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
+		));
+		if (!$this->_data->get_option('facebook-no_init')) {
+			if (defined('EAB_INTERNAL_FLAG__FB_INIT_ADDED')) return false;
+			add_action('wp_footer', create_function('', "echo '" .
+			sprintf(
+				'<div id="fb-root"></div><script type="text/javascript">
+				window.fbAsyncInit = function() {
+					FB.init({
+					  appId: "%s",
+					  status: true,
+					  cookie: true,
+					  xfbml: true
+					});
+				};
+				// Load the FB SDK Asynchronously
+				(function(d){
+					var js, id = "facebook-jssdk"; if (d.getElementById(id)) {return;}
+					js = d.createElement("script"); js.id = id; js.async = true;
+					js.src = "//connect.facebook.net/en_US/all.js";
+					d.getElementsByTagName("head")[0].appendChild(js);
+				}(document));
+				</script>',
+				$this->_data->get_option('facebook-app_id')
+			) .
+			"';"));
+			define('EAB_INTERNAL_FLAG__FB_INIT_ADDED', true, true);
+		}
     }
     
     function event_meta_box () {
@@ -1439,10 +1447,16 @@ class Eab_EventsHub {
 		if ('incsub_event' == $post->post_type) do_action('eab-event_meta-after_save_meta', $post_id);
     }
     
-    function post_type_link($permalink, $post_id, $leavename) {
-		global $event_variation;
+    function post_type_link($permalink, $post_obj, $leavename) {
+		if (empty($permalink)) return $permalink;
 		
-		$post = get_post($post_id);
+		if (is_object($post_obj) && !empty($post_obj->ID) && !empty($post_obj->post_name)) {
+			$post_id = $post_obj->ID;
+			$post = $post_obj;
+		} else {
+			$post_id = $post_obj;
+			$post = get_post($post_id);
+		}
 		
 		$rewritecode = array(
 		    '%incsub_event%',
@@ -1452,28 +1466,31 @@ class Eab_EventsHub {
 		
 		if ($post->post_type == 'incsub_event' && '' != $permalink) {
 		    
-		    $ptype = get_post_type_object($post->post_type);
+		    //$ptype = get_post_type_object($post->post_type);
+		    //$start = false;
 		    
-		    $start = eab_current_time();
-		    $end = eab_current_time();
-		    
-		    $meta = get_post_custom($post->ID);
+		    //$meta = get_post_custom($post->ID);
+		    /*
 		    if (isset($meta["incsub_event_start"])) {// && isset($meta["incsub_event_start"][$event_variation[$post->ID]])) {
 				//$start = strtotime($meta["incsub_event_start"][$event_variation[$post->ID]]);
 				$start = strtotime($meta["incsub_event_start"][0]);
 		    }
+		    */
+		    $starts = get_post_meta($post_id, 'incsub_event_start');
+		    $start = isset($starts[0])
+		    	? strtotime($starts[0])
+		    	: eab_current_time()
+		    ;
 
 		    $year = date('Y', $start);
 		    $month = date('m', $start);
 		    
 		    $rewritereplace = array(
-		    	($post->post_name == "")?(isset($post->id)?$post->id:0):$post->post_name,
+		    	($post->post_name == "") ? (isset($post->ID) ? $post->ID : 0) : $post->post_name,
 				$year,
 				$month,
 		    );
 		    $permalink = str_replace($rewritecode, $rewritereplace, $permalink);
-		} else {
-		    // if they're not using the fancy permalink option
 		}
 		
 		return $permalink;
@@ -1665,6 +1682,8 @@ class Eab_EventsHub {
 				`status` ENUM( 'paid', 'yes', 'maybe', 'no' ) NOT NULL DEFAULT 'no' ,
 		    		PRIMARY KEY (`id`),
 				UNIQUE KEY `event_id_2` (`event_id`,`user_id`),
+				KEY `event_id` (`event_id`),
+				KEY `user_id` (`user_id`),
 				KEY `timestamp` (`timestamp`),
 				KEY `status` (`status`)
 			    ) ENGINE = InnoDB {$charset_collate};";
@@ -1800,7 +1819,7 @@ class Eab_EventsHub {
 			    </li>	
 			    <li>
 				<?php _e('The archive displays a list of upcoming events on your site.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo site_url($this->_data->get_option('slug')); ?>" class="eab-goto-step button"><?php _e('Events Archive', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo home_url($this->_data->get_option('slug')); ?>" class="eab-goto-step button"><?php _e('Events Archive', self::TEXT_DOMAIN); ?></a>
 			    </li>	
 			</ol>
 		    </div>
@@ -2324,6 +2343,21 @@ class Eab_EventsHub {
 	function handle_get_twitter_auth_url () {
 		header("Content-type: application/json");
 		$twitter = $this->_get_twitter_object();
+
+		/* --- Start delta time correction --- */
+		$test_time = OAuthRequest::generate_raw_timestamp();
+		$test_url = "https://api.twitter.com/1/help/test.json";
+		$request = wp_remote_get($test_url, array('sslverify' => false));
+		$headers = wp_remote_retrieve_headers($request);
+		if (!empty($headers['date'])) {
+			$twitter_time = strtotime($headers['date']);
+			$delta = $twitter_time - $test_time;
+			if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
+				add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
+			}
+		}
+		/* --- End delta time correction --- */
+
 		$request_token = $twitter->getRequestToken(@$_POST['url']);
 		echo json_encode(array(
 			'url' => $twitter->getAuthorizeURL($request_token['oauth_token']),
@@ -2348,6 +2382,21 @@ class Eab_EventsHub {
 		if (!$data) die(json_encode($resp));
 		
 		$twitter = $this->_get_twitter_object($data['oauth_token'], $secret);
+
+		/* --- Start delta time correction --- */
+		$test_time = OAuthRequest::generate_raw_timestamp();
+		$test_url = "https://api.twitter.com/1/help/test.json";
+		$request = wp_remote_get($test_url, array('sslverify' => false));
+		$headers = wp_remote_retrieve_headers($request);
+		if (!empty($headers['date'])) {
+			$twitter_time = strtotime($headers['date']);
+			$delta = $twitter_time - $test_time;
+			if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
+				add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
+			}
+		}
+		/* --- End delta time correction --- */
+
 		$access = $twitter->getAccessToken($data['oauth_verifier']);
 		
 		$twitter = $this->_get_twitter_object($access['oauth_token'], $access['oauth_token_secret']);

@@ -260,14 +260,14 @@ class WpmuDev_HelpTooltips {
 	width: 14px;
 	height: 30px;
 	margin-top: 8px;
-	background: url(<?php echo site_url("/wp-includes/images/arrow-pointer-blue.png");?>) 0 -15px no-repeat;
+	background: url(<?php echo home_url("/wp-includes/images/arrow-pointer-blue.png");?>) 0 -15px no-repeat;
 }
 .wpmudev-right_pointer {
 	float: right;
 	width: 14px;
 	height: 30px;
 	margin-top: 8px;
-	background: url(<?php echo site_url("/wp-includes/images/arrow-pointer-blue.png");?>) -16px -15px no-repeat;
+	background: url(<?php echo home_url("/wp-includes/images/arrow-pointer-blue.png");?>) -16px -15px no-repeat;
 }
 </style>		
 		<?php

@@ -63,16 +63,40 @@ class Eab_Export_iCal {
 	function save_settings ($options) {
 		$options['eab_export-ical-auto_show_links'] = @$_POST['event_default']['eab_export-ical-auto_show_links'];
 		$options['eab_export-ical-download_links'] = @$_POST['event_default']['eab_export-ical-download_links'];
+		$options['eab_export-ical-time'] = @$_POST['event_default']['eab_export-ical-time'];
 		return $options;
 	}
 
 	function show_settings () {
+		$export_time = $this->_data->get_option('eab_export-ical-time', 'gmt');
+		$checked_time_gmt = 'gmt' == $export_time ? 'checked="checked"' : '';
+		$checked_time_entered = 'local' == $export_time ? 'checked="checked"' : '';
+		$checked_time_tz_local = 'tz_local' == $export_time ? 'checked="checked"' : '';
 		$checked_auto = $this->_data->get_option('eab_export-ical-auto_show_links') ? 'checked="checked"' : '';
 		$checked_dload = $this->_data->get_option('eab_export-ical-download_links') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-ical_export" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('iCal export settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
+	    <div class="eab-settings-settings_item">
+			<b><?php _e('Exported event times', Eab_EventsHub::TEXT_DOMAIN); ?></b>
+			<div style="line-height:1.5em; padding-bottom:.5em;">
+				<label for="eab_export-ical-time-gmt">
+					<input type="radio" id="eab_export-ical-time-gmt" name="event_default[eab_export-ical-time]" value="gmt" <?php echo $checked_time_gmt; ?> />
+					<?php _e('Greenwich Mean Time (GMT)', Eab_EventsHub::TEXT_DOMAIN); ?>
+				</label>
+				<br />
+				<label for="eab_export-ical-time-entered">
+					<input type="radio" id="eab_export-ical-time-entered" name="event_default[eab_export-ical-time]" value="local" <?php echo $checked_time_entered; ?> />
+					<?php _e('Local time (as entered)', Eab_EventsHub::TEXT_DOMAIN); ?>
+				</label>
+				<br />
+				<label for="eab_export-ical-time-tz_local">
+					<input type="radio" id="eab_export-ical-time-tz_local" name="event_default[eab_export-ical-time]" value="tz_local" <?php echo $checked_time_tz_local; ?> />
+					<?php _e('Local time (as entered) with timezone information', Eab_EventsHub::TEXT_DOMAIN); ?>
+				</label>
+			</div>
+	    </div>
 		<div class="eab-settings-settings_item">
 	    	<label for="eab_export-ical-auto_show_links"><?php _e('Automatically add export links to Events and archives', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
 			<input type="checkbox" id="eab_export-ical-auto_show_links" name="event_default[eab_export-ical-auto_show_links]" value="1" <?php print $checked_auto; ?> />
@@ -112,6 +136,8 @@ class Eab_Export_iCal {
 
 		if (isset($_GET['recurring'])) add_filter('eab-export-ical-recurring_instances', '__return_true');
 
+		$request['event_time_calculus'] = $this->_data->get_option('eab_export-ical-time', 'gmt');
+
 		Eab_ExporterFactory::serve($request);
 	}
 }
@@ -119,6 +145,12 @@ class Eab_Export_iCal {
 class Eab_Exporter_Ical extends Eab_Exporter {
 
 	private $_processed = array();
+	private $_calculus = 'gmt';
+
+	public function __construct ($args) {
+		if (!empty($args['event_time_calculus'])) $this->_calculus = $args['event_time_calculus'];
+		parent::__construct($args);
+	}
 
 	public function get_mime_type () {
 		return 'text/calendar';
@@ -176,21 +208,30 @@ class Eab_Exporter_Ical extends Eab_Exporter {
 			return $this->_get_event_as_ical(get_post($event->get_parent()), false);
 		}
 
-		$domain = preg_replace('/^www\./', '', parse_url(site_url(), PHP_URL_HOST));
+		$domain = preg_replace('/^www\./', '', parse_url(home_url(), PHP_URL_HOST));
 		$author = get_userdata($event->get_author());
 		$location = $event->get_venue_location(Eab_EventModel::VENUE_AS_ADDRESS);
-		
+
 		$start_dates = $event->get_start_dates();
 		$tz_offset = get_option('gmt_offset') * 3600;
+		$time_callback = /*'gmt' == $this->_calculus ? 'gmdate' : */'date';
+		
+		$zulu = ''; $tzid = '';
+		if ('gmt' == $this->_calculus) {
+			$zulu = 'Z';
+		} else if ('tz_local' == $this->_calculus) {
+			$zone_string = get_option('timezone_string');
+			if (!empty($zone_string)) $tzid = ";TZID={$zone_string}";
+		}
 
 		foreach ($start_dates as $key => $start) {
-			$start = $event->get_start_timestamp($key) + $tz_offset;
-			$end = $event->get_end_timestamp($key) + $tz_offset;
+			$start = $event->get_start_timestamp($key) + (('gmt' == $this->_calculus) ? $tz_offset : 0);
+			$end = $event->get_end_timestamp($key) + (('gmt' == $this->_calculus) ? $tz_offset : 0);
 			$ret .= "BEGIN:VEVENT\n" .
 				'UID:' . $event->get_id() . rand() . "@{$domain}\n" .
 				"ORGANIZER;CN={$author->display_name}:MAILTO:{$author->user_email}\n".
-				"DTSTART:" . gmdate('Ymd', $start) . "T" . gmdate('His', $start) . "Z\n" .
-				"DTEND:" . gmdate('Ymd', $end) . "T" . gmdate('His', $end) . "Z\n" .
+				"DTSTART{$tzid}:" . $time_callback('Ymd', $start) . "T" . $time_callback('His', $start) . "{$zulu}\n" .
+				"DTEND{$tzid}:" . $time_callback('Ymd', $end) . "T" . $time_callback('His', $end) . "{$zulu}\n" .
 				"SUMMARY:" . $event->get_title() . "\n" .
 				"DESCRIPTION:" . strip_tags(preg_replace('/\s\s+/', ' ', preg_replace('/\r|\n/', ' ', $event->get_content()))) . "\n" .
 				"URL:" . get_permalink($event->get_id()) . "\n" .

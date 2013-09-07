@@ -3,7 +3,7 @@
 Plugin Name: Recurrent Events Redirect
 Description: Redirects from root instance to currently closest to active instance.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 0.2
+Version: 0.3
 Author: Ve Bailovity (Incsub)
 */
 
@@ -50,14 +50,21 @@ class Eab_Events_RecurrentRootRedirect {
 
 		$now = eab_current_time();
 		$redirect_to = $active = false;
+		$fallback = array();
 		foreach ($children as $key => $child) {
 			if ($child->get_end_timestamp() < $now) continue; // Already passed, move on
 			if ($child->get_start_timestamp() <= $now) {
 				$active = $child;
 				break; // Currently ongoing event
-			} else $redirect_to = $child; // Collection results are ordered, so this makes sense
+			} else $fallback[$child->get_start_timestamp()] = $child;
 		}
-		$redirect_to = $active ? $active : $redirect_to;
+
+		if (!empty($active)) {
+			$redirect_to = $active;
+		} else if (!empty($fallback)) {
+			sort($fallback);
+			$redirect_to = reset($fallback);
+		}
 		if (!$redirect_to) return false;
 
 		wp_redirect(get_permalink($redirect_to->get_id())); die;

@@ -47,48 +47,35 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		}
 	
 		if (is_array($_events) && count($_events) > 0) {
-		?>
-		<?php echo $before_widget; ?>
-		<?php echo $before_title . $title . $after_title; ?>
-	            <div id="event-popular">
-			<ul>
-			    <?php
-				foreach ($_events as $_event) {
-					$thumbnail = $excerpt = false;
-					if ($options['thumbnail']) {
-						$raw = wp_get_attachment_image_src(get_post_thumbnail_id($_event->get_id()));
-						$thumbnail = $raw ? @$raw[0] : false;
-					}
-					$excerpt = false;
-					if ($options['excerpt']) {
-						$words = (int)$options['excerpt_words_limit'] ? (int)$options['excerpt_words_limit'] : false;
-						$excerpt = eab_call_template('util_words_limit', $_event->get_excerpt_or_fallback(), $words);
-					}
-			    ?>
-					<li>
-						<a href="<?php print get_permalink($_event->get_id()); ?>" class="<?php print ($_event->get_id() == $post->ID)?'current':''; ?>" >
-							<?php if ($options['thumbnail'] && $thumbnail) { ?>
-								<img src="<?php echo $thumbnail; ?>" /><br />
-							<?php } ?>
-							<?php print $_event->get_title(); ?>
-						</a>
-						<?php if ($options['dates']) { ?>
-							<div class="wpmudevevents-date">
-								<?php echo Eab_Template::get_event_dates($_event); ?>
-							</div>
-						<?php } ?>
-						<?php if ($options['excerpt'] && $excerpt) { ?>
-							<p><?php echo $excerpt; ?></p>
-						<?php } ?>
-						<?php do_action('eab-widgets-upcoming-after_event', $options, $_event, $this); ?>
-					</li>
-			    <?php
+			echo $before_widget;
+			echo $before_title . $title . $after_title;
+	        echo '<div id="event-popular"><ul>';
+			foreach ($_events as $_event) {
+				$thumbnail = $excerpt = false;
+				if ($options['thumbnail']) {
+					$raw = wp_get_attachment_image_src(get_post_thumbnail_id($_event->get_id()));
+					$thumbnail = $raw ? @$raw[0] : false;
 				}
-			    ?>
-			</ul>
-	            </div>
-	        <?php echo $after_widget; ?>
-		<?php
+				$excerpt = false;
+				if ($options['excerpt']) {
+					$words = (int)$options['excerpt_words_limit'] ? (int)$options['excerpt_words_limit'] : false;
+					$excerpt = eab_call_template('util_words_limit', $_event->get_excerpt_or_fallback(), $words);
+				}
+				echo '<li>';
+				echo '<a href="' . get_permalink($_event->get_id()) . '" class="' . ($_event->get_id() == $post->ID ? 'current' : '') . '" >' .
+					($options['thumbnail'] && $thumbnail
+						? '<img src="' . $thumbnail . '" /><br />'
+						: ''
+					) .
+					$_event->get_title() .
+				'</a>';
+				if ($options['dates']) echo '<div class="wpmudevevents-date">' . Eab_Template::get_event_dates($_event) . '</div>';
+				if ($options['excerpt'] && $excerpt) echo '<p>' . $excerpt . '</p>';
+				do_action('eab-widgets-upcoming-after_event', $options, $_event, $this);
+				echo '</li>';
+			}
+			echo '</ul></div>';
+	        echo $after_widget;
 		} else {
 			echo $before_widget .
 				$before_title . $title . $after_title .

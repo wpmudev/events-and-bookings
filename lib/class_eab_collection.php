@@ -249,7 +249,7 @@ class Eab_OrganizerCollection extends Eab_Collection {
 			'author' => $arg,
 			'post_type' => 'incsub_event',
 			'post_status' => array('publish', Eab_EventModel::RECURRENCE_STATUS),
-			'posts_per_page' => -1,
+			'posts_per_page' => EAB_OLD_EVENTS_EXPIRY_LIMIT,
 		);
 		return $args;
 	}	

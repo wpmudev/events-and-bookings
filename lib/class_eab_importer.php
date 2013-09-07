@@ -50,7 +50,7 @@ abstract class Eab_Importer {
 	}
 
 	public function import_event ($source) {
-		if ($this->is_recurring()) return false; // We currently do not support recurring events
+		if ($this->is_recurring($source)) return false; // We currently do not support recurring events
 		$post = $this->map_to_post_type($source);
 		if (!$post || !is_array($post)) return false;
 		$post['post_type'] = Eab_EventModel::POST_TYPE;

@@ -82,7 +82,7 @@ class Eab_Gcal_Importer_GoogleImporter extends Eab_ScheduledImporter {
 	}
 
 	public function is_recurring ($source) {
-		return empty($source['recurrence']);
+		return !empty($source['recurrence']);
 	}
 
 	public function map_to_post_type ($gevent) {

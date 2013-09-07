@@ -69,13 +69,42 @@ if (!(defined('EAB_SKIP_FORCED_META_ID_ORDERING') && EAB_SKIP_FORCED_META_ID_ORD
 	/**
 	 * Late binding filter for forced query ordering on postmeta requests.
 	 */
-	function _eab_filter_meta_query ($check, $object_id, $meta_key) {
-		if (!preg_match('/incsub_event/', $meta_key)) return $check;
-		wp_cache_delete($object_id, 'post_meta'); // Throw away the caches!
-		add_filter('query', '_eab_wpdb_filter_postmeta_query');
+	function _eab_filter_meta_query ($check, $object_id, $meta_key, $single) {
+		if (!preg_match('/incsub_event_(.*?)start$/', $meta_key) && !preg_match('/incsub_event_(.*)end$/', $meta_key)) return $check;
+
+		if (!(defined('EAB_SKIP_FORCED_META_ID_SORT_OPTIMIZATION') && EAB_SKIP_FORCED_META_ID_SORT_OPTIMIZATION)) {
+			// First, let's see what we have custom-cached
+			$cache = wp_cache_get($object_id, 'post_meta_sorted');
+			if (!empty($cache) && isset($cache[$meta_key])) return $single
+				? maybe_unserialize($cache[$meta_key][0])
+				: array_map('maybe_unserialize', $cache[$meta_key])
+			;
+
+			// Nothing... move on
+			global $wpdb;
+			$query = $wpdb->prepare("SELECT meta_key, meta_value FROM {$wpdb->postmeta} WHERE post_id=%d ORDER BY {$wpdb->postmeta}.meta_id", $object_id);
+			$metas = $wpdb->get_results($query, ARRAY_A);
+			if (!empty($metas)) {
+				$cache = array();
+				foreach ($metas as $meta) {
+					if (empty($meta['meta_key'])) continue;
+					$key = $meta['meta_key'];
+					if (!isset($cache[$key]) || !is_array($cache[$key])) $cache[$key] = array();
+					$cache[$key][] = $meta['meta_value'];
+				}
+				if (!empty($cache)) wp_cache_add($object_id, $cache, 'post_meta_sorted');
+				if (isset($cache[$meta_key])) return $single
+					? maybe_unserialize($cache[$meta_key][0])
+					: array_map('maybe_unserialize', $cache[$meta_key])
+				;
+			}
+		} else {
+			wp_cache_delete($object_id, 'post_meta'); // Throw away the caches!
+			add_filter('query', '_eab_wpdb_filter_postmeta_query');
+		}
 		return $check;
 	}
-	add_filter('get_post_metadata', '_eab_filter_meta_query', 10, 3);
+	add_filter('get_post_metadata', '_eab_filter_meta_query', 10, 4);
 }
 // End Core WP postmeta filtering
 
@@ -204,3 +233,6 @@ if (!(defined('EAB_SKIP_DEFAULT_WPML_REWRITE_FILTERING') && EAB_SKIP_DEFAULT_WPM
 	add_action('init', 'eab_to_wpml__rebind_rewrites');
 }
 // End WPML translated Events content with directory URL setup
+
+// Twitter delta threshold correction
+define('EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD', 10, true);

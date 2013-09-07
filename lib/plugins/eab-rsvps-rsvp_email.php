@@ -51,15 +51,23 @@ class Eab_Events_RsvpEmail {
 		$body = $this->_data->get_option('eab_rsvps-email-body');
 
 		if (!is_email($user->user_email) || empty($from) || empty($subject) || empty($body)) return false;
+		$headers = array(
+			'From: ' . $from,
+			'Content-Type: ' . $this->email_charset() . '; charset="' . get_option('blog_charset') . '"'
+		);
 
 		$codec = new Eab_Events_RsvpEmail_Codec($event_id, $user_id);
+		add_filter('wp_mail_content_type', array($this, 'email_charset'));
 		wp_mail(
 			$user->user_email, 
 			$codec->expand($subject),
 			$codec->expand($body),
-			"From: {$from}\r\n"
+			$headers
 		);
+		remove_filter('wp_mail_content_type', array($this, 'email_charset'));
 	}
+
+	function email_charset () { return 'text/html'; }
 
 	function ajax_preview_email () {
 		$data = stripslashes_deep($_POST);

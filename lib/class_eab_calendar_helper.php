@@ -262,16 +262,18 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 
 	protected function _get_last_row () {
 		$time = $this->get_timestamp();
+		// Make sure we subtract for the end of the month.
+		if (date('j', $time) == date('t', $time)) $time -= 4*86400;
 		return '<tr>' .
 			'<td>' .
 				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-next eab-time_unit-year" href="' . 
-					Eab_Template::get_archive_url_next($time, true) . '">' . 
+					Eab_Template::get_archive_url_next_year($time, true) . '">' . 
 					'&nbsp;&laquo;' .
 				'</a>' .
 			'</td>' .
 			'<td>' .
 				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-next eab-time_unit-month" href="' . 
-					Eab_Template::get_archive_url_next_year($time, false) . '">' . 
+					Eab_Template::get_archive_url_next($time, true) . '">' . 
 					'&nbsp;&lsaquo;' .
 				'</a>' .
 			'</td>' .
@@ -281,30 +283,59 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 			'</td>' .
 			'<td>' .
 				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-prev eab-time_unit-month" href="' . 
-					Eab_Template::get_archive_url_prev_year($time, false) . '">&rsaquo;&nbsp;' . 
+					Eab_Template::get_archive_url_prev($time, true) . '">&rsaquo;&nbsp;' . 
 				'</a>' .
 			'</td>' .
 			'<td>' .
 				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 
-					Eab_Template::get_archive_url_prev($time, true) . '">&raquo;&nbsp;' . 
+					Eab_Template::get_archive_url_prev_year($time, true) . '">&raquo;&nbsp;' . 
 				'</a>' .
 			'</td>' .
 		'</tr>';
 	}
-}
+	
+	/**
+	 * Override the main method to allow output caching.
+	 * Calendar widget could be used often, so make sure we're quick.
+	 */
+	public function get_month_calendar ($timestamp) {
+		if (!(defined('EAB_CALENDAR_USE_CACHE') && EAB_CALENDAR_USE_CACHE)) return parent::get_month_calendar($timestamp);
 
+		$key = md5(serialize($this->_events)) . '-eab_ucw';
+		$output = get_transient($key);
+		if (empty($output)) {
+			$output = parent::get_month_calendar($timestamp);
+			set_transient($key, $output, 3600); // 1 hour
+		}
+		return $output;
+	}
+}
 
 class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 	
 	protected $_data = array();
+	protected $_long_date_format = false;
+
+	public function __construct ($events) {
+		parent::__construct($events);
+		$this->_long_date_format = get_option("date_format");
+	}
+
+	public function set_long_date_format ($fmt) {
+		$this->_long_date_format = $fmt ? $fmt : $this->_long_date_format;
+	}
 	
 	public function get_calendar_id () { return false; }
-	public function get_calendar_class () { return false; }
+	public function get_calendar_class () { return 'eab-monthly_calendar'; }
 	public function reset_event_info_storage () { $this->_data = array(); }
 	
 	public function set_event_info ($event_tstamps, $current_tstamps, $event_info) {
 		$css_classes = $event_info['status_class'];
-		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . get_permalink($event_info['id']) . '">' . 
+		$event_permalink = !empty($event_info['blog_id'])
+			? get_blog_permalink($event_info['blog_id'], $event_info['id'])
+			: get_permalink($event_info['id'])
+		;
+		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' . 
 				apply_filters('eab-calendar-event_archive-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . 
@@ -315,8 +346,23 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 	
 	public function get_event_info_as_string ($day) {
 		$activity = '';
+		$full_date = date_i18n(
+			apply_filters('eab-calendar-item-full_date_format', $this->_long_date_format),
+			strtotime(
+				date('Y', $this->_current_timestamp) .
+				'-' .
+				date('m', $this->_current_timestamp) .
+				'-' .
+				$day
+			)
+		);
 		if ($this->_data) {
-			$activity = '<p>' . $day . '<br />' . join(' ', $this->_data) . '</p>';
+			$activity = '<p>' . 
+				"<span class='eab-date-ordinal'>{$day}</span> <span class='eab-date-full' style='display:none'>{$full_date}</span>" . 
+				'<br />' . join(' ', $this->_data) . 
+			'</p>';
+		} else {
+			$activity = '<p>' . "<span class='eab-date-ordinal'>{$day}</span> <span class='eab-date-full' style='display:none'>{$full_date}</span>" . '</p>';
 		}
 		return $activity;
 	}
@@ -362,7 +408,7 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 	}
 
 	public function get_calendar_class () {
-		return $this->_class;
+		return join(' ', array(parent::get_calendar_class(), $this->_class));
 	}
 	
 	public function set_footer ($use) {

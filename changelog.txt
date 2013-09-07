@@ -3,9 +3,21 @@ Author: Incsub
 
 Change Log:
 ----------------------------------------------------------------------
-1.6.3 - 2013-08-13 - Marko Miljus (Incsub)
+
+1.7 - 2013-09-07
 ----------------------------------------------------------------------
-- Fixed issue with custom tables (conflict with UNIQUE and INDEX keys)
+- Fix for permalink fetching method.
+- Mail headers fix and better MIME header format handling.
+- Performance update for query filtering.
+- Cache optimization for calendars and widgets.
+- Optional widget caching via `EAB_CALENDAR_USE_CACHE` define.
+- Fix for event redirection.
+- Twitter request time correction fix for broken servers.
+- Added the categories option for the calendar upcoming widget.
+- Added settings for variable exported event times calculus.
+- Added notification on RSVP add-on.
+- Added Colors add-on.
+- Added Maps Options overrides add-on.
 
 1.6.2 - 2013-05-22
 ----------------------------------------------------------------------
@@ -177,5 +189,3 @@ Change Log:
 1.0 - 2012-02-13
 ----------------------------------------------------------------------
 - Initial release.
-
-67022-1334033597

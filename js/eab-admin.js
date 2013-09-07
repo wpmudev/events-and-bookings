@@ -41,12 +41,12 @@ jQuery(function() {
 		return false;
     });
 
-    if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
-		jQuery(".incsub_event-payment_method_row").hide();
+    if (!jQuery("#incsub_event-accept_payments").is(":checked")) {
+		jQuery("#eab-settings-paypal").hide();
     }
 
     jQuery("#incsub_event-accept_payments").change(function () {
-		if (jQuery("#incsub_event-accept_payments:checked") && jQuery("#incsub_event-accept_payments:checked").length == 0) {
+		if (!jQuery("#incsub_event-accept_payments").is(":checked")) {
 			jQuery("#eab-settings-paypal").hide();
 		} else {
 			jQuery("#eab-settings-paypal").show();
@@ -188,14 +188,14 @@ jQuery(function() {
 			jQuery('#incsub_event_start_time_'+_c).addClass('error');
 			jQuery('#incsub_event_end_'+_c).addClass('error');
 			jQuery('#incsub_event_end_time_'+_c).addClass('error');
-			jQuery('input.button-primary').attr('disabled', true);
+			jQuery('input.button-primary.button-large').attr('disabled', true);
 			return false;
 		} else {
 			jQuery('#incsub_event_start_'+_c).removeClass('error');
 			jQuery('#incsub_event_start_time_'+_c).removeClass('error');
 			jQuery('#incsub_event_end_'+_c).removeClass('error');
 			jQuery('#incsub_event_end_time_'+_c).removeClass('error');
-			jQuery('input.button-primary').removeAttr('disabled');
+			jQuery('input.button-primary.button-large').removeAttr('disabled');
 		}
 		return true;
     }

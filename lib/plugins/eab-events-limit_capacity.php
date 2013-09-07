@@ -35,10 +35,15 @@ class Eab_Addon_LimitCapacity {
 		add_action('eab-events-fpe-save_meta', array($this, 'save_fpe_meta'), 10, 2);
 	}
 	
-	private function _get_event_total_attendance ($event_id) {
+	private function _get_event_total_attendance ($event_id, $exclude_user=false) {
 		global $wpdb;
 		$event_id = (int)$event_id;
-		$meta = $wpdb->get_col("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id={$event_id} AND status='" . Eab_EventModel::BOOKING_YES . "'");
+		$exclude_user = (int)$exclude_user;
+		$exclusion = '';
+		if ($exclude_user) {
+			$exclusion = sprintf('AND user_id<>%d', $exclude_user);
+		}
+		$meta = $wpdb->get_col("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id={$event_id} AND status='" . Eab_EventModel::BOOKING_YES . "' {$exclusion}");
 		if (!$meta) return 0;
 
 		$booked = join(',', $meta);
@@ -54,8 +59,14 @@ class Eab_Addon_LimitCapacity {
 	function handle_paypal_tickets ($atts, $event_id, $booking_id) {
 		$capacity = (int)get_post_meta($event_id, 'eab_capacity', true);
 		if (!$capacity) return $atts; // No capacity set, we're good to show
+
+		$user_id = false;
+		if (is_user_logged_in()) {
+			$user = wp_get_current_user();
+			$user_id = $user->ID;
+		}
 		
-		$total = $this->_get_event_total_attendance($event_id);
+		$total = $this->_get_event_total_attendance($event_id, $user_id);
 		$max = $capacity - $total;
 		return "{$atts} max='{$max}'";
 		
@@ -74,7 +85,7 @@ class Eab_Addon_LimitCapacity {
 		$users = $wpdb->get_col("SELECT user_id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id={$post_id} AND status='yes';");
 		
 		if ($capacity > $total) return $content;
-		return (in_array($current_user->id, $users)) ? $content : $this->_get_overbooked_message();
+		return (in_array($current_user->id, $users)) ? $content : $this->_get_overbooked_message($post_id);
 		/*
 		if ($capacity > $total) return $content;
 		return (in_array($current_user->id, $users)) ? $content : $this->_get_overbooked_message();
@@ -165,9 +176,16 @@ class Eab_Addon_LimitCapacity {
 		wp_enqueue_script('eab-buddypress-limit_capacity-public', plugins_url(basename(EAB_PLUGIN_DIR) . "/js/eab-buddypress-limit_capacity-public.js"), array('jquery'));		
 	}
 	
-	private function _get_overbooked_message () {
+	private function _get_overbooked_message ($post_id=false) {
+		$message = apply_filters('eab-rsvps-event_capacity_reached-message', __('Sorry, the event sold out.', Eab_EventsHub::TEXT_DOMAIN), $post_id);
+		/*
+		if (!is_user_logged_in() && $post_id) {
+			$login_url_n = apply_filters('eab-rsvps-rsvp_login_page-no', wp_login_url(get_permalink($post_id)) . '&eab=n');
+			$message .= '<a href="' . $login_url_n . '" >'.__('Cancel', Eab_EventsHub::TEXT_DOMAIN).'</a></div>';
+		}
+		*/
 		return '<div class="wpmudevevents-event_reached_capacity">' .
-			apply_filters('eab-rsvps-event_capacity_reached-message', __('Sorry, the event sold out.', Eab_EventsHub::TEXT_DOMAIN)) .
+			$message .
 		'</div>';
 	}
 }

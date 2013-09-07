@@ -25,6 +25,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$title = esc_attr($instance['title']);
 		$date = esc_attr($instance['date']);
 		$network = esc_attr($instance['network']) ? 'checked="checked"' : '';
+		$category = !empty($instance['category']) ? esc_attr($instance['category']) : false;
 		
 		$html .= '<p>';
 		$html .= '<label for="' . $this->get_field_id('title') . '">' . __('Title:', $this->translation_domain) . '</label>';
@@ -38,6 +39,23 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 				__('Network-wide?', $this->translation_domain) .
 				'</label> ' .
 			'</p>';
+		} else {
+			$options = false;
+			$all_categories = get_terms('eab_events_category');
+			foreach ($all_categories as $cat) {
+				$options .= '<option value="' . $cat->term_id . '" ' . selected($cat->term_id, $category, false) . '>' . $cat->name . '</option>';
+			}
+			if ($options) {
+				$html .= '<p>' .
+					'<label for="' . $this->get_field_id('category') . '">' .
+	            		__('Only Events from this category', $this->translation_domain) .
+						'<select id="' . $this->get_field_id('category') . '" name="' . $this->get_field_name('category') . '">' .
+							'<option>' . __('Any', $this->translation_domain) . '</option>' .
+							$options . 
+						'</select>' .
+	           		'</label>' .
+				'</p>';
+			}
 		}
 	
 		echo $html;
@@ -48,6 +66,9 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['date'] = strip_tags($new_instance['date']);
 		$instance['network'] = strip_tags($new_instance['network']);
+		$instance['category'] = !empty($instance['category']) ? strip_tags($new_instance['category']) : false;
+
+		delete_transient($this->get_field_id('cache'));
 
 		return $instance;
 	}
@@ -56,18 +77,44 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
 		$network = is_multisite() ? (int)$instance['network'] : false;
-		
+		$category = $network ? false : (!empty($instance['category']) ? (int)$instance['category'] : false);
+
 		echo $before_widget;
 		if ($title) echo $before_title . $title . $after_title;
-		echo $this->_render_calendar(eab_current_time(), $network);
+		echo $this->_get_calendar_output(eab_current_time(), $network, $category);
 		echo $after_widget;	
 	}
+
+	/**
+	 * Allow for calendar widget caching.
+	 * @TODO: Caching should have a more organized approach.
+	 */
+	private function _get_calendar_output ($date, $network, $category=false) {
+		if (!(defined('EAB_CALENDAR_USE_CACHE') && EAB_CALENDAR_USE_CACHE)) return $this->_render_calendar($date, $network, $category);
+
+		$key = $this->get_field_id('cache');
+		$output = get_transient($key);
+		if (empty($output)) {
+			$output = $this->_render_calendar($date, $network);
+			set_transient($key, $output, 3600); // 1 hour
+		}
+		return $output;
+	}
 	
-	private function _render_calendar ($date, $network=false) {
+	private function _render_calendar ($date, $network=false, $category=false) {
+		$args = array();
+		if ($category && (int)$category) {
+			$args['tax_query'] =  array(array(
+				'taxonomy' => 'eab_events_category',
+				'field' => 'id',
+				'terms' => $category,
+			));
+		}
 		$events = $network
 			? Eab_Network::get_upcoming_events(10)
-			: $events = Eab_CollectionFactory::get_upcoming_events($date)
+			: Eab_CollectionFactory::get_upcoming_events($date, $args)
 		;
+
 		if (!class_exists('Eab_CalendarTable_UpcomingCalendarWidget')) require_once EAB_PLUGIN_DIR . 'lib/class_eab_calendar_helper.php';
 		$renderer = new Eab_CalendarTable_UpcomingCalendarWidget($events);
 		return $renderer->get_month_calendar($date);

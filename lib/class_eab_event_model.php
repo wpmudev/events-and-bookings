@@ -167,7 +167,23 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 		if (preg_match_all('/map id="([0-9]+)"/', $venue, $matches) > 0) return true;
 		$map_id = get_post_meta($this->get_id(), 'agm_map_created', true);
 		return $map_id ? true : false;
-	} 
+	}
+
+	/**
+	 * Get raw venue map.
+	 * @param string $venue Venue
+	 * @return mixed (array)Map or (bool)false
+	 */
+	public function get_raw_map ($venue=false) {
+		$venue = $venue ? $venue : $this->get_venue();
+		if (!class_exists('AgmMapModel')) return false;
+
+		$map = $this->_get_venue_map($venue);
+		return is_array($map) && !empty($map)
+			? $map
+			: false
+		;
+	}
 	
 	/**
 	 * Convert venue map to address.
@@ -202,7 +218,22 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 		if (!$this->has_venue_map($venue)) return $venue;
 		$codec = new AgmMarkerReplacer;
 
+		if (empty($args)) {
+			$args = apply_filters('eab-maps-map_defaults', array());
+			$args = apply_filters('agm_google_maps-autogen_map-shortcode_attributes', $args);
+		}
+
 		return $codec->create_tag($this->_get_venue_map($venue), $args);
+	}
+
+	protected function _get_venue_map_id ($venue=false) {
+		$venue = $venue ? $venue : $this->get_venue();
+		$map_id = false;
+		if (preg_match_all('/map id="([0-9]+)"/', $venue, $matches) <= 0) {
+			$map_id = get_post_meta($this->get_id(), 'agm_map_created', true);
+			if (!$map_id) return false;
+		} else if (!isset($matches[1]) || !isset($matches[1][0])) return false;
+		return $map_id ? $map_id : $matches[1][0];
 	}
 	
 	/**
@@ -213,15 +244,14 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 	 */
 	private function _get_venue_map ($venue, $args=array()) { 
 		$venue = $venue ? $venue : $this->get_venue();
-		$map_id = false;
 		if (!class_exists('AgmMapModel')) return $venue;
-		if (preg_match_all('/map id="([0-9]+)"/', $venue, $matches) <= 0) {
-			$map_id = get_post_meta($this->get_id(), 'agm_map_created', true);
-			if (!$map_id) return $venue;
-		} else if (!isset($matches[1]) || !isset($matches[1][0])) return $venue;
+		
+		$map_id = $this->_get_venue_map_id($venue);
+		if (!$map_id) return $venue;
 		
 		$model = new AgmMapModel();
-		return $map_id ? $model->get_map($map_id) : $model->get_map($matches[1][0]);
+
+		return $model->get_map($map_id);
 	}
 }
 
@@ -281,7 +311,9 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	private $_event;
 	
 	private $_start_dates;
+	private $_no_start_dates;
 	private $_end_dates;
+	private $_no_end_dates;
 	
 	private $_venue;
 	private $_price;
@@ -385,8 +417,14 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	}
 
 	public function get_categories () {
-		$list = get_the_terms($this->get_id(), 'eab_events_category');
-		return is_wp_error($list) ? false : $list;
+		$event_id = $this->get_id();
+		$list = wp_cache_get('eab_events_category-' . $event_id);
+		if ($list) return $list;
+
+		$list = get_the_terms($event_id, 'eab_events_category');
+		if (is_wp_error($list)) return false;
+		wp_cache_set('eab_events_category-' . $event_id, $list);
+		return $list;
 	}
 
 	public function get_category_ids () {
@@ -410,13 +448,21 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 /* ----- Date/Time methods ----- */
 
 	public function has_no_start_time ($key=0) {
-		$raw = get_post_meta($this->get_id(), 'incsub_event_no_start');
-		return isset($raw[$key]) ? $raw[$key] : false;
+		if (empty($this->_no_start_dates) && !is_array($this->_no_start_dates)) {
+			$raw = get_post_meta($this->get_id(), 'incsub_event_no_start');
+			$raw = is_array($raw) ? $raw : array();
+			$this->_no_start_dates = $raw;
+		}
+		return isset($this->_no_start_dates[$key]) ? $this->_no_start_dates[$key] : false;
 	}
 	
 	public function has_no_end_time ($key=0) {
-		$raw = get_post_meta($this->get_id(), 'incsub_event_no_end');
-		return isset($raw[$key]) ? $raw[$key] : false;
+		if (empty($this->_no_end_dates) && !is_array($this->_no_end_dates)) {
+			$raw = get_post_meta($this->get_id(), 'incsub_event_no_end');
+			$raw = is_array($raw) ? $raw : array();
+			$this->_no_end_dates = $raw;
+		}
+		return isset($this->_no_end_dates[$key]) ? $this->_no_end_dates[$key] : false;
 	}
 	
 	/**
@@ -979,5 +1025,19 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			$user_id = $current_user->id;
 		}
 		return (int)$user_id;
+	}
+
+	public function from_network () {
+		return !empty($this->_event->blog_id) ? $this->_event->blog_id : false;
+	}
+
+	public function cache_data () {
+		$this->get_start_dates();
+		$this->has_no_start_time();
+		$this->get_end_dates();
+		$this->has_no_end_time();
+		$this->get_venue();
+		$this->get_price();
+		$this->get_status();
 	}
 }
