@@ -100,8 +100,17 @@ abstract class Eab_Exporter {
 	abstract function export_attendees();
 
 	protected function _get_bookings ($status) {
+		$event = new Eab_EventModel($this->_event_id);
+		$event_id = "event_id = " . (int)$this->_event_id;
+		if ($event->is_recurring()) {
+			$all_event_ids = array();
+			$events = Eab_CollectionFactory::get_all_recurring_children_events($event);
+			foreach ($events as $e) { $all_event_ids[] = $e->get_id(); }
+			$all_event_ids = array_filter(array_map('intval', $all_event_ids));
+			$event_id = "event_id IN(" . join(',', $all_event_ids) . ")";
+		}
 		global $wpdb;
-		return $wpdb->get_results($wpdb->prepare("SELECT id,user_id,timestamp FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s ORDER BY timestamp;", $this->_event_id, $status));
+		return $wpdb->get_results($wpdb->prepare("SELECT id,user_id,event_id,timestamp FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE {$event_id} AND status = %s ORDER BY timestamp;", $status));
 	}
 
 	protected function _get_statuses () {
@@ -138,7 +147,7 @@ class Eab_Exporter_Csv extends Eab_Exporter {
 	}
 
 	public function export_attendees () {
-		$event = new Eab_EventModel(get_post($this->_event_id));
+		error_reporting(0);
 		if (!$this->_event_id) wp_die(__('No event to export', Eab_EventsHub::TEXT_DOMAIN));
 		$event = new Eab_EventModel(get_post($this->_event_id));
 		$attendees = array();
@@ -148,6 +157,7 @@ class Eab_Exporter_Csv extends Eab_Exporter {
 			$bookings = $this->_get_bookings($status);
 			foreach ($bookings as $booking) {
 				$user_data = get_userdata($booking->user_id);
+				if ($event->get_id() !== $booking->event_id) $event = new Eab_EventModel(get_post($booking->event_id));
 				$payment_status = $ticket_count = __('N/A', Eab_EventsHub::TEXT_DOMAIN);
 				if (Eab_EventModel::BOOKING_NO != $status) {
 					$ticket_count = $event->get_booking_meta($booking->id, 'booking_ticket_count');

@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.7
+ Version: 1.7.1
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7';
+    const CURRENT_VERSION = '1.7.1';
     
     /**
      * Translation domain
@@ -631,7 +631,7 @@ class Eab_EventsHub {
     
     function handle_archive_template( $path ) {
 		global $wp_query, $post;
-		
+
 		if ( 'incsub_event' != $post->post_type )
 		    return $path;
 		
@@ -1311,7 +1311,11 @@ class Eab_EventsHub {
 		$content .= '<input type="hidden" name="incsub_event_bookings_meta" value="1" />';
 		$content .= '<div class="bookings-list-left">';
 		
-		if ($event->has_bookings(false)) {
+		if (
+			(!$event->is_recurring() && $event->has_bookings(false))
+			||
+			($event->is_recurring() && $event->has_child_bookings(false))
+		) {
 	    	$content .= '<div id="event-booking-yes">';
             $content .= Eab_Template::get_admin_bookings(Eab_EventModel::BOOKING_YES, $event);
             $content .= '</div>';
@@ -2647,6 +2651,7 @@ class Eab_EventsHub {
 
 			do_action('eab-query_rewrite-before_query_replacement', $original_year, $original_month);
 			$wp_query = Eab_CollectionFactory::get_upcoming(strtotime("{$year}-{$month}-01 00:00"), $wp_query->query);
+			$wp_query->is_404 = false;
 			do_action('eab-query_rewrite-after_query_replacement');
 		} else if (!empty($wp_query->query_vars['eab_events_category']) && empty($wp_query->query_vars['paged']) && !empty($_GET['date'])) {
 			$date = strtotime($_GET['date']);
@@ -2654,6 +2659,7 @@ class Eab_EventsHub {
 
 			do_action('eab-query_rewrite-before_query_replacement', false, false);
 			$wp_query = Eab_CollectionFactory::get_upcoming($date, $wp_query->query);
+			$wp_query->is_404 = false;
 			do_action('eab-query_rewrite-after_query_replacement');	
 		}
 	}

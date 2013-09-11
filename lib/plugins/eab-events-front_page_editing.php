@@ -397,7 +397,9 @@ class Eab_Events_FrontPageEditing {
 		$ret .= '	<option value="' . Eab_EventModel::STATUS_CLOSED . '" '.(($event->is_closed())?'selected="selected"':'').' >'.__('Closed', Eab_EventsHub::TEXT_DOMAIN).'</option>';
 		$ret .= '	<option value="' . Eab_EventModel::STATUS_EXPIRED . '" '.(($event->is_expired())?'selected="selected"':'').' >'.__('Expired', Eab_EventsHub::TEXT_DOMAIN).'</option>';
 		$ret .= '	<option value="' . Eab_EventModel::STATUS_ARCHIVED . '" '.(($event->is_archived())?'selected="selected"':'').' >'.__('Archived', Eab_EventsHub::TEXT_DOMAIN).'</option>';
+		$ret .= apply_filters('eab-events-fpe-event_meta-extra_event_status', '', $event);
 		$ret .= '</select>';
+		$ret .= apply_filters('eab-events-fpe-event_meta-after_event_status', '', $event);
 		$ret .= '</div>';
 		
 		// Type

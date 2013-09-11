@@ -40,6 +40,10 @@ class Eab_Events_EventCancel {
 		add_filter('eab-event_meta-extra_event_status', array($this, 'inject_cancelled_status'), 10, 2);
 		add_filter('eab-event_meta-after_event_status', array($this, 'inject_cancel_button'), 10, 2);
 
+		// FPE
+		add_filter('eab-events-fpe-event_meta-extra_event_status', array($this, 'inject_cancelled_status'), 10, 2);
+		add_filter('eab-events-fpe-event_meta-after_event_status', array($this, 'inject_cancel_button'), 10, 2);
+
 		add_action('wp_head', array($this, 'inject_public_styles'));
 
 		add_action('eab_scheduled_jobs', array($this, 'send_queued_notifications'));

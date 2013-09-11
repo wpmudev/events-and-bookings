@@ -858,6 +858,24 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	}
 
 	/**
+	 * Does the event children have some RSVPs?
+	 * @param bool $coming Only count positive RSVPs (yes and maybe)
+	 * @return array
+	 */
+	public function has_child_bookings($coming=true) {
+		if (!$this->is_recurring()) return false;
+		$children = array_filter(array_map('intval', $this->_get_recurring_children_ids()));
+		if (empty($children)) return false;
+
+		global $wpdb;
+
+		return $coming
+			? $wpdb->get_results("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id IN(" . join(',', $children) . ") AND status != 'no' ORDER BY timestamp;")
+			: $wpdb->get_results("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id IN(" . join(',', $children) . ") ORDER BY timestamp;")
+		;
+	}
+
+	/**
 	 * Returns a list of promised bookings.
 	 * @param  mixed $status Booking status (const), or false for all possible bookings.
 	 * @param  mixed $since UNIX timestamp, or false for no lower time limit

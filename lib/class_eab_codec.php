@@ -173,7 +173,7 @@ class Eab_Macro_Codec {
 				);
 			}
 		}
-		return apply_filters('eab-codec-expand', $str, $this->_event);
+		return apply_filters('eab-codec-expand', apply_filters('the_content', $str), $this->_event);
 	}
 
 	public function replace_event_name () {

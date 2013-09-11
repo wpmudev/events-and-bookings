@@ -154,6 +154,7 @@ class Eab_Template {
 		$content = '';		
 		$content .= '<h4>'. $status_name . '</h4>';
 		$content .= '<ul class="eab-guest-list">';
+		
 		foreach ($bookings as $booking) {
 			$user_data = get_userdata($booking->user_id);
 			$url = defined('BP_VERSION') 
@@ -171,6 +172,7 @@ class Eab_Template {
 			
 			$content .= "<li>{$avatar}</li>";
 		}
+		
 		$content .= '</ul>';
 		$content .= '<div class="clear"></div>';
 		
@@ -235,14 +237,22 @@ class Eab_Template {
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
 		
-		$bookings = $wpdb->get_results($wpdb->prepare("SELECT id,user_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id = %d AND status = %s ORDER BY timestamp;", $event->get_id(), $status));
-		if (!count($bookings)) return false;
-		
 		$content = '';		
 		$content .= '<h4>'. __($status_name, Eab_EventsHub::TEXT_DOMAIN). '</h4>';
 		$content .= '<ul class="eab-guest-list">';
+
+		$all_events = array($event);
+		if ($event->is_recurring()) $all_events = Eab_CollectionFactory::get_all_recurring_children_events($event);
+		$all_event_ids = array();
+		foreach ($all_events as $e) { $all_event_ids[] = $e->get_id(); }
+		$all_event_ids = array_filter(array_map('intval', $all_event_ids));
+
+		$bookings = $wpdb->get_results($wpdb->prepare("SELECT id,user_id,event_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id IN(" . join(',', $all_event_ids) . ") AND status = %s ORDER BY timestamp;", $status));
+		if (!count($bookings)) return false;
+
 		foreach ($bookings as $booking) {
 			$user_data = get_userdata($booking->user_id);
+			if ($event->get_id() !== $booking->event_id) $event = new Eab_EventModel(get_post($booking->event_id));
 			$content .= '<li>';
 			$content .= '<div class="eab-guest">';
 			$content .= '<a href="user-edit.php?user_id='.$booking->user_id .'" title="'.$user_data->display_name.'">' .
@@ -252,7 +262,6 @@ class Eab_Template {
 			'</a>';
 			if ($event->is_premium()) {
 				if ($event->user_paid($booking->user_id)) {
-				//if ($event->get_booking_paid($booking->id)) {
 					$ticket_count = $event->get_booking_meta($booking->id, 'booking_ticket_count');
 					$ticket_count = $ticket_count ? $ticket_count : 1;
 					$payment_status = '' .
@@ -645,6 +654,8 @@ class Eab_Template {
 		$renderer->set_scripts(!$args['override_scripts']);
 		$renderer->set_navigation($args['navigation']);
 		$renderer->set_title_format($args['title_format']);
+		$renderer->set_short_title_format($args['short_title_format']);
+		$renderer->set_long_date_format($args['long_date_format']);
 
 		return '<section class="wpmudevevents-list">' . $renderer->get_month_calendar($args['date']) . '</section>';
 	}

@@ -176,6 +176,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'class' => 'eab-shortcode_calendar',
 			'navigation' => false,
 			'title_format' => 'M Y',
+			'short_title_format' => 'm-Y',
 			'long_date_format' => false,
 			'template' => 'get_shortcode_calendar_output', // Subtemplate file, or template class call
 			'override_styles' => false,
@@ -212,6 +213,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'categories' => array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
 				'navigation' => array('help' => __('Show navigation', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'title_format' => array('help' => __('Date format used in the navigation title, defaults to "M Y"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
+				'short_title_format' => array('help' => __('Date format used for shorter date representation in the navigation title, defaults to "m-Y"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
 				'long_date_format' => array('help' => __('Date format used for displaying long date representation, defaults to your date settings', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
 				'footer' => array('help' => __('Show calendar table footer', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),

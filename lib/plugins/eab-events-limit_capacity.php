@@ -8,8 +8,12 @@ Author: Ve Bailovity (Incsub)
 */
 
 class Eab_Addon_LimitCapacity {
+
+	private $_data;
 	
-	private function __construct () {}
+	private function __construct () {
+		$this->_data = Eab_Options::get_instance();
+	}
 	
 	public static function serve () {
 		$me = new Eab_Addon_LimitCapacity;
@@ -17,6 +21,9 @@ class Eab_Addon_LimitCapacity {
 	}
 	
 	private function _add_hooks () {
+		add_action('eab-settings-after_api_settings', array($this, 'show_settings'));
+		add_filter('eab-settings-before_save', array($this, 'save_settings'));
+
 		add_filter('eab-event_meta-event_meta_box-after', array($this, 'add_capacity_meta_box'));
 		add_action('eab-event_meta-save_meta', array($this, 'save_capacity_meta'));
 		add_action('eab-events-recurrent_event_child-save_meta', array($this, 'save_capacity_meta'));
@@ -25,7 +32,7 @@ class Eab_Addon_LimitCapacity {
 		add_action('admin_print_scripts-post-new.php', array($this, 'enqueue_admin_dependencies'));
 		add_action('eab-javascript-enqueue_scripts', array($this, 'enqueue_public_dependencies'));
 		
-		add_filter('eab-rsvps-rsvp_form', array($this, 'handle_rsvp_form'));
+		add_filter('eab-rsvps-rsvp_form', array($this, 'handle_rsvp_form'), 10, 2);
 		add_filter('eab-event-payment_forms', array($this, 'show_remaining_tickets'), 10, 2);
 		add_filter('eab-payment-paypal_tickets-extra_attributes', array($this, 'handle_paypal_tickets'), 10, 3);
 		
@@ -33,6 +40,9 @@ class Eab_Addon_LimitCapacity {
 		add_filter('eab-events-fpe-add_meta', array($this, 'add_fpe_meta_box'), 10, 2);
 		add_action('eab-events-fpe-enqueue_dependencies', array($this, 'enqueue_fpe_dependencies'), 10, 2);
 		add_action('eab-events-fpe-save_meta', array($this, 'save_fpe_meta'), 10, 2);
+
+		// Attendance data juggling
+		add_filter('_eab-capacity-internal-attendance', array($this, 'get_remaining_capacity'), 10, 2);
 	}
 	
 	private function _get_event_total_attendance ($event_id, $exclude_user=false) {
@@ -72,9 +82,14 @@ class Eab_Addon_LimitCapacity {
 		
 	}
 	
-	function handle_rsvp_form ($content) {
-		global $post;
-		$post_id = (int)@$post->ID;
+	function handle_rsvp_form ($content, $event=false) {
+		$post_id = false;
+		if ($event && $event instanceof Eab_EventModel) {
+			$post_id = $event->get_id();
+		} else {
+			global $post;
+			$post_id = (int)@$post->ID;
+		}
 
 		$capacity = (int)get_post_meta($post_id, 'eab_capacity', true);
 		if (!$capacity) return $content; // No capacity set, we're good to show
@@ -84,7 +99,14 @@ class Eab_Addon_LimitCapacity {
 		global $wpdb, $current_user;
 		$users = $wpdb->get_col("SELECT user_id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id={$post_id} AND status='yes';");
 		
-		if ($capacity > $total) return $content;
+		if ($capacity > $total) {
+			$remaining = $this->get_remaining_capacity(0, $post_id);
+			$content .= $this->_data->get_option('eab-limit_capacity-show_remaining')
+				? '<span class="eab-limit_capacity-remaining">' . apply_filters('eab-rsvps-event_capacity_remaining-message', sprintf(__('%d seats left', Eab_EventsHub::TEXT_DOMAIN), $remaining), $post_id, $remaining) . '</span>'
+				: ''
+			;
+			return $content;
+		}
 		return (in_array($current_user->id, $users)) ? $content : $this->_get_overbooked_message($post_id);
 		/*
 		if ($capacity > $total) return $content;
@@ -102,6 +124,14 @@ class Eab_Addon_LimitCapacity {
 			? '<div class="eab-max_capacity">' . sprintf(__('%s tickets left', Eab_EventsHub::TEXT_DOMAIN), $max) . '</div>' . $content
 			: $content . '<div class="eab-max_capacity">' . __('No tickets left', Eab_EventsHub::TEXT_DOMAIN) . '</div>'
 		;
+	}
+
+	function get_remaining_capacity ($attentance, $event_id) {
+		$capacity = (int)get_post_meta($event_id, 'eab_capacity', true);
+		if (!$capacity) return false; // No capacity set
+		
+		$total = $this->_get_event_total_attendance($event_id);
+		return $capacity - $total;
 	}
 	
 	function add_capacity_meta_box ($box) {
@@ -178,16 +208,68 @@ class Eab_Addon_LimitCapacity {
 	
 	private function _get_overbooked_message ($post_id=false) {
 		$message = apply_filters('eab-rsvps-event_capacity_reached-message', __('Sorry, the event sold out.', Eab_EventsHub::TEXT_DOMAIN), $post_id);
-		/*
-		if (!is_user_logged_in() && $post_id) {
+		if ($post_id && $this->_data->get_option('eab-limit_capacity-show_cancel')) {
 			$login_url_n = apply_filters('eab-rsvps-rsvp_login_page-no', wp_login_url(get_permalink($post_id)) . '&eab=n');
-			$message .= '<a href="' . $login_url_n . '" >'.__('Cancel', Eab_EventsHub::TEXT_DOMAIN).'</a></div>';
+			if (is_user_logged_in()) {
+				$user_id = get_current_user_id();
+				$event = new Eab_EventModel($post_id);
+				$is_coming = $event->user_is_coming(false, $user_id);
+				$cancel = '<input class="current wpmudevevents-no-submit" type="submit" name="action_no" value="' . 
+					__('Cancel', Eab_EventsHub::TEXT_DOMAIN) . 
+					'" ' .
+					($is_coming ? '' : 'style="display:none"') .
+				' />';
+				if ($is_coming) {
+					$cancel .= '<input type="hidden" name="user_id" value="' . get_current_user_id() . '" />';
+				}
+			} else {
+				$cancel = '<a class="wpmudevevents-no-submit" href="' . $login_url_n . '" >' . __('Cancel', Eab_EventsHub::TEXT_DOMAIN) . '</a>';
+			}
+			$message .= '<div class="wpmudevevents-buttons">' .
+				'<form action="' . get_permalink($post_id) . '" method="post" >' .
+				'<input type="hidden" name="event_id" value="' . $post_id . '" />' .
+				$cancel .
+				'</form>' .
+			'</div>';
 		}
-		*/
 		return '<div class="wpmudevevents-event_reached_capacity">' .
 			$message .
 		'</div>';
 	}
+
+	function save_settings ($options) {
+		$options['eab-limit_capacity-show_remaining'] = @$_POST['event_default']['eab-limit_capacity-show_remaining'];
+		$options['eab-limit_capacity-show_cancel'] = @$_POST['event_default']['eab-limit_capacity-show_cancel'];
+		return $options;
+	}
+
+	function show_settings () {
+		$checked_remaining = $this->_data->get_option('eab-limit_capacity-show_remaining') ? 'checked="checked"' : '';
+		$checked_cancel = $this->_data->get_option('eab-limit_capacity-show_cancel') ? 'checked="checked"' : '';
+?>
+<div id="eab-settings-limit_capacity" class="eab-metabox postbox">
+	<h3 class="eab-hndle"><?php _e('Limited capacity events settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<div class="eab-inside">
+		<div class="eab-settings-settings_item">
+	    	<label for="eab-limit_capacity-show_remaining"><?php _e('Show remaining seats', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
+			<input type="checkbox" id="eab-limit_capacity-show_remaining" name="event_default[eab-limit_capacity-show_remaining]" value="1" <?php print $checked_remaining; ?> />
+		</div>
+		<div class="eab-settings-settings_item">
+			<label for="eab-limit_capacity-show_cancel"><?php _e('Show cancel link for logged out users when the event is sold out', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
+			<input type="checkbox" id="eab-limit_capacity-show_cancel" name="event_default[eab-limit_capacity-show_cancel]" value="1" <?php print $checked_cancel; ?> />
+	    </div>
+	</div>
+</div>
+<?php
+	}
 }
 
 Eab_Addon_LimitCapacity::serve();
+
+function eab_capacity_remaining ($event_id=false) {
+	if (!$event_id) {
+		global $post;
+		$event_id = $post->ID;
+	}
+	return apply_filters('_eab-capacity-internal-attendance', 0, $event_id);
+}

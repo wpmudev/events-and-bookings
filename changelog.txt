@@ -4,6 +4,14 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.1 - 2013-09-11
+----------------------------------------------------------------------
+- Changes to widget categories selection.
+- Exposing the limited capacity settings.
+- Adding short title format for calendar shortcode.
+- Exposing event cancellation to front page editor.
+- Fix for children attendance getter.
+
 1.7 - 2013-09-07
 ----------------------------------------------------------------------
 - Fix for permalink fetching method.

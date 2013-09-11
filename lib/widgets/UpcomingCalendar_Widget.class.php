@@ -25,8 +25,11 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$title = esc_attr($instance['title']);
 		$date = esc_attr($instance['date']);
 		$network = esc_attr($instance['network']) ? 'checked="checked"' : '';
-		$category = !empty($instance['category']) ? esc_attr($instance['category']) : false;
-		
+		$category = !empty($instance['category']) ? 
+			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
+			: array()
+		;
+
 		$html .= '<p>';
 		$html .= '<label for="' . $this->get_field_id('title') . '">' . __('Title:', $this->translation_domain) . '</label>';
 		$html .= '<input type="text" name="' . $this->get_field_name('title') . '" id="' . $this->get_field_id('title') . '" class="widefat" value="' . $title . '"/>';
@@ -43,14 +46,14 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 			$options = false;
 			$all_categories = get_terms('eab_events_category');
 			foreach ($all_categories as $cat) {
-				$options .= '<option value="' . $cat->term_id . '" ' . selected($cat->term_id, $category, false) . '>' . $cat->name . '</option>';
+				$options .= '<option value="' . $cat->term_id . '" ' . (in_array($cat->term_id, $category) ? 'selected="selected"' : '') . '>' . $cat->name . '</option>';
 			}
 			if ($options) {
 				$html .= '<p>' .
 					'<label for="' . $this->get_field_id('category') . '">' .
 	            		__('Only Events from this category', $this->translation_domain) .
-						'<select id="' . $this->get_field_id('category') . '" name="' . $this->get_field_name('category') . '">' .
-							'<option>' . __('Any', $this->translation_domain) . '</option>' .
+						'<select id="' . $this->get_field_id('category') . '" name="' . $this->get_field_name('category') . '[]" multiple class="widefat">' .
+							'<option ' . (empty($category) ? 'selected="selected"' : '') . ' value="">' . __('Any', $this->translation_domain) . '</option>' .
 							$options . 
 						'</select>' .
 	           		'</label>' .
@@ -66,7 +69,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['date'] = strip_tags($new_instance['date']);
 		$instance['network'] = strip_tags($new_instance['network']);
-		$instance['category'] = !empty($instance['category']) ? strip_tags($new_instance['category']) : false;
+		$instance['category'] = !empty($new_instance['category']) ? array_map('strip_tags', $new_instance['category']) : false;
 
 		delete_transient($this->get_field_id('cache'));
 
@@ -77,7 +80,10 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
 		$network = is_multisite() ? (int)$instance['network'] : false;
-		$category = $network ? false : (!empty($instance['category']) ? (int)$instance['category'] : false);
+		$category = !empty($instance['category']) ? 
+			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
+			: array()
+		;
 
 		echo $before_widget;
 		if ($title) echo $before_title . $title . $after_title;
@@ -89,7 +95,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	 * Allow for calendar widget caching.
 	 * @TODO: Caching should have a more organized approach.
 	 */
-	private function _get_calendar_output ($date, $network, $category=false) {
+	private function _get_calendar_output ($date, $network, $category=array()) {
 		if (!(defined('EAB_CALENDAR_USE_CACHE') && EAB_CALENDAR_USE_CACHE)) return $this->_render_calendar($date, $network, $category);
 
 		$key = $this->get_field_id('cache');
@@ -101,15 +107,22 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		return $output;
 	}
 	
-	private function _render_calendar ($date, $network=false, $category=false) {
+	private function _render_calendar ($date, $network=false, $category=array()) {
 		$args = array();
-		if ($category && (int)$category) {
-			$args['tax_query'] =  array(array(
-				'taxonomy' => 'eab_events_category',
-				'field' => 'id',
-				'terms' => $category,
-			));
+		if (!empty($category)) {
+			$args['tax_query'] = array(
+				'relation' => 'OR',
+			);
+			foreach ($category as $cat) {
+				if (!$cat) continue;
+				$args['tax_query'][] = array(
+					'taxonomy' => 'eab_events_category',
+					'field' => 'id',
+					'terms' => $cat,
+				);
+			}
 		}
+
 		$events = $network
 			? Eab_Network::get_upcoming_events(10)
 			: Eab_CollectionFactory::get_upcoming_events($date, $args)

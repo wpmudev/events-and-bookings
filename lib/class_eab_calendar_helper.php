@@ -402,6 +402,7 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 	protected $_use_scripts = true;
 	protected $_navigation = false;
 	protected $_title_format = 'M Y';
+	protected $_short_title_format = 'm-Y';
 	
 	public function set_class ($class) {
 		$this->_class = sanitize_html_class($class);
@@ -421,6 +422,10 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 
 	public function set_title_format ($title_format) {
 		$this->_title_format = $title_format ? $title_format : $this->_title_format;
+	}
+	
+	public function set_short_title_format ($title_format) {
+		$this->_short_title_format = $title_format ? $title_format : $this->_short_title_format;
 	}
 
 	public function set_navigation ($navigation) {
@@ -457,12 +462,18 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 		$row_class = "eab-calendar-title {$calendar_class}-title-{$position}";
 
 
+		$short_attribute = $this->_short_title_format
+			? 'datetime="' . esc_attr(date_i18n($this->_short_title_format, $time)) . '"'
+			: ''
+		;
 		$title_format = 'top' == $position
-			? '<h4>' . date_i18n($this->_title_format, $time) . '</h4>'
-			: '<b>' . date_i18n($this->_title_format, $time) . '</b>'
+			? date_i18n($this->_title_format, $time)
+			: date_i18n($this->_title_format, $time)
 		;
 		$title_link = '<a href="' . Eab_Template::get_archive_url($time, true) . '" class="' . $calendar_class . '-navigation-link eab-cuw-calendar_date">' .
-			$title_format . 
+			"<time {$short_attribute}>" .
+				"<span>{$title_format}</span>" . 
+			'</time>' .
 		'</a>';
 		$title = 'top' == $position
 			? "<h4>{$title_link}</h4>"

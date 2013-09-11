@@ -108,6 +108,16 @@ a.wpmudevevents-calendar-event:hover {
 	{
 		display: none;
 	}
+
+	.wpmudevevents-list table.eab-monthly_calendar thead h4 span,
+	.wpmudevevents-list table.eab-monthly_calendar tfoot b span {
+		display: none;
+	}
+	.wpmudevevents-list table.eab-monthly_calendar thead h4 time:after,
+	.wpmudevevents-list table.eab-monthly_calendar tfoot b time:after {
+		content: attr(datetime);
+	}
+
 	.wpmudevevents-list table.eab-monthly_calendar thead td,
 	.wpmudevevents-list table.eab-monthly_calendar tfoot td
 	{

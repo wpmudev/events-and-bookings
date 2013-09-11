@@ -8,6 +8,7 @@ $renderer->set_footer($args['footer']);
 $renderer->set_scripts(!$args['override_scripts']);
 $renderer->set_navigation($args['navigation']);
 $renderer->set_title_format($args['title_format']);
+$renderer->set_short_title_format($args['short_title_format']);
 $renderer->set_long_date_format($args['long_date_format']);
 
 echo $renderer->get_month_calendar($args['date']);
