@@ -15,8 +15,8 @@ class Eab_Events_RsvpEmail_Codec extends Eab_Macro_Codec {
 		$this->_macros = apply_filters('eab-events-rsvp_email-codec-macros', $this->_macros);
 	}
 
-	public function expand ($str) {
-		return apply_filters('eab-events-rsvp_email-codec-expand', parent::expand($str), $this->_event);
+	public function expand ($str, $filter=false) {
+		return apply_filters('eab-events-rsvp_email-codec-expand', parent::expand($str, $filter), $this->_event);
 	}
 
 }
@@ -60,8 +60,8 @@ class Eab_Events_RsvpEmail {
 		add_filter('wp_mail_content_type', array($this, 'email_charset'));
 		wp_mail(
 			$user->user_email, 
-			$codec->expand($subject),
-			$codec->expand($body),
+			$codec->expand($subject, Eab_Macro_Codec::FILTER_TITLE),
+			$codec->expand($body, Eab_Macro_Codec::FILTER_BODY),
 			$headers
 		);
 		remove_filter('wp_mail_content_type', array($this, 'email_charset'));
@@ -76,8 +76,8 @@ class Eab_Events_RsvpEmail {
 		$user = wp_get_current_user();
 		$codec = new Eab_Events_RsvpEmail_Codec($event_id, $user->ID);
 		die(
-			'<strong>' . $codec->expand($data['subject']) . '</strong>' .
-			'<div>' . $codec->expand($data['body']) . '</div>'
+			'<strong>' . $codec->expand($data['subject'], Eab_Macro_Codec::FILTER_TITLE) . '</strong>' .
+			'<div>' . $codec->expand($data['body'], Eab_Macro_Codec::FILTER_BODY) . '</div>'
 		);
 	}
 

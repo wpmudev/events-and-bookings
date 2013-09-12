@@ -128,6 +128,9 @@ abstract class Eab_Codec {
  * Macro expansion codec class.
  */
 class Eab_Macro_Codec {
+
+	const FILTER_TITLE = 'title';
+	const FILTER_BODY = 'body';
 	
 	protected $_macros = array(
 		'EVENT_NAME',
@@ -160,7 +163,7 @@ class Eab_Macro_Codec {
 		if (is_object($user)) $this->_user = $user;
 	}
 
-	public function expand ($str) {
+	public function expand ($str, $filter=false) {
 		if (!$str) return $str;
 		foreach ($this->_macros as $macro) {
 			$callback = false;
@@ -173,7 +176,9 @@ class Eab_Macro_Codec {
 				);
 			}
 		}
-		return apply_filters('eab-codec-expand', apply_filters('the_content', $str), $this->_event);
+		if (!$filter || self::FILTER_BODY == $filter) $str = apply_filters('the_content', $str);
+		if (self::FILTER_TITLE == $filter) $str = wp_strip_all_tags($str);
+		return apply_filters('eab-codec-expand', $str, $this->_event);
 	}
 
 	public function replace_event_name () {
