@@ -24,12 +24,12 @@ $(function () {
 			});
 		});
 	});
-	//$(".eab-upcoming_calendar_widget-navigation-link:not(.eab-cuw-calendar_date)").live('click', function () {
 	$(document).on("click", ".eab-upcoming_calendar_widget .eab-upcoming_calendar_widget-navigation-link:not(.eab-cuw-calendar_date)", function () {
 		var $me = $(this);
 		var now = $me.parents("tr").find("input.eab-cuw-calendar_date").val();
 		var direction = $me.is(".eab-navigation-prev") ? "prev" : "next";
 		var unit = $me.is(".eab-time_unit-year") ? "year" : "month";
+		var widget_id = $me.parents('[data-eab-widget_id]').attr("data-eab-widget_id");
 
 		// Start UI change
 		var $out = $("#wpmudevevents-upcoming_calendar_widget-shelf");
@@ -42,7 +42,8 @@ $(function () {
 			"action": "eab_cuw_get_calendar",
 			"now": now,
 			"direction": direction,
-			"unit": unit
+			"unit": unit,
+			"widget_id": parseInt(widget_id, 10) || 0
 		}, function (data) {
 			$me.parents("table").replaceWith(data);
 			$(document).trigger('eab-cuw-render_complete');

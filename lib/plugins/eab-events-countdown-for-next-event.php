@@ -84,7 +84,7 @@ class Eab_Events_CountdownforNextEvent {
 	 * Register jQuery countdown
 	 */		
 	function register_scripts() {
-		wp_register_script('jquery-countdown',plugins_url('events-and-bookings/js/').'jquery.countdown.min.js',array('jquery','jquery-ui-widget'));
+		wp_register_script('jquery-countdown', plugins_url('events-and-bookings/js/').'jquery.countdown.min.js', array('jquery','jquery-ui-widget'), Eab_EventsHub::CURRENT_VERSION);
 	}
 
 	/**
@@ -103,8 +103,10 @@ class Eab_Events_CountdownforNextEvent {
 			}
 		}
  
-		if ($shortcode_found) 
+		if ($shortcode_found) {
 			wp_enqueue_style('jquery-countdown',plugins_url('events-and-bookings/css/').'jquery.countdown.css');
+			define('EAB_COUNTDOWN_FLAG_STYLES_INJECTED', true); // Don't double-enqueue
+		}
  
 		return $posts;
 	}
@@ -116,6 +118,10 @@ class Eab_Events_CountdownforNextEvent {
 			wp_enqueue_script('jquery-countdown');
 				if ( $locale = $this->locale() )
 			wp_enqueue_script('jquery-countdown-'.$locale,plugins_url('events-and-bookings/js/').'jquery.countdown-'.$locale.'.js',array('jquery-countdown'));
+
+			if (!(defined('EAB_COUNTDOWN_FLAG_STYLES_INJECTED') && EAB_COUNTDOWN_FLAG_STYLES_INJECTED)) {
+				wp_enqueue_style('jquery-countdown',plugins_url('events-and-bookings/css/').'jquery.countdown.css'); // E.g. in a widget
+			}
 		}
 	}
 
@@ -151,6 +157,8 @@ class Eab_Events_CountdownforNextEvent {
 		'type'		=> '',
 		'size'		=> 70,
 		'add'		=> 0,
+		'allow_scaling' => false, // Scaling allowing boolean switch
+		'compact' => false, // Boolean compact flag
 		'title'		=> false,
 		'footer_script' => false,
 		'expired'	=> __('Closed', Eab_EventsHub::TEXT_DOMAIN)
@@ -166,6 +174,10 @@ class Eab_Events_CountdownforNextEvent {
 		if ( $goto && $goto != "window.location.href" )
 			$goto = "'". str_replace( array("'",'"'), "", $goto ). "'"; // Do not allow quotes which may break js
 
+		$transform = false;
+		if ($size < 70 && !empty($allow_scaling)) {
+			$transform = $size / 70;
+		}
 		switch ($size) {
 			case 70:	$height = 72; break;
 			case 82:	$height = 84; break;
@@ -234,6 +246,30 @@ class Eab_Events_CountdownforNextEvent {
 			) . 
 			"<div id='eab_next_event_countdown{$id}' {$class} data-height='{$height}' data-size='{$size}'></div>" . 
 		'</div>';
+
+		if ($transform && !empty($allow_scaling)) {
+			$markup .= <<<EOTransformCSS
+<style type="text/css">
+#eab_next_event_countdown{$id} .countdown_section { 
+	transform: scale({$transform},{$transform});
+	-ms-transform: scale({$transform},{$transform});
+	-webkit-transform: scale({$transform},{$transform});
+}
+</style>
+EOTransformCSS;
+		}
+
+		if (!empty($size) && !empty($compact)) {
+			$base_size = $transform && !empty($allow_scaling) ? $size * $transform : $size;
+			$max_width = ($base_size * 8) + 20;
+			$markup .= <<<EOCompactCSS
+<style type="text/css">
+#eab_next_event_countdown{$id} {
+	max-width: {$max_width}px;
+}
+</style>
+EOCompactCSS;
+		}
 
 		if ($footer_script && in_array($footer_script, array('yes', 'true', '1'))) {
 			self::add_script($script);

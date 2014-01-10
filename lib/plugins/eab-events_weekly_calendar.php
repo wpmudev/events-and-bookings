@@ -113,8 +113,8 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		$c .= '<div class="event-pagination">';
 		$prev = $time - (7*86400); 
 		$next = $time + (7*86400);
-		$c .= '<a href="'. add_query_arg( "wcalendar", $prev, get_permalink( $post->ID ) ) .'">Prev</a>';
-		$c .= '<a href="'. add_query_arg( "wcalendar", $next, get_permalink( $post->ID ) ). '">Next</a>';
+		$c .= '<a href="'. add_query_arg( "wcalendar", $prev, get_permalink( $post->ID ) ) .'">' . __('Prev', Eab_EventsHub::TEXT_DOMAIN) . '</a>';
+		$c .= '<a href="'. add_query_arg( "wcalendar", $next, get_permalink( $post->ID ) ). '">' . __('Next', Eab_EventsHub::TEXT_DOMAIN) . '</a>';
 		$c .= '</div>';
 			
 		$c .= '</div>
@@ -406,7 +406,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		$tips = new WpmuDev_HelpTooltips();
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 		?>
-		<div id="eab-settings-paypal" class="eab-metabox postbox">
+		<div id="eab-settings-weekly_calendar" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Weekly Event Calendar settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">
@@ -434,7 +434,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 						<option value="author" <?php if( $this->_data->get_option('weekly_calendar_display') ) echo "selected='selected'"?>><?php _e('Author name, avatar and bio', Eab_EventsHub::TEXT_DOMAIN); ?></option>
 						
 						</select>
-						<span><?php echo $tips->add_tip(__('Select which items should be displayed in the toltip, i.e. when visitor places the mouse over the event.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+						<span><?php echo $tips->add_tip(__('Select which items should be displayed in the tooltip, i.e. when visitor places the mouse over the event.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 					</div>
 					    
 				</div>

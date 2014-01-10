@@ -115,7 +115,7 @@ class Eab_Export_iCal {
 		return "{$content} <a href='" . 
 			get_permalink($event->get_id()) . 
 			'?eab_format=ical' . $download .
-		"'><span class='eab_export'>" . __('Export', Eab_EventsHub::TEXT_DOMAIN) . '</span></a>';
+		"'><span class='eab_export'>" . __('Export to iCal', Eab_EventsHub::TEXT_DOMAIN) . '</span></a>';
 	}
 
 	function intercept_page_load () {

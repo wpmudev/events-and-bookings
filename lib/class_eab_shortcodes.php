@@ -28,6 +28,7 @@ class Eab_Shortcodes extends Eab_Codec {
 		$map_args = $args;
 		$args = $this->_preparse_arguments($args, array(
 		// Date arguments	
+			'relative_date' => false, // A date relative to _now_ or to date argument - using a strtotime string
 			'date' => false, // Starting date - default to now
 			'lookahead' => false, // Don't use default monthly page - use weeks count instead
 			'weeks' => false, // Look ahead this many weeks
@@ -143,6 +144,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'note' => __('Requires Google Maps plugin.', Eab_EventsHub::TEXT_DOMAIN),
 			'arguments' => array(
 				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'relative_date' => array('help' => __('A date relative to now or to date argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_strtotime'),
 				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'weeks' => array('help' => __('Look ahead this many weeks', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
@@ -168,6 +170,7 @@ class Eab_Shortcodes extends Eab_Codec {
 		$args = $this->_preparse_arguments($args, array(
 			'network' => false,
 			'date' => false,
+			'relative_date' => false,
 		// Query arguments
 			'category' => false, // ID or slug
 			'categories' => false, // Comma-separated list of IDs
@@ -181,6 +184,8 @@ class Eab_Shortcodes extends Eab_Codec {
 			'template' => 'get_shortcode_calendar_output', // Subtemplate file, or template class call
 			'override_styles' => false,
 			'override_scripts' => false,
+			'with_thumbnail' => false,
+			'default_thumbnail' => false,
 		));
 
 		if (!empty($_GET['date'])) {
@@ -209,6 +214,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'arguments' => array(
 				'network' => array('help' => __('Query type', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'relative_date' => array('help' => __('A date relative to now or to date argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_strtotime'),
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
 				'categories' => array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
 				'navigation' => array('help' => __('Show navigation', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
@@ -217,11 +223,13 @@ class Eab_Shortcodes extends Eab_Codec {
 				'long_date_format' => array('help' => __('Date format used for displaying long date representation, defaults to your date settings', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
 				'footer' => array('help' => __('Show calendar table footer', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'with_thumbnail' => array('help' => __('Show event thumbnail', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'default_thumbnail' => array('help' => __('Use this image URL as thumnail if event does not have an appropriate featured image set', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:url'),
 				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 			),
-			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
+			'advanced_arguments' => array('template', 'override_scripts', 'override_styles', 'default_thumbnail'),
 		);
 		return $help;
 	}
@@ -234,6 +242,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'network' => false, // Query type
 		// Date arguments	
 			'date' => false, // Starting date - default to now
+			'relative_date' => false,
 			'lookahead' => false, // Don't use default monthly page - use weeks count instead
 			'weeks' => false, // Look ahead this many weeks
 		// Query arguments
@@ -312,6 +321,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'arguments' => array(
 				'network' => array('help' => __('Query type', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'relative_date' => array('help' => __('A date relative to now or to date argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_strtotime'),
 				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'weeks' => array('help' => __('Look ahead this many weeks', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
@@ -405,11 +415,14 @@ class Eab_Shortcodes extends Eab_Codec {
 		}
 		if (!$event) return $content;
 		
-		$output = Eab_Template::util_apply_shortcode_template($event, $args);//eab_call_template('util_apply_shortcode_template', $event, $args);
+		$output = Eab_Template::util_apply_shortcode_template($event, $args);
 		$output = $output ? $output : $content;
 
 		if (!$args['override_styles']) wp_enqueue_style('eab_front');
-		if (!$args['override_scripts']) wp_enqueue_script('eab_event_js');
+		if (!$args['override_scripts']) {
+			wp_enqueue_script('eab_event_js');
+			do_action('eab-javascript-do_enqueue_api_scripts');
+		}
 		return $output;
 	}
 

@@ -24,11 +24,26 @@ class Eab_GuestList_ShowAdditionalInfo {
 		
 		add_action('wp_print_styles', array($this, 'add_styles'));
 		add_filter('eab-guest_list-guest_avatar', array($this, 'process_avatar'), 10, 4);
+
+		if ($this->_data->get_option('guest_lists-sai-show_in_admin')) {
+			add_filter('eab-guest_list-admin-guest_name', array($this, 'process_username'), 10, 3);
+		}
+		if ($this->_data->get_option('guest_lists-sai-show_in_export')) {
+			add_filter('eab-guest_list-export-guest_name', array($this, 'process_username'), 10, 3);
+		}
 	}
 	
 	function add_styles () {
 		global $post;
 		if (Eab_EventModel::POST_TYPE != $post->post_type) return false;
+	}
+
+	function process_username ($username, $user_id, $user_data) {
+		$name = $this->_userdata_to_user_name($user_id, $user_data);
+		return trim($name)
+			? $name
+			: $username
+		;
 	}
 	
 	function process_avatar ($avatar, $user_id, $user_data, $event) {
@@ -42,6 +57,26 @@ class Eab_GuestList_ShowAdditionalInfo {
 		$size = in_array($size, array_keys($avatar_sizes)) ? (int)$avatar_sizes[$size] : false; 
 		$avatar = $size ? get_avatar($user_id, $size) : false;
 		
+		$name = $this->_userdata_to_user_name($user_id, $user_data);
+		$name = sprintf("<span class='eab-guest_lists-user_name'>%s</span>", $name);
+
+		$url = defined('BP_VERSION') 
+			? bp_core_get_user_domain($user_id) : 
+			get_author_posts_url($user_id)
+		;
+		
+		if ($size) {
+			$width = $size+4;
+			$style = "style='display:block; width:{$width}px; float:left; overflow:hidden; margin: 0 5px;'";
+		}
+
+		$avatar = '<a ' . $style . ' href="' . $url . '" title="' . esc_attr(strip_tags($name)) . '">' .
+			$avatar . $name .
+		'</a>';
+		return $avatar;
+	}
+
+	private function _userdata_to_user_name ($user_id, $user_data) {
 		$name = $user_data->user_login;
 		switch ($this->_data->get_option('guest_lists-sai-show_name')) {
 			case "username":
@@ -68,24 +103,12 @@ class Eab_GuestList_ShowAdditionalInfo {
 				break;
 			default:
 				$tmp_name = false;
-				break;
-			
+				break;	
 		}
-		$name = sprintf("<span class='eab-guest_lists-user_name'>%s</span>", (trim($tmp_name) ? $tmp_name : $name));
-		$url = defined('BP_VERSION') 
-			? bp_core_get_user_domain($user_id) : 
-			get_author_posts_url($user_id)
+		return trim($tmp_name) 
+			? $tmp_name 
+			: $name
 		;
-		
-		if ($size) {
-			$width = $size+4;
-			$style = "style='display:block; width:{$width}px; float:left; overflow:hidden; margin: 0 5px;'";
-		}
-
-		$avatar = '<a ' . $style . ' href="' . $url . '" title="' . esc_attr(strip_tags($name)) . '">' .
-			$avatar . $name .
-		'</a>';
-		return $avatar;
 	}
 	
 	function show_settings () {
@@ -104,6 +127,9 @@ class Eab_GuestList_ShowAdditionalInfo {
 		$lastname = ('lastname' == $this->_data->get_option('guest_lists-sai-show_name')) ? 'checked="checked"' : '';
 		$fullname_first = ('fullname_first' == $this->_data->get_option('guest_lists-sai-show_name')) ? 'checked="checked"' : '';
 		$fullname_last = ('fullname_last' == $this->_data->get_option('guest_lists-sai-show_name')) ? 'checked="checked"' : '';
+
+		$show_in_admin = $this->_data->get_option('guest_lists-sai-show_in_admin') ? 'checked="checked"' : '';
+		$show_in_export = $this->_data->get_option('guest_lists-sai-show_in_export') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-guest_lists" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Guest Lists Options :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -160,6 +186,20 @@ class Eab_GuestList_ShowAdditionalInfo {
 			<span><?php echo $tips->add_tip(__('Show user full names in RSVP listings as Lastname Firstname', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 			<p></p>
 	    </div>
+	    <div class="eab-settings-settings_item" style="line-height:1.8em">
+			<label><?php _e('Show prettified gues list names in...', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+			<br />
+			<input type="hidden" name="event_default[guest_lists-sai-show_in_admin]" value="" />
+			<input type="checkbox" id="eab_event-guest_lists-sai-show_in_admin" name="event_default[guest_lists-sai-show_in_admin]" value="1" <?php print $show_in_admin; ?> />
+	    	<label for="eab_event-guest_lists-sai-show_in_admin"><?php _e('Events admin area', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+			<span><?php echo $tips->add_tip(__('By default, the user names will be shown here', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+			<br />
+			<input type="hidden" name="event_default[guest_lists-sai-show_in_export]" value="" />
+			<input type="checkbox" id="eab_event-guest_lists-sai-show_in_export" name="event_default[guest_lists-sai-show_in_export]" value="1" <?php print $show_in_export; ?> />
+	    	<label for="eab_event-guest_lists-sai-show_in_export"><?php _e('Events export files', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+			<span><?php echo $tips->add_tip(__('By default, the user names will be shown here', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+			<br />
+	    </div>
 	</div>
 </div>
 <?php
@@ -168,6 +208,8 @@ class Eab_GuestList_ShowAdditionalInfo {
 	function save_settings ($options) {
 		$options['guest_lists-sai-avatar_size'] = $_POST['event_default']['guest_lists-sai-avatar_size'];
 		$options['guest_lists-sai-show_name'] = $_POST['event_default']['guest_lists-sai-show_name'];
+		$options['guest_lists-sai-show_in_admin'] = !empty($_POST['event_default']['guest_lists-sai-show_in_admin']);
+		$options['guest_lists-sai-show_in_export'] = !empty($_POST['event_default']['guest_lists-sai-show_in_export']);
 		return $options;
 	}
 	

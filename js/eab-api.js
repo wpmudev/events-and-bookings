@@ -20,20 +20,27 @@ function rsvp_after_wordpress_login (data) {
 }
 
 function send_wordpress_registration_request () {
-	// Client-side validation first
-	var username = $("#eab-wordpress_login-registration_username").val();
-	if (!username) return false;
-	var email = $("#eab-wordpress_login-registration_email").val();
-	if (!email) return false;
-	$.post(_eab_data.ajax_url, {
-		"action": "eab_wordpress_register",
-		"data": {
-			"username": username,
-			"email": email
+	var deferred = $.Deferred(),
+		data = {
+			username: $("#eab-wordpress_login-registration_username").val(),
+			email: $("#eab-wordpress_login-registration_email").val()
 		}
-	}, function (data) {
-		rsvp_after_wordpress_login(data);
+	;
+	deferred.done(function () {
+		// Client-side validation first
+		if (!data.username || !data.email) return false;
+		$.post(_eab_data.ajax_url, {
+			"action": "eab_wordpress_register",
+			"data": data
+		}, function (data) {
+			rsvp_after_wordpress_login(data);
+		});
 	});
+
+	$(document).trigger("eab-api-registration-data", [data, deferred]);
+	setTimeout(function () {
+		if ('pending' === deferred.state()) deferred.resolve();
+	}, 500);
 }
 
 function send_wordpress_login_request () {
@@ -99,6 +106,7 @@ function create_wordpress_login_popup ($action, post_id) {
 				"</div>" +
 			"</div>"
 		);
+		$(document).trigger("eab-api-registration-form_rendered");
 	}
 	var $background = $("#eab-wordpress_login-background");
 	var $wrapper = $("#eab-wordpress_login-wrapper");

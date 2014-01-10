@@ -136,7 +136,10 @@ function send_save_request () {
 		"venue": $("#eab-events-fpe-venue").val(),
 		"status": $("#eab-events-fpe-status").val(),
 		"is_premium": ($("#eab-events-fpe-is_premium").length ? $("#eab-events-fpe-is_premium").val() : 0),
-		"category": $("#eab-events-fpe-categories").val()
+		"category": $("#eab-events-fpe-categories").val(),
+		/* Added by Ashok */
+		"featured" : $('#eab-fpe-attach_id').val()
+		/* End of adding by Ashok */
 	};
 	if ($("#eab-events-fpe-event_fee").length) {
 		data["fee"] = $("#eab-events-fpe-event_fee").val();
@@ -203,12 +206,30 @@ $(function () {
 
 	var link = $("#eab-events-fpe-back_to_event").is(":visible") && $("#eab-events-fpe-back_to_event").attr("href");
 	if (link) {
-		console.log(link);
 		$("#eab-events-fpe-cancel").off("click").on("click", function () {
 			window.location = link;
 		}).show();
 	} else $("#eab-events-fpe-cancel").hide();
+	/* Added by Ashok */
+	$('.eab-fpe-upload').click(function() {
+		var _old_send = window.send_to_editor;
+        tb_show('&nbsp;', l10nFpe.base_url+'/wp-admin/media-upload.php?type=image&TB_iframe=true&post_id=0', false);
+        window.send_to_editor = function(html) {
+	    	var id = html.split('wp-image-')[1].split('"')[0];
+	    	$('#eab-fpe-attach_id').val(id);
+            var src = $('img', html).attr('src');
+    		$('#eab-fpe-preview-upload')
+    			.attr('src', src)
+    			.show()
+    		;
+            tb_remove();
+            window.send_to_editor = _old_send;
+        }
+        return false;
+    });
+	/* End of adding by Ashok */
 });
+
 	
 	
 })(jQuery);

@@ -36,7 +36,7 @@ class Eab_Maps_EventMapsOptions {
 	function show_nags () {
 		if (!class_exists('AgmMapModel')) {
 			echo '<div class="error"><p>' .
-				__("You'll need Google Maps plugin installed and activated for Events Maps Options add-on to work", Eab_EventsHub::TEXT_DOMAIN) .
+				sprintf(__("You'll need <a href='%s'>Google Maps</a> plugin installed and activated for Events Maps Options add-on to work", Eab_EventsHub::TEXT_DOMAIN), 'http://premium.wpmudev.org/project/wordpress-google-maps-plugin') .
 			'</p></div>';
 		}
 	}

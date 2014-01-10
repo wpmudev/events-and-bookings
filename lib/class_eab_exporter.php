@@ -168,7 +168,7 @@ class Eab_Exporter_Csv extends Eab_Exporter {
 				}
 				$attendees[] = apply_filters('eab-exporter-csv-row', array(
 					__('User ID', Eab_EventsHub::TEXT_DOMAIN) => $user_data->id,
-					__('User Name', Eab_EventsHub::TEXT_DOMAIN) => $user_data->display_name,
+					__('User Name', Eab_EventsHub::TEXT_DOMAIN) => apply_filters('eab-guest_list-export-guest_name', $user_data->display_name, $booking->user_id, $user_data),
 					__('User Email', Eab_EventsHub::TEXT_DOMAIN) => $user_data->user_email,
 					__('Attending', Eab_EventsHub::TEXT_DOMAIN) => $title,
 					__('Ticket Count', Eab_EventsHub::TEXT_DOMAIN) => $ticket_count,

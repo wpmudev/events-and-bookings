@@ -435,13 +435,21 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return $cats;
 	}
 
+	public function has_featured_image () {
+		return has_post_thumbnail($this->get_id());
+	}
+
 	public function get_featured_image ($size=false) {
-		$size = $size ? $size : 'medium';
+		$size = $size ? $size : 'thumbnail';
 		return get_the_post_thumbnail($this->get_id(), $size);
 	}
 
 	public function get_featured_image_url ($size=false) {
 		return wp_get_attachment_url(get_post_thumbnail_id($this->get_id()));
+	}
+
+	public function get_featured_image_id () {
+		return get_post_thumbnail_id($this->get_id());
 	}
 
 
@@ -592,6 +600,10 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			global $wpdb;
 			if (false !== $wpdb->insert($wpdb->posts, $post)) {
 				$post_id = $wpdb->insert_id;
+				$featured_image_id = $this->has_featured_image()
+					? $this->get_featured_image_id()
+					: false
+				;
 
 				$event_cats = $this->get_category_ids();
 				if ($event_cats) {
@@ -606,6 +618,9 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				if ($this->is_premium()) {
 					update_post_meta($post_id, 'incsub_event_paid', 1);
 					update_post_meta($post_id, 'incsub_event_fee', $this->get_price());
+				}
+				if (!empty($featured_image_id)) {
+					update_post_meta($post_id, '_thumbnail_id', $featured_image_id);
 				}
 				do_action('eab-events-recurrent_event_child-save_meta', $post_id);
 			}
@@ -684,7 +699,6 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				}
 			}
 		}
-
 		if (self::RECURRANCE_DOW == $interval) {
 			$week_count = !empty($time_parts["week"]) ? $time_parts["week"] : 'first';
 			$weekday = !empty($time_parts["weekday"]) ? $time_parts["weekday"] : 'Monday';
@@ -694,8 +708,55 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			for ($i = $start; $i <= $end; $i+=$month_days) {
 				$month_days = date('t', $i)*86400;
 				$first = strtotime(date("Y-m-01", $i));
-				//$day = strtotime("{$week_count} {$weekday} of this month {$time_parts['time']}", $first);
-				$day = strtotime("{$week_count} {$weekday} this month {$time_parts['time']}", $first);
+
+				// PHP 5.3+ - strtotime has "of", we're good.
+				// This is because of https://bugs.php.net/bug.php?id=53778
+				$day = strtotime("{$week_count} {$weekday} of this month {$time_parts['time']}", $first);
+
+				// "Fifth" test for supporting implementations
+				if ($day && "fifth" === strtolower($week_count)) {
+					// Special case, as not all months have this.
+					$last = strtotime("last {$weekday} of this month {$time_parts['time']}", $first);
+					$fourth = strtotime("fourth {$weekday} of this month {$time_parts['time']}", $first);
+					if ($fourth === $last) continue; // This month doesn't have five $weekdays, so keep on going
+					else if ($last > $fourth) $day = $last; // Oooh, but here we have a fifth occurance, go with that
+				}
+
+				if (!$day) {
+					// No "of", meaning we're in pre-PHPv5.3 and the bug kicks in - so, we're left with non-timestamp
+					$day = strtotime("{$week_count} {$weekday} this month {$time_parts['time']}", $first); // Get a bugged timestamp in pre-PHP5.3 compatible way
+					// Now that we have a timestamp possibly affected pre-v5.3 bug, check the other conditions:
+					// (1) are we explicitly told to fix the bug?
+					// (1) is the first day of month actually the day of month we're after, and
+					// (2) generated timestamp isn't first of the month
+					if (defined('EAB_LEGACY_PHP_BUG_DOW_FIX') && EAB_LEGACY_PHP_BUG_DOW_FIX && strtolower($weekday) == strtolower(date("l", $first)) && 1 < (int)date("d", $day)) {
+						// Get the same day last week
+						$this_day_week_before = strtotime('-1 week', $day);
+						// Check the result (1) against $start timestamp
+						// (2) and make sure we're still in the same month
+						// (3) and make sure the generated timestamp is the day name we're after
+						// (4) to see if we already have this timestamp
+						if (
+							$start < $day && $start < $this_day_week_before // 1
+							&& 
+							date("m", $day) === date("m", $this_day_week_before) // 2 
+							&& 
+							strtolower($weekday) == strtolower(date("l", $this_day_week_before)) // 3
+							&& 
+							!in_array($this_day_week_before, $instances) // 4
+						) {
+							// First up, log this for support purposes
+							do_action('eab-debug-log_error', sprintf(
+								__('Possible DOW precision bug detected, overriding %s with %s for expression [%s %s this month], for %s pivot', Eab_EventsHub::TEXT_DOMAIN),
+								$day, $this_day_week_before, // timestamps
+								$week_count, $weekday, // expression 
+								$first // pivot
+							));
+							$day = $this_day_week_before;
+						}
+					}
+				}
+				
 				if (!$day) do_action('eab-debug-log_error', sprintf(
 					__('Invalid %s instance timestamp: [%s %s for %s]', Eab_EventsHub::TEXT_DOMAIN),
 					$interval,
@@ -734,7 +795,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				$instances[] = $unix_timestamp;
 			}
 		}
-		
+
 		if (self::RECURRANCE_YEARLY == $interval) {
 			$year_days = (date('L', $start) ? 366 : 365) * 86400;
 			for ($i = $start; $i <= $end; $i+=$year_days) {
@@ -749,7 +810,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				));
 				$instances[] = $unix_timestamp;
 			}
-		}	
+		}
 		return $instances;	
 	}
 	

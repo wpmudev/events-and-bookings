@@ -552,3 +552,10 @@ a.wpmudevevents-login_link-wordpress:hover, a.wpmudevevents-login_link-wordpress
 	width: 175px;
 	float: right;
 }
+
+.wpmudevevents-date var,
+var.eab-date_format-date,
+var.eab-date_format-time 
+{
+  font-style: normal;
+}

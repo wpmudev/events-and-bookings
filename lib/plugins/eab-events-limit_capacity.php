@@ -43,6 +43,38 @@ class Eab_Addon_LimitCapacity {
 
 		// Attendance data juggling
 		add_filter('_eab-capacity-internal-attendance', array($this, 'get_remaining_capacity'), 10, 2);
+
+		// MarketPress integration
+		add_action('eab-mp-variation-meta', array($this, 'add_mp_inventory'), 10, 5);
+		add_action('eab-mp-variation-thrash', array($this, 'thrash_mp_inventory'), 10, 2);
+	}
+
+	public function add_mp_inventory ($product_id, $key, $instance_event_id, $parent_event_id, $unset_first) {
+		$capacity = !empty($_POST['eab-elc_capacity']) && (int)$_POST['eab-elc_capacity']
+			? (int)$_POST['eab-elc_capacity']
+			: $this->get_remaining_capacity(null, $parent_event_id)
+		;
+		if (!$capacity) {
+			update_post_meta($product_id, 'mp_track_inventory', 0); // Stop tracking inventory changes
+			return false;
+		}
+
+		$inventory = get_post_meta($product_id, 'mp_inventory', true);
+		$inventory[$key] = $capacity;
+
+		if ($unset_first && empty($inventory[0])) {
+			unset($inventory[0]);
+			$inventory = array_values($inventory);
+		}
+
+		update_post_meta($product_id, 'mp_track_inventory', 1); // Do track inventory changes
+
+		return update_post_meta($product_id, 'mp_inventory', $inventory);
+	}
+
+	public function thrash_mp_inventory ($event_id, $product_id) {
+		delete_post_meta($product_id, 'mp_inventory');
+		add_post_meta($product_id, 'mp_inventory', array(0));
 	}
 	
 	private function _get_event_total_attendance ($event_id, $exclude_user=false) {

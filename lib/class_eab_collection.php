@@ -139,7 +139,8 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 						'value' => $forbidden_statuses,
 						'compare' => 'NOT IN',
 					),
-				)
+				),
+				'posts_per_page' => apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS),
 			)
 		);
 		return $args;

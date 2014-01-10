@@ -29,16 +29,17 @@ class Eab_Events_Colors {
 	}
 	
 	function enqueue_dependencies () {
-		wp_enqueue_style( 'wp-color-picker' );
-		wp_enqueue_script( 'wp-color-picker' );
-		//wp_enqueue_style('eab-event-capabilities', plugins_url(basename(EAB_PLUGIN_DIR) . '/css/eab-event-capabilities.css'));
-		//wp_enqueue_script('eab-event-capabilities', plugins_url(basename(EAB_PLUGIN_DIR) . '/js/eab-event-capabilities.js'), array('jquery'));
+		wp_enqueue_style('wp-color-picker');
+		wp_enqueue_script('wp-color-picker');
 	}
 
 	function inject_color_settings () {
 		$colors = $this->_data->get_option("eab-colors");
 		$colors = $colors ? $colors : array();
 		if (empty($colors)) return false;
+
+		$use_widget = $this->_data->get_option('eab-colors-use_widget');
+		$use_expanded_widget = $this->_data->get_option('eab-colors-use_expanded_widget');
 
 		$default = !empty($colors['__default__']) ? $colors['__default__'] : false;
 		$style = '';
@@ -57,7 +58,20 @@ class Eab_Events_Colors {
 			unset($colors['__default__']);
 		}
 		foreach ($colors as $class => $color) {
-			$style .= '.wpmudevevents-calendar-event.' . sanitize_html_class($class) . ' {';
+			$selectors = array(
+				'.wpmudevevents-calendar-event.' . sanitize_html_class($class),
+			);
+			if ($use_widget) {
+				$selectors[] = '.eab-upcoming_calendar_widget.' . sanitize_html_class($class) . ' td.eab-has_events';
+				$selectors[] = '.eab-upcoming_calendar_widget.' . sanitize_html_class($class) . ' td.eab-has_events a';
+			}
+			if ($use_expanded_widget) {
+				$exp = '#wpmudevevents-upcoming_calendar_widget-shelf .wpmudevevents-upcoming_calendar_widget-event.' . sanitize_html_class($class);
+				$selectors[] = $exp;
+				$selectors[] = "{$exp} span";
+			}
+			$style .= join(',', $selectors) . ' {' .
+			'';
 			if (!empty($color['bg'])) {
 				$style .= '' .
 					'background: ' . $color['bg'] . ' !important;' .
@@ -68,6 +82,9 @@ class Eab_Events_Colors {
 				$style .= 'color: ' . $color['fg'] . ' !important;';
 			}
 			$style .= '}';
+		}
+		if ($use_expanded_widget) {
+			$style .= '#wpmudevevents-upcoming_calendar_widget-shelf .wpmudevevents-upcoming_calendar_widget-event { display: block; padding: .2em; }';
 		}
 ?>
 <style type="text/css">
@@ -86,6 +103,11 @@ class Eab_Events_Colors {
 
 		$default_bg = '#75AB24';
 		$default_fg = '#FFFFFF';
+
+		$use_widget = $this->_data->get_option('eab-colors-use_widget') ? 'checked="checked"' : '';
+		$use_expanded_widget = $this->_data->get_option('eab-colors-use_expanded_widget') ? 'checked="checked"' : '';
+		$tips = new WpmuDev_HelpTooltips();
+		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 ?>
 <div id="eab-settings-colors" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Event Colors :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -124,6 +146,17 @@ class Eab_Events_Colors {
 		<div class="eab-settings-settings_item">
 			<button id="eab-colors-reset_to_defaults" class="button"><?php _e('Reset to defaults', Eab_EventsHub::TEXT_DOMAIN); ?></button>
 		</div>
+		<div class="eab-settings-settings_item">
+			<input type="hidden" name="eab-colors-use_widget" value="" />
+			<input type="checkbox" name="eab-colors-use_widget" id="eab-colors-use_widget" value="1" <?php echo $use_widget; ?> />
+			<label for="eab-colors-use_widget"><?php esc_html_e(__('Apply backgrounds to single-category calendar widget', Eab_EventsHub::TEXT_DOMAIN)); ?></label>
+			<span><?php echo $tips->add_tip(__('Selecting this option will propagate foreground and background color to your Calendar widget events, provided there is only one category selected for displaying.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+		</div>
+		<div class="eab-settings-settings_item">
+			<input type="hidden" name="eab-colors-use_expanded_widget" value="" />
+			<input type="checkbox" name="eab-colors-use_expanded_widget" id="eab-colors-use_expanded_widget" value="1" <?php echo $use_expanded_widget; ?> />
+			<label for="eab-colors-use_expanded_widget"><?php esc_html_e(__('Apply colors to calendar widget expanded events', Eab_EventsHub::TEXT_DOMAIN)); ?></label>
+		</div>
 	</div>
 </div>
 <script>
@@ -142,6 +175,8 @@ $(function () {
 	
 	function save_settings ($options) {
 		if (!empty($_POST['eab-colors'])) $options['eab-colors'] = $_POST['eab-colors'];
+		$options['eab-colors-use_widget'] = !empty($_POST['eab-colors-use_widget']);
+		$options['eab-colors-use_expanded_widget'] = !empty($_POST['eab-colors-use_expanded_widget']);
 		return $options;
 	}
 }

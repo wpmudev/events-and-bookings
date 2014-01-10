@@ -212,8 +212,31 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 	
 	protected $_titles = array();
 	protected $_data = array();
+
+	private $_class;
+
+	public function set_class ($cls) {
+		if (
+			!empty($cls) && (
+				!is_array($cls)
+				||
+				is_array($cls) && 1 == count($cls)
+			)) {
+				$this->_class = is_array($cls) ? $cls[0] : $cls;
+		}
+	}
+
 	public function get_calendar_id () { return false; }
-	public function get_calendar_class () { return 'eab-upcoming_calendar_widget'; }
+	public function get_calendar_class () {
+		$cls = $this->get_calendar_root_class();
+		return $this->_class 
+			? sanitize_html_class($cls) . ' ' . sanitize_html_class($this->_class)
+			: $cls
+		; 
+	}
+	public function get_calendar_root_class () {
+		return 'eab-upcoming_calendar_widget';
+	}
 	
 	public function get_day_names () {
 		return array(
@@ -241,11 +264,12 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 		$this->_titles[] = esc_attr($event_info['title']);
 		$css_classes = $event_info['status_class'];
 		$permalink = isset($event_info['blog_id']) ? get_blog_permalink($event_info['blog_id'], $event_info['id']) : get_permalink($event_info['id']);
+		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:sO", $event_tstamps['start']));
 		$this->_data[] = '<a class="wpmudevevents-upcoming_calendar_widget-event ' . $css_classes . '" href="' . $permalink . '">' . 
 			$event_info['title'] .
-			'<span class="wpmudevevents-upcoming_calendar_widget-event-info">' . 
-				apply_filters('eab-calendar-upcoming_calendar_widget-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . 
-				' ' . $event_info['event_venue'] .
+			'<span class="wpmudevevents-upcoming_calendar_widget-event-info"><time datetime="' . $tstamp . '">' . 
+				'<var class="eab-date_format-date">' . apply_filters('eab-calendar-upcoming_calendar_widget-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . '</var>' .
+				'</time> ' . $event_info['event_venue'] .
 			'</span>' .
 		'</a>'; 
 	}
@@ -266,29 +290,29 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 		if (date('j', $time) == date('t', $time)) $time -= 4*86400;
 		return '<tr>' .
 			'<td>' .
-				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-next eab-time_unit-year" href="' . 
-					Eab_Template::get_archive_url_next_year($time, true) . '">' . 
+				'<a class="' . $this->get_calendar_root_class() . '-navigation-link eab-navigation-next eab-time_unit-year" href="' . 
+					Eab_Template::get_archive_url_prev_year($time, true) . '">' . 
 					'&nbsp;&laquo;' .
 				'</a>' .
 			'</td>' .
 			'<td>' .
-				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-next eab-time_unit-month" href="' . 
-					Eab_Template::get_archive_url_next($time, true) . '">' . 
+				'<a class="' . $this->get_calendar_root_class() . '-navigation-link eab-navigation-next eab-time_unit-month" href="' . 
+					Eab_Template::get_archive_url_prev($time, true) . '">' . 
 					'&nbsp;&lsaquo;' .
 				'</a>' .
 			'</td>' .
 			'<td colspan="3" style="text-align:center;">' .
 				'<input type="hidden" class="eab-cuw-calendar_date" value="' . $time . '" />' .
-				'<a href="' . Eab_Template::get_archive_url($time, true) . '" class="' . $this->get_calendar_class() . '-navigation-link eab-cuw-calendar_date">' . date_i18n('M Y', $time) . '</a>' .
+				'<a href="' . Eab_Template::get_archive_url($time, true) . '" class="' . $this->get_calendar_root_class() . '-navigation-link eab-cuw-calendar_date">' . date_i18n('M Y', $time) . '</a>' .
 			'</td>' .
 			'<td>' .
-				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-prev eab-time_unit-month" href="' . 
-					Eab_Template::get_archive_url_prev($time, true) . '">&rsaquo;&nbsp;' . 
+				'<a class="' . $this->get_calendar_root_class() . '-navigation-link eab-navigation-prev eab-time_unit-month" href="' . 
+					Eab_Template::get_archive_url_next($time, true) . '">&rsaquo;&nbsp;' . 
 				'</a>' .
 			'</td>' .
 			'<td>' .
-				'<a class="' . $this->get_calendar_class() . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 
-					Eab_Template::get_archive_url_prev_year($time, true) . '">&raquo;&nbsp;' . 
+				'<a class="' . $this->get_calendar_root_class() . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 
+					Eab_Template::get_archive_url_next_year($time, true) . '">&raquo;&nbsp;' . 
 				'</a>' .
 			'</td>' .
 		'</tr>';
@@ -315,10 +339,19 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 	
 	protected $_data = array();
 	protected $_long_date_format = false;
+	protected $_thumbnail = array(
+		'with_thumbnail' => false,
+		'default_thumbnail' => false,
+	);
 
 	public function __construct ($events) {
 		parent::__construct($events);
 		$this->_long_date_format = get_option("date_format");
+	}
+
+	public function set_thumbnail ($args) {
+		if (!empty($args['with_thumbnail'])) $this->_thumbnail['with_thumbnail'] = true;
+		if (!empty($args['default_thumbnail'])) $this->_thumbnail['default_thumbnail'] = esc_url($args['default_thumbnail']);
 	}
 
 	public function set_long_date_format ($fmt) {
@@ -335,11 +368,19 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 			? get_blog_permalink($event_info['blog_id'], $event_info['id'])
 			: get_permalink($event_info['id'])
 		;
+		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:sO", $event_tstamps['start']));
 		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
 			$event_info['title'] .
-			'<span class="wpmudevevents-calendar-event-info">' . 
-				apply_filters('eab-calendar-event_archive-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . 
-				' ' . $event_info['event_venue'] .
+			'<span class="wpmudevevents-calendar-event-info">' .
+				(
+					!empty($this->_thumbnail['with_thumbnail']) && !empty($event_info['thumbnail'])
+						? $event_info['thumbnail']
+						: ''
+				) .
+				'<time datetime="' . $tstamp . '">' .
+					'<var class="eab-date_format-date">' . apply_filters('eab-calendar-event_archive-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . '</var>' .
+				'</time> ' . 
+				$event_info['event_venue'] .
 			'</span>' . 
 		'</a>'; 
 	}
@@ -391,6 +432,20 @@ $(".wpmudevevents-calendar-event")
 })(jQuery);
 </script>
 EabEctEacJs;
+	}
+
+	protected function _get_item_data ($post) {
+		$data = parent::_get_item_data($post);
+		if (isset($post->blog_id)) return $data;
+		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
+		if (!empty($this->_thumbnail['with_thumbnail'])) {
+			$thumbnail = $event->get_featured_image();
+			if (empty($thumbnail) && !empty($this->_thumbnail['default_thumbnail'])) {
+				$thumbnail = '<img src="' . esc_url($this->_thumbnail['default_thumbnail']) . '" />';
+			}
+			$data['thumbnail'] = $thumbnail;
+		}
+		return $data;
 	}
 }
 

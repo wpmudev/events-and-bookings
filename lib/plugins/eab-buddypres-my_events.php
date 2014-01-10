@@ -14,8 +14,12 @@ Detail: Displays lists of user RSVPs on your users member pages.
 
 class Eab_BuddyPress_MyEvents {
 	
-	private function __construct () {}
+	private $_data;
 	
+	private function __construct () {
+		$this->_data = Eab_Options::get_instance();
+	}
+
 	public static function serve () {
 		$me = new Eab_BuddyPress_MyEvents;
 		$me->_add_hooks();
@@ -23,6 +27,8 @@ class Eab_BuddyPress_MyEvents {
 	
 	private function _add_hooks () {
 		add_action('admin_notices', array($this, 'show_nags'));
+		add_action('eab-settings-after_plugin_settings', array($this, 'show_settings'));
+		add_filter('eab-settings-before_save', array($this, 'save_settings'));
 		
 		add_action('bp_init', array($this, 'add_bp_profile_entry'));
 	}
@@ -136,6 +142,11 @@ class Eab_BuddyPress_MyEvents {
 	}
 	function show_attending_body () {
 		global $bp;
+		$premium = $this->_data->get_option('bp-my_events-premium_events');
+		if (!empty($premium)) {
+			if ('nag' == $premium) add_filter('eab-event-user_events-before_meta', array($this, 'premium_event_rsvp'), 10, 3);
+			if ('hide' == $premium) add_filter('eab-event-user_events-exclude_event', array($this, 'exclude_premium_event_rsvp'), 10, 2);
+		}
 		echo '<div id="eab-bp-my_events-wrapper">';
 		echo '<div class="eab-bp-my_events eab-bp-rsvp_yes">' . 
 			Eab_Template::get_user_events(Eab_EventModel::BOOKING_YES, $bp->displayed_user->id) .
@@ -157,6 +168,61 @@ class Eab_BuddyPress_MyEvents {
 			Eab_Template::get_user_events(Eab_EventModel::BOOKING_NO, $bp->displayed_user->id) .
 		'</div>';
 		echo '</div>';
+	}
+
+	function premium_event_rsvp ($content, $event, $status) {
+		if (!$event->is_premium()) return $content;
+
+		global $bp;
+		$user_id = $bp->displayed_user->id;
+		if (Eab_EventModel::BOOKING_YES != $status) return $content;
+		if ($event->user_paid($user_id)) return $content;
+		
+		$content .= '<div class="eab-premium_event-unpaid_notice"><b>' . __('Event not paid', Eab_EventsHub::TEXT_DOMAIN) . '</b></div>';
+
+		return $content;
+	}
+
+	function exclude_premium_event_rsvp ($exclude, $event) {
+		if ($exclude) return $exclude;
+
+		global $bp;
+		$user_id = $bp->displayed_user->id;
+
+		if (!$event->is_premium()) return false;
+		return !$event->user_paid($user_id);
+	}
+
+	function show_settings () {
+		$tips = new WpmuDev_HelpTooltips();
+		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$premium = $this->_data->get_option('bp-my_events-premium_events');
+		$options = array(
+			'' => __('Do nothing special', Eab_EventsHub::TEXT_DOMAIN),
+			'hide' => __('Hide', Eab_EventsHub::TEXT_DOMAIN),
+			'nag' => __('Show nag notice', Eab_EventsHub::TEXT_DOMAIN),
+		);
+?>
+<div id="eab-settings-my_events" class="eab-metabox postbox">
+	<h3 class="eab-hndle"><?php _e('My Events settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<div class="eab-inside">
+		<div class="eab-settings-settings_item" style="line-height:1.8em">
+	    	<label for="eab_event-bp-my_events-premium_events"><?php _e('Non-paid premium events with positive RSPVs', Eab_EventsHub::TEXT_DOMAIN); ?>:</label>
+	    	<?php foreach ($options as $value => $label) { ?>
+	    		<br />
+				<input type="radio" id="eab_event-bp-my_events-premium_events-<?php echo esc_attr($value); ?>" name="event_default[bp-my_events-premium_events]" value="<?php echo esc_attr($value); ?>" <?php checked($value, $premium); ?> />
+	    		<label for="eab_event-bp-my_events-premium_events-<?php echo esc_attr($value); ?>"><?php echo esc_html($label) ?></label>
+	    	<?php } ?>
+			<span><?php echo $tips->add_tip(__('How to deal with non-paid premium events on user events list display.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+	    </div>
+	</div>
+</div>
+<?php
+	}
+
+	function save_settings ($options) {
+		$options['bp-my_events-premium_events'] = $_POST['event_default']['bp-my_events-premium_events'];
+		return $options;
 	}
 }
 

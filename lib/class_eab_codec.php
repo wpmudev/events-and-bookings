@@ -51,8 +51,16 @@ abstract class Eab_Codec {
 
 		$args = wp_parse_args($raw, $accepted);
 		if (isset($accepted['network'])) $args['network'] = $this->_arg_to_bool($args['network']);
+		if (isset($accepted['relative_date']) && !empty($args['relative_date'])) {
+			$pivot = !empty($args['date'])
+				? strtotime($args['date'])
+				: eab_current_time()
+			;
+			$relative_date = strtotime($args["relative_date"], $pivot);
+			if ($relative_date) $args['date'] = date("Y-m-d H:i:s", $relative_date);
+		}
 		if (isset($accepted['date'])) $args['date'] = $this->_arg_to_time($args['date']);
-		
+
 		if (isset($accepted['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
 		if (isset($accepted['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
 		

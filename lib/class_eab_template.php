@@ -16,7 +16,8 @@ class Eab_Template {
 		
 		$new_content  = '';
 		
-		$new_content .= '<div class="event ' . self::get_status_class($event) . '">';
+		$new_content .= '<div class="event ' . self::get_status_class($event) . '" itemscope itemtype="http://schema.org/Event">';
+		$new_content .= '<meta itemprop="name" content="' . esc_attr($event->get_title()) . '" />';
 		$new_content .= '<a href="' . $link . '" class="wpmudevevents-viewevent">' .
 			__('View event', Eab_EventsHub::TEXT_DOMAIN) . 
 		'</a>';
@@ -40,7 +41,8 @@ class Eab_Template {
 		$start_day = date_i18n('m', $event->get_start_timestamp());
 		    
 		$new_content  = '';
-		$new_content .= '<div class="event ' . self::get_status_class($event) . '" id="wpmudevevents-wrapper"><div id="wpmudevents-single">';
+		$new_content .= '<div class="event ' . self::get_status_class($event) . '" id="wpmudevevents-wrapper" itemscope itemtype="http://schema.org/Event"><div id="wpmudevents-single">';
+		$new_content .= '<meta itemprop="name" content="' . esc_attr($event->get_title()) . '" />';
 		
 		$new_content .= self::get_error_notice();
 		
@@ -79,7 +81,7 @@ class Eab_Template {
 		$new_content .= '<hr/>';
 		
 		$new_content .= '<div id="wpmudevevents-contentmeta">' . self::get_event_details($event) . '<div style="clear: both;"></div></div>';
-		$new_content .= '<div id="wpmudevevents-contentbody">' . ($content ? $content : $event->get_content()) . '</div>';			
+		$new_content .= '<div id="wpmudevevents-contentbody" itemprop="description">' . ($content ? $content : $event->get_content()) . '</div>';			
 		
 		if ($event->has_venue_map()) {
 			$new_content .= '<div id="wpmudevevents-map">' . $event->get_venue_location(Eab_EventModel::VENUE_AS_MAP) . '</div>';
@@ -196,8 +198,11 @@ class Eab_Template {
 		$ret = '<div class="wpmudevevents-user_bookings wpmudevevents-user_bookings-' . $status . '">';
 		foreach ($bookings as $event_id) {
 			$event = new Eab_EventModel(get_post($event_id));
+			$id_check = $event->get_id();
+			if (apply_filters('eab-event-user_events-exclude_event', empty($id_check), $event)) continue;
 			$ret .= '<h4>' . self::get_event_link($event) . '</h4>';
 			$ret .= '<div class="wpmudevevents-event-meta">' . 
+				apply_filters('eab-event-user_events-before_meta', '', $event, $status) .
 				self::get_event_dates($event) .
 				'<br />' .
 				$event->get_venue_location() . 
@@ -258,7 +263,7 @@ class Eab_Template {
 			$content .= '<a href="user-edit.php?user_id='.$booking->user_id .'" title="'.$user_data->display_name.'">' .
 				get_avatar( $booking->user_id, 32 ) .
 				'<br />' .
-				$user_data->display_name .
+				apply_filters('eab-guest_list-admin-guest_name', $user_data->display_name, $booking->user_id, $user_data) .
 			'</a>';
 			if ($event->is_premium()) {
 				if ($event->user_paid($booking->user_id)) {
@@ -275,7 +280,7 @@ class Eab_Template {
 					$payment_status = '<span class="eab-guest-payment_info-not_paid">' . __('Not paid', Eab_EventsHub::TEXT_DOMAIN) . '</span>';
 				}
 				// Added by Hakan
-				$payment_status = apply_filters('eab-event-payment_status', $payment_status, $booking->user_id ); 
+				$payment_status = apply_filters('eab-event-payment_status', $payment_status, $booking->user_id, $event); 
 				$content .= "<div class='eab-guest-payment_info'>{$payment_status}</div>";
 			}
 			if (in_array($status, array(Eab_EventModel::BOOKING_YES, Eab_EventModel::BOOKING_MAYBE))) {
@@ -286,7 +291,7 @@ class Eab_Template {
 			$content .= '<div class="eab-guest-actions"><a href="#delete-attendance" class="eab-guest-delete_attendance" data-eab-user_id="' . $booking->user_id . '" data-eab-event_id="' . $event->get_id() . '">' .
 				__('Delete attendance entirely', Eab_EventsHub::TEXT_DOMAIN) .
 			'</a></div>';
-			$content = apply_filters('eab-event-booking_metabox_content', $content, $booking->user_id );
+			$content = apply_filters('eab-event-booking_metabox_content', $content, $booking->user_id);
 			$content .= '</div>'; // .eab-guest
 			$content .= '</li>';
 		}
@@ -502,7 +507,7 @@ class Eab_Template {
 
 		if ($event->has_venue()) {
 			$venue = $event->get_venue_location(Eab_EventModel::VENUE_AS_ADDRESS);
-			$content .= "<div class='wpmudevevents-location'>{$venue}</div>";
+			$content .= "<div class='wpmudevevents-location' itemprop='location'>{$venue}</div>";
 		}
 		if ($event->is_premium()) {
 			$price = $event->get_price();
@@ -538,34 +543,36 @@ class Eab_Template {
 			if ($end_date_str) {
 				// Start and end day stamps differ
 				$start_string = $event->has_no_start_time($key)
-					? sprintf(__('On <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
-					: sprintf(__('On %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+					? sprintf(__('On <span class="wpmudevevents-date_format-start"><var class="eab-date_format-date">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
+					: sprintf(__('On <var class="eab-date_format-date">%s</var> <span class="wpmudevevents-date_format-start">from <var class="eab-date_format-time">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
 				;
 				$end_string = $event->has_no_end_time($key)
-					? sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span>')
-					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span> <span class="wpmudevevents-date_format-end_time">' . date_i18n(get_option('time_format'), $end) . '</span>')
+					? sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date"><var class="eab-date_format-date">' . $end_date_str . '</var></span>')
+					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date"><var class="eab-date_format-date">' . $end_date_str . '</var></span> <span class="wpmudevevents-date_format-end_time"><var class="eab-date_format-time">' . date_i18n(get_option('time_format'), $end) . '</var></span>')
 				;
 			} else {
 				// The start and end day stamps do NOT differ
 				if (eab_current_time() > $start) {
 					// In the past
 					$start_string = $event->has_no_start_time($key)
-						? sprintf(__('Took place on <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
-						: sprintf(__('Took place on %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+						? sprintf(__('Took place on <span class="wpmudevevents-date_format-start"><var class="eab-date_format-date">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
+						: sprintf(__('Took place on <var class="eab-date_format-date">%s</var> <span class="wpmudevevents-date_format-start">from <var class="eab-date_format-time">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
 					;
 				} else {
 					// Now, or in the future
 					$start_string = $event->has_no_start_time($key)
-						? sprintf(__('Takes place on <span class="wpmudevevents-date_format-start">%s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
-						: sprintf(__('Takes place on %s <span class="wpmudevevents-date_format-start">from %s</span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+						? sprintf(__('Takes place on <span class="wpmudevevents-date_format-start"><var class="eab-date_format-date">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
+						: sprintf(__('Takes place on <var class="eab-date_format-date">%s</var> <span class="wpmudevevents-date_format-start">from <var class="eab-date_format-date">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
 					;
 				}
 				$end_string = $event->has_no_end_time($key)
 					? ''
-					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date">' . $end_date_str . '</span> <span class="wpmudevevents-date_format-end_time">' . date_i18n(get_option('time_format'), $end) . '</span>')
+					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date"><var class="eab-date_format-date">' . $end_date_str . '</var></span> <span class="wpmudevevents-date_format-end_time"><var class="eab-date_format-time">' . date_i18n(get_option('time_format'), $end) . '</var></span>')
 				;
 			}
-			$content .= apply_filters('eab-events-event_date_string', "{$start_string} {$end_string}", $event->get_id(), $start, $end);
+			$time_date_start = esc_attr(date_i18n("Y-m-d\TH:i:sO", $start));
+			$time_date_end = esc_attr(date_i18n("Y-m-d\TH:i:sO", $end));
+			$content .= apply_filters('eab-events-event_date_string', "<time itemprop='startDate' datetime='{$time_date_start}'>{$start_string}</time> <time itemprop='endDate' datetime='{$time_date_end}'>{$end_string}</time>", $event->get_id(), $start, $end);
 			/*
 			$content .= apply_filters('eab-events-event_date_string', sprintf(
 				__('On %s <span class="wpmudevevents-date_format-start">from %s</span> <span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN),
@@ -656,6 +663,7 @@ class Eab_Template {
 		$renderer->set_title_format($args['title_format']);
 		$renderer->set_short_title_format($args['short_title_format']);
 		$renderer->set_long_date_format($args['long_date_format']);
+		$renderer->set_thumbnail($args);
 
 		return '<section class="wpmudevevents-list">' . $renderer->get_month_calendar($args['date']) . '</section>';
 	}
@@ -796,6 +804,11 @@ class Eab_Template {
 				'value' => __('format string for dates', Eab_EventsHub::TEXT_DOMAIN),
 				'example' => sprintf(__('%s="Y-m-d"', Eab_EventsHub::TEXT_DOMAIN), $argument),
 			),
+			'string:date_strtotime' => array(
+				'type' => sprintf(__('<a href="%s" target="_blank">strtotime</a>-compatible string', Eab_EventsHub::TEXT_DOMAIN), 'http://www.php.net/manual/en/datetime.formats.relative.php'),
+				'value' => __('strtotime-compatible expression', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf('%s="+1 month"', $argument),
+			),
 			'string:or_integer' => array(
 				'type' => __('string or integer', Eab_EventsHub::TEXT_DOMAIN),
 				'value' => __('"some_text" or "212"', Eab_EventsHub::TEXT_DOMAIN),
@@ -815,6 +828,11 @@ class Eab_Template {
 				'type' => __('list of comma-separated strings', Eab_EventsHub::TEXT_DOMAIN),
 				'value' => __('"foo,bar,baz"', Eab_EventsHub::TEXT_DOMAIN),
 				'example' => sprintf(__('%s="foo,bar,baz"', Eab_EventsHub::TEXT_DOMAIN), $argument),
+			),
+			'string:url' => array(
+				'type' => __('valid URL', Eab_EventsHub::TEXT_DOMAIN),
+				'value' => __('"http://example.com/something"', Eab_EventsHub::TEXT_DOMAIN),
+				'example' => sprintf(__('%s="http://example.com/something"', Eab_EventsHub::TEXT_DOMAIN), $argument),
 			),
 		);
 		if (empty($type_map[$raw_type])) return "<code>({$raw_type})</code>";

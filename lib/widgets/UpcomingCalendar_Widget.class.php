@@ -18,7 +18,12 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	}
 
 	function js_load_scripts () {
-		if (!is_admin()) wp_enqueue_script('eab-upcoming_calendar_widget-script', plugins_url('events-and-bookings/js/upcoming_calendar_widget.js'), array('jquery'));
+		if (!is_admin()) wp_enqueue_script(
+			'eab-upcoming_calendar_widget-script', 
+			plugins_url('events-and-bookings/js/upcoming_calendar_widget.js'), 
+			array('jquery'), 
+			Eab_EventsHub::CURRENT_VERSION
+		);
 	}
 	
 	function form ($instance) {
@@ -87,7 +92,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 
 		echo $before_widget;
 		if ($title) echo $before_title . $title . $after_title;
-		echo $this->_get_calendar_output(eab_current_time(), $network, $category);
+		echo '<div data-eab-widget_id="' . (int)$this->number . '">' . $this->_get_calendar_output(eab_current_time(), $network, $category) . '</div>';
 		echo $after_widget;	
 	}
 
@@ -109,6 +114,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	
 	private function _render_calendar ($date, $network=false, $category=array()) {
 		$args = array();
+		$category_class = false;
 		if (!empty($category)) {
 			$args['tax_query'] = array(
 				'relation' => 'OR',
@@ -121,6 +127,10 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 					'terms' => $cat,
 				);
 			}
+			if (1 === count($category)) {
+				$term = get_term_by('id', $category[0], 'eab_events_category');
+				$category_class = !empty($term->slug) ? $term->slug : false;
+			}
 		}
 
 		$events = $network
@@ -130,18 +140,30 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 
 		if (!class_exists('Eab_CalendarTable_UpcomingCalendarWidget')) require_once EAB_PLUGIN_DIR . 'lib/class_eab_calendar_helper.php';
 		$renderer = new Eab_CalendarTable_UpcomingCalendarWidget($events);
+		$renderer->set_class($category_class);
 		return $renderer->get_month_calendar($date);
 	}
 	
 	function handle_calendar_request () {
-		$now = (int)@$_POST['now'];
+		$now = !empty($_POST['now']) ? (int)$_POST['now'] : false;
 		$now = $now ? $now : eab_current_time();
 		
-		$unit = ("year" == @$_POST['unit']) ? "year" : "month";
-		$operand = ("prev" == $_POST['direction']) ? "+1" : "-1";
+		$unit = !empty($_POST["unit"]) && ("year" == $_POST['unit']) ? "year" : "month";
+		$operand = !empty($_POST['direction']) && ("prev" == $_POST['direction']) ? "+1" : "-1";
+		$widget_id = !empty($_POST['widget_id']) && (int)$_POST['widget_id'] ? (int)$_POST['widget_id'] : $this->number;
 		
 		$date = strtotime("{$operand} {$unit}", $now);
-		echo $this->_render_calendar($date);
+
+		$all_data = $this->get_settings();
+		$instance = !empty($all_data[$widget_id]) ? $all_data[$widget_id] : array();
+
+		$network = is_multisite() ? (int)$instance['network'] : false;
+		$category = !empty($instance['category']) ? 
+			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
+			: array()
+		;
+
+		echo $this->_render_calendar($date, $network, $category);
 		die;
 	}
 }

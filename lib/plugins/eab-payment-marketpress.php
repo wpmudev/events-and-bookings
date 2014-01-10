@@ -219,6 +219,8 @@ class Eab_Payments_PaymentViaProducts {
 		add_post_meta($product_id, 'mp_var_name', array(''));
 		add_post_meta($product_id, 'mp_sku', array(0));
 		add_post_meta($product_id, 'mp_price', array($price));
+
+		add_action('eab-mp-variation-thrash', $event_id, $product_id);
 	}
 
 	/**
@@ -227,10 +229,10 @@ class Eab_Payments_PaymentViaProducts {
 	function save_event_product_variations ($instance_id) {
 		$product_id = !empty($_POST['eab_e2mp_product_id']) ? $_POST['eab_e2mp_product_id'] : false;
 
-		$event = new Eab_EventModel($instance_id);
+		$event = new Eab_EventModel(get_post($instance_id));
 		$quick_price = $this->_get_quick_product_price($product_id);
 
-		$meta = get_post_meta( $product_id, 'mp_var_name', true );
+		$meta = get_post_meta($product_id, 'mp_var_name', true);
 		if (!$meta || !is_array($meta)) {
 			/*
 			add_post_meta($product_id, 'mp_var_name', array(''));
@@ -250,6 +252,7 @@ class Eab_Payments_PaymentViaProducts {
 		$price = get_post_meta($product_id, 'mp_price', true);
 		$price[$max] = $quick_price;
 
+		$unset_first = false;
 		if (empty($meta[0]) && empty($sku[0])) {
 			unset($meta[0]);
 			$meta = array_values($meta);
@@ -259,11 +262,16 @@ class Eab_Payments_PaymentViaProducts {
 
 			unset($price[0]);
 			$price = array_values($price);
+
+			$unset_first = true;
 		}
+
 
 		update_post_meta($product_id, 'mp_var_name', $meta);
 		update_post_meta($product_id, 'mp_sku', $sku);
 		update_post_meta($product_id, 'mp_price', $price);
+
+		do_action('eab-mp-variation-meta', $product_id, $max, $instance_id, $event->is_recurring_child(), $unset_first);
 
 		// Add a download link, so that app will be a digital product
 		//$file = get_post_meta($product_id, 'mp_file', true);

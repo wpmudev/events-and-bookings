@@ -6,7 +6,7 @@
  Author: S H Mohanjith (Incsub)
  Text Domain: eab
  WDP ID: 249
- Version: 1.7.1.1
+ Version: 1.7.2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -25,7 +25,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7.1.1';
+    const CURRENT_VERSION = '1.7.2';
     
     /**
      * Translation domain
@@ -473,15 +473,6 @@ class Eab_EventsHub {
 		    $req .= "&$key=$value";
 		    $post_values .= " $key : $value\n";
 		}
-		
-		$header = "";
-		// post back to PayPal system to validate
-		$header .= "POST /cgi-bin/webscr HTTP/1.0\r\n";
-		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
-		
-		//$ip = $ip;
-		
 		$pay_to_email = $request['receiver_email'];
 		$pay_from_email = $request['payer_email'];
 		$transaction_id = $request['txn_id'];
@@ -497,7 +488,18 @@ class Eab_EventsHub {
 		
 		if (is_multisite()) switch_to_blog($blog_id);
 		$eab_options = get_option('incsub_event_default');
-	
+		
+		$header = "";
+		// post back to PayPal system to validate
+		$header .= "POST /cgi-bin/webscr HTTP/1.1\r\n";
+		// Sandbox host: http://stackoverflow.com/questions/17477815/receiving-error-invalid-host-header-from-paypal-ipn
+		if ((int)@$eab_options['paypal_sandbox'] == 1) $header .= "Host: www.sandbox.paypal.com\r\n";
+		else $header .= "Host: www.paypal.com\r\n";
+		
+		// End host
+		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
+
 		if ((int)@$eab_options['paypal_sandbox'] == 1) {
 		    $fp = fsockopen ('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
 		} else {
@@ -796,6 +798,7 @@ class Eab_EventsHub {
 			'incsub_event_page_eab_welcome',
 			'edit-incsub_event',
 			'incsub_event',
+			'incsub_event_page_eab_shortcodes',
 			'incsub_event_page_eab_settings',
 		);
     	$screen = get_current_screen();
@@ -1152,6 +1155,7 @@ class Eab_EventsHub {
 				'second' => __('Second', self::TEXT_DOMAIN),
 				'third' => __('Third', self::TEXT_DOMAIN),
 				'fourth' => __('Fourth', self::TEXT_DOMAIN),
+				'fifth' => __('Fifth', self::TEXT_DOMAIN),
 				'last' => __('Last', self::TEXT_DOMAIN),
 			);
 			$week = '<select name="eab_repeat[week]">';
@@ -1327,6 +1331,8 @@ class Eab_EventsHub {
 	    	$content .= '<div id="event-booking-no">';
             $content .= Eab_Template::get_admin_bookings(Eab_EventModel::BOOKING_NO, $event);
             $content .= '</div>';
+
+            $content .= apply_filters('eab-metabox-bookings-has_bookings', '', $event);
         }  else {
             $content .= __('No bookings', self::TEXT_DOMAIN);
         }
@@ -2583,9 +2589,14 @@ class Eab_EventsHub {
 		}
 
 		$password = wp_generate_password(12, false);
+
+		$status = apply_filters('eab-user_registration-wordpress-field_validation', true, $data);
+		if (!$status) die(json_encode($resp));
 		
 		$wordp_user = wp_create_user($login, $password, $email);
 		if (is_wp_error($wordp_user)) die(json_encode($resp));
+
+		do_action('eab-user_registered-wordpress', $wordp_user, $data);
 		
 		$user = get_userdata($wordp_user);
 		
@@ -2703,6 +2714,7 @@ define('EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ), true);
 define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . EAB_PLUGIN_BASENAME . '/');
 
 if (!defined('EAB_OLD_EVENTS_EXPIRY_LIMIT')) define('EAB_OLD_EVENTS_EXPIRY_LIMIT', 100, true);
+if (!defined('EAB_MAX_UPCOMING_EVENTS')) define('EAB_MAX_UPCOMING_EVENTS', 500, true);
 
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_error_reporter.php';
 Eab_ErrorReporter::serve();
@@ -2730,14 +2742,24 @@ require_once EAB_PLUGIN_DIR . 'lib/default_filters.php';
 if (is_admin()) {
 	require_once dirname(__FILE__) . '/lib/contextual_help/class_eab_admin_help.php';
 	Eab_AdminHelp::serve();
-}
 
-if ( !function_exists( 'wdp_un_check' ) ) {
-	add_action( 'admin_notices', 'wdp_un_check', 5 );
-	add_action( 'network_admin_notices', 'wdp_un_check', 5 );
-
-	function wdp_un_check() {
-		if ( !class_exists( 'WPMUDEV_Update_Notifications' ) && current_user_can( 'edit_users' ) )
-			echo '<div class="error fade"><p>' . __('Please install the latest version of <a href="http://premium.wpmudev.org/project/update-notifications/" title="Download Now &raquo;">our free Update Notifications plugin</a> which helps you stay up-to-date with the most stable, secure versions of WPMU DEV themes and plugins. <a href="http://premium.wpmudev.org/wpmu-dev/update-notifications-plugin-information/">More information &raquo;</a>', Eab_EventsHub::TEXT_DOMAIN) . '</a></p></div>';
-	}
+	// Dashboard notification
+	global $wpmudev_notices;
+	if (!is_array($wpmudev_notices)) $wpmudev_notices = array();
+	$wpmudev_notices[] = array(
+		'id' => 249,
+		'name' => 'Events +',
+		'screens' => array(
+			/*
+			// No working pages, please
+			'edit-incsub_event',
+			'incsub_event',
+			'edit-eab_events_category',
+			*/
+			'incsub_event_page_eab_welcome',
+			'incsub_event_page_eab_settings',
+			'incsub_event_page_eab_shortcodes',
+		),
+	);
+	require_once EAB_PLUGIN_DIR . '/lib/wpmudev-dash-notification.php';
 }

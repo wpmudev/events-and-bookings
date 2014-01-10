@@ -117,8 +117,9 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 	}
 
 	function _eab_dispatch_event_categories_for_ordering ($query) {
+		global $wp_query;
 		if (is_admin()) return false;
-		if (!is_main_query()) return false;
+		if (!$wp_query->is_main_query()) return false;
 		if (empty($query->query_vars['eab_events_category'])) return false;
 		Eab_Filter::start_date_ordering_set_up();
 		add_filter('found_posts', '_eab_tear_down_event_categories_for_ordering');
@@ -233,6 +234,102 @@ if (!(defined('EAB_SKIP_DEFAULT_WPML_REWRITE_FILTERING') && EAB_SKIP_DEFAULT_WPM
 	add_action('init', 'eab_to_wpml__rebind_rewrites');
 }
 // End WPML translated Events content with directory URL setup
+
+
+// Script concatenation start
+if (defined('EAB_OPTMIZIE_SCRIPT_LOAD') && EAB_OPTMIZIE_SCRIPT_LOAD) {
+	class Eab_FrontendDependencies {
+
+		private static $_cache = array();
+
+		private function __construct () {}
+
+		public static function serve () {
+			$me = new self;
+			$me->_add_hooks();
+		}
+
+		private function _add_hooks () {
+			if (!is_admin()) {
+				add_action('script_loader_src', array($this, 'optimize_scripts'), 10, 2);
+				add_action('wp_enqueue_scripts', array($this, 'enqueue_optimized_scripts'), 999);
+				add_action('wp_footer', array($this, 'write_optimized_cache'), 99);
+			}
+			add_action('wp_ajax_eab_get_optimized_scripts', array($this, 'output_cached_scripts'));
+			add_action('wp_ajax_nopriv_eab_get_optimized_scripts', array($this, 'output_cached_scripts'));
+		}
+
+		public function optimize_scripts ($src, $handle) {
+			if ('eab-optimized' === $handle) return $src; // We're good :)
+			if (!preg_match('/^eab[-_]/', $handle)) return $src;
+			if ($this->_endpoint_has_optimized_scripts()) return false; // We know we're good here, so don't add this
+
+			$filepath = $this->_eab_src_to_filepath($src);
+			if (!$filepath) return $src; // Unknown file
+
+			$this->_endpoint_add_to_optimized_cache(file_get_contents($filepath));
+		}
+
+		public function enqueue_optimized_scripts () {
+			wp_enqueue_script('eab-optimized', admin_url('admin-ajax.php?action=eab_get_optimized_scripts&key=' . $this->_get_request_key()), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+		}
+
+		public function write_optimized_cache () {
+			if (empty($this->_cache)) return false;
+			$this->_endpoint_set_optimized_cache(join("\n", $this->_cache));
+		}
+
+		public function output_cached_scripts () {
+			$data = stripslashes_deep($_GET);
+			$key = !empty($data['key']) ? $data['key'] : false;
+			if (empty($key)) die;
+
+			$cache = $this->_endpoint_get_optimized_cache($key);
+			if (empty($cache)) die;
+
+			header("Content-type: text/javascript");
+			die($cache);
+		}
+
+		private function _eab_src_to_filepath ($src) {
+			$src = preg_replace('/\?.*$/', '', $src);
+			$raw = preg_replace('/' . preg_quote(trailingslashit(plugins_url(basename(EAB_PLUGIN_DIR))), '/') . '/', EAB_PLUGIN_DIR, $src);
+			$filepath = escapeshellcmd($raw);
+			return file_exists($filepath)
+				? $filepath
+				: false
+			;
+		}
+
+		private function _get_request_key () {
+			global $wp;
+			$url = home_url($wp->request); // Use simplified baseurl fetching
+			return 'eab-js-' . md5($url);
+		}
+
+		private function _endpoint_has_optimized_scripts () {
+			$cache = $this->_endpoint_get_optimized_cache();
+			return !empty($cache);
+		}
+
+		private function _endpoint_get_optimized_cache ($key=false) {
+			$key = !empty($key) ? $key : $this->_get_request_key();
+			return get_transient($key);
+		}
+		
+		private function _endpoint_set_optimized_cache ($cache) {
+			$key = $this->_get_request_key();
+			return set_transient($key, $cache, DAY_IN_SECONDS);
+		}
+
+		private function _endpoint_add_to_optimized_cache ($cache) {
+			$this->_cache[] = $cache;
+		}
+
+	}
+	Eab_FrontendDependencies::serve();
+}
+// End script concatenation
 
 // Twitter delta threshold correction
 define('EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD', 10, true);

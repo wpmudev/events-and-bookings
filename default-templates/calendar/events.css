@@ -93,6 +93,10 @@ a.wpmudevevents-calendar-event:hover {
 	font-size: 1.6em;
 }
 
+.eab-shortcode_calendar .wpmudevevents-calendar-event-info img {
+	display: block;
+}
+
 /* ----- Breakpoints ----- */
 
 @media screen and (max-width : 768px) {

@@ -4,6 +4,21 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.2 - 2014-01-10
+----------------------------------------------------------------------
+- Fix for singular events embed dependencies.
+- Fix for inventory tracking.
+- Fix for calendar widget categories navigation.
+- Additional DOW/time sanity check for explicit date conversion.
+- Added fifth day of the month recurring option to DOW model.
+- Added relative date core shortcodes argument.
+- Added the `with_thumbnail` calendar shortcode argument.
+- Added additional selectors in Colors add-on.
+- Added admin side name mapping.
+- Added meetup.com import add-on.
+- Added Additional registration fields add-on.
+- Added the non-paid email add-on (props Ashok).
+
 1.7.1.1 - 2013-09-12
 ----------------------------------------------------------------------
 - Applying different level filters to expansion process.
