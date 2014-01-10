@@ -1,0 +1,27 @@
+<?php
+/*
+Plugin Name: Local Timezones
+Description: Auto-converts your event dates and times for your visitors
+Plugin URI: http://premium.wpmudev.org/project/events-and-booking
+Version: 1.0
+AddonType: Events
+Author: Ve Bailovity (Incsub)
+*/
+
+class Eab_Events_LocalTimezones {
+	private function __construct () {}
+	
+	public static function serve () {
+		$me = new Eab_Events_LocalTimezones;
+		$me->_add_hooks();
+	}
+	
+	private function _add_hooks () {
+		add_action('eab-javascript-enqueue_scripts', array($this, 'include_scripts'));
+	}
+
+	public function include_scripts () {
+		wp_enqueue_script('eab-events-local_timezones', plugins_url(basename(EAB_PLUGIN_DIR) . "/js/eab-events-local_timezones.js"), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+	}
+}
+Eab_Events_LocalTimezones::serve();
