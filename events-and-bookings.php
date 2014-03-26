@@ -6,14 +6,14 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.7.2
+ Version: 1.7.3-RC-1
  Author URI: http://premium.wpmudev.org
 */
 
-/*
+ /*
 Authors - S H Mohanjith (Incsub), Ve Bailovity (Incsub)
-Contributors - Ashok Kumar Nath (Incsub), Hakan Evin
-*/
+Contributors - Ashok Kumar Nath, Hakan Evin, Hoang Ngo
+ */
 
 /**
  * Eab_EventsHub object
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7.2';
+    const CURRENT_VERSION = '1.7.3-RC-1';
     
     /**
      * Translation domain
@@ -503,6 +503,7 @@ class Eab_EventsHub {
 		
 		// End host
 		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
+		$header .= "Connection: Close\r\n";
 		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 
 		if ((int)@$eab_options['paypal_sandbox'] == 1) {
@@ -510,7 +511,7 @@ class Eab_EventsHub {
 		} else {
 		    $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 		}
-		
+
 		$booking_obj = Eab_EventModel::get_booking($booking_id);
 		
 		if (!$booking_obj || !$booking_obj->id) {
@@ -564,8 +565,11 @@ class Eab_EventsHub {
 		    exit(0);
 		} else {
 		    fputs ($fp, $header . $req);
-		    while (!feof($fp)) $res = fgets ($fp, 1024);
-			
+		    while (!feof($fp)) {
+		    	$res = trim(fgets ($fp, 1024));
+		    	if (strcmp ($res, "VERIFIED") == 0) break;
+		    	if (strcmp ($res, "INVALID") == 0) break;
+		    }
 			if (strcmp ($res, "VERIFIED") == 0) {
 				if ($test_ipn == 1) {
 				  	if ((int)@$eab_options['paypal_sandbox'] == 1) {
@@ -857,7 +861,7 @@ class Eab_EventsHub {
 		$domain = $domain ? $domain : __('WordPress', self::TEXT_DOMAIN);
 		
 	    wp_enqueue_script('eab_api_js');
-		wp_localize_script('eab_api_js', 'l10nEabApi', array(
+		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
 			'facebook' => __('Login with Facebook', self::TEXT_DOMAIN),
 			'twitter' => __('Login with Twitter', self::TEXT_DOMAIN),
 			'google' => __('Login with Google', self::TEXT_DOMAIN),
@@ -881,7 +885,12 @@ class Eab_EventsHub {
 			'show_twitter' => !$this->_data->get_option('api_login-hide-twitter'),
 			'show_google' => !$this->_data->get_option('api_login-hide-google'),
 			'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
-		));
+			//validation error for worpress popup
+			'wp_missing_username_password' => __( 'Username and password are required!', self::TEXT_DOMAIN ),
+			'wp_username_pass_invalid' => __( 'Invalid username or password!', self::TEXT_DOMAIN ),
+			'wp_missing_user_email' => __( 'Username and email are required!', self::TEXT_DOMAIN ),
+			'wp_signup_error' => __( 'Your email/username is already taken or email is invalid!', self::TEXT_DOMAIN ),
+		)));
 		if (!$this->_data->get_option('facebook-no_init')) {
 			if (defined('EAB_INTERNAL_FLAG__FB_INIT_ADDED')) return false;
 			add_action('wp_footer', create_function('', "echo '" .
@@ -1197,7 +1206,7 @@ class Eab_EventsHub {
 
 			$week = '<select name="eab_repeat[week]">';
 			foreach (range(1,25) as $count) {
-				$selected = $count == $parts['week'] ? 'selected="selected"' : '';
+				$selected = !empty($parts['week']) && $count == $parts['week'] ? 'selected="selected"' : '';
 				$week .= "<option value='{$count}' {$selected}>{$count}</option>";
 			}
 			$week .= '</select>';
@@ -1465,10 +1474,11 @@ class Eab_EventsHub {
     function post_type_link($permalink, $post_obj, $leavename) {
 		if (empty($permalink)) return $permalink;
 		
-		if (is_object($post_obj) && !empty($post_obj->ID) && !empty($post_obj->post_name)) {
+		$post_id = $post = false;
+		if (is_object($post_obj) && !empty($post_obj->ID)/* && !empty($post_obj->post_name)*/) {
 			$post_id = $post_obj->ID;
 			$post = $post_obj;
-		} else {
+		} else if (is_numeric($post_obj)) {
 			$post_id = $post_obj;
 			$post = get_post($post_id);
 		}
@@ -1479,7 +1489,7 @@ class Eab_EventsHub {
 		    '%event_monthnum%'
 		);
 		
-		if ($post->post_type == 'incsub_event' && '' != $permalink) {
+		if ($post && $post->post_type == 'incsub_event' && '' != $permalink) {
 		    
 		    //$ptype = get_post_type_object($post->post_type);
 		    //$start = false;

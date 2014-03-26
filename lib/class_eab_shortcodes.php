@@ -186,6 +186,8 @@ class Eab_Shortcodes extends Eab_Codec {
 			'override_scripts' => false,
 			'with_thumbnail' => false,
 			'default_thumbnail' => false,
+			'show_excerpt' => false,
+			'excerpt_length' => 55,
 		));
 
 		if (!empty($_GET['date'])) {
@@ -225,6 +227,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'with_thumbnail' => array('help' => __('Show event thumbnail', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'default_thumbnail' => array('help' => __('Use this image URL as thumnail if event does not have an appropriate featured image set', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:url'),
+				'show_excerpt' => array('help' => __('Show event excerpt in the quick overview.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),

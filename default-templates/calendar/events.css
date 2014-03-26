@@ -93,7 +93,9 @@ a.wpmudevevents-calendar-event:hover {
 	font-size: 1.6em;
 }
 
-.eab-shortcode_calendar .wpmudevevents-calendar-event-info img {
+.eab-shortcode_calendar .wpmudevevents-calendar-event-info img,
+.eab-shortcode_calendar .wpmudevevents-calendar-event-info .eab-calendar-event_excerpt
+{
 	display: block;
 }
 

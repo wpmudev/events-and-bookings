@@ -24,6 +24,7 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 		add_action('eab-settings-after_appearance_settings', array($this, 'show_settings'));
 		add_filter('eab-settings-before_save', array($this, 'save_settings'));
 	
+		add_filter('eab-javascript-api_vars', array($this, 'update_api_messages'));
 		add_action('wp_footer', array($this, 'inject_tmp_scripts'));
 		
 		add_filter('eab-user_registration-wordpress-field_validation', array($this, 'validate_additional_fields'), 10, 2);
@@ -58,6 +59,12 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 		}
 	}
 
+	function update_api_messages ($api) {
+		if (!empty($api['required_field_missing'])) return $api;
+		$api['required_field_missing'] = __('A required field is missing.', Eab_EventsHub::TEXT_DOMAIN);
+		return $api;
+	}
+
 	function inject_tmp_scripts () {
 		$fields = $this->_get_fields();
 		if (empty($fields)) return false;
@@ -79,7 +86,7 @@ $(document).on("eab-api-registration-form_rendered", function () {
 				'<label for="eab-rarf-' + field.id + '">' +
 					field.label +
 				'</label>' +
-				'<input type="' + field.type + '" value="test" id="eab-rarf-' + field.id + '" />' +
+				'<input type="' + field.type + '" value="" id="eab-rarf-' + field.id + '" />' +
 			'</p>' +
 		'';
 	});
@@ -89,6 +96,7 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 	$.each(eab_rarf_fields, function (idx, field) {
 		var value = $.trim($("#eab-rarf-" + field.id).val());
 		if (!value && field.required) {
+			$('#eab-wordpress-signup-status').text(l10nEabApi.required_field_missing);
 			deferred.reject();
 			return false;
 		}

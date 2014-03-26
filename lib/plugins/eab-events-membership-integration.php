@@ -160,12 +160,13 @@ class Eab_Events_MembershipIntegration {
 		$content .= '<input type="hidden" name="incsub_event_membership_meta" value="1" />';
 		$content .= '<div class="misc-eab-section">';
 		$content .= '<div class="eab_meta_column_box">'.__('Membership Integration', Eab_EventsHub::TEXT_DOMAIN).'</div>';
+		$meta_selection = !empty($meta['sel']) ? $meta['sel'] : 0;
 		if ( $this->membership_active ) {
 			$content .= '<label for="incsub_event_membership_select" id="incsub_event_membership_select_label">'.__('Membership Fees', Eab_EventsHub::TEXT_DOMAIN).':</label>&nbsp;';
 			$content .= '<select name="eab_events_mi[sel]" id="incsub_event_membership_select" class="incsub_event_paid" >';
-			$content .= '<option value="1" ' . ($meta["sel"] == 1 ? 'selected="selected"' : '') . '>'.__('Free for all members', Eab_EventsHub::TEXT_DOMAIN).'&nbsp;</option>';
-			$content .= '<option value="0" ' . ($meta["sel"] == 0 ? 'selected="selected"' : '') . '>'.__('Event price', Eab_EventsHub::TEXT_DOMAIN).'&nbsp;</option>';
-			$content .= '<option value="2" ' . ($meta["sel"] == 2 ? 'selected="selected"' : '') . '>'.__('Member price', Eab_EventsHub::TEXT_DOMAIN).'&nbsp;</option>';
+			$content .= '<option value="1" ' . ($meta_selection == 1 ? 'selected="selected"' : '') . '>'.__('Free for all members', Eab_EventsHub::TEXT_DOMAIN).'&nbsp;</option>';
+			$content .= '<option value="0" ' . ($meta_selection == 0 ? 'selected="selected"' : '') . '>'.__('Event price', Eab_EventsHub::TEXT_DOMAIN).'&nbsp;</option>';
+			$content .= '<option value="2" ' . ($meta_selection == 2 ? 'selected="selected"' : '') . '>'.__('Member price', Eab_EventsHub::TEXT_DOMAIN).'&nbsp;</option>';
 			$content .= '</select>';
 			$content .= '<div class="clear"></div>';
 			$content .= '<label for="incsub_event_membership_level" id="incsub_event_membership_level_label">'.__('Free for', Eab_EventsHub::TEXT_DOMAIN).':&nbsp;&nbsp;';

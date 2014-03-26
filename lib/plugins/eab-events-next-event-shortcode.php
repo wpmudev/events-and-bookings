@@ -51,12 +51,61 @@ class Eab_Events_NextEventShortcode {
 		add_shortcode( 'next_event', array(&$this, 'shortcode') );
 	}
 
+	public function shortcode ($args=array(), $content='') {
+		$original_arguments = $args;
+		$codec = new Eab_Codec_ArgumentsCodec;
+		$args = $codec->parse_arguments($args, array(
+			'format'=> 'H:i T l',
+			'class'	=> '',
+			'add' => 0,
+			'expired'	=> __('Closed', Eab_EventsHub::TEXT_DOMAIN),
+			'legacy' => false,
+			'category' => false,
+			'categories' => false,
+		));
+
+		if (!empty($args['legacy'])) return $this->_legacy_shortcode($original_arguments);
+		$class = !empty($args['class'])
+			? 'class="' . sanitize_html_class($args['class']) . '"'
+			: ''
+		;
+		$format = "<div {$class}>%s</div>";
+		$output = '';
+
+		$additional = 0;
+		if (!empty($args['add']) && (int)$args['add']) {
+			$additional = (int)$args['add'] * 60;
+		}
+
+		$query = $codec->get_query_args($args);
+		$now = eab_current_time() + $additional;
+		$events = Eab_CollectionFactory::get_upcoming_events($now, $query);
+		$ret = array();
+		foreach ($events as $event) {
+			$ts = $event->get_start_timestamp();
+			if ($ts < $now) continue;
+			$ret[$ts] = $event;
+		}
+		ksort($ret);
+		$next = reset($ret);
+		if ($next) {
+			$output = date_i18n($args['format'], $next->get_start_timestamp());
+		} else {
+			$output = !empty($args['expired'])
+				? esc_html($args['expired'])
+				: $content
+			;
+		}
+
+		return sprintf($format, $output);
+	}
+
 	/**
 	 * Generate shortcode
 	 *
 	 */	
-	function shortcode( $atts ) {
-	
+	private function _legacy_shortcode( $atts ) {
+
 		extract( shortcode_atts( array(
 		'format'=> 'H:i T l',
 		'class'	=> '',
@@ -70,7 +119,7 @@ class Eab_Events_NextEventShortcode {
 		global $wpdb;
 		
 		$result = $wpdb->get_row(
-			"SELECT estart.* 
+			"SELECT estart.*
 			FROM $wpdb->posts wposts, $wpdb->postmeta estart, $wpdb->postmeta eend, $wpdb->postmeta estatus
 			WHERE 
 			wposts.ID=estart.post_id AND wposts.ID=eend.post_id AND wposts.ID=estatus.post_id 

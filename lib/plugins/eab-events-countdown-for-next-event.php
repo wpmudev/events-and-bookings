@@ -144,10 +144,149 @@ class Eab_Events_CountdownforNextEvent {
 		return false;
 	}
 
+	public function shortcode ($args=array(), $content='') {
+		$original_arguments = $args;
+		$codec = new Eab_Codec_ArgumentsCodec;
+		$args = $codec->parse_arguments($args, array(
+			'id' => '',
+			'format' => 'dHMS',
+			'goto' => '',
+			'class' => '',
+			'type' => '',
+			'size' => 70,
+			'add' => 0,
+			'allow_scaling' => false, // Scaling allowing boolean switch
+			'compact' => false, // Boolean compact flag
+			'title' => false,
+			'footer_script' => false,
+			'expired' => __('Closed', Eab_EventsHub::TEXT_DOMAIN),
+			'legacy' => false,
+			'category' => false,
+			'categories' => false,
+		)); 
+
+		if (!empty($args['legacy'])) return $this->_legacy_shortcode($original_arguments);
+		$class = !empty($args['class'])
+			? 'class="' . sanitize_html_class($args['class']) . '"'
+			: ''
+		;
+
+		$id = str_replace(array(" ","'",'"'), "", $args['id']); // We cannot let spaces and quotes in id
+			
+		// Do not add quotes for page refresh
+		if ( $args['goto'] && $args['goto'] != "window.location.href" )
+			$args['goto'] = "'". str_replace( array("'",'"'), "", $args['goto'] ). "'"; // Do not allow quotes which may break js
+
+		$transform = false;
+		if ($args['size'] < 70 && !empty($args['allow_scaling'])) {
+			$transform = $args['size'] / 70;
+		}
+		switch ($args['size']) {
+			case 70:	$height = 72; break;
+			case 82:	$height = 84; break;
+			case 127:	$height = 130; break;
+			case 254:	$height = 260; break;
+			default:	$args['size'] = 70; $height = 72; break;
+		}
+		
+		$sprite_file = plugins_url('/events-and-bookings/img/sprite_'.$args['size'].'x'.$height.'.png');
+
+		$secs = -1;
+		$additional = 0;
+		if (!empty($args['add']) && (int)$args['add']) {
+			$additional = (int)$args['add'] * 60;
+		}
+
+		$query = $codec->get_query_args($args);
+		$now = eab_current_time() + $additional;
+		$events = Eab_CollectionFactory::get_upcoming_events($now, $query);
+		$ret = array();
+		foreach ($events as $event) {
+			$ts = $event->get_start_timestamp();
+			if ($ts < $now) continue;
+			$ret[$ts] = $event;
+		}
+		ksort($ret);
+		$next = reset($ret);
+		if ($next) $secs = $next->get_start_timestamp() - $now;
+		else return $content;
+
+		$script  = '';
+		$script .= "<script type='text/javascript'>";
+		$script .= "jQuery(document).ready(function($) {";
+		$script .= "$('#eab_next_event_countdown".$id."').countdown({
+					format: '".$args['format']."',
+					expiryText: '".$args['expired']."',
+					until: ".$secs.","
+		;
+		if ($args['goto']) {
+			$script .= "onExpiry: eab_next_event_refresh".$id.",";
+		}
+		if ($args['type'] == 'flip') {
+			$script .= "onTick: function () { $(document).trigger('eab-event_countdown-tick', [$(this), '{$sprite_file}']);},";
+		}
+		$script .= "alwaysExpire: true});";
+		if ($args['goto']) {
+			$script .= "function eab_next_event_refresh".$id."() {window.location.href=".$args['goto'].";}";
+		}
+
+		$script .= "});</script>";
+
+		if ('flip' == $args['type']) {
+			$script .= '<script type="text/javascript" src="' . plugins_url(basename(EAB_PLUGIN_DIR) . "/js/event_countdown_flip.js") . '"></script>';
+		}
+		
+		// remove line breaks to prevent wpautop break the script
+		$script = str_replace( array("\r","\n","\t","<br>","<br />"), "", preg_replace('/\s+/m', ' ', $script) );
+		
+		$this->add_countdown = true;
+
+		$markup = '<div class="eab_next_event_countdown-wrapper">' .
+			($args['title']
+				? '<h4><a href="' . get_permalink($next->get_id()) . '">' . $next->get_title() . '</a></h4>'
+				: ''
+			) . 
+			"<div id='eab_next_event_countdown{$id}' {$class} data-height='{$height}' data-size='" . $args['size'] . "'></div>" . 
+		'</div>';
+
+		if ($transform && !empty($args['allow_scaling'])) {
+			$markup .= <<<EOStandardTransformCSS
+<style type="text/css">
+#eab_next_event_countdown{$id} .countdown_section { 
+	transform: scale({$transform},{$transform});
+	-ms-transform: scale({$transform},{$transform});
+	-webkit-transform: scale({$transform},{$transform});
+}
+</style>
+EOStandardTransformCSS;
+		}
+
+		if (!empty($args['size']) && !empty($args['compact'])) {
+			$base_size = $transform && !empty($args['allow_scaling']) ? $args['size'] * $transform : $args['size'];
+			$max_width = ($base_size * 8) + 20;
+			$markup .= <<<EOStandardCompactCSS
+<style type="text/css">
+#eab_next_event_countdown{$id} {
+	max-width: {$max_width}px;
+}
+</style>
+EOStandardCompactCSS;
+		}
+
+		if ($args['footer_script'] && in_array($args['footer_script'], array('yes', 'true', '1'))) {
+			self::add_script($script);
+			add_action('wp_footer', array($this, 'inject_queued_scripts'), 99);
+		} else {
+			$markup .= $script;
+		}
+
+		return $markup;
+	}
+
 	/**
 	 * Generate shortcode
 	 */	
-	function shortcode( $atts ) {
+	private function _legacy_shortcode( $atts ) {
 	
 		extract( shortcode_atts( array(
 		'id'		=> '',

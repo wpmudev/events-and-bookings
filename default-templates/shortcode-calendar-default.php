@@ -10,6 +10,8 @@ $renderer->set_navigation($args['navigation']);
 $renderer->set_title_format($args['title_format']);
 $renderer->set_short_title_format($args['short_title_format']);
 $renderer->set_long_date_format($args['long_date_format']);
+$renderer->set_thumbnail($args);
+$renderer->set_excerpt($args);
 
 echo $renderer->get_month_calendar($args['date']);
 ?>

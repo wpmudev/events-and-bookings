@@ -463,31 +463,49 @@ class Eab_Template {
 				$content .= '<form action="' . get_permalink($event->get_id()) . '" method="post" id="eab_booking_form">';
 				$content .= '<input type="hidden" name="event_id" value="' . $event->get_id() . '" />';
 				$content .= '<input type="hidden" name="user_id" value="' . $booking_id . '" />';
-				$content .= '<input class="' .
-					(($booking_id && $booking_status == 'no') ? 'current wpmudevevents-no-submit' : 'wpmudevevents-no-submit ' . $default_class) .
-					'" type="submit" name="action_no" value="' . __('No', Eab_EventsHub::TEXT_DOMAIN) .
-				'" />';
-				$content .= '<input class="' . (($booking_id && $booking_status == 'maybe') ? 'current wpmudevevents-maybe-submit' : 'wpmudevevents-maybe-submit ' . $default_class) .
-					'" type="submit" name="action_maybe" value="' . __('Maybe', Eab_EventsHub::TEXT_DOMAIN) . 
-				'" />';
-				$content .= '<input class="' . (($booking_id && $booking_status == 'yes') ? 'current wpmudevevents-yes-submit' : 'wpmudevevents-yes-submit ' . $default_class) .
-					'" type="submit" name="action_yes" value="' . __('I\'m attending', Eab_EventsHub::TEXT_DOMAIN) .
-				'" />';
+				$content .= apply_filters('eab-rsvps-button-no',
+					'<input class="' .
+						(($booking_id && $booking_status == 'no') ? 'current wpmudevevents-no-submit' : 'wpmudevevents-no-submit ' . $default_class) .
+						'" type="submit" name="action_no" value="' . __('No', Eab_EventsHub::TEXT_DOMAIN) .
+					'" />',
+					$event->get_id()
+				);
+				$content .= apply_filters('eab-rsvps-button-maybe',
+					'<input class="' . (($booking_id && $booking_status == 'maybe') ? 'current wpmudevevents-maybe-submit' : 'wpmudevevents-maybe-submit ' . $default_class) .
+						'" type="submit" name="action_maybe" value="' . __('Maybe', Eab_EventsHub::TEXT_DOMAIN) . 
+					'" />',
+					$event->get_id()
+				);
+				$content .= apply_filters('eab-rsvps-button-yes',
+					'<input class="' . (($booking_id && $booking_status == 'yes') ? 'current wpmudevevents-yes-submit' : 'wpmudevevents-yes-submit ' . $default_class) .
+						'" type="submit" name="action_yes" value="' . __('I\'m attending', Eab_EventsHub::TEXT_DOMAIN) .
+					'" />',
+					$event->get_id()
+				);
 				$content .= '</form>';
 			} else {
 				$login_url_y = apply_filters('eab-rsvps-rsvp_login_page-yes', wp_login_url(get_permalink($event->get_id())) . '&eab=y');
 				$login_url_m = apply_filters('eab-rsvps-rsvp_login_page-maybe', wp_login_url(get_permalink($event->get_id())) . '&eab=m');
 				$login_url_n = apply_filters('eab-rsvps-rsvp_login_page-no', wp_login_url(get_permalink($event->get_id())) . '&eab=n');
 				$content .= '<input type="hidden" name="event_id" value="' . $event->get_id() . '" />';
-				$content .= '<a class="wpmudevevents-no-submit" href="' .
-					$login_url_n .
-				'" >'.__('No', Eab_EventsHub::TEXT_DOMAIN).'</a>';
-				$content .= '<a class="wpmudevevents-maybe-submit" href="' .
-					$login_url_m .
-				'" >'.__('Maybe', Eab_EventsHub::TEXT_DOMAIN).'</a>';
-				$content .= '<a class="wpmudevevents-yes-submit" href="' .
-					$login_url_y .
-				'" >'.__('I\'m Attending', Eab_EventsHub::TEXT_DOMAIN).'</a>';
+				$content .= apply_filters('eab-rsvps-button-no',
+					'<a class="wpmudevevents-no-submit" href="' .
+						$login_url_n .
+					'" >'.__('No', Eab_EventsHub::TEXT_DOMAIN).'</a>',
+					$event->get_id()
+				);
+				$content .= apply_filters('eab-rsvps-button-maybe',
+					'<a class="wpmudevevents-maybe-submit" href="' .
+						$login_url_m .
+					'" >'.__('Maybe', Eab_EventsHub::TEXT_DOMAIN).'</a>',
+					$event->get_id()
+				);
+				$content .= apply_filters('eab-rsvps-button-yes',
+					'<a class="wpmudevevents-yes-submit" href="' .
+						$login_url_y .
+					'" >'.__('I\'m Attending', Eab_EventsHub::TEXT_DOMAIN).'</a>',
+					$event->get_id()
+				);
 			}
 		}
 		
@@ -664,6 +682,7 @@ class Eab_Template {
 		$renderer->set_short_title_format($args['short_title_format']);
 		$renderer->set_long_date_format($args['long_date_format']);
 		$renderer->set_thumbnail($args);
+		$renderer->set_excerpt($args);
 
 		return '<section class="wpmudevevents-list">' . $renderer->get_month_calendar($args['date']) . '</section>';
 	}

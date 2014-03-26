@@ -371,7 +371,8 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			? $excerpt
 			: $this->get_content()
 		;
-		if (!function_exists('eab_call_template')) return wp_strip_all_tags($excerpt);
+		$excerpt = wp_strip_all_tags(strip_shortcodes($excerpt));
+		if (!function_exists('eab_call_template')) return $excerpt;
 
 		$suffix = false;
 		$length = eab_call_template('util_strlen', $excerpt);
@@ -596,6 +597,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				'post_author' => $this->get_author(),
 				'post_excerpt' => $this->get_excerpt(),
 				'post_content' => $this->get_content(),
+				'to_ping' => '',
 			);
 			global $wpdb;
 			if (false !== $wpdb->insert($wpdb->posts, $post)) {

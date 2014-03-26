@@ -131,6 +131,21 @@ abstract class Eab_Codec {
 	}
 }
 
+/**
+ * Simple arguments parsing implementation for add-ons that do not implement Eab_Codec.
+ */
+class Eab_Codec_ArgumentsCodec extends Eab_Codec {
+	protected function _register () {} // We won't be registering anything
+	
+	public function parse_arguments ($args=array(), $accepted=array()) {
+		return $this->_preparse_arguments($args, $accepted);
+	}
+
+	public function get_query_args ($args=array()) {
+		return $this->_to_query_args($args);
+	}
+}
+
 
 /**
  * Macro expansion codec class.

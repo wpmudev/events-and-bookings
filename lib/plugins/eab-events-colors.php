@@ -3,7 +3,7 @@
 Plugin Name: Colors
 Description: Allows you to easily tweak the background color for your events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 1.0
+Version: 1.1
 Author: Ve Bailovity (Incsub)
 */
 
@@ -43,7 +43,7 @@ class Eab_Events_Colors {
 
 		$default = !empty($colors['__default__']) ? $colors['__default__'] : false;
 		$style = '';
-		if ($default) {
+		if ($default && empty($default['skip'])) {
 			$style .= '.wpmudevevents-calendar-event {';
 			if (!empty($default['bg'])) {
 			$style .= '' .
@@ -58,6 +58,7 @@ class Eab_Events_Colors {
 			unset($colors['__default__']);
 		}
 		foreach ($colors as $class => $color) {
+			if (!empty($color['skip'])) continue; // We won't be using this
 			$selectors = array(
 				'.wpmudevevents-calendar-event.' . sanitize_html_class($class),
 			);
@@ -140,6 +141,10 @@ class Eab_Events_Colors {
 			<label for="<?php echo $for; ?>-fg">
 				<?php _e('Text', Eab_EventsHub::TEXT_DOMAIN); ?>
 				<input type="color" name="eab-colors[<?php echo $cat; ?>][fg]" value="<?php echo $value_fg; ?>" />
+			</label>
+			<label for="<?php echo $for; ?>-skip">
+				<input type="checkbox" id="<?php echo $for; ?>-skip" name="eab-colors[<?php echo $cat; ?>][skip]" value="1" <?php echo !empty($colors[$cat]['skip']) ? 'checked="checked"' : ''; ?> />
+				<?php _e('Skip', Eab_EventsHub::TEXT_DOMAIN); ?>
 			</label>
 		</div>
 	<?php } ?>

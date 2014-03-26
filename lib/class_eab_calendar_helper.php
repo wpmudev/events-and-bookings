@@ -343,6 +343,10 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 		'with_thumbnail' => false,
 		'default_thumbnail' => false,
 	);
+	protected $_excerpt = array(
+		'show_excerpt' => false,
+		'excerpt_length' => false,
+	);
 
 	public function __construct ($events) {
 		parent::__construct($events);
@@ -352,6 +356,11 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 	public function set_thumbnail ($args) {
 		if (!empty($args['with_thumbnail'])) $this->_thumbnail['with_thumbnail'] = true;
 		if (!empty($args['default_thumbnail'])) $this->_thumbnail['default_thumbnail'] = esc_url($args['default_thumbnail']);
+	}
+
+	public function set_excerpt ($args) {
+		if (!empty($args['show_excerpt'])) $this->_excerpt['show_excerpt'] = true;
+		if (!empty($args['excerpt_length'])) $this->_excerpt['excerpt_length'] = intval($args['excerpt_length']);
 	}
 
 	public function set_long_date_format ($fmt) {
@@ -369,6 +378,15 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 			: get_permalink($event_info['id'])
 		;
 		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:sO", $event_tstamps['start']));
+
+		if (!empty($event_info['has_no_start_time'])) {
+			$datetime_format = get_option('date_format');
+			$datetime_class = 'eab-date_format-date';
+		} else {
+			$datetime_format = get_option('time_format');
+			$datetime_class = 'eab-date_format-time';
+		}
+
 		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' .
@@ -378,9 +396,10 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 						: ''
 				) .
 				'<time datetime="' . $tstamp . '">' .
-					'<var class="eab-date_format-date">' . apply_filters('eab-calendar-event_archive-start_time', date_i18n(get_option('date_format'), $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . '</var>' .
+					'<var class="' . sanitize_html_class($datetime_class) . '">' . apply_filters('eab-calendar-event_archive-start_time', date_i18n($datetime_format, $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . '</var>' .
 				'</time> ' . 
 				$event_info['event_venue'] .
+				(!empty($this->_excerpt['show_excerpt']) ? ' <span class="eab-calendar-event_excerpt">' . esc_html($event_info['excerpt']) . '</span>' : '') .
 			'</span>' . 
 		'</a>'; 
 	}
@@ -438,6 +457,7 @@ EabEctEacJs;
 		$data = parent::_get_item_data($post);
 		if (isset($post->blog_id)) return $data;
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
+		
 		if (!empty($this->_thumbnail['with_thumbnail'])) {
 			$thumbnail = $event->get_featured_image();
 			if (empty($thumbnail) && !empty($this->_thumbnail['default_thumbnail'])) {
@@ -445,6 +465,17 @@ EabEctEacJs;
 			}
 			$data['thumbnail'] = $thumbnail;
 		}
+		
+		if (!empty($this->_excerpt['show_excerpt'])) {
+			$excerpt_length = !empty($this->_excerpt['excerpt_length']) && (int)$this->_excerpt['excerpt_length']
+				? (int)$this->_excerpt['excerpt_length']
+				: 30
+			;
+			$data['excerpt'] = $event->get_excerpt_or_fallback($excerpt_length);
+		}
+
+		$data['has_no_start_time'] = $event->has_no_start_time(); // Only check first
+
 		return $data;
 	}
 }

@@ -1,5 +1,6 @@
 ;(function ($, undefined) {
 
+
 $(function () {
 	var locale = $("html").attr("lang");
 	$("time[datetime]").each(function () {
@@ -15,6 +16,7 @@ $(function () {
 		if (!$time.length || !datetime || !$dts.length) return true;
 
 		var date = new Date(Date.parse(datetime));
+		if (isNaN(date)) return false;
 		$dts.each(function () {
 			var $me = $(this),
 				old = $me.text()
