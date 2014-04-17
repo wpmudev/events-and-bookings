@@ -36,7 +36,10 @@ function send_wordpress_registration_request () {
 	;
 	deferred.done(function () {
 		// Client-side validation first
-		if (!data.username || !data.email) $('#eab-wordpress-signup-status').text(l10nEabApi.wp_missing_user_email);
+		if (!data.username || !data.email) {
+			$('#eab-wordpress-signup-status').text(l10nEabApi.wp_missing_user_email);
+			return false;
+		}
 		$root.append('<img class="eab-waiting" src="' + _eab_data.root_url + '/waiting.gif" />');
 		$.post(_eab_data.ajax_url, {
 			"action": "eab_wordpress_register",

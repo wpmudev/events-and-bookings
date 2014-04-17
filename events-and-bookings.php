@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.7.3-RC-1
+ Version: 1.7.3
  Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7.3-RC-1';
+    const CURRENT_VERSION = '1.7.3';
     
     /**
      * Translation domain
@@ -652,9 +652,11 @@ class Eab_EventsHub {
 		
 		$style = file_exists(get_stylesheet_directory() . '/events.css')
 			? get_stylesheet_directory_uri() . '/events.css'
-			: file_exists(get_template_directory() . '/events.css')
-				? get_template_directory_uri() . '/events.css'
-				: false
+			: (
+				file_exists(get_template_directory() . '/events.css')
+					? get_template_directory_uri() . '/events.css'
+					: false
+			)
 		;
 		$eab_type = $is_theme_tpl = false;
 		if ($this->_data->get_option('override_appearance_defaults')) {
@@ -720,9 +722,11 @@ class Eab_EventsHub {
 		
 		$style = file_exists(get_stylesheet_directory() . '/events.css')
 			? get_stylesheet_directory_uri() . '/events.css'
-			: file_exists(get_template_directory() . '/events.css')
-				? get_template_directory_uri() . '/events.css'
-				: false
+			: (
+				file_exists(get_template_directory() . '/events.css')
+					? get_template_directory_uri() . '/events.css'
+					: false
+			)
 		;
 		$eab_type = $is_theme_tpl = false;
 		if ($this->_data->get_option('override_appearance_defaults')) {

@@ -29,10 +29,32 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 		
 		add_filter('eab-user_registration-wordpress-field_validation', array($this, 'validate_additional_fields'), 10, 2);
 		add_action('eab-user_registered-wordpress', array($this, 'save_additional_fields'), 10, 2);
+
+		if ($this->_data->get_option('additional_fields-export')) {
+			add_filter('eab-exporter-csv-row', array($this, 'inject_export_columns'), 10, 4);
+		}
+	}
+
+	function inject_export_columns ($row, $event, $booking, $user) {
+		if (empty($user->ID)) return $row;
+		$has_empty = true;
+		
+		$fields = Eab_Rsvps_Arf_Model::get($user->ID);
+		if (empty($fields) && !$has_empty) return $row;
+		
+		foreach ($fields as $key => $value) {
+			if (empty($value) && !$has_empty) continue;
+			$row[$key] = '' === $value
+				? __('N/A', Eab_EventsHub::TEXT_DOMAIN)
+				: $value
+			;
+		}
+
+		return $row;
 	}
 
 	function validate_additional_fields ($status, $data) {
-		$fields = $this->_get_fields();
+		$fields = Eab_Rsvps_Arf_Model::get_all();
 		if (empty($fields)) return $status;
 
 		foreach ($fields as $field) {
@@ -46,7 +68,7 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 	}
 
 	function save_additional_fields ($user_id, $data) {
-		$fields = $this->_get_fields();
+		$fields = Eab_Rsvps_Arf_Model::get_all();
 		if (empty($fields)) return false;
 
 		foreach ($fields as $field) {
@@ -66,7 +88,7 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 	}
 
 	function inject_tmp_scripts () {
-		$fields = $this->_get_fields();
+		$fields = Eab_Rsvps_Arf_Model::get_all();
 		if (empty($fields)) return false;
 
 		?>
@@ -94,7 +116,9 @@ $(document).on("eab-api-registration-form_rendered", function () {
 });
 $(document).on("eab-api-registration-data", function (e, data, deferred) {
 	$.each(eab_rarf_fields, function (idx, field) {
-		var value = $.trim($("#eab-rarf-" + field.id).val());
+		var $field = $("#eab-rarf-" + field.id),
+			value = $field.is(":checkbox") ? $field.is(":checked") : $.trim($field.val())
+		;
 		if (!value && field.required) {
 			$('#eab-wordpress-signup-status').text(l10nEabApi.required_field_missing);
 			deferred.reject();
@@ -111,7 +135,7 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 	
 	function show_settings () {
 		wp_enqueue_script('underscore');
-		$fields = $this->_get_fields();
+		$fields = Eab_Rsvps_Arf_Model::get_all();
 		$fields = is_array($fields) ? $fields : array();
 		$_types = array(
 			'text' => __('Text', Eab_EventsHub::TEXT_DOMAIN),
@@ -128,7 +152,7 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 				<br />
 				<?php echo esc_html('Required', Eab_EventsHub::TEXT_DOMAIN); ?>: <b><?php echo esc_html(($field['required'] ? __('Yes', Eab_EventsHub::TEXT_DOMAIN) : __('No', Eab_EventsHub::TEXT_DOMAIN))); ?></b>
 				<br />
-				<!--<?php _e('E-mail macro:', Eab_EventsHub::TEXT_DOMAIN); ?> <code><?php echo esc_html($this->_to_email_macro($field['label'])); ?></code>
+				<!--<?php _e('E-mail macro:', Eab_EventsHub::TEXT_DOMAIN); ?> <code><?php echo esc_html(Eab_Rsvps_Arf_Model::get_macro($field['label'])); ?></code>
 				<span class="description"><?php _e('This is the placeholder you can use in your emails.', Eab_EventsHub::TEXT_DOMAIN); ?></span> -->
 				<input type="hidden" name="eab-arf-additional_fields[]" value="<?php echo rawurlencode(json_encode($field)); ?>" />
 				<a href="#remove" class="eab-arf-additional_fields-remove"><?php echo esc_html('Remove', Eab_EventsHub::TEXT_DOMAIN); ?></a>
@@ -156,6 +180,14 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 			</label>
 			<button type="button" class="button-secondary" id="eab-arf-new_additional_field-add"><?php _e('Add', Eab_EventsHub::TEXT_DOMAIN); ?></button>
 		</div>
+	</div>
+	<div class="eab-inside">
+		<h4><?php _e('Options', Eab_EventsHub::TEXT_DOMAIN); ?></h4>
+		<label for="eab-arf-additional_fields-options-export">
+			<input type="hidden" name="eab-arf-additional_fields-options-export" value="" />
+			<input type="checkbox" id="eab-arf-additional_fields-options-export" name="eab-arf-additional_fields-options-export" value="1" <?php checked(true, $this->_data->get_option('additional_fields-export')); ?> />
+			<?php _e('Include additional fields in data export', Eab_EventsHub::TEXT_DOMAIN); ?>
+		</label>
 	</div>
 </div>
 <script id="eab-arf-additional_fields-template" type="text/template">
@@ -229,10 +261,68 @@ $(function () {
 			if (empty($field['label'])) continue;
 			$options['additional_fields'][] = $field;
 		}
+
+		$options['additional_fields-export'] = !empty($_POST['eab-arf-additional_fields-options-export']);
+
 		return $options;
 	}
 
-	protected function _get_fields () {
+}
+
+class Eab_Rsvps_Arf_Model {
+
+	private static $_me;
+
+	private $_data;
+
+	private function __construct () {
+		$this->_data = Eab_Options::get_instance();
+	}
+
+	private static function _instantiate () {
+		if (self::$_me) return true;
+		self::$_me = new Eab_Rsvps_Arf_Model;
+	}
+
+
+
+	public static function get ($user_id) {
+		self::_instantiate();
+		return self::$_me->_get_user_field_values($user_id);
+	}
+
+	public static function get_all () {
+		self::_instantiate();
+		return self::$_me->_get_fields();
+	}
+
+	public static function get_clean_name ($label) {
+		self::_instantiate();
+		return self::$_me->_to_clean_name($label);
+	}
+
+	public static function get_macro ($label) {
+		self::_instantiate();
+		return self::$_me->_to_email_macro($label);
+	}
+
+
+
+	private function _get_user_field_values ($user_id) {
+		$values = array();
+		$fields = $this->_get_fields();
+		if (empty($fields)) return $values;
+
+		foreach ($fields as $field) {
+			if (empty($field["id"])) continue;
+			$key = $field["id"];
+			$label = $field['label'];
+			$values[$label] = get_user_meta($user_id, $key, true);
+		}
+		return $values;
+	}
+
+	private function _get_fields () {
 		$fields = $this->_data->get_option('additional_fields');
 		if (empty($fields)) return $fields;
 		foreach ($fields as $idx => $field) {

@@ -4,6 +4,15 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.3 - 2014-04-17
+----------------------------------------------------------------------
+- Fix for popup login/registration validation.
+- Fix for child themes path resolution.
+- Fix for javascript date parsing in old engines.
+- Added excerpt setting for calendar shortcode.
+- Added categories plural and singular arguments to countdown.
+- Added additional fields to attendees export.
+
 1.7.2 - 2014-01-10
 ----------------------------------------------------------------------
 - Fix for singular events embed dependencies.
