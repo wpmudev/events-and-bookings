@@ -161,6 +161,7 @@ class Eab_Events_MembershipIntegration {
 		$content .= '<div class="misc-eab-section">';
 		$content .= '<div class="eab_meta_column_box">'.__('Membership Integration', Eab_EventsHub::TEXT_DOMAIN).'</div>';
 		$meta_selection = !empty($meta['sel']) ? $meta['sel'] : 0;
+		$meta_level = !empty($meta['level']) ? $meta['level'] : array();
 		if ( $this->membership_active ) {
 			$content .= '<label for="incsub_event_membership_select" id="incsub_event_membership_select_label">'.__('Membership Fees', Eab_EventsHub::TEXT_DOMAIN).':</label>&nbsp;';
 			$content .= '<select name="eab_events_mi[sel]" id="incsub_event_membership_select" class="incsub_event_paid" >';
@@ -177,7 +178,7 @@ class Eab_Events_MembershipIntegration {
 				$content .= '<select multiple="multiple" name="eab_events_mi[level][]" id="incsub_event_membership_level" class="incsub_event_membership_level" >';
 				foreach ( $levels as $level ) {
 					if ( $level->level_slug != 'visitors' ) { // Do not include strangers
-						if ( is_array( $meta["level"] ) AND in_array( $level->id, $meta["level"] ) )
+						if ( is_array( $meta_level ) AND in_array( $level->id, $meta_level ) )
 							$sela = 'selected="selected"';
 						else
 							$sela = '';

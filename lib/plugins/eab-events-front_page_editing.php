@@ -540,7 +540,7 @@ class Eab_Events_FrontPageEditing {
 		$event = new Eab_EventModel($post);
 		echo '<div id="fpe-editor-root" style="display:none">';
 		wp_editor(
-			$post->post_content,
+			(!empty($post->post_content) ? $post->post_content : ''),
 			'eab-events-fpe-content', array(
 				'textarea_rows' => 5,
 				'media_buttons' => true,

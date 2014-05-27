@@ -42,7 +42,8 @@ class Eab_Rsvps_RsvpAutoReset {
 	}
 
 	private function _reset_expired_bookings ($since) {
-		$rsvps = Eab_EventModel::get_bookings(Eab_EventModel::BOOKING_YES, $since);
+		//$rsvps = Eab_EventModel::get_bookings(Eab_EventModel::BOOKING_YES, $since);
+		$rsvps = Eab_EventModel::get_bookings(Eab_EventModel::BOOKING_YES); // Just reset all the expired bookings.
 		$now = eab_current_time();
 		
 		$cutoff_limit = $this->_data->get_option('rsvp_auto_reset-cutoff');

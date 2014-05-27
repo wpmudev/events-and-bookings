@@ -42,9 +42,13 @@ class Eab_Events_Capabilities {
 
 		$roles_map = $this->_data->get_option('eab-capabilities_map');
 		$capabilities = $tmp = array();
+
 		foreach ($user->roles as $role) {
 			$tmp = isset($roles_map[$role]) ? $roles_map[$role] : array();
-			//$capabilities = array_merge($capabilities, $tmp);
+			$tmp = defined('EAB_CAPABILITIES_HIGHEST_SUBSET_MERGE') && EAB_CAPABILITIES_HIGHEST_SUBSET_MERGE
+				? array_filter($tmp)
+				: $tmp
+			;
 			$capabilities = wp_parse_args($capabilities, $tmp);
 		}
 		if (!$capabilities) {

@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.7.3
+ Version: 1.7.4-BETA-2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7.3';
+    const CURRENT_VERSION = '1.7.4-BETA-2';
     
     /**
      * Translation domain
@@ -1794,22 +1794,26 @@ class Eab_EventsHub {
      * @see		http://codex.wordpress.org/Adding_Administration_Menus
      */
     function admin_menu() {
-		global $submenu;
-	        global $menu;
+		global $submenu, $menu;
+
+		$root_key = 'edit.php?post_type=incsub_event';
 		
 		if (get_option('eab_setup', false) == false) {
-		    add_submenu_page('edit.php?post_type=incsub_event', __("Get Started", self::TEXT_DOMAIN), __("Get started", self::TEXT_DOMAIN), 'manage_options', 'eab_welcome', array($this,'welcome_render'));
+		    add_submenu_page($root_key, __("Get Started", self::TEXT_DOMAIN), __("Get started", self::TEXT_DOMAIN), 'manage_options', 'eab_welcome', array($this,'welcome_render'));
 		    
-		    if (isset($submenu['edit.php?post_type=incsub_event']) && is_array($submenu['edit.php?post_type=incsub_event'])) foreach ($submenu['edit.php?post_type=incsub_event'] as $k=>$item) {
+		    if (isset($submenu[$root_key]) && is_array($submenu[$root_key])) foreach ($submenu[$root_key] as $k=>$item) {
 				if ($item[2] == 'eab_welcome') {
-				    $submenu['edit.php?post_type=incsub_event'][1] = $item;
-				    unset($submenu['edit.php?post_type=incsub_event'][$k]);
+				    $submenu[$root_key][1] = $item;
+				    unset($submenu[$root_key][$k]);
 				}
 		    }
 		}
-		add_submenu_page('edit.php?post_type=incsub_event', __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array($this, 'settings_render'));
-		add_submenu_page('edit.php?post_type=incsub_event', __("Event Shortcodes", self::TEXT_DOMAIN), __("Shortcodes", self::TEXT_DOMAIN), 'edit_events', 'eab_shortcodes', array($this, 'shortcodes_render'));
-		if (isset($submenu['edit.php?post_type=incsub_event']) && is_array($submenu['edit.php?post_type=incsub_event'])) ksort($submenu['edit.php?post_type=incsub_event']);
+		add_submenu_page($root_key, __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array($this, 'settings_render'));
+		add_submenu_page($root_key, __("Event Shortcodes", self::TEXT_DOMAIN), __("Shortcodes", self::TEXT_DOMAIN), 'edit_events', 'eab_shortcodes', array($this, 'shortcodes_render'));
+
+		do_action('eab-admin-add_pages', $root_key);
+
+		if (isset($submenu[$root_key]) && is_array($submenu[$root_key])) ksort($submenu[$root_key]);
     }
 	    
     function cron_schedules($schedules) {

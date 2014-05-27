@@ -39,6 +39,8 @@ class Eab_BuddyPress_AutoUpdateActivity {
 	}
 
 	function dispatch_creation_activity_update ($post_id) {
+		if (!function_exists('bp_activity_get')) return false; // WTF
+		
 		$created = $this->_data->get_option('bp-activity_autoupdate-event_created');
 		if (!$created) return false;
 

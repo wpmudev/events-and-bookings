@@ -260,13 +260,16 @@ function toggle_recurrence_mode () {
 	$(".eab_event_recurrence_mode").hide();
 
 	var val = $("#eab_event-repeat_every").val();
-	if (!val) return false;
-
+	if (!val) {
+		$("#publish").attr("disabled", true);
+		return false;
+	}
 	var $el = $("#eab_event-repeat_interval-" + val);
 	if (!$el.length) return false;
 
 	$(".eab_event_recurrence_mode").find("input,select").attr("disabled", true);
 	$el.find("input,select").attr("disabled", false);
+	$("#publish").attr("disabled", false);
 	$el.show();
 
 	// Init jQuery UI date selectors

@@ -580,7 +580,7 @@ class Eab_Template {
 					// Now, or in the future
 					$start_string = $event->has_no_start_time($key)
 						? sprintf(__('Takes place on <span class="wpmudevevents-date_format-start"><var class="eab-date_format-date">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start))
-						: sprintf(__('Takes place on <var class="eab-date_format-date">%s</var> <span class="wpmudevevents-date_format-start">from <var class="eab-date_format-date">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
+						: sprintf(__('Takes place on <var class="eab-date_format-date">%s</var> <span class="wpmudevevents-date_format-start">from <var class="eab-date_format-time">%s</var></span>', Eab_EventsHub::TEXT_DOMAIN), date_i18n(get_option('date_format'), $start), date_i18n(get_option('time_format'), $start))
 					;
 				}
 				$end_string = $event->has_no_end_time($key)

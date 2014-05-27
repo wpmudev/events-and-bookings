@@ -57,7 +57,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 					$thumbnail = $raw ? @$raw[0] : false;
 				}
 				$excerpt = false;
-				if ($options['excerpt']) {
+				if (!empty($options['excerpt'])) {
 					$words = (int)$options['excerpt_words_limit'] ? (int)$options['excerpt_words_limit'] : false;
 					$excerpt = eab_call_template('util_words_limit', $_event->get_excerpt_or_fallback(), $words);
 				}
@@ -69,8 +69,8 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 					) .
 					$_event->get_title() .
 				'</a>';
-				if ($options['dates']) echo '<div class="wpmudevevents-date">' . Eab_Template::get_event_dates($_event) . '</div>';
-				if ($options['excerpt'] && $excerpt) echo '<p>' . $excerpt . '</p>';
+				if (!empty($options['dates'])) echo '<div class="wpmudevevents-date">' . Eab_Template::get_event_dates($_event) . '</div>';
+				if (!empty($options['excerpt']) && !empty($excerpt)) echo '<p>' . $excerpt . '</p>';
 				do_action('eab-widgets-upcoming-after_event', $options, $_event, $this);
 				echo '</li>';
 			}
