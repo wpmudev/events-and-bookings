@@ -4,6 +4,14 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.4 - 2014-05-29
+----------------------------------------------------------------------
+- Fix for limited capacity checks on RSVP time (props @Hoang)
+- Fix for timestamp formats and front-end date parsing.
+- Added new features to the E-Newsletter integration add-on.
+- Added the RSVP with email add-on.
+- Allowing the top subset access for capabilities.
+
 1.7.3 - 2014-04-17
 ----------------------------------------------------------------------
 - Fix for popup login/registration validation.
