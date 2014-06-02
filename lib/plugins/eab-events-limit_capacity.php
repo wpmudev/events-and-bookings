@@ -323,12 +323,14 @@ class Eab_Addon_LimitCapacity {
 	function validate_attending_submission( $event_id, $user_id, $booking_action ) {
 		if ( isset( $_POST['action_yes'] ) ) {
 			$capacity = (int) get_post_meta( $event_id, 'eab_capacity', true );
-			$total    = $this->_get_event_total_attendance( $event_id );
+			if ( $capacity > 0 ) {
+				$total = $this->_get_event_total_attendance( $event_id );
 
-			if ( $total >= $capacity ) {
-				//reach the limit
-				wp_redirect( '?eab_error_msg=' . urlencode( __( 'Sorry, the event has reached it\'s max capacity!!', Eab_EventsHub::TEXT_DOMAIN ) ) );
-				exit;
+				if ( $total >= $capacity ) {
+					//reach the limit
+					wp_redirect( '?eab_error_msg=' . urlencode( __( 'Sorry, the event has reached it\'s max capacity!!', Eab_EventsHub::TEXT_DOMAIN ) ) );
+					exit;
+				}
 			}
 		}
 	}
