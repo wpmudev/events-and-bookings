@@ -437,11 +437,11 @@ class Eab_Template {
 				? apply_filters('eab-rsvps-status_messages-legacy_message', $status)
 				: self::get_success_message($status)
 			;
-			if ($message) $content = '<div id="eab-success-notice" class="message success">' . $message . '</div>';
+			if ($message) $content = '<div id="eab-success-notice" class="message success">' . esc_html($message) . '</div>';
 		}
 		
 		$content .= isset($_GET['eab_error_msg'])
-		 	? '<div id="eab-error-notice" class="message error">'.__(stripslashes($_GET['eab_error_msg']), Eab_EventsHub::TEXT_DOMAIN).'</div>'
+		 	? '<div id="eab-error-notice" class="message error">'.esc_html(stripslashes($_GET['eab_error_msg'])).'</div>'
 		 	: ''
 		 ;	
 		return $content;
