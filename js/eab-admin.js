@@ -350,6 +350,12 @@ $(function () {
 		return false;
 	});
 
+	var $times = $("#incsub-event input.incsub_event");
+	$times.each(function () {
+		var _c = $(this).attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
+		_eab_validate_when(_c);
+	});
+
 });
 })(jQuery);
 
