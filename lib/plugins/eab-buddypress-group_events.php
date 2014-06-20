@@ -476,6 +476,10 @@ class Eab_GroupEvents_Shortcodes extends Eab_Codec {
 				if (!function_exists('groups_get_groups')) return $content;
 				$groups = groups_get_groups(array('user_id' => $args['user']));
 				$args['groups'] = array_map('intval', wp_list_pluck($groups['groups'], 'id'));
+			} else if ('all' == trim($args['groups'])) {
+				if (!function_exists('groups_get_groups')) return $content;
+				$groups = groups_get_groups();
+				$args['groups'] = array_map('intval', wp_list_pluck($groups['groups'], 'id'));
 			} else {
 				$args['groups'] = false;
 			}
@@ -531,7 +535,7 @@ class Eab_GroupEvents_Shortcodes extends Eab_Codec {
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
 				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
-				'groups' => array('help' => __('Group ID, keyword "my-groups" or comma-separated list of group IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'groups' => array('help' => __('Group ID, keywords "my-groups" or "all", or comma-separated list of group IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
 				'user' => array('help' => __('User ID or keyword "current" - required if <code>groups</code> is set to "my-groups"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
 				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
     			'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
