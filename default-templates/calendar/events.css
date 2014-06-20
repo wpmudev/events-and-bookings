@@ -19,6 +19,7 @@
 .wpmudevevents-list table td {
 	border: 1px solid #ddd;
 	height: 120px;
+    width: auto; /* fix a+ conflict */
 }
 .wpmudevevents-list table td .eab-date-full {
 	display: none;
