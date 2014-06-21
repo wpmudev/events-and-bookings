@@ -4,6 +4,14 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.5 - 2014-06-21
+----------------------------------------------------------------------
+- Fix for the max capacity bug - add the case unlimited.
+- Fix for a potential XSS issue.
+- Fix for appearance conflict with Appointments+ tables.
+- Added initial boot-time dates validation.
+- Added "all" keyword for BP groups events shortcode (props Saurabh)
+
 1.7.4 - 2014-05-29
 ----------------------------------------------------------------------
 - Fix for limited capacity checks on RSVP time (props @Hoang)

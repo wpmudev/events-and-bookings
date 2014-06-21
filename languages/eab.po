@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Events and Bookings\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-29 16:22+0100\n"
-"PO-Revision-Date: 2014-05-29 16:22+0100\n"
+"POT-Creation-Date: 2014-06-21 15:07+0100\n"
+"PO-Revision-Date: 2014-06-21 15:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: Incsub\n"
 "MIME-Version: 1.0\n"
@@ -292,7 +292,7 @@ msgstr ""
 
 #: lib/class_eab_shortcodes.php:146 lib/class_eab_shortcodes.php:218
 #: lib/class_eab_shortcodes.php:326
-#: lib/plugins/eab-buddypress-group_events.php:528
+#: lib/plugins/eab-buddypress-group_events.php:532
 msgid "Starting date - default to now"
 msgstr ""
 
@@ -302,18 +302,18 @@ msgid "A date relative to now or to date argument"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:148 lib/class_eab_shortcodes.php:328
-#: lib/plugins/eab-buddypress-group_events.php:529
+#: lib/plugins/eab-buddypress-group_events.php:533
 msgid "Don't use default monthly page - use weeks count instead"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:149 lib/class_eab_shortcodes.php:329
-#: lib/plugins/eab-buddypress-group_events.php:530
+#: lib/plugins/eab-buddypress-group_events.php:534
 msgid "Look ahead this many weeks"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:150 lib/class_eab_shortcodes.php:220
 #: lib/class_eab_shortcodes.php:330 lib/class_eab_shortcodes.php:381
-#: lib/plugins/eab-buddypress-group_events.php:531
+#: lib/plugins/eab-buddypress-group_events.php:535
 msgid "Show events from this category (ID or slug)"
 msgstr ""
 
@@ -324,13 +324,13 @@ msgstr ""
 
 #: lib/class_eab_shortcodes.php:152 lib/class_eab_shortcodes.php:332
 #: lib/class_eab_shortcodes.php:383
-#: lib/plugins/eab-buddypress-group_events.php:532
+#: lib/plugins/eab-buddypress-group_events.php:536
 msgid "Show at most this many events"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:153 lib/class_eab_shortcodes.php:333
 #: lib/class_eab_shortcodes.php:384
-#: lib/plugins/eab-buddypress-group_events.php:533
+#: lib/plugins/eab-buddypress-group_events.php:537
 msgid "Sort events in this direction"
 msgstr ""
 
@@ -353,7 +353,7 @@ msgstr ""
 #: lib/class_eab_shortcodes.php:158 lib/class_eab_shortcodes.php:231
 #: lib/class_eab_shortcodes.php:337 lib/class_eab_shortcodes.php:385
 #: lib/class_eab_shortcodes.php:440
-#: lib/plugins/eab-buddypress-group_events.php:537
+#: lib/plugins/eab-buddypress-group_events.php:541
 msgid "Subtemplate file, or template class call"
 msgstr ""
 
@@ -396,7 +396,7 @@ msgstr ""
 #: lib/class_eab_shortcodes.php:227 lib/class_eab_shortcodes.php:336
 #: lib/class_eab_shortcodes.php:380 lib/class_eab_shortcodes.php:439
 #: lib/plugins/eab-buddypres-my_events.php:311
-#: lib/plugins/eab-buddypress-group_events.php:536
+#: lib/plugins/eab-buddypress-group_events.php:540
 msgid "Apply this CSS class"
 msgstr ""
 
@@ -416,13 +416,13 @@ msgstr ""
 
 #: lib/class_eab_shortcodes.php:232 lib/class_eab_shortcodes.php:338
 #: lib/class_eab_shortcodes.php:386 lib/class_eab_shortcodes.php:441
-#: lib/plugins/eab-buddypress-group_events.php:538
+#: lib/plugins/eab-buddypress-group_events.php:542
 msgid "Toggle default styles usage"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:233 lib/class_eab_shortcodes.php:339
 #: lib/class_eab_shortcodes.php:387 lib/class_eab_shortcodes.php:442
-#: lib/plugins/eab-buddypress-group_events.php:539
+#: lib/plugins/eab-buddypress-group_events.php:543
 msgid "Toggle default scripts usage"
 msgstr ""
 
@@ -1182,15 +1182,17 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:525
+#: lib/plugins/eab-buddypress-group_events.php:529
 msgid "BuddyPress group archives"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:534
-msgid "Group ID, keyword \"my-groups\" or comma-separated list of group IDs"
+#: lib/plugins/eab-buddypress-group_events.php:538
+msgid ""
+"Group ID, keywords \"my-groups\" or \"all\", or comma-separated list of "
+"group IDs"
 msgstr ""
 
-#: lib/plugins/eab-buddypress-group_events.php:535
+#: lib/plugins/eab-buddypress-group_events.php:539
 msgid ""
 "User ID or keyword \"current\" - required if <code>groups</code> is set to "
 "\"my-groups\""
@@ -1684,7 +1686,7 @@ msgstr ""
 msgid "Show cancel link for logged out users when the event is sold out"
 msgstr ""
 
-#: lib/plugins/eab-events-limit_capacity.php:330
+#: lib/plugins/eab-events-limit_capacity.php:331
 msgid "Sorry, the event has reached it's max capacity!!"
 msgstr ""
 
