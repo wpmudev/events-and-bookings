@@ -69,10 +69,10 @@ class Eab_Events_EventCountdown {
 	 * Hooks 
 	 */	
 	private function _add_hooks () {
-		add_action( 'wp_enqueue_scripts', array( &$this, 'register_scripts') );
-		add_shortcode( 'event_countdown', array(&$this, 'shortcode') );
-		add_action( 'wp_footer', array(&$this, 'load_scripts_footer') );
-		add_filter( 'the_posts', array(&$this, 'load_styles') );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts') );
+		add_shortcode( 'event_countdown', array($this, 'shortcode') );
+		add_action( 'wp_footer', array($this, 'load_scripts_footer') );
+		add_filter( 'the_posts', array($this, 'load_styles') );
 	}
 
 	/**

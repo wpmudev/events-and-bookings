@@ -1024,6 +1024,7 @@ class Eab_EventsHub {
 			$content .= '</div>';
 			
 			$content .= '<div id="eab-add-more"><input type="button" name="eab-add-more-button" id="eab-add-more-button" class="eab_add_more" value="'.__('Click here to add another date to event', self::TEXT_DOMAIN).'"/></div>';
+			$i = !empty($i) ? $i : 0;
 			
 			$content .= '<div id="eab-add-more-bank">';
 			$content .= '<div class="eab-section-block">';
@@ -1178,7 +1179,7 @@ class Eab_EventsHub {
 			);
 			$week = '<select name="eab_repeat[week]">';
 			foreach ($week_counts as $count => $label) {
-				$selected = $count == $parts['week'] ? 'selected="selected"' : '';
+				$selected = !empty($parts['week']) && $count == $parts['week'] ? 'selected="selected"' : '';
 				$week .= "<option value='{$count}' {$selected}>{$label}</option>";
 			}
 			$week .= '</select>';

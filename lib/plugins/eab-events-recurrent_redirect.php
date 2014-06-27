@@ -32,7 +32,7 @@ class Eab_Events_RecurrentRootRedirect {
 	 *
 	 */	
 	private function _add_hooks () {
-		add_action('template_redirect', array(&$this, 'redirect'));
+		add_action('template_redirect', array($this, 'redirect'));
 	}
 	
 	function redirect() {

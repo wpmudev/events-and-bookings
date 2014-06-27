@@ -43,10 +43,10 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 	 */	
 	private function _add_hooks () {
 		
-		add_action('eab-settings-after_payment_settings', array(&$this, 'show_settings'));
-		add_filter('eab-settings-before_save', array(&$this,'save_settings'));
-		add_filter( 'the_posts', array(&$this, 'load_styles') );
-		add_shortcode('weekly_event_calendar', array(&$this,'shortcode'));
+		add_action('eab-settings-after_payment_settings', array($this, 'show_settings'));
+		add_filter('eab-settings-before_save', array($this,'save_settings'));
+		add_filter( 'the_posts', array($this, 'load_styles') );
+		add_shortcode('weekly_event_calendar', array($this,'shortcode'));
 	}
 	
 	/**

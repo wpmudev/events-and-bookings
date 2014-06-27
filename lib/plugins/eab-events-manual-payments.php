@@ -37,16 +37,16 @@ class Eab_Events_ManualPayments {
 	 *
 	 */	
 	private function _add_hooks () {
-		add_action('eab-settings-after_payment_settings', array(&$this, 'show_settings'));
-		add_action('admin_notices', array(&$this, 'show_nags'));
-		add_action('wp_ajax_eab_manual_payment', array(&$this, 'do_payment'));
-		add_action('wp_ajax_eab_approve_manual_payment', array(&$this, 'approve_payment'));
-		add_filter('eab-event-show_pay_note', array(&$this,'will_show_pay_note'), 10, 2);
-		add_filter('eab-event-payment_status', array(&$this,'status'), 10, 2);
-		add_filter('eab-event-booking_metabox_content', array(&$this,'add_approve_payment'), 10, 2);
-		add_filter('eab-settings-before_save', array(&$this,'save_settings'));
-		add_filter('eab-event-payment_forms', array(&$this,'add_select_button'), 10, 2);
-		add_filter('eab-event-after_payment_forms', array(&$this,'add_instructions'), 10, 2);
+		add_action('eab-settings-after_payment_settings', array($this, 'show_settings'));
+		add_action('admin_notices', array($this, 'show_nags'));
+		add_action('wp_ajax_eab_manual_payment', array($this, 'do_payment'));
+		add_action('wp_ajax_eab_approve_manual_payment', array($this, 'approve_payment'));
+		add_filter('eab-event-show_pay_note', array($this,'will_show_pay_note'), 10, 2);
+		add_filter('eab-event-payment_status', array($this,'status'), 10, 2);
+		add_filter('eab-event-booking_metabox_content', array($this,'add_approve_payment'), 10, 2);
+		add_filter('eab-settings-before_save', array($this,'save_settings'));
+		add_filter('eab-event-payment_forms', array($this,'add_select_button'), 10, 2);
+		add_filter('eab-event-after_payment_forms', array($this,'add_instructions'), 10, 2);
 	}
 
 	/**

@@ -19,7 +19,7 @@ class Eab_Events_MembershipIntegration {
 	private function __construct () {
 
 		global $wpdb;
-		$this->db = &$wpdb;
+		$this->db = $wpdb;
 		// At the beginning, we assume Membership plugin is not activated.
 		// After all plugins loaded we will check this variable
 		$this->membership_active = false;
@@ -39,14 +39,14 @@ class Eab_Events_MembershipIntegration {
 	 *
 	 */	
 	private function _add_hooks () {
-		add_action('admin_enqueue_scripts', array( &$this, 'load_scripts'));
-		add_action('plugins_loaded', array( &$this, 'check_membership_plugin'));
+		add_action('admin_enqueue_scripts', array( $this, 'load_scripts'));
+		add_action('plugins_loaded', array( $this, 'check_membership_plugin'));
 		add_action('admin_notices', array($this, 'show_nags'));
-		add_action('eab-event_meta-save_meta', array(&$this, 'save_membership_meta'));
-		add_action('eab-events-recurrent_event_child-save_meta', array(&$this, 'save_membership_meta'));
-		add_filter('eab-event_meta-event_meta_box-after', array( &$this, 'event_meta_box'));
-		add_filter('eab-event-show_pay_note',array(&$this,'will_show_pay_note'), 10, 2);
-		add_filter('eab-event-payment_status',array(&$this,'status'), 10, 2);
+		add_action('eab-event_meta-save_meta', array($this, 'save_membership_meta'));
+		add_action('eab-events-recurrent_event_child-save_meta', array($this, 'save_membership_meta'));
+		add_filter('eab-event_meta-event_meta_box-after', array( $this, 'event_meta_box'));
+		add_filter('eab-event-show_pay_note',array($this,'will_show_pay_note'), 10, 2);
+		add_filter('eab-event-payment_status',array($this,'status'), 10, 2);
 
 		add_filter('eab-payment-event_price', array($this, 'memeber_event_price'), 10, 2);
 		add_filter('eab-payment-event_price-for_user', array($this, 'memeber_event_price_for_user'), 10, 3);
@@ -256,7 +256,7 @@ class Eab_Events_MembershipIntegration {
 
 	function memeber_event_price ($price, $event_id) {
 		global $current_user;
-		return $this->memeber_event_price_for_user($price, $event_id, $current_user->id);
+		return $this->memeber_event_price_for_user($price, $event_id, $current_user->ID);
 	}
 	
 	function memeber_event_price_for_user ($price, $event_id, $user_id) {

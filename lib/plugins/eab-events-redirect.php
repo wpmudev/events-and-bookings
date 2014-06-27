@@ -37,12 +37,12 @@ class Eab_Events_EventControlledRedirect {
 	 *
 	 */	
 	private function _add_hooks () {
-		add_action('eab-settings-after_payment_settings', array(&$this, 'show_settings'));
-		add_action('template_redirect', array(&$this, 'redirect'));
-		add_action('eab-event_meta-save_meta', array(&$this, 'save_redirect_meta'));
-		add_filter('eab-event_meta-event_meta_box-after', array( &$this, 'event_meta_box'));
-		add_filter('eab-settings-before_save', array(&$this,'save_settings'));
-		add_action('admin_notices', array(&$this, 'warn_admin'));
+		add_action('eab-settings-after_payment_settings', array($this, 'show_settings'));
+		add_action('template_redirect', array($this, 'redirect'));
+		add_action('eab-event_meta-save_meta', array($this, 'save_redirect_meta'));
+		add_filter('eab-event_meta-event_meta_box-after', array( $this, 'event_meta_box'));
+		add_filter('eab-settings-before_save', array($this,'save_settings'));
+		add_action('admin_notices', array($this, 'warn_admin'));
 	}
 	
 	function redirect() {

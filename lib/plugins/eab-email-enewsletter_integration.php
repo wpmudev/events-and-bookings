@@ -55,7 +55,7 @@ class Eab_Email_eNewsletterIntegration {
 	
 	function add_meta_box () {
 		if (!$this->_model->has_newsletter()) return false;
-		add_meta_box('eab-email-newsletter', __('e-Newsletter', Eab_EventsHub::TEXT_DOMAIN), array(&$this, 'create_meta_box'), 'incsub_event', 'side', 'low');	
+		add_meta_box('eab-email-newsletter', __('e-Newsletter', Eab_EventsHub::TEXT_DOMAIN), array($this, 'create_meta_box'), 'incsub_event', 'side', 'low');	
 	}
 	
 	function create_meta_box () {
@@ -101,7 +101,10 @@ class Eab_Email_eNewsletterIntegration {
 	}
 	
 	function save_meta ($event_id) {
-		$newsletter_id = (int)$_POST['eab_event-email-enewsletter'];
+		$newsletter_id = !empty($_POST['eab_event-email-enewsletter']) && is_numeric($_POST['eab_event-email-enewsletter'])
+			? (int)$_POST['eab_event-email-enewsletter']
+			: false
+		;
 
 		if (!empty($_POST['eab_event-email-enewsletter-as_template']) && $newsletter_id) {
 			$new_id = $this->_model->newsletter_from_template($newsletter_id, $event_id);

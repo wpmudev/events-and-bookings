@@ -48,7 +48,7 @@ class Eab_Events_NextEventShortcode {
 	 *
 	 */	
 	private function _add_hooks () {
-		add_shortcode( 'next_event', array(&$this, 'shortcode') );
+		add_shortcode( 'next_event', array($this, 'shortcode') );
 	}
 
 	public function shortcode ($args=array(), $content='') {
@@ -78,6 +78,7 @@ class Eab_Events_NextEventShortcode {
 		}
 
 		$query = $codec->get_query_args($args);
+
 		$now = eab_current_time() + $additional;
 		$events = Eab_CollectionFactory::get_upcoming_events($now, $query);
 		$ret = array();

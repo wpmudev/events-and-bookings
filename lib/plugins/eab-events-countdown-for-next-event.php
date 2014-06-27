@@ -74,10 +74,10 @@ class Eab_Events_CountdownforNextEvent {
 	 * Hooks 
 	 */	
 	private function _add_hooks () {
-		add_action( 'wp_enqueue_scripts', array( &$this, 'register_scripts') );
-		add_shortcode( 'next_event_countdown', array(&$this, 'shortcode') );
-		add_action( 'wp_footer', array(&$this, 'load_scripts_footer') );
-		add_filter( 'the_posts', array(&$this, 'load_styles') );
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts') );
+		add_shortcode( 'next_event_countdown', array($this, 'shortcode') );
+		add_action( 'wp_footer', array($this, 'load_scripts_footer') );
+		add_filter( 'the_posts', array($this, 'load_styles') );
 	}
 
 	/**
@@ -196,7 +196,6 @@ class Eab_Events_CountdownforNextEvent {
 		if (!empty($args['add']) && (int)$args['add']) {
 			$additional = (int)$args['add'] * 60;
 		}
-
 		$query = $codec->get_query_args($args);
 		$now = eab_current_time() + $additional;
 		$events = Eab_CollectionFactory::get_upcoming_events($now, $query);
