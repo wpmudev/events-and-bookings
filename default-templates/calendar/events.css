@@ -104,6 +104,14 @@ a.wpmudevevents-calendar-event:hover {
 
 @media screen and (max-width : 768px) {
 
+	.wpmudevevents-list table.eab-monthly_calendar,
+	.wpmudevevents-list table.eab-monthly_calendar tr,
+	.wpmudevevents-list table.eab-monthly_calendar th,
+	.wpmudevevents-list table.eab-monthly_calendar td
+	{
+		display: block;
+	}
+
 	.wpmudevevents-list table.eab-monthly_calendar td {
 		display: block;
 		height: auto;
