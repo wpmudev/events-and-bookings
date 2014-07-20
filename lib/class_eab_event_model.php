@@ -599,6 +599,10 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				'post_content' => $this->get_content(),
 				'to_ping' => '',
 			);
+// Also propagate discussion settings
+			if (!empty($this->_event->comment_status)) $post['comment_status'] = $this->_event->comment_status;
+			if (!empty($this->_event->ping_status)) $post['ping_status'] = $this->_event->ping_status;
+			
 			global $wpdb;
 			if (false !== $wpdb->insert($wpdb->posts, $post)) {
 				$post_id = $wpdb->insert_id;
