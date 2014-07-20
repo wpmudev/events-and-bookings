@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.7.5
+ Version: 1.7.6-BETA-1 
  Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7.5';
+    const CURRENT_VERSION = '1.7.5-BETA-1';
     
     /**
      * Translation domain
@@ -835,7 +835,7 @@ class Eab_EventsHub {
     function wp_print_styles() {
 		global $wp_query;
 		
-		if (isset($wp_query->query_vars['post_type']) && $wp_query->query_vars['post_type'] == 'incsub_event') {
+		if ((isset($wp_query->query_vars['post_type']) && $wp_query->query_vars['post_type'] == 'incsub_event') || is_tax('eab_events_category')) {
 		    wp_enqueue_style('eab_front');
 		}
     }
