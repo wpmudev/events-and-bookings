@@ -98,8 +98,10 @@ class Eab_Events_EventCountdown {
 			}
 		}
  
-		if ($shortcode_found) 
+		if ($shortcode_found) {
 			wp_enqueue_style('jquery-countdown',plugins_url('events-and-bookings/css/').'jquery.countdown.css');
+			define('EAB_COUNTDOWN_FLAG_STYLES_INJECTED', true); // Don't double-enqueue
+		}
  
 		return $posts;
 	}
@@ -110,8 +112,12 @@ class Eab_Events_EventCountdown {
 	function load_scripts_footer() {
 		if ( $this->add_countdown ) {
 			wp_enqueue_script('jquery-countdown');
-				if ( $locale = $this->locale() )
-			wp_enqueue_script('jquery-countdown-'.$locale,plugins_url('events-and-bookings/js/').'jquery.countdown-'.$locale.'.js',array('jquery-countdown'));
+			if ( $locale = $this->locale() ) {
+				wp_enqueue_script('jquery-countdown-'.$locale,plugins_url('events-and-bookings/js/').'jquery.countdown-'.$locale.'.js',array('jquery-countdown'));
+			}
+			if (!(defined('EAB_COUNTDOWN_FLAG_STYLES_INJECTED') && EAB_COUNTDOWN_FLAG_STYLES_INJECTED)) {
+				wp_enqueue_style('jquery-countdown',plugins_url('events-and-bookings/css/').'jquery.countdown.css'); // E.g. in a widget
+			}
 		}
 	}
 	
