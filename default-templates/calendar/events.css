@@ -103,7 +103,7 @@ a.wpmudevevents-calendar-event:hover {
 /* ----- Breakpoints ----- */
 
 @media screen and (max-width : 768px) {
-
+	/* force old browsers, such as legacy droid */
 	.wpmudevevents-list table.eab-monthly_calendar,
 	.wpmudevevents-list table.eab-monthly_calendar tr,
 	.wpmudevevents-list table.eab-monthly_calendar th,

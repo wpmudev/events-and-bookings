@@ -227,6 +227,7 @@ class Eab_Emi_Model {
 		$prefix = $this->_get_table_prefix();
 		
 		$packed_group_ids = get_post_meta($event_id, $group_key, true);
+		$packed_group_ids = is_array($packed_group_ids) ? $packed_group_ids : array();
 		$group_id = false;
 		foreach ($packed_group_ids as $key => $status) {
 			if ($status != $bookings) continue;

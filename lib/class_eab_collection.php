@@ -113,7 +113,7 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 			$end_year = $year+1;
 		}
 		
-		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;		
+		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);		
 		
 		$args = array_merge(
 			$args,
@@ -140,7 +140,6 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 						'compare' => 'NOT IN',
 					),
 				),
-				'posts_per_page' => apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS),
 			)
 		);
 		return $args;
