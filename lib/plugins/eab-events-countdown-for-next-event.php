@@ -163,6 +163,7 @@ class Eab_Events_CountdownforNextEvent {
 			'legacy' => false,
 			'category' => false,
 			'categories' => false,
+			'weeks' => false
 		)); 
 
 		if (!empty($args['legacy'])) return $this->_legacy_shortcode($original_arguments);
@@ -198,7 +199,16 @@ class Eab_Events_CountdownforNextEvent {
 		}
 		$query = $codec->get_query_args($args);
 		$now = eab_current_time() + $additional;
-		$events = Eab_CollectionFactory::get_upcoming_events($now, $query);
+		
+		//$events = Eab_CollectionFactory::get_upcoming_events($now, $query);
+
+		$future_peeking_method = false;
+		if (!empty($args['weeks']) && is_numeric($args['weeks'])) $future_peeking_method = create_function('', 'return ' . (int)$args['weeks'] . ';');
+
+		if (!empty($future_peeking_method)) add_filter('eab-collection-upcoming_weeks-week_number', $future_peeking_method);
+		$events = Eab_CollectionFactory::get_upcoming_weeks_events($now, $query);
+		if (!empty($future_peeking_method)) remove_filter('eab-collection-upcoming_weeks-week_number', $future_peeking_method);
+		
 		$ret = array();
 		foreach ($events as $event) {
 			$ts = $event->get_start_timestamp();
