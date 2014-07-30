@@ -471,7 +471,7 @@ EabEctEacJs;
 				? (int)$this->_excerpt['excerpt_length']
 				: 30
 			;
-			$data['excerpt'] = $event->get_excerpt_or_fallback($excerpt_length);
+			$data['excerpt'] = $event->get_excerpt_or_fallback($excerpt_length); // Creating the excerpt
 		}
 
 		$data['has_no_start_time'] = $event->has_no_start_time(); // Only check first

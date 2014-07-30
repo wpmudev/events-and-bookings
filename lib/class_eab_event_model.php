@@ -371,7 +371,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			? $excerpt
 			: $this->get_content()
 		;
-		$excerpt = wp_strip_all_tags(strip_shortcodes($excerpt));
+		$excerpt = str_replace(array("\r\n", "\r", "\n"), " ", wp_strip_all_tags(strip_shortcodes($excerpt))); // Strip shortcodes, tags and newlines
 		if (!function_exists('eab_call_template')) return $excerpt;
 
 		$suffix = false;
