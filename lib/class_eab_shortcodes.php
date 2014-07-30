@@ -228,6 +228,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'with_thumbnail' => array('help' => __('Show event thumbnail', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'default_thumbnail' => array('help' => __('Use this image URL as thumnail if event does not have an appropriate featured image set', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:url'),
 				'show_excerpt' => array('help' => __('Show event excerpt in the quick overview.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'excerpt_length' => array('help' => __('Determine the excerpt length (characters count) to be shown.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
