@@ -163,6 +163,11 @@ function create_wordpress_login_popup ($action, post_id) {
 	});
 }
 
+function get_google_login_button () {
+	if (!l10nEabApi.data.gg_client_id) return '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-google">' + l10nEabApi.google + '</a></li>';
+	return '<li><span id="signinButton"> <span class="g-signin" data-callback="eab_google_plus_login_callback" data-clientid="' + l10nEabApi.data.gg_client_id + '" data-cookiepolicy="single_host_origin" data-scope="profile email"> </span> </span></li>';
+}
+
 function create_login_interface ($me) {
 	if ($("#wpmudevevents-login_links-wrapper").length) {
 		$("#wpmudevevents-login_links-wrapper").remove();
@@ -172,10 +177,10 @@ function create_login_interface ($me) {
 	var post_id = $me.parents(".wpmudevevents-buttons").find('input:hidden[name="event_id"]').val();
 	$root.html(
 		'<ul class="wpmudevevents-login_links">' +
-			(l10nEabApi.show_facebook ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-facebook">' + l10nEabApi.facebook + '</a></li>' : '') +
-			(l10nEabApi.show_twitter ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-twitter">' + l10nEabApi.twitter + '</a></li>' : '') +
-			(l10nEabApi.show_google ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-google">' + l10nEabApi.google + '</a></li>' : '') +
-			(l10nEabApi.show_wordpress ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-wordpress">' + l10nEabApi.wordpress + '</a></li>' : '') +
+			(l10nEabApi.data.show_facebook ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-facebook">' + l10nEabApi.facebook + '</a></li>' : '') +
+			(l10nEabApi.data.show_twitter ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-twitter">' + l10nEabApi.twitter + '</a></li>' : '') +
+			(l10nEabApi.data.show_google ? get_google_login_button() : '') +
+			(l10nEabApi.data.show_wordpress ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-wordpress">' + l10nEabApi.wordpress + '</a></li>' : '') +
 			'<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-cancel">' + l10nEabApi.cancel + '</a></li>' +
 		'</ul>'
 	);
@@ -327,6 +332,7 @@ function create_login_interface ($me) {
 			.bind('click', callback)
 		;
 	});
+	if (l10nEabApi.data.gg_client_id && "undefined" !== typeof gapi && "undefined" !== typeof gapi.signin) gapi.signin.go();
 }
 
 // Init
@@ -348,5 +354,25 @@ $(function () {
 			return false;
 		})
 	;
+	if (l10nEabApi.data.gg_client_id) {
+		window.eab_google_plus_login_callback = signinCallback;
+		(function() {
+			var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+			po.src = 'https://apis.google.com/js/client:plusone.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+		})();
+	}
 });
+
+function signinCallback(authResult) {
+	if (authResult['status']['signed_in']) {
+		$.post(_eab_data.ajax_url, {
+			"action": "eab_google_plus_login",
+			"token": authResult['access_token']
+		}, function (data) {
+			window.location.href = window.location.href;
+		});
+	}
+}
+
 })(jQuery);
