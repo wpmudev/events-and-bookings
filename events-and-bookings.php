@@ -87,9 +87,7 @@ class Eab_EventsHub {
 		add_action('init', array($this, 'init'), 0);
 		add_action('init', array($this, 'process_rsvps'), 99); // Bind this a bit later, so BP can load up
 		add_action('admin_init', array($this, 'admin_init'), 0);
-		if (version_compare($wp_version, "3.3") >= 0) {
-		    add_action('admin_init', array($this, 'tutorial') );
-		}
+		
 		add_action('admin_menu', array($this, 'admin_menu'));
 		add_action('admin_notices', array($this, 'check_permalink_format'));
 	
@@ -142,7 +140,6 @@ class Eab_EventsHub {
 		$this->_api->initialize();
 		// End API login & form section
 		
-		add_action('wp_ajax_eab_restart_tutorial', array($this, 'handle_tutorial_restart'));
 		add_action('wp_ajax_eab_cancel_attendance', array($this, 'handle_attendance_cancel'));		
 		add_action('wp_ajax_eab_delete_attendance', array($this, 'handle_attendance_delete'));	
     }
@@ -2050,110 +2047,6 @@ class Eab_EventsHub {
 		register_widget('Eab_Upcoming_Widget');
 		register_widget('Eab_CalendarUpcoming_Widget');
     }
-    
-    function tutorial() {
-		//load the file
-		require_once( dirname(__FILE__) . '/lib/pointers-tutorial/pointer-tutorials.php' );
-		
-		//create our tutorial, with default redirect prefs
-		$tutorial = new Pointer_Tutorial('eab_tutorial', true, false);
-		
-		//add our textdomain that matches the current plugin
-		$tutorial->set_textdomain = self::TEXT_DOMAIN;
-		
-		//add the capability a user must have to view the tutorial
-		$tutorial->set_capability = 'manage_options';
-		
-		$tutorial->add_icon( plugins_url( 'events-and-bookings/img/large-greyscale.png' , __FILE__ ) );
-		
-		$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-slug', __('Event Slug', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . esc_js( __('Change the root slug for events', self::TEXT_DOMAIN) ) . '</p>',
-		    'position' => array( 'edge' => 'left', 'align' => 'center' ),
-		));
-		
-		$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-accept_payments', __('Accept Payments?', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . esc_js( __('Check this to accept payments for your events', self::TEXT_DOMAIN) ) . '</p>',
-		    'position' => array( 'edge' => 'left', 'align' => 'center' ),
-		));
-		
-		$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-display_attendees', __('Display RSVP\'s?', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . esc_js( __('Check this to display RSVP\'s in the event details', self::TEXT_DOMAIN) ) . '</p>',
-		    'position' => array( 'edge' => 'left', 'align' => 'center' ),
-		));
-		
-		$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-currency', __('Currency', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . esc_js(__('Which currency will you be accepting payment in? See ', self::TEXT_DOMAIN)) . '<a href="https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes" target="_blank">Accepted PayPal Currency Codes</a></p>',
-		    'position' => array( 'edge' => 'left', 'align' => 'center' ),
-		));
-		
-		$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-paypal_email', __('PayPal E-Mail', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . esc_js(__('PayPal e-mail address payments should be made to', self::TEXT_DOMAIN)) . '</p>',
-		    'position' => array( 'edge' => 'left', 'align' => 'center' ),
-		));
-		
-		$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#title', __('Event title', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . __("What's happening?", self::TEXT_DOMAIN) . '</p>',
-		    'position' => array( 'edge' => 'top', 'align' => 'center' ), 'post_type' => 'incsub_event',
-		));
-		
-		if (defined('AGM_PLUGIN_URL')) {
-		    $tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_venue_label', __('Event location', self::TEXT_DOMAIN), array(
-			'content'  => '<p>' . __("Where? Enter the address or insert a map by clicking the globe icon", self::TEXT_DOMAIN) . '</p>',
-			'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
-		    ));
-		} else {
-		    $tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_venue_label', __('Event location', self::TEXT_DOMAIN), array(
-			'content'  => '<p>' . __("Where? Enter the address", self::TEXT_DOMAIN) . '</p>',
-			'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
-		    ));
-		}
-		
-		$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_times_label', __('Event time and dates', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . __("When? YYYY-mm-dd HH:mm", self::TEXT_DOMAIN) . '</p>',
-		    'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
-		));
-		
-		$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_status_label', __('Event status', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . __("Is this event still open to RSVP?", self::TEXT_DOMAIN) . '</p>',
-		    'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
-		));
-		
-		$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub_event_paid_label', __('Event type', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . __("Is this a paid event? Select 'Yes' and enter how much do you plan to charge in the text box that will appear", self::TEXT_DOMAIN) . '</p>',
-		    'position' => array( 'edge' => 'right', 'align' => 'left' ), 'post_type' => 'incsub_event',
-		));
-		
-		$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#wp-content-editor-container', __('Event Details', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . __("More about the event", self::TEXT_DOMAIN) . '</p>',
-		    'position' => array( 'edge' => 'bottom', 'align' => 'center' ), 'post_type' => 'incsub_event',
-		));
-		
-		$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#incsub-event-bookings', __("Event RSVPs", self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . __("See who is attending, who may be attend and who is not after you publish the event", self::TEXT_DOMAIN) . '</p>',
-		    'position' => array( 'edge' => 'bottom', 'align' => 'center' ), 'post_type' => 'incsub_event',
-		));
-		
-		$tutorial->add_step(admin_url('post-new.php?post_type=incsub_event'), 'post-new.php', '#publish', __('Publish', self::TEXT_DOMAIN), array(
-		    'content'  => '<p>' . __("Now it's time to publish the event", self::TEXT_DOMAIN) . '</p>',
-		    'position' => array( 'edge' => 'right', 'align' => 'center' ), 'post_type' => 'incsub_event',
-		));
-		
-		//start the tutorial
-		$tutorial->initialize();
-		
-		// $tutorial->restart(6);
-		return $tutorial;
-    }
-	
-	/**
-	 * Handles tutorial restart requests.
-	 */
-	function handle_tutorial_restart () {
-		$tutorial = $this->tutorial();
-		$step = (int)$_POST['step'];
-		$tutorial->restart($step);
-		die;
-	}
 	
 	/**
 	 * Save a message to the log file
@@ -2250,6 +2143,8 @@ require_once EAB_PLUGIN_DIR . 'lib/class_eab_scheduler.php';
 Eab_Scheduler::serve();
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_addon_handler.php';
 Eab_AddonHandler::serve();
+require_once EAB_PLUGIN_DIR . 'lib/class_eab_admin_tutorial.php';
+Eab_AdminTutorial::serve();
 
 require_once EAB_PLUGIN_DIR . 'lib/default_filters.php';
 
