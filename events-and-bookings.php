@@ -1442,18 +1442,19 @@ class Eab_EventsHub {
 		return array_merge($new_rules, $rules);
     }
     
-    function check_rewrite_rules($value) {
+    function check_rewrite_rules ($values) {
 		//prevent an infinite loop
-		if (!post_type_exists(Eab_EventModel::POST_TYPE)) return $value;
+		if (!post_type_exists(Eab_EventModel::POST_TYPE)) return $values;
 
-		$value = is_array($value) ? $value : array();
+		$values = is_array($values) ? $values : array();
 		$rules = $this->_get_rewrite_rules();
 
 		foreach ($rules as $rx => $rpl) {
-			if (array_key_exists($rx, $value)) continue;
+			if (array_key_exists($rx, $values)) continue;
 			$this->flush_rewrite();
 			break;
 		}
+		return $values;
     }
     
     function query_vars($vars) {
