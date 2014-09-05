@@ -4,6 +4,13 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.6 - 2014-09-05
+----------------------------------------------------------------------
+- Fix for some shortcode styles injection when used outside content.
+- Allowing the future peeking method to modify the lookahead time.
+- Fix for multiline string shortening safety in generated excerpts.
+- Ensuring WordPress 4.0 compatibility.
+
 1.7.5 - 2014-06-21
 ----------------------------------------------------------------------
 - Fix for the max capacity bug - add the case unlimited.

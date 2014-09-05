@@ -2,17 +2,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Events and Bookings\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-06-21 15:07+0100\n"
-"PO-Revision-Date: 2014-06-21 15:07+0100\n"
+"POT-Creation-Date: 2014-09-05 15:34+0100\n"
+"PO-Revision-Date: 2014-09-05 15:35+0100\n"
 "Last-Translator: \n"
 "Language-Team: Incsub\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: __;_e\n"
-"X-Poedit-Basepath: /Volumes/Trunk/xampp/htdocs/3.3-dev-1/wp-content/plugins/"
-"events-and-bookings\n"
-"X-Generator: Poedit 1.5.5\n"
+"X-Poedit-Basepath: d:/xampp/htdocs/3.3-dev-1/wp-content/plugins/events-and-"
+"bookings\n"
+"X-Generator: Poedit 1.6.7\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: default-templates\n"
 "X-Poedit-SearchPath-1: default-templates/calendar\n"
 "X-Poedit-SearchPath-2: default-templates/default\n"
@@ -31,9 +33,9 @@ msgstr ""
 
 #: default-templates/default/archive-incsub_event.php:8
 #: default-templates/full-width/archive-incsub_event.php:8
+#: events-and-bookings.php:182 events-and-bookings.php:192
 #: lib/class_eab_template.php:325 lib/plugins/eab-buddypres-my_events.php:52
 #: lib/plugins/eab-events-front_page_editing.php:169
-#: events-and-bookings.php:211 events-and-bookings.php:221
 msgid "Events"
 msgstr ""
 
@@ -56,6 +58,711 @@ msgstr ""
 #: default-templates/default/single-incsub_event.php:43
 #: lib/class_eab_template.php:78
 msgid "Created by "
+msgstr ""
+
+#: events-and-bookings.php:183
+msgid "Event"
+msgstr ""
+
+#: events-and-bookings.php:184
+#: lib/plugins/eab-events-front_page_editing.php:112
+#: lib/plugins/eab-events-front_page_editing.php:175
+msgid "Add Event"
+msgstr ""
+
+#: events-and-bookings.php:185
+msgid "Add New Event"
+msgstr ""
+
+#: events-and-bookings.php:186 events-and-bookings.php:1548
+msgid "Edit Event"
+msgstr ""
+
+#: events-and-bookings.php:187
+msgid "New Event"
+msgstr ""
+
+#: events-and-bookings.php:188
+msgid "View Event"
+msgstr ""
+
+#: events-and-bookings.php:189
+msgid "Search Event"
+msgstr ""
+
+#: events-and-bookings.php:190
+msgid "No event found"
+msgstr ""
+
+#: events-and-bookings.php:191
+msgid "No event found in Trash"
+msgstr ""
+
+#: events-and-bookings.php:221
+msgid "Event Categories"
+msgstr ""
+
+#: events-and-bookings.php:222 events-and-bookings.php:223
+msgid "Event Category"
+msgstr ""
+
+#: events-and-bookings.php:267
+msgid "View all RSVPs"
+msgstr ""
+
+#: events-and-bookings.php:268
+msgid "Back to getting started"
+msgstr ""
+
+#: events-and-bookings.php:367
+msgid "Loading maps... please wait"
+msgstr ""
+
+#: events-and-bookings.php:368
+msgid "Insert this map"
+msgstr ""
+
+#: events-and-bookings.php:369
+msgid "Preview/Edit"
+msgstr ""
+
+#: events-and-bookings.php:370
+msgid "Delete"
+msgstr ""
+
+#: events-and-bookings.php:371
+msgid "Add Map"
+msgstr ""
+
+#: events-and-bookings.php:372
+msgid "Existing map"
+msgstr ""
+
+#: events-and-bookings.php:373
+msgid "No existing maps"
+msgstr ""
+
+#: events-and-bookings.php:374
+msgid "Create new map"
+msgstr ""
+
+#: events-and-bookings.php:375
+msgid "Advanced mode"
+msgstr ""
+
+#: events-and-bookings.php:376
+msgid ""
+"Activate Advanced mode to select individual maps to merge into one new map "
+"or to batch delete maps"
+msgstr ""
+
+#: events-and-bookings.php:377
+msgid ""
+"To create a new map from several maps select the maps you want to use and "
+"click Merge locations"
+msgstr ""
+
+#: events-and-bookings.php:378
+msgid "Exit advanced mode"
+msgstr ""
+
+#: events-and-bookings.php:379
+msgid "Merge locations"
+msgstr ""
+
+#: events-and-bookings.php:380
+msgid "Batch delete"
+msgstr ""
+
+#: events-and-bookings.php:381
+msgid ""
+"Create a new map which can be inserted into this post or page. Once you are "
+"done you can manage all maps below"
+msgstr ""
+
+#: events-and-bookings.php:389
+#, php-format
+msgid ""
+"You must must update your permalink structure to something other than "
+"default to use Events. <a href=\"%s\">You can do so here.</a>"
+msgstr ""
+
+#: events-and-bookings.php:397
+msgid ""
+"Excellent, few more steps! We need you to login or register to get you "
+"marked as coming!"
+msgstr ""
+
+#: events-and-bookings.php:401
+msgid ""
+"Please login or register to help us let you know any changes about the event "
+"and record your response!"
+msgstr ""
+
+#: events-and-bookings.php:405
+msgid ""
+"That's too bad you won't be able to make it, if you login or register we "
+"will be able to record your response"
+msgstr ""
+
+#: events-and-bookings.php:756 lib/class_eab_admin_tutorial.php:91
+#: lib/contextual_help/class_eab_admin_help.php:146
+msgid "Event Details"
+msgstr ""
+
+#: events-and-bookings.php:757 lib/class_eab_admin_tutorial.php:96
+msgid "Event RSVPs"
+msgstr ""
+
+#: events-and-bookings.php:759
+msgid "Are you following the step by step guide?"
+msgstr ""
+
+#: events-and-bookings.php:849 lib/class_eab_admin_tutorial.php:65
+#: lib/class_eab_admin_tutorial.php:70
+msgid "Event location"
+msgstr ""
+
+#: events-and-bookings.php:863
+#: lib/contextual_help/class_eab_admin_help.php:153
+msgid "Event times and dates"
+msgstr ""
+
+#: events-and-bookings.php:880 events-and-bookings.php:901
+#, php-format
+msgid "Part %d"
+msgstr ""
+
+#: events-and-bookings.php:880 events-and-bookings.php:901
+#: events-and-bookings.php:926 lib/plugins/eab-payment-multiple_prices.php:96
+msgid "Remove"
+msgstr ""
+
+#: events-and-bookings.php:882 events-and-bookings.php:903
+#: events-and-bookings.php:928
+msgid "Start"
+msgstr ""
+
+#: events-and-bookings.php:886 events-and-bookings.php:907
+#: events-and-bookings.php:932
+msgid "No start time"
+msgstr ""
+
+#: events-and-bookings.php:890 events-and-bookings.php:911
+#: events-and-bookings.php:936
+msgid "End"
+msgstr ""
+
+#: events-and-bookings.php:894 events-and-bookings.php:915
+#: events-and-bookings.php:940
+msgid "No end time"
+msgstr ""
+
+#: events-and-bookings.php:921
+msgid "Click here to add another date to event"
+msgstr ""
+
+#: events-and-bookings.php:926
+msgid "Part bank"
+msgstr ""
+
+#: events-and-bookings.php:956
+msgid "Edit instances"
+msgstr ""
+
+#: events-and-bookings.php:976
+msgid "This is a recurring event"
+msgstr ""
+
+#: events-and-bookings.php:977
+msgid "This is a regular event"
+msgstr ""
+
+#: events-and-bookings.php:1001
+msgid "Start on"
+msgstr ""
+
+#: events-and-bookings.php:1007
+msgid "Repeat every"
+msgstr ""
+
+#: events-and-bookings.php:1009
+msgid "Select one"
+msgstr ""
+
+#: events-and-bookings.php:1028 events-and-bookings.php:1037
+msgid "On"
+msgstr ""
+
+#: events-and-bookings.php:1029 events-and-bookings.php:1038
+#: events-and-bookings.php:1058 events-and-bookings.php:1098
+#: events-and-bookings.php:1130 events-and-bookings.php:1138
+msgid "At"
+msgstr ""
+
+#: events-and-bookings.php:1068
+msgid "First"
+msgstr ""
+
+#: events-and-bookings.php:1069
+msgid "Second"
+msgstr ""
+
+#: events-and-bookings.php:1070
+msgid "Third"
+msgstr ""
+
+#: events-and-bookings.php:1071
+msgid "Fourth"
+msgstr ""
+
+#: events-and-bookings.php:1072
+msgid "Fifth"
+msgstr ""
+
+#: events-and-bookings.php:1073
+msgid "Last"
+msgstr ""
+
+#: events-and-bookings.php:1097
+#, php-format
+msgid "Every %s %s"
+msgstr ""
+
+#: events-and-bookings.php:1129
+#, php-format
+msgid "Every %s weeks, on %s"
+msgstr ""
+
+#: events-and-bookings.php:1144
+msgid "Until"
+msgstr ""
+
+#: events-and-bookings.php:1150
+msgid "Event duration"
+msgstr ""
+
+#: events-and-bookings.php:1151
+msgid "hours"
+msgstr ""
+
+#: events-and-bookings.php:1168 lib/class_eab_admin_tutorial.php:81
+#: lib/plugins/eab-events-front_page_editing.php:405
+msgid "Event status"
+msgstr ""
+
+#: events-and-bookings.php:1171
+msgid "What is the event status? "
+msgstr ""
+
+#: events-and-bookings.php:1173
+#: lib/plugins/eab-events-front_page_editing.php:407
+msgid "Open"
+msgstr ""
+
+#: events-and-bookings.php:1174
+#: lib/plugins/eab-events-countdown-for-next-event.php:162
+#: lib/plugins/eab-events-countdown-for-next-event.php:312
+#: lib/plugins/eab-events-event-countdown.php:159
+#: lib/plugins/eab-events-front_page_editing.php:408
+#: lib/plugins/eab-events-next-event-shortcode.php:61
+#: lib/plugins/eab-events-next-event-shortcode.php:114
+msgid "Closed"
+msgstr ""
+
+#: events-and-bookings.php:1175
+#: lib/plugins/eab-events-front_page_editing.php:409
+msgid "Expired"
+msgstr ""
+
+#: events-and-bookings.php:1176
+#: lib/plugins/eab-events-front_page_editing.php:410
+msgid "Archived"
+msgstr ""
+
+#: events-and-bookings.php:1195 lib/class_eab_admin_tutorial.php:86
+msgid "Event type"
+msgstr ""
+
+#: events-and-bookings.php:1196
+msgid "Is this a paid event? "
+msgstr ""
+
+#: events-and-bookings.php:1198 lib/class_eab_exporter.php:166
+#: lib/plugins/eab-email-enewsletter_integration.php:239
+#: lib/plugins/eab-events-front_page_editing.php:421
+#: lib/plugins/eab-rsvps-additional_registration_fields.php:153
+msgid "Yes"
+msgstr ""
+
+#: events-and-bookings.php:1199 lib/class_eab_exporter.php:120
+#: lib/class_eab_exporter.php:166 lib/class_eab_template.php:148
+#: lib/class_eab_template.php:190 lib/class_eab_template.php:240
+#: lib/class_eab_template.php:469 lib/class_eab_template.php:494
+#: lib/plugins/eab-email-enewsletter_integration.php:241
+#: lib/plugins/eab-events-front_page_editing.php:422
+#: lib/plugins/eab-rsvps-additional_registration_fields.php:153
+msgid "No"
+msgstr ""
+
+#: events-and-bookings.php:1204
+#: lib/plugins/eab-events-front_page_editing.php:425
+msgid "Fee"
+msgstr ""
+
+#: events-and-bookings.php:1219 events-and-bookings.php:1507
+msgid "Export"
+msgstr ""
+
+#: events-and-bookings.php:1251
+msgid "No bookings"
+msgstr ""
+
+#: events-and-bookings.php:1483
+msgid "When"
+msgstr ""
+
+#: events-and-bookings.php:1484
+msgid "Where"
+msgstr ""
+
+#: events-and-bookings.php:1487
+msgid "RSVPs"
+msgstr ""
+
+#: events-and-bookings.php:1503
+msgid "Attending / Undecided"
+msgstr ""
+
+#: events-and-bookings.php:1504 lib/plugins/eab-buddypres-my_events.php:82
+msgid "Not Attending"
+msgstr ""
+
+#: events-and-bookings.php:1524
+#, php-format
+msgid "From %s, repeats every %s until %s"
+msgstr ""
+
+#: events-and-bookings.php:1537
+msgid "Draft"
+msgstr ""
+
+#: events-and-bookings.php:1538
+msgid "Private"
+msgstr ""
+
+#: events-and-bookings.php:1539
+msgid "Pending"
+msgstr ""
+
+#: events-and-bookings.php:1543
+#, php-format
+msgid "Edit &#8220;%s&#8221;"
+msgstr ""
+
+#: events-and-bookings.php:1548
+msgid "Edit"
+msgstr ""
+
+#: events-and-bookings.php:1549
+msgid "Edit this Event inline"
+msgstr ""
+
+#: events-and-bookings.php:1549
+msgid "Quick&nbsp;Edit"
+msgstr ""
+
+#: events-and-bookings.php:1554
+msgid "Restore this Event from the Trash"
+msgstr ""
+
+#: events-and-bookings.php:1554
+msgid "Restore"
+msgstr ""
+
+#: events-and-bookings.php:1556
+msgid "Move this Event to the Trash"
+msgstr ""
+
+#: events-and-bookings.php:1556
+msgid "Trash"
+msgstr ""
+
+#: events-and-bookings.php:1559
+msgid "Delete this Event permanently"
+msgstr ""
+
+#: events-and-bookings.php:1559
+msgid "Delete Permanently"
+msgstr ""
+
+#: events-and-bookings.php:1571
+#, php-format
+msgid "View &#8220;%s&#8221;"
+msgstr ""
+
+#: events-and-bookings.php:1571
+msgid "View"
+msgstr ""
+
+#: events-and-bookings.php:1706
+msgid "Get Started"
+msgstr ""
+
+#: events-and-bookings.php:1706
+msgid "Get started"
+msgstr ""
+
+#: events-and-bookings.php:1715
+msgid "Event Settings"
+msgstr ""
+
+#: events-and-bookings.php:1715
+msgid "Settings"
+msgstr ""
+
+#: events-and-bookings.php:1716
+msgid "Event Shortcodes"
+msgstr ""
+
+#: events-and-bookings.php:1716
+msgid "Shortcodes"
+msgstr ""
+
+#: events-and-bookings.php:1724
+msgid "Once every half an hour"
+msgstr ""
+
+#: events-and-bookings.php:1733
+msgid "Getting started"
+msgstr ""
+
+#: events-and-bookings.php:1736
+#: lib/contextual_help/class_eab_admin_help.php:39
+msgid ""
+"Events gives you a flexible WordPress-based system for organizing parties, "
+"dinners, fundraisers - you name it."
+msgstr ""
+
+#: events-and-bookings.php:1741
+msgid "Getting Started"
+msgstr ""
+
+#: events-and-bookings.php:1743
+msgid ""
+"You're almost ready! Follow these steps and start creating events on your "
+"WordPress site."
+msgstr ""
+
+#: events-and-bookings.php:1746
+msgid ""
+"Before creating an event, you'll need to configure some basic settings, like "
+"your root slug and payment options."
+msgstr ""
+
+#: events-and-bookings.php:1747
+msgid "Configure Your Settings"
+msgstr ""
+
+#: events-and-bookings.php:1750
+msgid "Now you can create your first event."
+msgstr ""
+
+#: events-and-bookings.php:1751
+msgid "Add an Event"
+msgstr ""
+
+#: events-and-bookings.php:1754
+msgid "You can view and edit your existing events whenever you like."
+msgstr ""
+
+#: events-and-bookings.php:1755 lib/plugins/eab-events-capabilities.php:18
+msgid "Edit Events"
+msgstr ""
+
+#: events-and-bookings.php:1758
+msgid "The archive displays a list of upcoming events on your site."
+msgstr ""
+
+#: events-and-bookings.php:1759
+msgid "Events Archive"
+msgstr ""
+
+#: events-and-bookings.php:1769
+msgid "Need help?"
+msgstr ""
+
+#: events-and-bookings.php:1772
+msgid "Check out the Events plugin page on WPMU DEV"
+msgstr ""
+
+#: events-and-bookings.php:1773
+msgid "Post a question about this plugin on our support forums"
+msgstr ""
+
+#: events-and-bookings.php:1774
+msgid "Watch a video of the Events plugin in action"
+msgstr ""
+
+#: events-and-bookings.php:1818
+msgid "Nice Try..."
+msgstr ""
+
+#: events-and-bookings.php:1822
+msgid "Settings saved."
+msgstr ""
+
+#: events-and-bookings.php:1856
+#, php-format
+msgid "Plugin: %s"
+msgstr ""
+
+#: events-and-bookings.php:1859
+#, php-format
+msgid "Theme: %s"
+msgstr ""
+
+#: events-and-bookings.php:1865
+msgid "Events Settings"
+msgstr ""
+
+#: events-and-bookings.php:1867
+msgid ""
+"This is where you manage your general settings for the plugin and how events "
+"are displayed on your site."
+msgstr ""
+
+#: events-and-bookings.php:1874
+msgid "Plugin settings :"
+msgstr ""
+
+#: events-and-bookings.php:1877
+msgid "Set your root slug here:"
+msgstr ""
+
+#: events-and-bookings.php:1879
+msgid ""
+"This is the URL where your events archive can be found. By default, the "
+"format is yoursite.com/events, but you can change this to whatever you want."
+msgstr ""
+
+#: events-and-bookings.php:1883
+msgid "Will you be accepting payment for any of your events?"
+msgstr ""
+
+#: events-and-bookings.php:1885
+msgid ""
+"Leave this box unchecked if you don't intend to collect payment at any time."
+msgstr ""
+
+#: events-and-bookings.php:1889
+msgid "Allow Facebook and Twitter Login?"
+msgstr ""
+
+#: events-and-bookings.php:1891
+msgid ""
+"Check this box to allow guests to RSVP to an event with their Facebook or "
+"Twitter account. (If this feature is not enabled, guests will need a "
+"WordPress account to RSVP)."
+msgstr ""
+
+#: events-and-bookings.php:1895
+msgid "Display public RSVPs?"
+msgstr ""
+
+#: events-and-bookings.php:1897
+msgid ""
+"Check this box to display a \"who's attending\" list in the event details."
+msgstr ""
+
+#: events-and-bookings.php:1903
+msgid "Appearance settings :"
+msgstr ""
+
+#: events-and-bookings.php:1906
+msgid "Override default appearance?"
+msgstr ""
+
+#: events-and-bookings.php:1908
+msgid ""
+"Check this box if you want to customize the appearance of your events with "
+"overriding templates."
+msgstr ""
+
+#: events-and-bookings.php:1913
+msgid "Archive template"
+msgstr ""
+
+#: events-and-bookings.php:1922
+msgid "Choose how the events archive is displayed on your site."
+msgstr ""
+
+#: events-and-bookings.php:1929
+msgid "Single Event template"
+msgstr ""
+
+#: events-and-bookings.php:1938
+msgid "Choose how single event listings are displayed on your site."
+msgstr ""
+
+#: events-and-bookings.php:1949
+msgid "Payment settings :"
+msgstr ""
+
+#: events-and-bookings.php:1952 lib/class_eab_admin_tutorial.php:49
+msgid "Currency"
+msgstr ""
+
+#: events-and-bookings.php:1954
+#, php-format
+msgid ""
+"Nominate the currency in which you will be accepting payment for your "
+"events. For more information see <a href=\"%s\" target=\"_blank\">Accepted "
+"PayPal Currency Codes</a>."
+msgstr ""
+
+#: events-and-bookings.php:1958
+msgid "PayPal E-Mail address"
+msgstr ""
+
+#: events-and-bookings.php:1960
+msgid ""
+"Add the primary email address of the PayPal account you will use to collect "
+"payment for your events."
+msgstr ""
+
+#: events-and-bookings.php:1964
+msgid "PayPal Sandbox mode?"
+msgstr ""
+
+#: events-and-bookings.php:1966
+msgid "Use PayPal Sandbox mode for testing your payments"
+msgstr ""
+
+#: events-and-bookings.php:1974
+msgid "Events comes with a range of extras just activate them below :"
+msgstr ""
+
+#: events-and-bookings.php:1984
+msgid "Save Changes"
+msgstr ""
+
+#: events-and-bookings.php:1986
+msgid "Go back to Getting started guide"
+msgstr ""
+
+#: events-and-bookings.php:2007
+#: lib/contextual_help/class_eab_admin_help.php:57
+msgid "Tag:"
+msgstr ""
+
+#: events-and-bookings.php:2011
+#: lib/contextual_help/class_eab_admin_help.php:61
+msgid "Arguments:"
+msgstr ""
+
+#: events-and-bookings.php:2032
+msgid "Events Shortcodes"
 msgstr ""
 
 #: lib/class_eab_addon_handler.php:119
@@ -82,6 +789,267 @@ msgstr ""
 #: lib/class_eab_addon_handler.php:144
 #, php-format
 msgid "by %s"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:34
+msgid "Event Slug"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:35
+msgid "Change the root slug for events"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:39
+msgid "Accept Payments?"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:40
+msgid "Check this to accept payments for your events"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:44
+msgid "Display RSVP's?"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:45
+msgid "Check this to display RSVP's in the event details"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:50
+msgid "Which currency will you be accepting payment in? See "
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:54
+msgid "PayPal E-Mail"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:55
+msgid "PayPal e-mail address payments should be made to"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:59
+msgid "Event title"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:60
+msgid "What's happening?"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:66
+msgid "Where? Enter the address or insert a map by clicking the globe icon"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:71
+msgid "Where? Enter the address"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:76
+msgid "Event time and dates"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:77
+msgid "When? YYYY-mm-dd HH:mm"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:82
+msgid "Is this event still open to RSVP?"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:87
+msgid ""
+"Is this a paid event? Select 'Yes' and enter how much do you plan to charge "
+"in the text box that will appear"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:92
+msgid "More about the event"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:97
+msgid ""
+"See who is attending, who may be attend and who is not after you publish the "
+"event"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:101
+#: lib/plugins/eab-events-front_page_editing.php:494
+msgid "Publish"
+msgstr ""
+
+#: lib/class_eab_admin_tutorial.php:102
+msgid "Now it's time to publish the event"
+msgstr ""
+
+#: lib/class_eab_api.php:54
+msgid "WordPress"
+msgstr ""
+
+#: lib/class_eab_api.php:58
+msgid "Login with Facebook"
+msgstr ""
+
+#: lib/class_eab_api.php:59
+msgid "Login with Twitter"
+msgstr ""
+
+#: lib/class_eab_api.php:60
+msgid "Login with Google"
+msgstr ""
+
+#: lib/class_eab_api.php:61
+#, php-format
+msgid "Login with %s"
+msgstr ""
+
+#: lib/class_eab_api.php:62 lib/class_eab_api.php:75
+#: lib/plugins/eab-events-front_page_editing.php:497
+#: lib/plugins/eab-events-limit_capacity.php:272
+#: lib/plugins/eab-events-limit_capacity.php:280
+msgid "Cancel"
+msgstr ""
+
+#: lib/class_eab_api.php:63
+msgid "Please, wait..."
+msgstr ""
+
+#: lib/class_eab_api.php:65
+msgid "Register"
+msgstr ""
+
+#: lib/class_eab_api.php:66
+msgid ""
+"Create a username in order to register for this event - or just click cancel "
+"to register using your Facebook or Twitter ID"
+msgstr ""
+
+#: lib/class_eab_api.php:67
+msgid "Log in"
+msgstr ""
+
+#: lib/class_eab_api.php:68
+msgid ""
+"Login with your existing username in order to register for this event - or "
+"just click cancel to register using your Facebook or Twitter ID"
+msgstr ""
+
+#: lib/class_eab_api.php:69
+msgid "Username"
+msgstr ""
+
+#: lib/class_eab_api.php:70
+msgid "Password"
+msgstr ""
+
+#: lib/class_eab_api.php:71 lib/plugins/eab-rsvps-rsvp_with_email.php:84
+msgid "Email"
+msgstr ""
+
+#: lib/class_eab_api.php:72
+msgid "Already a member? Log in here"
+msgstr ""
+
+#: lib/class_eab_api.php:73
+msgid "Click here to register"
+msgstr ""
+
+#: lib/class_eab_api.php:74
+msgid "Submit"
+msgstr ""
+
+#: lib/class_eab_api.php:85
+msgid "Username and password are required!"
+msgstr ""
+
+#: lib/class_eab_api.php:86
+msgid "Invalid username or password!"
+msgstr ""
+
+#: lib/class_eab_api.php:87
+msgid "Username and email are required!"
+msgstr ""
+
+#: lib/class_eab_api.php:88
+msgid "Your email/username is already taken or email is invalid!"
+msgstr ""
+
+#: lib/class_eab_api.php:579
+msgid "API settings :"
+msgstr ""
+
+#: lib/class_eab_api.php:582
+msgid "Facebook App ID"
+msgstr ""
+
+#: lib/class_eab_api.php:584
+#, php-format
+msgid ""
+"Enter your App ID number here. If you don't have a Facebook App yet, you "
+"will need to create one <a href=\"%s\">here</a>"
+msgstr ""
+
+#: lib/class_eab_api.php:588
+msgid "My pages already load scripts from Facebook"
+msgstr ""
+
+#: lib/class_eab_api.php:591
+msgid ""
+"Check this box if you're already using Facebook scripts on your WordPress "
+"site. (If you're not sure what this means, leave the box unchecked)."
+msgstr ""
+
+#: lib/class_eab_api.php:595
+msgid "Twitter Consumer Key"
+msgstr ""
+
+#: lib/class_eab_api.php:597
+#, php-format
+msgid ""
+"Enter your Twitter App ID number here. If you don't have a Twitter App yet, "
+"you will need to create one <a href=\"%s\">here</a>"
+msgstr ""
+
+#: lib/class_eab_api.php:601
+msgid "Twitter Consumer Secret"
+msgstr ""
+
+#: lib/class_eab_api.php:603
+msgid "Enter your Twitter App secret here."
+msgstr ""
+
+#: lib/class_eab_api.php:607
+msgid "Google Client ID"
+msgstr ""
+
+#: lib/class_eab_api.php:609
+#, php-format
+msgid ""
+"Enter your Google App Client ID here. If you don't have a Google App yet, "
+"you will need to create one <a href=\"%s\">here</a>"
+msgstr ""
+
+#: lib/class_eab_api.php:611
+msgid ""
+"If you leave this field empty, Google Auth will revert to legacy OpenID."
+msgstr ""
+
+#: lib/class_eab_api.php:616
+msgid "Hide login buttons"
+msgstr ""
+
+#: lib/class_eab_api.php:619
+msgid "Hide Facebook login button"
+msgstr ""
+
+#: lib/class_eab_api.php:622
+msgid "Hide Twitter login button"
+msgstr ""
+
+#: lib/class_eab_api.php:625
+msgid "Hide Google login button"
+msgstr ""
+
+#: lib/class_eab_api.php:628
+msgid "Hide WordPress login button"
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:141
@@ -189,20 +1157,20 @@ msgstr ""
 msgid "Invalid end boundary after start: [%s] - [%s]"
 msgstr ""
 
-#: lib/class_eab_event_model.php:673 lib/class_eab_event_model.php:696
-#: lib/class_eab_event_model.php:793 lib/class_eab_event_model.php:809
+#: lib/class_eab_event_model.php:677 lib/class_eab_event_model.php:700
+#: lib/class_eab_event_model.php:797 lib/class_eab_event_model.php:813
 #, php-format
 msgid "Invalid %s instance timestamp: [%s]"
 msgstr ""
 
-#: lib/class_eab_event_model.php:752
+#: lib/class_eab_event_model.php:756
 #, php-format
 msgid ""
 "Possible DOW precision bug detected, overriding %s with %s for expression "
 "[%s %s this month], for %s pivot"
 msgstr ""
 
-#: lib/class_eab_event_model.php:763
+#: lib/class_eab_event_model.php:767
 #, php-format
 msgid "Invalid %s instance timestamp: [%s %s for %s]"
 msgstr ""
@@ -229,19 +1197,8 @@ msgstr ""
 #: lib/class_eab_template.php:189 lib/class_eab_template.php:239
 #: lib/class_eab_template.php:475 lib/class_eab_template.php:500
 #: lib/plugins/eab-buddypres-my_events.php:75
-#: lib/plugins/eab-email-enewsletter_integration.php:236
+#: lib/plugins/eab-email-enewsletter_integration.php:240
 msgid "Maybe"
-msgstr ""
-
-#: lib/class_eab_exporter.php:120 lib/class_eab_exporter.php:166
-#: lib/class_eab_template.php:148 lib/class_eab_template.php:190
-#: lib/class_eab_template.php:240 lib/class_eab_template.php:469
-#: lib/class_eab_template.php:494
-#: lib/plugins/eab-email-enewsletter_integration.php:237
-#: lib/plugins/eab-events-front_page_editing.php:422
-#: lib/plugins/eab-rsvps-additional_registration_fields.php:153
-#: events-and-bookings.php:1303
-msgid "No"
 msgstr ""
 
 #: lib/class_eab_exporter.php:142 lib/class_eab_exporter.php:146
@@ -252,14 +1209,6 @@ msgstr ""
 #: lib/class_eab_exporter.php:161
 #: lib/plugins/eab-rsvps-additional_registration_fields.php:48
 msgid "N/A"
-msgstr ""
-
-#: lib/class_eab_exporter.php:166
-#: lib/plugins/eab-email-enewsletter_integration.php:235
-#: lib/plugins/eab-events-front_page_editing.php:421
-#: lib/plugins/eab-rsvps-additional_registration_fields.php:153
-#: events-and-bookings.php:1302
-msgid "Yes"
 msgstr ""
 
 #: lib/class_eab_exporter.php:170
@@ -291,45 +1240,45 @@ msgid "Requires Google Maps plugin."
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:146 lib/class_eab_shortcodes.php:218
-#: lib/class_eab_shortcodes.php:326
+#: lib/class_eab_shortcodes.php:327
 #: lib/plugins/eab-buddypress-group_events.php:532
 msgid "Starting date - default to now"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:147 lib/class_eab_shortcodes.php:219
-#: lib/class_eab_shortcodes.php:327
+#: lib/class_eab_shortcodes.php:328
 msgid "A date relative to now or to date argument"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:148 lib/class_eab_shortcodes.php:328
+#: lib/class_eab_shortcodes.php:148 lib/class_eab_shortcodes.php:329
 #: lib/plugins/eab-buddypress-group_events.php:533
 msgid "Don't use default monthly page - use weeks count instead"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:149 lib/class_eab_shortcodes.php:329
+#: lib/class_eab_shortcodes.php:149 lib/class_eab_shortcodes.php:330
 #: lib/plugins/eab-buddypress-group_events.php:534
 msgid "Look ahead this many weeks"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:150 lib/class_eab_shortcodes.php:220
-#: lib/class_eab_shortcodes.php:330 lib/class_eab_shortcodes.php:381
+#: lib/class_eab_shortcodes.php:331 lib/class_eab_shortcodes.php:382
 #: lib/plugins/eab-buddypress-group_events.php:535
 msgid "Show events from this category (ID or slug)"
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:151 lib/class_eab_shortcodes.php:221
-#: lib/class_eab_shortcodes.php:331 lib/class_eab_shortcodes.php:382
+#: lib/class_eab_shortcodes.php:332 lib/class_eab_shortcodes.php:383
 msgid "Show events from these categories - accepts comma-separated list of IDs"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:152 lib/class_eab_shortcodes.php:332
-#: lib/class_eab_shortcodes.php:383
+#: lib/class_eab_shortcodes.php:152 lib/class_eab_shortcodes.php:333
+#: lib/class_eab_shortcodes.php:384
 #: lib/plugins/eab-buddypress-group_events.php:536
 msgid "Show at most this many events"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:153 lib/class_eab_shortcodes.php:333
-#: lib/class_eab_shortcodes.php:384
+#: lib/class_eab_shortcodes.php:153 lib/class_eab_shortcodes.php:334
+#: lib/class_eab_shortcodes.php:385
 #: lib/plugins/eab-buddypress-group_events.php:537
 msgid "Sort events in this direction"
 msgstr ""
@@ -350,9 +1299,9 @@ msgstr ""
 msgid "Use event featured image instead of map markers"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:158 lib/class_eab_shortcodes.php:231
-#: lib/class_eab_shortcodes.php:337 lib/class_eab_shortcodes.php:385
-#: lib/class_eab_shortcodes.php:440
+#: lib/class_eab_shortcodes.php:158 lib/class_eab_shortcodes.php:232
+#: lib/class_eab_shortcodes.php:338 lib/class_eab_shortcodes.php:386
+#: lib/class_eab_shortcodes.php:441
 #: lib/plugins/eab-buddypress-group_events.php:541
 msgid "Subtemplate file, or template class call"
 msgstr ""
@@ -365,7 +1314,7 @@ msgstr ""
 msgid "Calendar shortcode"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:217 lib/class_eab_shortcodes.php:325
+#: lib/class_eab_shortcodes.php:217 lib/class_eab_shortcodes.php:326
 msgid "Query type"
 msgstr ""
 
@@ -393,8 +1342,8 @@ msgstr ""
 msgid "Show calendar table footer"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:227 lib/class_eab_shortcodes.php:336
-#: lib/class_eab_shortcodes.php:380 lib/class_eab_shortcodes.php:439
+#: lib/class_eab_shortcodes.php:227 lib/class_eab_shortcodes.php:337
+#: lib/class_eab_shortcodes.php:381 lib/class_eab_shortcodes.php:440
 #: lib/plugins/eab-buddypres-my_events.php:311
 #: lib/plugins/eab-buddypress-group_events.php:540
 msgid "Apply this CSS class"
@@ -414,43 +1363,47 @@ msgstr ""
 msgid "Show event excerpt in the quick overview."
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:232 lib/class_eab_shortcodes.php:338
-#: lib/class_eab_shortcodes.php:386 lib/class_eab_shortcodes.php:441
-#: lib/plugins/eab-buddypress-group_events.php:542
-msgid "Toggle default styles usage"
+#: lib/class_eab_shortcodes.php:231
+msgid "Determine the excerpt length (characters count) to be shown."
 msgstr ""
 
 #: lib/class_eab_shortcodes.php:233 lib/class_eab_shortcodes.php:339
 #: lib/class_eab_shortcodes.php:387 lib/class_eab_shortcodes.php:442
+#: lib/plugins/eab-buddypress-group_events.php:542
+msgid "Toggle default styles usage"
+msgstr ""
+
+#: lib/class_eab_shortcodes.php:234 lib/class_eab_shortcodes.php:340
+#: lib/class_eab_shortcodes.php:388 lib/class_eab_shortcodes.php:443
 #: lib/plugins/eab-buddypress-group_events.php:543
 msgid "Toggle default scripts usage"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:322
+#: lib/class_eab_shortcodes.php:323
 msgid "Archive shortcode"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:334
+#: lib/class_eab_shortcodes.php:335
 msgid "Allow paging - use with \"limit\" argument"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:335
+#: lib/class_eab_shortcodes.php:336
 msgid "Start on this page"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:377
+#: lib/class_eab_shortcodes.php:378
 msgid "Expired events shortcode"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:434
+#: lib/class_eab_shortcodes.php:435
 msgid "Single event shortcode"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:437
+#: lib/class_eab_shortcodes.php:438
 msgid "Event ID to show"
 msgstr ""
 
-#: lib/class_eab_shortcodes.php:438
+#: lib/class_eab_shortcodes.php:439
 msgid "Show event by this slug"
 msgstr ""
 
@@ -720,13 +1673,6 @@ msgstr ""
 msgid "Events +"
 msgstr ""
 
-#: lib/contextual_help/class_eab_admin_help.php:39
-#: events-and-bookings.php:1832
-msgid ""
-"Events gives you a flexible WordPress-based system for organizing parties, "
-"dinners, fundraisers - you name it."
-msgstr ""
-
 #: lib/contextual_help/class_eab_admin_help.php:42
 msgid "Project page"
 msgstr ""
@@ -737,16 +1683,6 @@ msgstr ""
 
 #: lib/contextual_help/class_eab_admin_help.php:44
 msgid "Support forum"
-msgstr ""
-
-#: lib/contextual_help/class_eab_admin_help.php:57
-#: events-and-bookings.php:2150
-msgid "Tag:"
-msgstr ""
-
-#: lib/contextual_help/class_eab_admin_help.php:61
-#: events-and-bookings.php:2154
-msgid "Arguments:"
 msgstr ""
 
 #: lib/contextual_help/class_eab_admin_help.php:82
@@ -803,22 +1739,12 @@ msgstr ""
 msgid "This is where you create and edit your Events"
 msgstr ""
 
-#: lib/contextual_help/class_eab_admin_help.php:146
-#: events-and-bookings.php:797 events-and-bookings.php:2267
-msgid "Event Details"
-msgstr ""
-
 #: lib/contextual_help/class_eab_admin_help.php:148
 msgid "Event Location"
 msgstr ""
 
 #: lib/contextual_help/class_eab_admin_help.php:150
 msgid "You can enter your event address in this box."
-msgstr ""
-
-#: lib/contextual_help/class_eab_admin_help.php:153
-#: events-and-bookings.php:968
-msgid "Event times and dates"
 msgstr ""
 
 #: lib/contextual_help/class_eab_admin_help.php:155
@@ -1026,10 +1952,6 @@ msgstr ""
 
 #: lib/plugins/eab-buddypres-my_events.php:60
 msgid "Organized"
-msgstr ""
-
-#: lib/plugins/eab-buddypres-my_events.php:82 events-and-bookings.php:1607
-msgid "Not Attending"
 msgstr ""
 
 #: lib/plugins/eab-buddypres-my_events.php:123
@@ -1243,13 +2165,9 @@ msgstr ""
 msgid "Negative (&quot;No&quot;)"
 msgstr ""
 
-#: lib/plugins/eab-email-enewsletter_integration.php:404
+#: lib/plugins/eab-email-enewsletter_integration.php:408
 #, php-format
 msgid "New event: %s"
-msgstr ""
-
-#: lib/plugins/eab-events-capabilities.php:18 events-and-bookings.php:1851
-msgid "Edit Events"
 msgstr ""
 
 #: lib/plugins/eab-events-capabilities.php:19
@@ -1329,16 +2247,6 @@ msgstr ""
 
 #: lib/plugins/eab-events-colors.php:163
 msgid "Apply colors to calendar widget expanded events"
-msgstr ""
-
-#: lib/plugins/eab-events-countdown-for-next-event.php:162
-#: lib/plugins/eab-events-countdown-for-next-event.php:303
-#: lib/plugins/eab-events-event-countdown.php:153
-#: lib/plugins/eab-events-front_page_editing.php:408
-#: lib/plugins/eab-events-next-event-shortcode.php:61
-#: lib/plugins/eab-events-next-event-shortcode.php:113
-#: events-and-bookings.php:1278
-msgid "Closed"
 msgstr ""
 
 #: lib/plugins/eab-events-event_cancelation.php:23
@@ -1476,8 +2384,8 @@ msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:81
 msgid ""
-"Don't forget to add this shortcode to your selected page: <code>"
-"[eab_event_editor]</code>"
+"Don't forget to add this shortcode to your selected page: "
+"<code>[eab_event_editor]</code>"
 msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:82
@@ -1496,12 +2404,6 @@ msgstr ""
 msgid ""
 "Enabling this option will add a new &quot;Add Event&quot; tab to &quot;My "
 "Events&quot;"
-msgstr ""
-
-#: lib/plugins/eab-events-front_page_editing.php:112
-#: lib/plugins/eab-events-front_page_editing.php:175
-#: events-and-bookings.php:213
-msgid "Add Event"
 msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:137
@@ -1555,33 +2457,8 @@ msgstr ""
 msgid "Ends on"
 msgstr ""
 
-#: lib/plugins/eab-events-front_page_editing.php:405
-#: events-and-bookings.php:1272 events-and-bookings.php:2257
-msgid "Event status"
-msgstr ""
-
-#: lib/plugins/eab-events-front_page_editing.php:407
-#: events-and-bookings.php:1277
-msgid "Open"
-msgstr ""
-
-#: lib/plugins/eab-events-front_page_editing.php:409
-#: events-and-bookings.php:1279
-msgid "Expired"
-msgstr ""
-
-#: lib/plugins/eab-events-front_page_editing.php:410
-#: events-and-bookings.php:1280
-msgid "Archived"
-msgstr ""
-
 #: lib/plugins/eab-events-front_page_editing.php:419
 msgid "Is this a paid event?"
-msgstr ""
-
-#: lib/plugins/eab-events-front_page_editing.php:425
-#: events-and-bookings.php:1308
-msgid "Fee"
 msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:441
@@ -1602,18 +2479,6 @@ msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:494
 msgid "Update"
-msgstr ""
-
-#: lib/plugins/eab-events-front_page_editing.php:494
-#: events-and-bookings.php:2277
-msgid "Publish"
-msgstr ""
-
-#: lib/plugins/eab-events-front_page_editing.php:497
-#: lib/plugins/eab-events-limit_capacity.php:272
-#: lib/plugins/eab-events-limit_capacity.php:280 events-and-bookings.php:873
-#: events-and-bookings.php:886
-msgid "Cancel"
 msgstr ""
 
 #: lib/plugins/eab-events-front_page_editing.php:507
@@ -1696,9 +2561,9 @@ msgstr ""
 
 #: lib/plugins/eab-events-manual-payments.php:130
 msgid ""
-"You do not have MANUALPAYMENTBUTTON keyword in the Instructions field. \r\n"
+"You do not have MANUALPAYMENTBUTTON keyword in the Instructions field. \n"
 "\t\t\t\tThis means there will be no button and user will not be able to "
-"inform you that he/she made a payment, \r\n"
+"inform you that he/she made a payment, \n"
 "\t\t\t\twhich in turn means that Manual Payment will be practically useless."
 msgstr ""
 
@@ -2436,11 +3301,6 @@ msgid ""
 "Events payments."
 msgstr ""
 
-#: lib/plugins/eab-payment-multiple_prices.php:96 events-and-bookings.php:985
-#: events-and-bookings.php:1006 events-and-bookings.php:1030
-msgid "Remove"
-msgstr ""
-
 #: lib/plugins/eab-payment-multiple_prices.php:101
 msgid "Add pricing tier"
 msgstr ""
@@ -2579,10 +3439,6 @@ msgstr ""
 msgid "Please, submit a valid email."
 msgstr ""
 
-#: lib/plugins/eab-rsvps-rsvp_with_email.php:84 events-and-bookings.php:882
-msgid "Email"
-msgstr ""
-
 #: lib/plugins/eab-rsvps-scheduled_rsvp_reset.php:97
 msgid "RSVP status auto-reset settings :"
 msgstr ""
@@ -2714,6 +3570,24 @@ msgstr ""
 msgid "Limit"
 msgstr ""
 
+#: lib/widgets/UpcomingCalendar_Widget.class.php:13
+msgid "Calendar Upcoming"
+msgstr ""
+
+#: lib/widgets/UpcomingCalendar_Widget.class.php:47
+msgid "Network-wide?"
+msgstr ""
+
+#: lib/widgets/UpcomingCalendar_Widget.class.php:59
+#: lib/widgets/Upcoming_Widget.class.php:173
+msgid "Only Events from this category"
+msgstr ""
+
+#: lib/widgets/UpcomingCalendar_Widget.class.php:61
+#: lib/widgets/Upcoming_Widget.class.php:175
+msgid "Any"
+msgstr ""
+
 #: lib/widgets/Upcoming_Widget.class.php:9
 #: lib/widgets/Upcoming_Widget.class.php:17
 #: lib/widgets/Upcoming_Widget.class.php:29
@@ -2743,858 +3617,4 @@ msgstr ""
 #: lib/widgets/Upcoming_Widget.class.php:168
 #, php-format
 msgid "%d weeks"
-msgstr ""
-
-#: lib/widgets/Upcoming_Widget.class.php:173
-#: lib/widgets/UpcomingCalendar_Widget.class.php:59
-msgid "Only Events from this category"
-msgstr ""
-
-#: lib/widgets/Upcoming_Widget.class.php:175
-#: lib/widgets/UpcomingCalendar_Widget.class.php:61
-msgid "Any"
-msgstr ""
-
-#: lib/widgets/UpcomingCalendar_Widget.class.php:13
-msgid "Calendar Upcoming"
-msgstr ""
-
-#: lib/widgets/UpcomingCalendar_Widget.class.php:47
-msgid "Network-wide?"
-msgstr ""
-
-#: events-and-bookings.php:212
-msgid "Event"
-msgstr ""
-
-#: events-and-bookings.php:214
-msgid "Add New Event"
-msgstr ""
-
-#: events-and-bookings.php:215 events-and-bookings.php:1651
-msgid "Edit Event"
-msgstr ""
-
-#: events-and-bookings.php:216
-msgid "New Event"
-msgstr ""
-
-#: events-and-bookings.php:217
-msgid "View Event"
-msgstr ""
-
-#: events-and-bookings.php:218
-msgid "Search Event"
-msgstr ""
-
-#: events-and-bookings.php:219
-msgid "No event found"
-msgstr ""
-
-#: events-and-bookings.php:220
-msgid "No event found in Trash"
-msgstr ""
-
-#: events-and-bookings.php:250
-msgid "Event Categories"
-msgstr ""
-
-#: events-and-bookings.php:251 events-and-bookings.php:252
-msgid "Event Category"
-msgstr ""
-
-#: events-and-bookings.php:297
-msgid "View all RSVPs"
-msgstr ""
-
-#: events-and-bookings.php:298
-msgid "Back to getting started"
-msgstr ""
-
-#: events-and-bookings.php:408
-msgid "Loading maps... please wait"
-msgstr ""
-
-#: events-and-bookings.php:409
-msgid "Insert this map"
-msgstr ""
-
-#: events-and-bookings.php:410
-msgid "Preview/Edit"
-msgstr ""
-
-#: events-and-bookings.php:411
-msgid "Delete"
-msgstr ""
-
-#: events-and-bookings.php:412
-msgid "Add Map"
-msgstr ""
-
-#: events-and-bookings.php:413
-msgid "Existing map"
-msgstr ""
-
-#: events-and-bookings.php:414
-msgid "No existing maps"
-msgstr ""
-
-#: events-and-bookings.php:415
-msgid "Create new map"
-msgstr ""
-
-#: events-and-bookings.php:416
-msgid "Advanced mode"
-msgstr ""
-
-#: events-and-bookings.php:417
-msgid ""
-"Activate Advanced mode to select individual maps to merge into one new map "
-"or to batch delete maps"
-msgstr ""
-
-#: events-and-bookings.php:418
-msgid ""
-"To create a new map from several maps select the maps you want to use and "
-"click Merge locations"
-msgstr ""
-
-#: events-and-bookings.php:419
-msgid "Exit advanced mode"
-msgstr ""
-
-#: events-and-bookings.php:420
-msgid "Merge locations"
-msgstr ""
-
-#: events-and-bookings.php:421
-msgid "Batch delete"
-msgstr ""
-
-#: events-and-bookings.php:422
-msgid ""
-"Create a new map which can be inserted into this post or page. Once you are "
-"done you can manage all maps below"
-msgstr ""
-
-#: events-and-bookings.php:430
-#, php-format
-msgid ""
-"You must must update your permalink structure to something other than "
-"default to use Events. <a href=\"%s\">You can do so here.</a>"
-msgstr ""
-
-#: events-and-bookings.php:438
-msgid ""
-"Excellent, few more steps! We need you to login or register to get you "
-"marked as coming!"
-msgstr ""
-
-#: events-and-bookings.php:442
-msgid ""
-"Please login or register to help us let you know any changes about the event "
-"and record your response!"
-msgstr ""
-
-#: events-and-bookings.php:446
-msgid ""
-"That's too bad you won't be able to make it, if you login or register we "
-"will be able to record your response"
-msgstr ""
-
-#: events-and-bookings.php:798 events-and-bookings.php:2272
-msgid "Event RSVPs"
-msgstr ""
-
-#: events-and-bookings.php:800
-msgid "Are you following the step by step guide?"
-msgstr ""
-
-#: events-and-bookings.php:865
-msgid "WordPress"
-msgstr ""
-
-#: events-and-bookings.php:869
-msgid "Login with Facebook"
-msgstr ""
-
-#: events-and-bookings.php:870
-msgid "Login with Twitter"
-msgstr ""
-
-#: events-and-bookings.php:871
-msgid "Login with Google"
-msgstr ""
-
-#: events-and-bookings.php:872
-#, php-format
-msgid "Login with %s"
-msgstr ""
-
-#: events-and-bookings.php:874
-msgid "Please, wait..."
-msgstr ""
-
-#: events-and-bookings.php:876
-msgid "Register"
-msgstr ""
-
-#: events-and-bookings.php:877
-msgid ""
-"Create a username in order to register for this event - or just click cancel "
-"to register using your Facebook or Twitter ID"
-msgstr ""
-
-#: events-and-bookings.php:878
-msgid "Log in"
-msgstr ""
-
-#: events-and-bookings.php:879
-msgid ""
-"Login with your existing username in order to register for this event - or "
-"just click cancel to register using your Facebook or Twitter ID"
-msgstr ""
-
-#: events-and-bookings.php:880
-msgid "Username"
-msgstr ""
-
-#: events-and-bookings.php:881
-msgid "Password"
-msgstr ""
-
-#: events-and-bookings.php:883
-msgid "Already a member? Log in here"
-msgstr ""
-
-#: events-and-bookings.php:884
-msgid "Click here to register"
-msgstr ""
-
-#: events-and-bookings.php:885
-msgid "Submit"
-msgstr ""
-
-#: events-and-bookings.php:893
-msgid "Username and password are required!"
-msgstr ""
-
-#: events-and-bookings.php:894
-msgid "Invalid username or password!"
-msgstr ""
-
-#: events-and-bookings.php:895
-msgid "Username and email are required!"
-msgstr ""
-
-#: events-and-bookings.php:896
-msgid "Your email/username is already taken or email is invalid!"
-msgstr ""
-
-#: events-and-bookings.php:954 events-and-bookings.php:2241
-#: events-and-bookings.php:2246
-msgid "Event location"
-msgstr ""
-
-#: events-and-bookings.php:985 events-and-bookings.php:1006
-#, php-format
-msgid "Part %d"
-msgstr ""
-
-#: events-and-bookings.php:987 events-and-bookings.php:1008
-#: events-and-bookings.php:1032
-msgid "Start"
-msgstr ""
-
-#: events-and-bookings.php:991 events-and-bookings.php:1012
-#: events-and-bookings.php:1036
-msgid "No start time"
-msgstr ""
-
-#: events-and-bookings.php:995 events-and-bookings.php:1016
-#: events-and-bookings.php:1040
-msgid "End"
-msgstr ""
-
-#: events-and-bookings.php:999 events-and-bookings.php:1020
-#: events-and-bookings.php:1044
-msgid "No end time"
-msgstr ""
-
-#: events-and-bookings.php:1026
-msgid "Click here to add another date to event"
-msgstr ""
-
-#: events-and-bookings.php:1030
-msgid "Part bank"
-msgstr ""
-
-#: events-and-bookings.php:1060
-msgid "Edit instances"
-msgstr ""
-
-#: events-and-bookings.php:1080
-msgid "This is a recurring event"
-msgstr ""
-
-#: events-and-bookings.php:1081
-msgid "This is a regular event"
-msgstr ""
-
-#: events-and-bookings.php:1105
-msgid "Start on"
-msgstr ""
-
-#: events-and-bookings.php:1111
-msgid "Repeat every"
-msgstr ""
-
-#: events-and-bookings.php:1113
-msgid "Select one"
-msgstr ""
-
-#: events-and-bookings.php:1132 events-and-bookings.php:1141
-msgid "On"
-msgstr ""
-
-#: events-and-bookings.php:1133 events-and-bookings.php:1142
-#: events-and-bookings.php:1162 events-and-bookings.php:1202
-#: events-and-bookings.php:1234 events-and-bookings.php:1242
-msgid "At"
-msgstr ""
-
-#: events-and-bookings.php:1172
-msgid "First"
-msgstr ""
-
-#: events-and-bookings.php:1173
-msgid "Second"
-msgstr ""
-
-#: events-and-bookings.php:1174
-msgid "Third"
-msgstr ""
-
-#: events-and-bookings.php:1175
-msgid "Fourth"
-msgstr ""
-
-#: events-and-bookings.php:1176
-msgid "Fifth"
-msgstr ""
-
-#: events-and-bookings.php:1177
-msgid "Last"
-msgstr ""
-
-#: events-and-bookings.php:1201
-#, php-format
-msgid "Every %s %s"
-msgstr ""
-
-#: events-and-bookings.php:1233
-#, php-format
-msgid "Every %s weeks, on %s"
-msgstr ""
-
-#: events-and-bookings.php:1248
-msgid "Until"
-msgstr ""
-
-#: events-and-bookings.php:1254
-msgid "Event duration"
-msgstr ""
-
-#: events-and-bookings.php:1255
-msgid "hours"
-msgstr ""
-
-#: events-and-bookings.php:1275
-msgid "What is the event status? "
-msgstr ""
-
-#: events-and-bookings.php:1299 events-and-bookings.php:2262
-msgid "Event type"
-msgstr ""
-
-#: events-and-bookings.php:1300
-msgid "Is this a paid event? "
-msgstr ""
-
-#: events-and-bookings.php:1323 events-and-bookings.php:1610
-msgid "Export"
-msgstr ""
-
-#: events-and-bookings.php:1355
-msgid "No bookings"
-msgstr ""
-
-#: events-and-bookings.php:1586
-msgid "When"
-msgstr ""
-
-#: events-and-bookings.php:1587
-msgid "Where"
-msgstr ""
-
-#: events-and-bookings.php:1590
-msgid "RSVPs"
-msgstr ""
-
-#: events-and-bookings.php:1606
-msgid "Attending / Undecided"
-msgstr ""
-
-#: events-and-bookings.php:1627
-#, php-format
-msgid "From %s, repeats every %s until %s"
-msgstr ""
-
-#: events-and-bookings.php:1640
-msgid "Draft"
-msgstr ""
-
-#: events-and-bookings.php:1641
-msgid "Private"
-msgstr ""
-
-#: events-and-bookings.php:1642
-msgid "Pending"
-msgstr ""
-
-#: events-and-bookings.php:1646
-#, php-format
-msgid "Edit &#8220;%s&#8221;"
-msgstr ""
-
-#: events-and-bookings.php:1651
-msgid "Edit"
-msgstr ""
-
-#: events-and-bookings.php:1652
-msgid "Edit this Event inline"
-msgstr ""
-
-#: events-and-bookings.php:1652
-msgid "Quick&nbsp;Edit"
-msgstr ""
-
-#: events-and-bookings.php:1657
-msgid "Restore this Event from the Trash"
-msgstr ""
-
-#: events-and-bookings.php:1657
-msgid "Restore"
-msgstr ""
-
-#: events-and-bookings.php:1659
-msgid "Move this Event to the Trash"
-msgstr ""
-
-#: events-and-bookings.php:1659
-msgid "Trash"
-msgstr ""
-
-#: events-and-bookings.php:1662
-msgid "Delete this Event permanently"
-msgstr ""
-
-#: events-and-bookings.php:1662
-msgid "Delete Permanently"
-msgstr ""
-
-#: events-and-bookings.php:1674
-#, php-format
-msgid "View &#8220;%s&#8221;"
-msgstr ""
-
-#: events-and-bookings.php:1674
-msgid "View"
-msgstr ""
-
-#: events-and-bookings.php:1802
-msgid "Get Started"
-msgstr ""
-
-#: events-and-bookings.php:1802
-msgid "Get started"
-msgstr ""
-
-#: events-and-bookings.php:1811
-msgid "Event Settings"
-msgstr ""
-
-#: events-and-bookings.php:1811
-msgid "Settings"
-msgstr ""
-
-#: events-and-bookings.php:1812
-msgid "Event Shortcodes"
-msgstr ""
-
-#: events-and-bookings.php:1812
-msgid "Shortcodes"
-msgstr ""
-
-#: events-and-bookings.php:1820
-msgid "Once every half an hour"
-msgstr ""
-
-#: events-and-bookings.php:1829
-msgid "Getting started"
-msgstr ""
-
-#: events-and-bookings.php:1837
-msgid "Getting Started"
-msgstr ""
-
-#: events-and-bookings.php:1839
-msgid ""
-"You're almost ready! Follow these steps and start creating events on your "
-"WordPress site."
-msgstr ""
-
-#: events-and-bookings.php:1842
-msgid ""
-"Before creating an event, you'll need to configure some basic settings, like "
-"your root slug and payment options."
-msgstr ""
-
-#: events-and-bookings.php:1843
-msgid "Configure Your Settings"
-msgstr ""
-
-#: events-and-bookings.php:1846
-msgid "Now you can create your first event."
-msgstr ""
-
-#: events-and-bookings.php:1847
-msgid "Add an Event"
-msgstr ""
-
-#: events-and-bookings.php:1850
-msgid "You can view and edit your existing events whenever you like."
-msgstr ""
-
-#: events-and-bookings.php:1854
-msgid "The archive displays a list of upcoming events on your site."
-msgstr ""
-
-#: events-and-bookings.php:1855
-msgid "Events Archive"
-msgstr ""
-
-#: events-and-bookings.php:1865
-msgid "Need help?"
-msgstr ""
-
-#: events-and-bookings.php:1868
-msgid "Check out the Events plugin page on WPMU DEV"
-msgstr ""
-
-#: events-and-bookings.php:1869
-msgid "Post a question about this plugin on our support forums"
-msgstr ""
-
-#: events-and-bookings.php:1870
-msgid "Watch a video of the Events plugin in action"
-msgstr ""
-
-#: events-and-bookings.php:1914
-msgid "Nice Try..."
-msgstr ""
-
-#: events-and-bookings.php:1918
-msgid "Settings saved."
-msgstr ""
-
-#: events-and-bookings.php:1952
-#, php-format
-msgid "Plugin: %s"
-msgstr ""
-
-#: events-and-bookings.php:1955
-#, php-format
-msgid "Theme: %s"
-msgstr ""
-
-#: events-and-bookings.php:1961
-msgid "Events Settings"
-msgstr ""
-
-#: events-and-bookings.php:1963
-msgid ""
-"This is where you manage your general settings for the plugin and how events "
-"are displayed on your site."
-msgstr ""
-
-#: events-and-bookings.php:1970
-msgid "Plugin settings :"
-msgstr ""
-
-#: events-and-bookings.php:1973
-msgid "Set your root slug here:"
-msgstr ""
-
-#: events-and-bookings.php:1975
-msgid ""
-"This is the URL where your events archive can be found. By default, the "
-"format is yoursite.com/events, but you can change this to whatever you want."
-msgstr ""
-
-#: events-and-bookings.php:1979
-msgid "Will you be accepting payment for any of your events?"
-msgstr ""
-
-#: events-and-bookings.php:1981
-msgid ""
-"Leave this box unchecked if you don't intend to collect payment at any time."
-msgstr ""
-
-#: events-and-bookings.php:1985
-msgid "Allow Facebook and Twitter Login?"
-msgstr ""
-
-#: events-and-bookings.php:1987
-msgid ""
-"Check this box to allow guests to RSVP to an event with their Facebook or "
-"Twitter account. (If this feature is not enabled, guests will need a "
-"WordPress account to RSVP)."
-msgstr ""
-
-#: events-and-bookings.php:1991
-msgid "Display public RSVPs?"
-msgstr ""
-
-#: events-and-bookings.php:1993
-msgid ""
-"Check this box to display a \"who's attending\" list in the event details."
-msgstr ""
-
-#: events-and-bookings.php:1999
-msgid "Appearance settings :"
-msgstr ""
-
-#: events-and-bookings.php:2002
-msgid "Override default appearance?"
-msgstr ""
-
-#: events-and-bookings.php:2004
-msgid ""
-"Check this box if you want to customize the appearance of your events with "
-"overriding templates."
-msgstr ""
-
-#: events-and-bookings.php:2009
-msgid "Archive template"
-msgstr ""
-
-#: events-and-bookings.php:2018
-msgid "Choose how the events archive is displayed on your site."
-msgstr ""
-
-#: events-and-bookings.php:2025
-msgid "Single Event template"
-msgstr ""
-
-#: events-and-bookings.php:2034
-msgid "Choose how single event listings are displayed on your site."
-msgstr ""
-
-#: events-and-bookings.php:2045
-msgid "Payment settings :"
-msgstr ""
-
-#: events-and-bookings.php:2048 events-and-bookings.php:2225
-msgid "Currency"
-msgstr ""
-
-#: events-and-bookings.php:2050
-#, php-format
-msgid ""
-"Nominate the currency in which you will be accepting payment for your "
-"events. For more information see <a href=\"%s\" target=\"_blank\">Accepted "
-"PayPal Currency Codes</a>."
-msgstr ""
-
-#: events-and-bookings.php:2054
-msgid "PayPal E-Mail address"
-msgstr ""
-
-#: events-and-bookings.php:2056
-msgid ""
-"Add the primary email address of the PayPal account you will use to collect "
-"payment for your events."
-msgstr ""
-
-#: events-and-bookings.php:2060
-msgid "PayPal Sandbox mode?"
-msgstr ""
-
-#: events-and-bookings.php:2062
-msgid "Use PayPal Sandbox mode for testing your payments"
-msgstr ""
-
-#: events-and-bookings.php:2069
-msgid "API settings :"
-msgstr ""
-
-#: events-and-bookings.php:2072
-msgid "Facebook App ID"
-msgstr ""
-
-#: events-and-bookings.php:2074
-#, php-format
-msgid ""
-"Enter your App ID number here. If you don't have a Facebook App yet, you "
-"will need to create one <a href=\"%s\">here</a>"
-msgstr ""
-
-#: events-and-bookings.php:2078
-msgid "My pages already load scripts from Facebook"
-msgstr ""
-
-#: events-and-bookings.php:2081
-msgid ""
-"Check this box if you're already using Facebook scripts on your WordPress "
-"site. (If you're not sure what this means, leave the box unchecked)."
-msgstr ""
-
-#: events-and-bookings.php:2085
-msgid "Twitter Consumer Key"
-msgstr ""
-
-#: events-and-bookings.php:2087
-#, php-format
-msgid ""
-"Enter your Twitter App ID number here. If you don't have a Twitter App yet, "
-"you will need to create one <a href=\"%s\">here</a>"
-msgstr ""
-
-#: events-and-bookings.php:2091
-msgid "Twitter Consumer Secret"
-msgstr ""
-
-#: events-and-bookings.php:2093
-msgid "Enter your Twitter App secret here."
-msgstr ""
-
-#: events-and-bookings.php:2097
-msgid "Hide login buttons"
-msgstr ""
-
-#: events-and-bookings.php:2100
-msgid "Hide Facebook login button"
-msgstr ""
-
-#: events-and-bookings.php:2103
-msgid "Hide Twitter login button"
-msgstr ""
-
-#: events-and-bookings.php:2106
-msgid "Hide Google login button"
-msgstr ""
-
-#: events-and-bookings.php:2109
-msgid "Hide WordPress login button"
-msgstr ""
-
-#: events-and-bookings.php:2117
-msgid "Events comes with a range of extras just activate them below :"
-msgstr ""
-
-#: events-and-bookings.php:2127
-msgid "Save Changes"
-msgstr ""
-
-#: events-and-bookings.php:2129
-msgid "Go back to Getting started guide"
-msgstr ""
-
-#: events-and-bookings.php:2175
-msgid "Events Shortcodes"
-msgstr ""
-
-#: events-and-bookings.php:2210
-msgid "Event Slug"
-msgstr ""
-
-#: events-and-bookings.php:2211
-msgid "Change the root slug for events"
-msgstr ""
-
-#: events-and-bookings.php:2215
-msgid "Accept Payments?"
-msgstr ""
-
-#: events-and-bookings.php:2216
-msgid "Check this to accept payments for your events"
-msgstr ""
-
-#: events-and-bookings.php:2220
-msgid "Display RSVP's?"
-msgstr ""
-
-#: events-and-bookings.php:2221
-msgid "Check this to display RSVP's in the event details"
-msgstr ""
-
-#: events-and-bookings.php:2226
-msgid "Which currency will you be accepting payment in? See "
-msgstr ""
-
-#: events-and-bookings.php:2230
-msgid "PayPal E-Mail"
-msgstr ""
-
-#: events-and-bookings.php:2231
-msgid "PayPal e-mail address payments should be made to"
-msgstr ""
-
-#: events-and-bookings.php:2235
-msgid "Event title"
-msgstr ""
-
-#: events-and-bookings.php:2236
-msgid "What's happening?"
-msgstr ""
-
-#: events-and-bookings.php:2242
-msgid "Where? Enter the address or insert a map by clicking the globe icon"
-msgstr ""
-
-#: events-and-bookings.php:2247
-msgid "Where? Enter the address"
-msgstr ""
-
-#: events-and-bookings.php:2252
-msgid "Event time and dates"
-msgstr ""
-
-#: events-and-bookings.php:2253
-msgid "When? YYYY-mm-dd HH:mm"
-msgstr ""
-
-#: events-and-bookings.php:2258
-msgid "Is this event still open to RSVP?"
-msgstr ""
-
-#: events-and-bookings.php:2263
-msgid ""
-"Is this a paid event? Select 'Yes' and enter how much do you plan to charge "
-"in the text box that will appear"
-msgstr ""
-
-#: events-and-bookings.php:2268
-msgid "More about the event"
-msgstr ""
-
-#: events-and-bookings.php:2273
-msgid ""
-"See who is attending, who may be attend and who is not after you publish the "
-"event"
-msgstr ""
-
-#: events-and-bookings.php:2278
-msgid "Now it's time to publish the event"
 msgstr ""
