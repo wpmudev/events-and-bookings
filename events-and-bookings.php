@@ -46,6 +46,11 @@ class Eab_EventsHub {
 	 * @var object
      */
     private $_data;
+
+    /**
+     * API handler instance
+     */
+    private $_api;
     
     /**
      * Get the table name with prefixes
@@ -126,6 +131,7 @@ class Eab_EventsHub {
 		add_filter('login_message', array($this, 'login_message'), 10);
 		
 		$this->_data = Eab_Options::get_instance();
+		$this->_api = new Eab_Api();
 		
 		// Thrashing recurrent post trashes its instances, likewise for deleting.
 		add_action('wp_trash_post', array($this, 'process_recurrent_trashing'));
@@ -133,41 +139,9 @@ class Eab_EventsHub {
 		add_action('before_delete_post', array($this, 'process_recurrent_deletion'));
 		
 		// API login after the options have been initialized
-		if ($this->_data->get_option('accept_api_logins')) {
-			add_action('wp_ajax_nopriv_eab_facebook_login', array($this, 'handle_facebook_login'));
-			add_action('wp_ajax_nopriv_eab_get_form', array($this, 'handle_get_form'));
-			
-			add_action('wp_ajax_nopriv_eab_get_twitter_auth_url', array($this, 'handle_get_twitter_auth_url'));
-			add_action('wp_ajax_nopriv_eab_twitter_login', array($this, 'handle_twitter_login'));
-			
-			add_action('wp_ajax_nopriv_eab_get_google_auth_url', array($this, 'handle_get_google_auth_url'));
-			add_action('wp_ajax_nopriv_eab_google_login', array($this, 'handle_google_login'));
-
-			add_action('wp_ajax_nopriv_eab_wordpress_login', array($this, 'handle_wordpress_login'));
-			add_action('wp_ajax_nopriv_eab_wordpress_register', array($this, 'handle_wordpress_register'));
-			
-			add_action('wp_ajax_eab_get_form', array($this, 'handle_get_form'));
-			
-			// API avatars
-			add_filter('get_avatar', array($this, 'get_social_api_avatar'), 10, 3);
-			
-			// Google
-			if (!session_id()) session_start();
-			if (!class_exists('LightOpenID')) include_once  WP_PLUGIN_DIR . '/events-and-bookings/lib/lightopenid/openid.php';
-			$this->openid = new LightOpenID;
-			
-			$this->openid->identity = 'https://www.google.com/accounts/o8/id';
-			$this->openid->required = array('namePerson/first', 'namePerson/last', 'namePerson/friendly', 'contact/email');
-			if (!empty($_REQUEST['openid_ns'])) {
-				$cache = $this->openid->getAttributes();
-				if (isset($cache['namePerson/first']) || isset($cache['namePerson/last']) || isset($cache['contact/email'])) {
-					$_SESSION['wdcp_google_user_cache'] = $cache;
-				}
-			}
-			$this->_google_user_cache = isset($_SESSION['wdcp_google_user_cache']) ? $_SESSION['wdcp_google_user_cache'] : false;
-			
-		}
-		// End API login & form section	
+		$this->_api->initialize();
+		// End API login & form section
+		
 		add_action('wp_ajax_eab_restart_tutorial', array($this, 'handle_tutorial_restart'));
 		add_action('wp_ajax_eab_cancel_attendance', array($this, 'handle_attendance_cancel'));		
 		add_action('wp_ajax_eab_delete_attendance', array($this, 'handle_attendance_delete'));	
@@ -281,7 +255,6 @@ class Eab_EventsHub {
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
 		wp_register_script('eab_admin_js', plugins_url('events-and-bookings/js/eab-admin.js'), array('jquery'), self::CURRENT_VERSION);
 		wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), array('jquery'), self::CURRENT_VERSION);
-		wp_register_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), self::CURRENT_VERSION);
 		
 		wp_register_style('eab_jquery_ui', plugins_url('events-and-bookings/css/smoothness/jquery-ui-1.8.16.custom.css'), null, self::CURRENT_VERSION);
 		wp_register_style('eab_admin', plugins_url('events-and-bookings/css/admin.css'), null, self::CURRENT_VERSION);
@@ -315,17 +288,6 @@ class Eab_EventsHub {
 			$options['override_appearance_defaults']	= $_POST['event_default']['override_appearance_defaults'];
 			$options['archive_template'] 			= $_POST['event_default']['archive_template'];
 			$options['single_template'] 			= $_POST['event_default']['single_template'];
-			
-			$options['facebook-app_id'] 			= $_POST['event_default']['facebook-app_id'];
-			$options['facebook-no_init'] 			= $_POST['event_default']['facebook-no_init'];
-			
-			$options['twitter-app_id'] 				= $_POST['event_default']['twitter-app_id'];
-			$options['twitter-app_secret'] 			= $_POST['event_default']['twitter-app_secret'];
-			
-			$options['api_login-hide-facebook'] 	= @$_POST['event_default']['api_login-hide-facebook'];
-			$options['api_login-hide-twitter'] 		= @$_POST['event_default']['api_login-hide-twitter'];
-			$options['api_login-hide-google'] 		= @$_POST['event_default']['api_login-hide-google'];
-			$options['api_login-hide-wordpress'] 	= @$_POST['event_default']['api_login-hide-wordpress'];
 			
 		    //update_option('incsub_event_default', $this->_options['default']);
 			$options = apply_filters('eab-settings-before_save', $options);
@@ -851,76 +813,12 @@ class Eab_EventsHub {
 
 		if (isset($wp_query->query_vars['post_type']) && $wp_query->query_vars['post_type'] == 'incsub_event') {
 		    wp_enqueue_script('eab_event_js');
-		    $this->enqueue_api_scripts();
+		    $this->_api->enqueue_api_scripts();
 			do_action('eab-javascript-enqueue_scripts');
 		}
 
 		add_action('eab-javascript-do_enqueue_api_scripts', array($this, 'enqueue_api_scripts'));
 	
-    }
-
-    public function enqueue_api_scripts () {
-		if (!$this->_data->get_option('accept_api_logins')) return false;
-		$domain = get_bloginfo('name');
-		$domain = $domain ? $domain : __('WordPress', self::TEXT_DOMAIN);
-		
-	    wp_enqueue_script('eab_api_js');
-		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
-			'facebook' => __('Login with Facebook', self::TEXT_DOMAIN),
-			'twitter' => __('Login with Twitter', self::TEXT_DOMAIN),
-			'google' => __('Login with Google', self::TEXT_DOMAIN),
-			'wordpress' => sprintf(__('Login with %s', self::TEXT_DOMAIN), $domain),
-			'cancel' => __('Cancel', self::TEXT_DOMAIN),
-			'please_wait' => __('Please, wait...', self::TEXT_DOMAIN),
-			
-			'wp_register' => __('Register', self::TEXT_DOMAIN), 
-			'wp_registration_msg' => __('Create a username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
-			'wp_login' => __('Log in', self::TEXT_DOMAIN), 
-			'wp_login_msg' => __('Login with your existing username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', self::TEXT_DOMAIN), 
-			'wp_username' => __('Username', self::TEXT_DOMAIN), 
-			'wp_password' => __('Password', self::TEXT_DOMAIN), 
-			'wp_email' => __('Email', self::TEXT_DOMAIN), 
-			'wp_toggle_on' => __('Already a member? Log in here', self::TEXT_DOMAIN), 
-			'wp_toggle_off' => __('Click here to register', self::TEXT_DOMAIN), 
-			'wp_submit' => __('Submit', self::TEXT_DOMAIN), 
-			'wp_cancel' => __('Cancel', self::TEXT_DOMAIN), 
-			// Vars
-			'show_facebook' => !$this->_data->get_option('api_login-hide-facebook'),
-			'show_twitter' => !$this->_data->get_option('api_login-hide-twitter'),
-			'show_google' => !$this->_data->get_option('api_login-hide-google'),
-			'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
-			//validation error for worpress popup
-			'wp_missing_username_password' => __( 'Username and password are required!', self::TEXT_DOMAIN ),
-			'wp_username_pass_invalid' => __( 'Invalid username or password!', self::TEXT_DOMAIN ),
-			'wp_missing_user_email' => __( 'Username and email are required!', self::TEXT_DOMAIN ),
-			'wp_signup_error' => __( 'Your email/username is already taken or email is invalid!', self::TEXT_DOMAIN ),
-		)));
-		if (!$this->_data->get_option('facebook-no_init')) {
-			if (defined('EAB_INTERNAL_FLAG__FB_INIT_ADDED')) return false;
-			add_action('wp_footer', create_function('', "echo '" .
-			sprintf(
-				'<div id="fb-root"></div><script type="text/javascript">
-				window.fbAsyncInit = function() {
-					FB.init({
-					  appId: "%s",
-					  status: true,
-					  cookie: true,
-					  xfbml: true
-					});
-				};
-				// Load the FB SDK Asynchronously
-				(function(d){
-					var js, id = "facebook-jssdk"; if (d.getElementById(id)) {return;}
-					js = d.createElement("script"); js.id = id; js.async = true;
-					js.src = "//connect.facebook.net/en_US/all.js";
-					d.getElementsByTagName("head")[0].appendChild(js);
-				}(document));
-				</script>',
-				$this->_data->get_option('facebook-app_id')
-			) .
-			"';"));
-			define('EAB_INTERNAL_FLAG__FB_INIT_ADDED', true, true);
-		}
     }
     
     function event_meta_box () {
@@ -2072,54 +1970,7 @@ class Eab_EventsHub {
 				</div>
 		    </div>
 		    <?php do_action('eab-settings-after_payment_settings'); ?>
-		    <!-- API settings -->
-		    <div id="eab-settings-apis" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('API settings :', self::TEXT_DOMAIN); ?></h3>
-				<div class="eab-inside">
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-facebook-app_id" id="incsub_event_label-facebook-app_id"><?php _e('Facebook App ID', self::TEXT_DOMAIN); ?></label>
-						<input type="text" id="incsub_event-facebook-app_id" name="event_default[facebook-app_id]" value="<?php print $this->_data->get_option('facebook-app_id'); ?>" />
-						<span><?php echo $tips->add_tip(sprintf(__('Enter your App ID number here. If you don\'t have a Facebook App yet, you will need to create one <a href="%s">here</a>', self::TEXT_DOMAIN), 'https://developers.facebook.com/apps')); ?></span>
-					</div>
-		
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-facebook-no_init" id="incsub_event_label-facebook-no_init"><?php _e('My pages already load scripts from Facebook', self::TEXT_DOMAIN); ?></label>
-					    <input type="hidden" name="event_default[facebook-no_init]" value="" />
-						<input type="checkbox" id="incsub_event-facebook-no_init" name="event_default[facebook-no_init]" <?php print ($this->_data->get_option('facebook-no_init') ? "checked='checked'" : ''); ?> value="1" />
-						<span><?php echo $tips->add_tip(__('Check this box if you\'re already using Facebook scripts on your WordPress site. (If you\'re not sure what this means, leave the box unchecked).', self::TEXT_DOMAIN)); ?></span>
-					</div>
-		
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-twitter-app_id" id="incsub_event_label-twitter-app_id"><?php _e('Twitter Consumer Key', self::TEXT_DOMAIN); ?></label>
-						<input type="text" id="incsub_event-twitter-app_id" name="event_default[twitter-app_id]" value="<?php print $this->_data->get_option('twitter-app_id'); ?>" />
-						<span><?php echo $tips->add_tip(sprintf(__('Enter your Twitter App ID number here. If you don\'t have a Twitter App yet, you will need to create one <a href="%s">here</a>', self::TEXT_DOMAIN), 'https://dev.twitter.com/apps/new')); ?></span>
-					</div>
-					    
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-twitter-app_secret" id="incsub_event_label-twitter-app_secret"><?php _e('Twitter Consumer Secret', self::TEXT_DOMAIN); ?></label>
-						<input type="text" id="incsub_event-twitter-app_secret" name="event_default[twitter-app_secret]" value="<?php print $this->_data->get_option('twitter-app_secret'); ?>" />
-						<span><?php echo $tips->add_tip(__('Enter your Twitter App secret here.', self::TEXT_DOMAIN)); ?></span>
-					</div>
-
-					<div class="eab-settings-settings_item">
-						<label><?php _e('Hide login buttons', self::TEXT_DOMAIN); ?></label>
-						<br />
-						<input type="checkbox" name="event_default[api_login-hide-facebook]" id="eab-api_login-hide-facebook" value="1" <?php echo ($this->_data->get_option('api_login-hide-facebook') ? 'checked="checked"' : '') ?> />
-						<label for="eab-api_login-hide-facebook"><?php _e('Hide Facebook login button', self::TEXT_DOMAIN); ?></label>
-						<br />
-						<input type="checkbox" name="event_default[api_login-hide-twitter]" id="eab-api_login-hide-twitter" value="1" <?php echo ($this->_data->get_option('api_login-hide-twitter') ? 'checked="checked"' : '') ?> />
-						<label for="eab-api_login-hide-twitter"><?php _e('Hide Twitter login button', self::TEXT_DOMAIN); ?></label>
-						<br />
-						<input type="checkbox" name="event_default[api_login-hide-google]" id="eab-api_login-hide-google" value="1" <?php echo ($this->_data->get_option('api_login-hide-google') ? 'checked="checked"' : '') ?> />
-						<label for="eab-api_login-hide-google"><?php _e('Hide Google login button', self::TEXT_DOMAIN); ?></label>
-						<br />
-						<input type="checkbox" name="event_default[api_login-hide-wordpress]" id="eab-api_login-hide-wordpress" value="1" <?php echo ($this->_data->get_option('api_login-hide-wordpress') ? 'checked="checked"' : '') ?> />
-						<label for="eab-api_login-hide-wordpress"><?php _e('Hide WordPress login button', self::TEXT_DOMAIN); ?></label>
-						
-					</div>
-				</div>
-		    </div>
-		    <?php do_action('eab-settings-after_api_settings'); ?>
+		   <?php $this->_api->render_settings($tips); // API settings ?>
 		    <!-- Addon settings -->
 		    <div id="eab-settings-addons" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Events comes with a range of extras just activate them below :', self::TEXT_DOMAIN); ?></h3>
@@ -2303,187 +2154,6 @@ class Eab_EventsHub {
 		$tutorial->restart($step);
 		die;
 	}
-
-	/**
-	 * Handles Facebook user login and creation
-	 */
-	function handle_facebook_login () {
-		header("Content-type: application/json");
-		$resp = array(
-			"status" => 0,
-		);
-		$fb_uid = @$_POST['user_id'];
-		$token = @$_POST['token'];
-		if (!$token) die(json_encode($resp));
-		
-		$request = new WP_Http;
-		$result = $request->request(
-			'https://graph.facebook.com/me?oauth_token=' . $token, 
-			array('sslverify' => false) // SSL certificate issue workaround
-		);
-		if (200 != $result['response']['code']) die(json_encode($resp)); // Couldn't fetch info
-		
-		$data = json_decode($result['body']);
-		if (!$data->email) die(json_encode($resp)); // No email, can't go further
-		
-		$email = is_email($data->email);
-		if (!$email) die(json_encode($resp)); // Wrong email
-		
-		$wordp_user = get_user_by('email', $email);
-		
-		if (!$wordp_user) { // Not an existing user, let's create a new one
-			$password = wp_generate_password(12, false);
-			$username = @$data->name
-				? preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->name))
-				: preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->first_name)) . '_' . preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->last_name))
-			;
-	
-			$wordp_user = wp_create_user($username, $password, $email);
-			if (is_wp_error($wordp_user)) die(json_encode($resp)); // Failure creating user
-			else {
-				update_user_meta($wordp_user, 'first_name', @$data->first_name);
-				update_user_meta($wordp_user, 'last_name', @$data->last_name);
-			}
-		} else {
-			$wordp_user = $wordp_user->ID;
-		}
-		
-		update_user_meta($wordp_user, '_eab_fb', array(
-			'id' => $fb_uid,
-			'token' => $token,
-		));
-		do_action('eab-user_logged_in-facebook', $wordp_user, $fb_uid, $token);
-		
-		$user = get_userdata($wordp_user);
-
-		wp_set_current_user($user->ID, $user->user_login);
-		wp_set_auth_cookie($user->ID); // Logged in with Facebook, yay
-		do_action('wp_login', $user->user_login);
-		
-		die(json_encode(array(
-			"status" => 1,
-		)));
-	}
-
-	/**
-	 * Spawn a TwitterOAuth object.
-	 */
-	private function _get_twitter_object ($token=false, $secret=false) {
-		if (!class_exists('TwitterOAuth')) include_once 'lib/twitteroauth/twitteroauth.php';
-		$twitter = new TwitterOAuth(
-			$this->_data->get_option('twitter-app_id'), 
-			$this->_data->get_option('twitter-app_secret'),
-			$token, $secret
-		);
-		return $twitter;
-	}
-	
-	/**
-	 * Get OAuth request URL and token.
-	 */
-	function handle_get_twitter_auth_url () {
-		header("Content-type: application/json");
-		$twitter = $this->_get_twitter_object();
-
-		/* --- Start delta time correction --- */
-		$test_time = OAuthRequest::generate_raw_timestamp();
-		$test_url = "https://api.twitter.com/1/help/test.json";
-		$request = wp_remote_get($test_url, array('sslverify' => false));
-		$headers = wp_remote_retrieve_headers($request);
-		if (!empty($headers['date'])) {
-			$twitter_time = strtotime($headers['date']);
-			$delta = $twitter_time - $test_time;
-			if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
-				add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
-			}
-		}
-		/* --- End delta time correction --- */
-
-		$request_token = $twitter->getRequestToken(@$_POST['url']);
-		echo json_encode(array(
-			'url' => $twitter->getAuthorizeURL($request_token['oauth_token']),
-			'secret' => $request_token['oauth_token_secret'],
-		));
-		die;
-	}
-	
-	/**
-	 * Login or create a new user using whatever data we get from Twitter.
-	 */
-	function handle_twitter_login () {
-		header("Content-type: application/json");
-		$resp = array(
-			"status" => 0,
-		);
-		$secret = @$_POST['secret'];
-		$data_str = @$_POST['data'];
-		$data_str = ('?' == substr($data_str, 0, 1)) ? substr($data_str, 1) : $data_str;
-		$data = array();
-		parse_str($data_str, $data);
-		if (!$data) die(json_encode($resp));
-		
-		$twitter = $this->_get_twitter_object($data['oauth_token'], $secret);
-
-		/* --- Start delta time correction --- */
-		$test_time = OAuthRequest::generate_raw_timestamp();
-		$test_url = "https://api.twitter.com/1/help/test.json";
-		$request = wp_remote_get($test_url, array('sslverify' => false));
-		$headers = wp_remote_retrieve_headers($request);
-		if (!empty($headers['date'])) {
-			$twitter_time = strtotime($headers['date']);
-			$delta = $twitter_time - $test_time;
-			if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
-				add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
-			}
-		}
-		/* --- End delta time correction --- */
-
-		$access = $twitter->getAccessToken($data['oauth_verifier']);
-		
-		$twitter = $this->_get_twitter_object($access['oauth_token'], $access['oauth_token_secret']);
-		$tw_user = $twitter->get('account/verify_credentials');
-
-		// Have user, now register him/her
-		$domain = preg_replace('/www\./', '', parse_url(site_url(), PHP_URL_HOST));
-		$username = preg_replace('/[^_0-9a-z]/i', '_', strtolower($tw_user->name));
-		$email = $username . '@twitter.' . $domain; //STUB email
-		$wordp_user = get_user_by('email', $email);
-		
-		if (!$wordp_user) { // Not an existing user, let's create a new one
-			$password = wp_generate_password(12, false);
-			$count = 0;
-			while (username_exists($username)) {
-				$username .= rand(0,9);
-				if (++$count > 10) break;
-			}
-	
-			$wordp_user = wp_create_user($username, $password, $email);
-			if (is_wp_error($wordp_user)) die(json_encode($resp)); // Failure creating user
-			else {
-				list($first_name, $last_name) = explode(' ', @$tw_user->name, 2);
-				update_user_meta($wordp_user, 'first_name', $first_name);
-				update_user_meta($wordp_user, 'last_name', $last_name);
-			}
-		} else {
-			$wordp_user = $wordp_user->ID;
-		}
-		
-		update_user_meta($wordp_user, '_eab_tw', array(
-			'id' => $tw_user->id,
-			'avatar' => $tw_user->profile_image_url,
-			'token' => $access,
-		));
-		do_action('eab-user_logged_in-twitter', $wordp_user, $tw_user->id, $tw_user->profile_image_url, $access);
-		
-		$user = get_userdata($wordp_user);
-		wp_set_current_user($user->ID, $user->user_login);
-		wp_set_auth_cookie($user->ID); // Logged in with Twitter, yay
-		do_action('wp_login', $user->user_login);
-		
-		die(json_encode(array(
-			"status" => 1,
-		)));
-	}
 	
 	/**
 	 * Save a message to the log file
@@ -2491,168 +2161,6 @@ class Eab_EventsHub {
 	function log( $message='' ) {
 		// Don't give warning if folder is not writable
 		@file_put_contents( WP_PLUGIN_DIR . "/events-and-bookings/log.txt", $message . chr(10). chr(13), FILE_APPEND ); 
-	}
-	
-	
-	/**
-	 * Get OAuth request URL and token.
-	 */
-	function handle_get_google_auth_url () {
-		header("Content-type: application/json");
-		
-		$this->openid->returnUrl = $_POST['url'];
-		
-		echo json_encode(array(
-			'url' => $this->openid->authUrl()
-		));
-		exit();
-	}
-	
-	/**
-	 * Login or create a new user using whatever data we get from Google.
-	 */
-	function handle_google_login () {
-		header("Content-type: application/json");
-		$resp = array(
-			"status" => 0,
-		);
-		
-		$cache = $this->openid->getAttributes();
-		
-		if (isset($cache['namePerson/first']) || isset($cache['namePerson/last']) || isset($cache['namePerson/friendly']) || isset($cache['contact/email'])) {
-			$this->_google_user_cache = $cache;
-		}
-
-		// Have user, now register him/her
-		if ( !$username = $this->_google_user_cache['namePerson/friendly'] )
-			$username = $this->_google_user_cache['namePerson/first'];
-		$email = $this->_google_user_cache['contact/email'];
-		$wordp_user = get_user_by('email', $email);
-		
-		if (!$wordp_user) { // Not an existing user, let's create a new one
-			$password = wp_generate_password(12, false);
-			$count = 0;
-			while (username_exists($username)) {
-				$username .= rand(0,9);
-				if (++$count > 10) break;
-			}
-	
-			$wordp_user = wp_create_user($username, $password, $email);
-			if (is_wp_error($wordp_user)) 
-				die(json_encode($resp)); // Failure creating user
-			else {
-				update_user_meta($wordp_user, 'first_name', $this->_google_user_cache['namePerson/first']);
-				update_user_meta($wordp_user, 'last_name', $this->_google_user_cache['namePerson/last']);
-			}
-		} 
-		else {
-			$wordp_user = $wordp_user->ID;
-		}
-		
-		
-		$user = get_userdata($wordp_user);
-		wp_set_current_user($user->ID, $user->user_login);
-		wp_set_auth_cookie($user->ID); // Logged in with Google, yay
-		do_action('wp_login', $user->user_login);
-		
-		die(json_encode(array(
-			"status" => 1,
-		)));
-	}
-
-	function handle_wordpress_login () {
-		header("Content-type: application/json");
-		$resp = array(
-			"status" => 0,
-		);
-		$data = stripslashes_deep(@$_POST['data']);
-		$login = @$data['username'];
-		$pass = @$data['password'];
-		if (!user_pass_ok($login, $pass)) die(json_encode($resp));
-		
-		$user = get_user_by('login', $login);
-		if (is_wp_error($user)) die(json_encode($resp));
-		
-		wp_set_current_user($user->ID, $user->user_login);
-		wp_set_auth_cookie($user->ID); // Logged in with WordPress, yay
-		do_action('wp_login', $user->user_login);
-		
-		die(json_encode(array(
-			"status" => 1,
-		)));
-	}
-
-	function handle_wordpress_register () {
-		header("Content-type: application/json");
-		$resp = array(
-			"status" => 0,
-		);
-		$data = stripslashes_deep(@$_POST['data']);
-		$login = @$data['username'];
-		$email = @$data['email'];
-		
-		// Check the username
-		if ( empty($login) ) {
-			//$errors[] = __('Please enter a username.');
-			die(json_encode($resp));
-		}
-		if ( !validate_username( $login ) ) {
-			//$errors[] = __('This username is invalid.  Please enter a valid username.');
-			die(json_encode($resp));
-		}
-		if ( username_exists( $login ) ) {
-			//$errors[] = __('This username is already registered, please choose another.');
-			die(json_encode($resp));
-		}
-
-		// Check the e-mail address
-		if (empty($email)) {
-			//$errors[] = __('Please type your e-mail address.');
-			die(json_encode($resp));
-		} else if ( !is_email( $email ) ) {
-			//$errors[] = __('The email address appears invalid.');
-			//$email = '';
-			die(json_encode($resp));
-		}
-		if ( email_exists( $email ) ) {
-			//$errors[] = __('This email is already registered, please choose another.');
-			die(json_encode($resp));
-		}
-
-		$password = wp_generate_password(12, false);
-
-		$status = apply_filters('eab-user_registration-wordpress-field_validation', true, $data);
-		if (!$status) die(json_encode($resp));
-		
-		$wordp_user = wp_create_user($login, $password, $email);
-		if (is_wp_error($wordp_user)) die(json_encode($resp));
-
-		do_action('eab-user_registered-wordpress', $wordp_user, $data);
-		
-		$user = get_userdata($wordp_user);
-		
-		//notify
-		wp_new_user_notification($user->ID, $password);
-		
-		wp_set_current_user($user->ID, $user->user_login);
-		wp_set_auth_cookie($user->ID); // Logged in with WordPress, yay
-		do_action('wp_login', $user->user_login);
-		
-		die(json_encode(array(
-			"status" => 1,
-		)));
-	}
-
-	/**
-	 * Responds with RSVP form
-	 */
-	function handle_get_form () {
-		$post_id = (int)@$_POST['post_id'];
-		if (!$post_id) die;
-		
-		$post = get_post($post_id);
-		echo Eab_Template::get_rsvp_form($post);
-		die;
 	}
 	
 	function handle_attendance_cancel () {
@@ -2706,32 +2214,6 @@ class Eab_EventsHub {
 		}
 	}
 	
-	function get_social_api_avatar ($avatar, $id_or_email, $size = '96') {
-		$wp_uid = false;
-		if (is_object($id_or_email)) {
-			if (isset($id_or_email->comment_author_email)) $id_or_email = $id_or_email->comment_author_email;
-			else return $avatar;
-		}
-
-		if (is_numeric($id_or_email)) {
-			$wp_uid = (int)$id_or_email;
-		} else if (is_email($id_or_email)) {
-			$user = get_user_by('email', $id_or_email);
-			if ($user) $wp_uid = $user->ID;
-		} else return $avatar;
-		if (!$wp_uid) return $avatar;
-		
-		$fb = get_user_meta($wp_uid, '_eab_fb', true);
-		if ($fb && isset($fb['id'])) {
-			return "<img class='avatar avatar-{$size} photo eab-avatar eab-avatar-facebook' width='{$size}' height='{$size}' src='https://graph.facebook.com/" . $fb['id'] . "/picture' />";
-		}
-		$tw = get_user_meta($wp_uid, '_eab_tw', true);
-		if ($tw && isset($tw['avatar'])) {
-			return "<img class='avatar avatar-{$size} photo eab-avatar eab-avatar-twitter' width='{$size}' height='{$size}' src='" . $tw['avatar'] . "' />";
-		}
-		
-		return $avatar;
-	}
 }
 
 function eab_autoshow_map_off ($opts) {
@@ -2755,6 +2237,7 @@ require_once EAB_PLUGIN_DIR . 'lib/class_eab_collection.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_codec.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_event_model.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_template.php';
+require_once EAB_PLUGIN_DIR . 'lib/class_eab_api.php';
 
 // Lets get things started
 $__booking = new Eab_EventsHub(); // @TODO: Refactor
