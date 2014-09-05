@@ -2143,12 +2143,13 @@ require_once EAB_PLUGIN_DIR . 'lib/class_eab_scheduler.php';
 Eab_Scheduler::serve();
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_addon_handler.php';
 Eab_AddonHandler::serve();
-require_once EAB_PLUGIN_DIR . 'lib/class_eab_admin_tutorial.php';
-Eab_AdminTutorial::serve();
 
 require_once EAB_PLUGIN_DIR . 'lib/default_filters.php';
 
 if (is_admin()) {
+	require_once EAB_PLUGIN_DIR . 'lib/class_eab_admin_tutorial.php';
+	Eab_AdminTutorial::serve();
+	
 	require_once dirname(__FILE__) . '/lib/contextual_help/class_eab_admin_help.php';
 	Eab_AdminHelp::serve();
 
