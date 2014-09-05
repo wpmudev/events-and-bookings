@@ -1675,7 +1675,14 @@ class Eab_EventsHub {
 						$actions['view'] = '<a href="' . get_permalink($event_id) . '" title="' . esc_attr(sprintf(__('View &#8220;%s&#8221;'), $event->get_title())) . '" rel="permalink">' . __('View') . '</a>';
 					}
 				}
-				echo $title . WP_List_Table::row_actions($actions);
+				//echo $title . WP_List_Table::row_actions($actions);
+				echo $title;
+				if (!empty($actions)) {
+					foreach ($actions as $action => $link) {
+						$actions[$action] = "<span class='{$action}'>{$link}</span>";
+					}
+				}
+				echo '<div class="row-actions">' . join('|', $actions) . '</div>';
 				get_inline_data($post);
 				break;
 		}
