@@ -4,6 +4,11 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.6.1 - 2014-09-09
+----------------------------------------------------------------------
+- Fix for script pre-registration.
+- Added a global facade method for API scripts inclusion.
+
 1.7.6 - 2014-09-05
 ----------------------------------------------------------------------
 - Fix for some shortcode styles injection when used outside content.
