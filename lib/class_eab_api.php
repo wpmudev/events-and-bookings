@@ -45,7 +45,6 @@ class Eab_Api {
 			$this->_google_user_cache = isset($_SESSION['wdcp_google_user_cache']) ? $_SESSION['wdcp_google_user_cache'] : false;
 			
 		}
-		wp_register_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 	}
 
 	public function enqueue_api_scripts () {
@@ -53,7 +52,7 @@ class Eab_Api {
 		$domain = get_bloginfo('name');
 		$domain = $domain ? $domain : __('WordPress', Eab_EventsHub::TEXT_DOMAIN);
 		
-	    wp_enqueue_script('eab_api_js');
+		wp_enqueue_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
 			'facebook' => __('Login with Facebook', Eab_EventsHub::TEXT_DOMAIN),
 			'twitter' => __('Login with Twitter', Eab_EventsHub::TEXT_DOMAIN),
