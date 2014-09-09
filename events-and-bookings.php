@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.7.6
+ Version: 1.7.6.1-BETA-1
  Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7.6';
+    const CURRENT_VERSION = '1.7.6.1-BETA-1';
     
     /**
      * Translation domain
@@ -817,6 +817,8 @@ class Eab_EventsHub {
 		add_action('eab-javascript-do_enqueue_api_scripts', array($this, 'enqueue_api_scripts'));
 	
     }
+
+    public function enqueue_api_scripts () { return $this->_api->enqueue_api_scripts(); }
     
     function event_meta_box () {
 		global $post;
