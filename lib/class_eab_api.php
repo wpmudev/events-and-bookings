@@ -31,7 +31,7 @@ class Eab_Api {
 			
 			// Google
 			if (!session_id()) session_start();
-			if (!class_exists('LightOpenID')) include_once  WP_PLUGIN_DIR . '/events-and-bookings/lib/lightopenid/openid.php';
+			if (!class_exists('LightOpenID')) include_once  EAB_PLUGIN_DIR . 'lib/lightopenid/openid.php';
 			$this->openid = new LightOpenID;
 			
 			$this->openid->identity = 'https://www.google.com/accounts/o8/id';
@@ -206,7 +206,7 @@ class Eab_Api {
 	 * Spawn a TwitterOAuth object.
 	 */
 	private function _get_twitter_object ($token=false, $secret=false) {
-		if (!class_exists('TwitterOAuth')) include_once 'lib/twitteroauth/twitteroauth.php';
+		if (!class_exists('TwitterOAuth')) include_once EAB_PLUGIN_DIR . 'lib/twitteroauth/twitteroauth.php';
 		$twitter = new TwitterOAuth(
 			$this->_data->get_option('twitter-app_id'), 
 			$this->_data->get_option('twitter-app_secret'),
