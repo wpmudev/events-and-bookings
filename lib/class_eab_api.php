@@ -33,7 +33,7 @@ class Eab_Api {
 			if (!session_id()) session_start();
 			if (!class_exists('LightOpenID')) include_once  EAB_PLUGIN_DIR . 'lib/lightopenid/openid.php';
 			$this->openid = new LightOpenID;
-			
+
 			$this->openid->identity = 'https://www.google.com/accounts/o8/id';
 			$this->openid->required = array('namePerson/first', 'namePerson/last', 'namePerson/friendly', 'contact/email');
 			if (!empty($_REQUEST['openid_ns'])) {
@@ -223,15 +223,17 @@ class Eab_Api {
 		$twitter = $this->_get_twitter_object();
 
 		/* --- Start delta time correction --- */
-		$test_time = OAuthRequest::generate_raw_timestamp();
-		$test_url = "https://api.twitter.com/1/help/test.json";
-		$request = wp_remote_get($test_url, array('sslverify' => false));
-		$headers = wp_remote_retrieve_headers($request);
-		if (!empty($headers['date'])) {
-			$twitter_time = strtotime($headers['date']);
-			$delta = $twitter_time - $test_time;
-			if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
-				add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
+		if (method_exists('OAuthRequest', 'generate_raw_timestamp')) {
+			$test_time = OAuthRequest::generate_raw_timestamp();
+			$test_url = "https://api.twitter.com/1/help/test.json";
+			$request = wp_remote_get($test_url, array('sslverify' => false));
+			$headers = wp_remote_retrieve_headers($request);
+			if (!empty($headers['date'])) {
+				$twitter_time = strtotime($headers['date']);
+				$delta = $twitter_time - $test_time;
+				if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
+					add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
+				}
 			}
 		}
 		/* --- End delta time correction --- */
@@ -262,15 +264,17 @@ class Eab_Api {
 		$twitter = $this->_get_twitter_object($data['oauth_token'], $secret);
 
 		/* --- Start delta time correction --- */
-		$test_time = OAuthRequest::generate_raw_timestamp();
-		$test_url = "https://api.twitter.com/1/help/test.json";
-		$request = wp_remote_get($test_url, array('sslverify' => false));
-		$headers = wp_remote_retrieve_headers($request);
-		if (!empty($headers['date'])) {
-			$twitter_time = strtotime($headers['date']);
-			$delta = $twitter_time - $test_time;
-			if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
-				add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
+		if (method_exists('OAuthRequest', 'generate_raw_timestamp')) {
+			$test_time = OAuthRequest::generate_raw_timestamp();
+			$test_url = "https://api.twitter.com/1/help/test.json";
+			$request = wp_remote_get($test_url, array('sslverify' => false));
+			$headers = wp_remote_retrieve_headers($request);
+			if (!empty($headers['date'])) {
+				$twitter_time = strtotime($headers['date']);
+				$delta = $twitter_time - $test_time;
+				if (abs($delta) > EAB_OAUTH_TIMESTAMP_DELTA_THRESHOLD) {
+					add_action('eab-oauth-twitter-generate_timestamp', create_function('$time', 'return $time + ' . $delta . ';'));
+				}
 			}
 		}
 		/* --- End delta time correction --- */
