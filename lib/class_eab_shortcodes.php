@@ -38,6 +38,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'limit' => false, // Show at most this many events
 			'order' => false,
 		// Appearance arguments
+			'allow_multiple_markers' => false,
 			'open_only' => true,
 			'show_date' => true,
 			'show_excerpt' => false,
@@ -50,6 +51,7 @@ class Eab_Shortcodes extends Eab_Codec {
 		$args['featured_image'] = $this->_arg_to_bool($args['featured_image']);
 		$args['show_date'] = $this->_arg_to_bool($args['show_date']);
 		$args['show_excerpt'] = $this->_arg_to_bool($args['show_excerpt']);
+		$args['allow_multiple_markers'] = $this->_arg_to_bool($args['allow_multiple_markers']);
 		$class = $args['class'] ? 'class="' . $args['class'] . '"' : '';
 
 		$query = $this->_to_query_args($args);
@@ -110,6 +112,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			} else {
 				// No lookahead, get the full month only
 				$events = Eab_CollectionFactory::get_upcoming_events($args['date'], $query);
+
 			}
 			if ($order_method) remove_filter('eab-collection-date_ordering_direction', $order_method);
 
@@ -118,8 +121,10 @@ class Eab_Shortcodes extends Eab_Codec {
 				if ($open_only && !$event->is_open()) continue;
 				$map = $event->get_raw_map();
 				if (!is_array($map) || empty($map)) continue;
-				if (empty($map['markers']) || count($map['markers']) > 1) continue;
+				if (empty($map['markers'])) continue;
+				if (empty($args['allow_multiple_markers']) && count($map['markers']) > 1) continue;
 
+				// Even with multiple markers, only deal with the first one
 				$map['markers'][0]['title'] = $event->get_title();
 				$map['markers'][0]['body'] = Eab_Template::util_apply_shortcode_template($event, $args);
 				if ($args['featured_image']) {
@@ -151,6 +156,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'categories' => array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
 				'limit' => array('help' => __('Show at most this many events', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
 				'order' => array('help' => __('Sort events in this direction', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:sort'),
+				'allow_multiple_markers' => array('help' => __('Allow displaying of maps with multiple markers - defaults to true.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'open_only' => array('help' => __('Show only open events - defaults to true.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'show_date' => array('help' => __('Show event date in the marker - defaults to true.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'show_excerpt' => array('help' => __('Show event excerpt in the marker.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
