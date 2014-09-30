@@ -478,11 +478,13 @@ class Eab_Events_FrontPageEditing {
 
 		/* Added by Ashok */
 		$featured_image = $event->get_featured_image_url();
+		$featured_image_id = (int)$event->get_featured_image_id();
 		$ret .= '<div class="eab-events-fpe-col_wrapper">';
 			$ret .= '<label>' . __('Feature Image', Eab_EventsHub::TEXT_DOMAIN) . '</label>' .
 				'<br />' .
 				'<a href="#featured_image" class="eab-fpe-upload">' .
 				'<input type="hidden" id="eab-fpe-attach_id" name="" value="' . esc_url($featured_image) . '" />' .
+				'<input type="hidden" name="featured" value="' . esc_attr($featured_image_id) . '" />' .
 				'<img src="' . esc_url($featured_image) . '" id="eab-fpe-preview-upload" ' . (empty($featured_image) ? 'style="display:none"' : '') . ' />' .
 				'<br />' .
 				'<span>' . __('Change the featured image', Eab_EventsHub::TEXT_DOMAIN) . '</span>' .
