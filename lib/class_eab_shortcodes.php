@@ -125,11 +125,17 @@ class Eab_Shortcodes extends Eab_Codec {
 				if (empty($args['allow_multiple_markers']) && count($map['markers']) > 1) continue;
 
 				// Even with multiple markers, only deal with the first one
+				$marker_body = Eab_Template::util_apply_shortcode_template($event, $args);
 				$map['markers'][0]['title'] = $event->get_title();
-				$map['markers'][0]['body'] = Eab_Template::util_apply_shortcode_template($event, $args);
-				if ($args['featured_image']) {
-					$icon = $event->get_featured_image_url();
-					if ($icon) $map['markers'][0]['icon'] = $icon;
+				$icon = $args['featured_image']
+					? $event->get_featured_image_url()
+					: false
+				;
+				foreach ($map['markers'] as $idx => $mrk) {
+					$map['markers'][$idx]['body'] = $marker_body;
+					if ($args['featured_image'] && !empty($icon)) {
+						$map['markers'][$idx]['icon'] = $icon;
+					}
 				}
 				$maps[] = $map;
 			}
