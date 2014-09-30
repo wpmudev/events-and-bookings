@@ -344,7 +344,7 @@ $(function () {
 	)
 		.css("float", "left")
 		.unbind('click')
-		.click(function () {
+		.on('click touchend', function () {
 			$(
 				"a.wpmudevevents-yes-submit, " +
 				"a.wpmudevevents-maybe-submit, " +
