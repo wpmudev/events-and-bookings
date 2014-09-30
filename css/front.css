@@ -146,7 +146,7 @@ a.wpmudevevents-viewevent{
 	text-decoration:none;
 }
 
-a:hover.wpmudevevents-viewevent{
+.no-touch a:hover.wpmudevevents-viewevent{
     background-position: 0 -15px;
     text-decoration: none;
 }
@@ -188,7 +188,7 @@ a.wpmudevevents-yes-submit, input.wpmudevevents-yes-submit{
 	text-decoration:none;
 }
 
-:hover.wpmudevevents-yes-submit{
+.no-touch .wpmudevevents-yes-submit:hover{
 	background: #f5f5f5;
 }
 
@@ -230,7 +230,7 @@ a.wpmudevevents-maybe-submit, input.wpmudevevents-maybe-submit{
 	text-decoration:none;
 }
 
-:hover.wpmudevevents-maybe-submit{
+.no-touch .wpmudevevents-maybe-submit:hover{
 	background: #f5f5f5;
 }
 
@@ -272,7 +272,7 @@ a.wpmudevevents-no-submit, input.wpmudevevents-no-submit{
 	text-decoration:none;
 }
 
-:hover.wpmudevevents-no-submit{
+.no-touch .wpmudevevents-no-submit:hover{
 	background: #f5f5f5;
 }
 
@@ -420,7 +420,7 @@ a.wpmudevevents-login_link-facebook {
   transition: 0.1s linear all;
   margin-bottom: 5px;
 }
-a.wpmudevevents-login_link-facebook:hover, a.wpmudevevents-login_link-facebook.active {
+.no-touch a.wpmudevevents-login_link-facebook:hover, a.wpmudevevents-login_link-facebook.active {
   background: #2a406d url(../img/facebook.png) 5px 5px no-repeat;
   color: #fff;
   text-decoration: none;
@@ -449,7 +449,7 @@ a.wpmudevevents-login_link-twitter {
   transition: 0.1s linear all;
   margin-bottom: 5px;
 }
-a.wpmudevevents-login_link-twitter:hover, a.wpmudevevents-login_link-twitter.active {
+.no-touch a.wpmudevevents-login_link-twitter:hover, a.wpmudevevents-login_link-twitter.active {
   background: #39859b url(../img/twitter.png) 5px 5px no-repeat;
   color: #fff;
   text-decoration: none;
@@ -478,7 +478,7 @@ a.wpmudevevents-login_link-google {
   transition: 0.1s linear all;
   margin-bottom: 5px;
 }
-a.wpmudevevents-login_link-google:hover, a.wpmudevevents-login_link-google.active {
+.no-touch a.wpmudevevents-login_link-google:hover, a.wpmudevevents-login_link-google.active {
   background: #439eb8 url(../img/google.png) 5px 5px no-repeat;
   color: #fff;
   text-decoration: none;
@@ -507,7 +507,7 @@ a.wpmudevevents-login_link-wordpress {
   transition: 0.1s linear all;
   margin-bottom: 5px;
 }
-a.wpmudevevents-login_link-wordpress:hover, a.wpmudevevents-login_link-wordpress.active {
+.no-touch a.wpmudevevents-login_link-wordpress:hover, a.wpmudevevents-login_link-wordpress.active {
   background: #444 url(../img/wordpress.png) 5px 5px no-repeat;
   color: #fff;
   text-decoration: none;
