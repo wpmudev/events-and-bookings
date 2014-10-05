@@ -51,6 +51,32 @@ class Eab_Api {
 		if (!$this->_data->get_option('accept_api_logins')) return false;
 		$domain = get_bloginfo('name');
 		$domain = $domain ? $domain : __('WordPress', Eab_EventsHub::TEXT_DOMAIN);
+
+		$show_facebook = !$this->_data->get_option('api_login-hide-facebook');
+		$show_twitter = !$this->_data->get_option('api_login-hide-twitter');
+		$show_google = !$this->_data->get_option('api_login-hide-google');
+
+		$registration_msg = '';
+		$registration_services = array();
+		if ($show_facebook) $registration_services[] = 'Facebook';
+		if ($show_twitter) $registration_services[] = 'Twitter';
+		if ($show_google) $registration_services[] = 'Google';
+		
+		// Properly enumerate supported service IDs and construct the registration supplement message.
+		if (!empty($registration_services)) {
+			if (count($registration_services) > 1) {
+				$supported_ids = sprintf(
+					_x('%s or %s', 'Supported registration services: the first variable can be single service or comma-separated enumeration', Eab_EventsHub::TEXT_DOMAIN), 
+					join(', ', array_slice(
+						$registration_services, 
+						0, 
+						count($registration_services)-1
+					)), 
+					end($registration_services)
+				);
+			} else $supported_ids = end($registration_services);
+			$registration_msg = sprintf(_x(' - or just click cancel to register using your %s ID', 'Registration supplemental message part', Eab_EventsHub::TEXT_DOMAIN), $supported_ids);
+		}
 		
 		wp_enqueue_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
@@ -62,9 +88,9 @@ class Eab_Api {
 			'please_wait' => __('Please, wait...', Eab_EventsHub::TEXT_DOMAIN),
 			
 			'wp_register' => __('Register', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_registration_msg' => __('Create a username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', Eab_EventsHub::TEXT_DOMAIN), 
+			'wp_registration_msg' => sprintf(_x('Create a username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg), 
 			'wp_login' => __('Log in', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_login_msg' => __('Login with your existing username in order to register for this event - or just click cancel to register using your Facebook or Twitter ID', Eab_EventsHub::TEXT_DOMAIN), 
+			'wp_login_msg' => sprintf(_x('Login with your existing username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg), 
 			'wp_username' => __('Username', Eab_EventsHub::TEXT_DOMAIN), 
 			'wp_password' => __('Password', Eab_EventsHub::TEXT_DOMAIN), 
 			'wp_email' => __('Email', Eab_EventsHub::TEXT_DOMAIN), 
