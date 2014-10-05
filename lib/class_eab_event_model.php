@@ -563,6 +563,14 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			do_action('eab-events-recurring_instances-deleted', $this->get_id(), $this);
 		}
 
+		// Do this first, so we can short out on draft
+		update_post_meta($this->get_id(), 'eab_event_recurring', $interval);
+		update_post_meta($this->get_id(), 'eab_event_recurrence_parts', $time_parts);
+		update_post_meta($this->get_id(), 'eab_event_recurrence_starts', $start);
+		update_post_meta($this->get_id(), 'eab_event_recurrence_ends', $end);
+
+		if ('draft' === $this->_event->post_status) return false; // Draft recurring events do not spawn instances
+
 		$check_start = $start && checkdate((int)date('n', $start), (int)date('j', $start), (int)date('Y', $start));
 		if (!$check_start) do_action('eab-debug-log_error', sprintf(
 			__('Invalid interval start boundary timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
@@ -631,10 +639,6 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				do_action('eab-events-recurrent_event_child-save_meta', $post_id);
 			}
 		}
-		update_post_meta($this->get_id(), 'eab_event_recurring', $interval);
-		update_post_meta($this->get_id(), 'eab_event_recurrence_parts', $time_parts);
-		update_post_meta($this->get_id(), 'eab_event_recurrence_starts', $start);
-		update_post_meta($this->get_id(), 'eab_event_recurrence_ends', $end);
 
 		if ($old_post_ids) {
 			$new_post_ids = $this->_get_recurring_children_ids();
