@@ -527,4 +527,3 @@ if ( !class_exists( 'Pointer_Tutorial' ) ) {
 	
 	}
 }
-?>
