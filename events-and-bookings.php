@@ -135,6 +135,9 @@ class Eab_EventsHub {
 		add_action('wp_trash_post', array($this, 'process_recurrent_trashing'));
 		add_action('untrash_post', array($this, 'process_recurrent_untrashing'));
 		add_action('before_delete_post', array($this, 'process_recurrent_deletion'));
+
+		// Listen to transition from drafts and (re)spawn the recurring instances
+		add_action('draft_to_publish', array($this, 'respawn_recurring_instances'));
 		
 		// API login after the options have been initialized
 		$this->_api->initialize();
@@ -160,6 +163,19 @@ class Eab_EventsHub {
 		$event = new Eab_EventModel(get_post($post_id));
 		if (!$event->is_recurring()) return false;
 		$event->delete_recurring_instances();
+	}
+
+	function respawn_recurring_instances ($post) {
+		if (empty($post->post_type) || Eab_EventModel::POST_TYPE !== $post->post_type) return false;
+		$event = new Eab_EventModel($post);
+		if (!$event->is_recurring()) return false;
+
+		$interval = $event->get_recurrence();
+		$time_parts = $event->get_recurrence_parts();
+		$start = $event->get_recurrence_starts();
+		$end = $event->get_recurrence_ends();
+
+		$event->spawn_recurring_instances($start, $end, $interval, $time_parts);
 	}
     
     /**
