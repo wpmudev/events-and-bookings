@@ -29,7 +29,7 @@ class Eab_AdminTutorial {
 		//add the capability a user must have to view the tutorial
 		$tutorial->set_capability = 'manage_options';
 		
-		$tutorial->add_icon( plugins_url( 'events-and-bookings/img/large-greyscale.png' , __FILE__ ) );
+		//$tutorial->add_icon(plugins_url('events-and-bookings/img/large-greyscale.png', dirname(dirname(__FILE__))));
 		
 		$tutorial->add_step(admin_url('edit.php?post_type=incsub_event&page=eab_settings'), 'incsub_event_page_eab_settings', '#incsub_event-slug', __('Event Slug', Eab_EventsHub::TEXT_DOMAIN), array(
 		    'content'  => '<p>' . esc_js( __('Change the root slug for events', Eab_EventsHub::TEXT_DOMAIN) ) . '</p>',
