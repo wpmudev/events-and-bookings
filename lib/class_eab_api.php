@@ -100,9 +100,9 @@ class Eab_Api {
 			'wp_cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN), 
 			// Vars
 			'data' => array(
-				'show_facebook' => !$this->_data->get_option('api_login-hide-facebook'),
-				'show_twitter' => !$this->_data->get_option('api_login-hide-twitter'),
-				'show_google' => !$this->_data->get_option('api_login-hide-google'),
+				'show_facebook' => $show_facebook,
+				'show_twitter' => $show_twitter,
+				'show_google' => $show_google,
 				'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
 				'gg_client_id' => $this->_data->get_option('google-client_id'),
 			),
