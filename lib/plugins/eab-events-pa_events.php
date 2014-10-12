@@ -4,7 +4,7 @@ Plugin Name: Public Announcement Events
 Description: Allows you to create Public Announcement events, which will have no RSVP capabilities.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.1
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Events_Pae {

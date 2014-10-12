@@ -4,7 +4,7 @@ Plugin Name: Colors
 Description: Allows you to easily tweak the background color for your events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.1
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Events_Colors {

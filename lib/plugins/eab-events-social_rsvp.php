@@ -4,7 +4,7 @@ Plugin Name: Social RSVPs
 Description: Automatically posts RSVP status updates for your Facebook and Twitter guests.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 /*

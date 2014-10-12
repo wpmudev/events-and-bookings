@@ -4,7 +4,7 @@ Plugin Name: Weekly Event Calendar
 Description: Creates a weekly calender shortcode which can be used in any page. Calendar start and end hours, interval time can be selected. 
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.27
-Author: Hakan Evin
+Author: WPMU DEV
 */
 
 /*

@@ -4,7 +4,7 @@ Plugin Name: Next Event Shortcode
 Description: Generates a formattable shortcode displaying time of the next upcoming event that has not started yet 
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.27
-Author: Hakan Evin
+Author: WPMU DEV
 */
 
 /*

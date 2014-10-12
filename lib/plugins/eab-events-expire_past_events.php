@@ -4,7 +4,7 @@ Plugin Name: Immediately expire past events
 Description: By default, your past events will be archived. Activating this add-on will immediately expire all your archived events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 /*

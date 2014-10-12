@@ -4,7 +4,7 @@ Plugin Name: Export: Google Calendar
 Description: Adds a convenience button for your vistors to schedule events in their Google Calendars.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.1
-Author: Ve Bailovity
+Author: WPMU DEV
 */
 
 class Eab_Export_GCalButton {

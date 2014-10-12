@@ -4,7 +4,7 @@ Plugin Name: Event Controlled Redirect
 Description: Redirects visitor from a selected page, post or event of the website (given with its ID) to any external or internal url, if event is progressing at the moment.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.25
-Author: Hakan Evin
+Author: WPMU DEV
 */
 
 /*

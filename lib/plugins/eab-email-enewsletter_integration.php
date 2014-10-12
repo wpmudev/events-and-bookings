@@ -4,7 +4,7 @@ Plugin Name: Email: E-Newsletter integration
 Description: Allows you to automatically send newsletters about your events created with e-Newsletter plugin. <br /><b>Requires <a href="http://premium.wpmudev.org/project/e-newsletter">e-Newsletter plugin</a>.</b>
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.1
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Email_eNewsletterIntegration {

@@ -4,7 +4,7 @@ Plugin Name: Event Countdown
 Description: Generates a flexible countdown shortcode for the current or selected event. Visitor viewing the page can be redirected to any url when countdown expires. 
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.27
-Author: Hakan Evin
+Author: WPMU DEV
 */
 
 /*

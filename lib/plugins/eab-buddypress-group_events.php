@@ -5,7 +5,7 @@ Description: Allows you to connect your Events with your BuddyPress groups.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.1
 AddonType: BuddyPress
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 /*

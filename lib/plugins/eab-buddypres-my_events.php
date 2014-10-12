@@ -5,7 +5,7 @@ Description: Adds an Events tab to your user profiles.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 AddonType: BuddyPress
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 /*

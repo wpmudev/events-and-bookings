@@ -4,7 +4,7 @@ Plugin Name: Expire last month events
 Description: By default, your past events will be archived. Activating this add-on will immediately expire your month-old archived events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 /*

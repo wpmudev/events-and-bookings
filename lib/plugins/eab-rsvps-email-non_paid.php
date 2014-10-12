@@ -4,7 +4,7 @@ Plugin Name: Email: send reminder email to non-paid visitors
 Description: Allows you to send reminder email who wanted to attend in the event but didn't pay yet.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ashok Kumar Nath (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Events_RsvpEmailNonPaid {

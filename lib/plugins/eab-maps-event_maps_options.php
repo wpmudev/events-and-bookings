@@ -5,7 +5,7 @@ Description: Maps will, by default, use the global settings for Google Maps plug
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 AddonType: Maps
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Maps_EventMapsOptions {

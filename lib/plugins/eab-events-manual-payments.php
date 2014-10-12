@@ -4,7 +4,7 @@ Plugin Name: Manual Payments
 Description: Allows users to pay manually (check, wire transfer, etc)
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.27
-Author: Hakan Evin
+Author: WPMU DEV
 */
 
 /*

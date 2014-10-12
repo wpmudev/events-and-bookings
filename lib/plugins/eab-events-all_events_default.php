@@ -4,7 +4,7 @@ Plugin Name: Default to all Events
 Description: If no year or month arguments are passed to your archive page requests, this simple add-on will show all applicable Events instead of truncating them to montly archives. 
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 /*

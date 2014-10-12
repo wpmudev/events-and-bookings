@@ -4,7 +4,7 @@ Plugin Name: Email: send email on RSVP
 Description: Automatically send your user an email on event RSVP
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 

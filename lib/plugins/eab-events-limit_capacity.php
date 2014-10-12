@@ -5,7 +5,7 @@ Plugin Name: Limited capacity Events
 Description: Allows you to limit the number of attendees for each of your events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0.2
-Author: Ve Bailovity (Incsub), Hoang Ngo (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Addon_LimitCapacity {

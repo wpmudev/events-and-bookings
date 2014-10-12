@@ -4,7 +4,7 @@ Plugin Name: Recurrent Events Redirect
 Description: Redirects from root instance to currently closest to active instance.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.3
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Events_RecurrentRootRedirect {

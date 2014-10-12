@@ -4,7 +4,7 @@ Plugin Name: Noindex meta for Events
 Description: Adds noindex meta element to your recurring event instances and non-current archives.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 

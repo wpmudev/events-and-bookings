@@ -4,7 +4,7 @@ Plugin Name: Guest lists options
 Description: Gives you more control over user info displayed in your RSVP lists
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_GuestList_ShowAdditionalInfo {

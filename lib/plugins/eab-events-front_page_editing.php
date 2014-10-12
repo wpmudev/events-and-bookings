@@ -4,7 +4,7 @@ Plugin Name: Front-page editing
 Description: Allows you to embed front-page editing for events into your site public pages, using a shortcode.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub), Ashok Kumar Nath (Incsub)
+Author: WPMU DEV
 */
 
 /*

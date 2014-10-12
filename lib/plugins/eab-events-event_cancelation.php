@@ -4,7 +4,7 @@ Plugin Name: Event cancellation
 Description: Allows you to quickly cancel your events and send a notification email to your attendees.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 class Eab_Events_EventCancel {

@@ -4,7 +4,7 @@ Plugin Name: Membership Integration
 Description: Allows Events+ to Integrate with our Membership plugin, so that members can receive a alternative fee for paid events. <br /><b>Requires <a href="http://premium.wpmudev.org/project/membership">Membership plugin</a>.</b>
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.3
-Author: Hakan Evin
+Author: WPMU DEV
 */
 
 /*

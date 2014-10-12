@@ -5,7 +5,7 @@ Description: Auto-post an activity update when something happens with your Event
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 AddonType: BuddyPress
-Author: Ve Bailovity (Incsub)
+Author: WPMU DEV
 */
 
 /*
