@@ -4,6 +4,13 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.7.7 - 2014-10-30
+----------------------------------------------------------------------
+- Fix for Twitter login issues.
+- Fix for iDevices touchend and :hover event.
+- Fix for front-end editing featured image replacement.
+- Added new allow_multiple_markers attribute to eab_events_map shortcode.
+
 1.7.6.1 - 2014-09-09
 ----------------------------------------------------------------------
 - Fix for script pre-registration.
