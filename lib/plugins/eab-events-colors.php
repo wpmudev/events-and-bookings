@@ -26,12 +26,36 @@ class Eab_Events_Colors {
 		add_action('admin_head-incsub_event_page_eab_settings', array($this, 'enqueue_dependencies'));
 	
 		add_action('wp_head', array($this, 'inject_color_settings'));
+        add_action('wp_footer', array($this, 'inject_footer_script'), 10);
 	}
 	
 	function enqueue_dependencies () {
 		wp_enqueue_style('wp-color-picker');
 		wp_enqueue_script('wp-color-picker');
 	}
+
+    function inject_footer_script(){
+        $colors = $this->_data->get_option("eab-colors");
+        $colors = $colors ? $colors : array();
+        if (empty($colors)) return false;
+
+        $use_widget = $this->_data->get_option('eab-colors-use_widget');
+        if(!$use_widget) return false;
+
+        $colors_json = json_encode( $colors );
+        ?>
+        <script type="text/javascript">
+            var eab_colors_object = jQuery.parseJSON( '<?php echo $colors_json; ?>' );
+            jQuery(document).ready(
+                function($){
+                    $.each(eab_colors_object, function( key, value ) {
+                        jQuery( "td.eab-has_events" ).has( "a."+key ).addClass( key );
+                    });
+                }
+            );
+        </script>
+    <?php
+    }
 
 	function inject_color_settings () {
 		$colors = $this->_data->get_option("eab-colors");
@@ -63,6 +87,8 @@ class Eab_Events_Colors {
 				'.wpmudevevents-calendar-event.' . sanitize_html_class($class),
 			);
 			if ($use_widget) {
+                $selectors[] = 'td.eab-has_events.' . sanitize_html_class($class);
+                $selectors[] = 'td.eab-has_events.' . sanitize_html_class($class) . ' a';
 				$selectors[] = '.eab-upcoming_calendar_widget.' . sanitize_html_class($class) . ' td.eab-has_events';
 				$selectors[] = '.eab-upcoming_calendar_widget.' . sanitize_html_class($class) . ' td.eab-has_events a';
 			}
