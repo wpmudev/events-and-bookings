@@ -46,11 +46,18 @@ class Eab_Events_Colors {
         ?>
         <script type="text/javascript">
             var eab_colors_object = jQuery.parseJSON( '<?php echo $colors_json; ?>' );
+            var eab_widget_colors_update = function($){
+                $.each(eab_colors_object, function( key, value ) {
+                    $( "td.eab-has_events" ).has( "a."+key ).addClass( key );
+                });
+            };
             jQuery(document).ready(
                 function($){
-                    $.each(eab_colors_object, function( key, value ) {
-                        jQuery( "td.eab-has_events" ).has( "a."+key ).addClass( key );
-                    });
+                    eab_widget_colors_update($);
+                }
+            );
+            jQuery(document).bind('eab-cuw-render_complete', function () {
+                    eab_widget_colors_update(jQuery);
                 }
             );
         </script>
