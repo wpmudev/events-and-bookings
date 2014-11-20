@@ -350,6 +350,24 @@ $(function () {
 		return false;
 	});
 
+	$("body").on("click", ".eab-add_attendance .button", function () {
+		var $root = $(".eab-add_attendance"),
+			event_id = $root.find(".eab-attendance-event_id").val()
+			email = $root.find(".eab-attendance-email").val(),
+			status = $root.find(".eab-attendance-status").val()
+		;
+		if (!event_id || !email || !status) return false;
+		$.post(ajaxurl, {
+			action: "eab_add_attendance",
+			user: email,
+			post_id: event_id,
+			status: status
+		}, function (data) {
+			$("#eab-bookings-response").html(data);
+		});
+		return false;
+	});
+
 	var $times = $("#incsub-event input.incsub_event");
 	$times.each(function () {
 		var _c = $(this).attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
