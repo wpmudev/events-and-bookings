@@ -229,6 +229,33 @@ class Eab_Template {
 		return $ret;
 	}
 
+	private static function get_admin_attendance_addition_form ($event, $statuses) {
+		if (!method_exists($event, 'get_id') || !is_array($statuses)) return false;
+		if ($event->is_paid()) return ''; // Won't deal with the paid events
+
+		$content = '';
+
+		$content = '<div class="eab-add_attendance-container">';
+
+		$content .= '<fieldset class="eab-add_attendance">';
+		$content .= '<legend>' . __('Add user', Eab_EventsHub::TEXT_DOMAIN) . '</legend>';
+		
+		$content .= '<label>' . __('User email', Eab_EventsHub::TEXT_DOMAIN) . '</label>&nbsp;';
+		$content .= '<input type="hidden" class="eab-attendance-event_id" value="' . (int)$event->get_id() . '" />';
+		$content .= '<input type="email" class="eab-attendance-email" />';
+		$content .= '<select class="eab-attendance-status">';
+		foreach ($statuses as $status => $label) {
+			$content .= '<option value="' . esc_attr($status) . '">' . esc_html($label) . '</option>';
+		}
+		$content .= '</select>';
+		$content .= '<input type="button" class="button" value="' . esc_attr(__('Add', Eab_EventsHub::TEXT_DOMAIN)) . '" />';
+		$content .= '</fieldset>';
+		
+		$content .= '</div>';
+		
+		return $content;
+	}
+
 	public static function get_admin_bookings ($status, $post) {
 		global $wpdb;
 		if (!current_user_can('edit_posts')) return false; // Basic sanity check
@@ -241,8 +268,9 @@ class Eab_Template {
 		);
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
-		
-		$content = '';		
+
+		$content = Eab_Template::get_admin_attendance_addition_form($event, $statuses);
+
 		$content .= '<h4>'. __($status_name, Eab_EventsHub::TEXT_DOMAIN). '</h4>';
 		$content .= '<ul class="eab-guest-list">';
 
