@@ -60,12 +60,21 @@ var maps_url = ("undefined" != typeof _agm && _agm.root_url
     eab_mbuttons_container = $('#eab_insert_map')
 ;
 if (!eab_mbuttons_container.length) return;
-
-eab_mbuttons_container.append('' + 
-	'<a onclick="return openMapEditor();" title="' + eab_l10nEditor.add_map + '" class="thickbox" id="eab_add_map" href="#TB_inline?width=640&height=594&inlineId=map_container">' +
-		'<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + maps_url + '/img/system/globe-button.gif">' +
-	'</a>'
-);
+if (window.openMapEditor) {
+    // Old API
+    eab_mbuttons_container.append('' + 
+    	'<a onclick="return openMapEditor();" title="' + eab_l10nEditor.add_map + '" class="thickbox" id="eab_add_map" href="#TB_inline?width=640&height=594&inlineId=map_container">' +
+    		'<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + maps_url + '/img/system/globe-button.gif">' +
+    	'</a>'
+    );
+} else {
+    // New API
+    eab_mbuttons_container.append('' + 
+        '<a class="add_map" title="' + eab_l10nEditor.add_map + '">' +
+            '<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + maps_url + '/img/system/globe-button.gif">' +
+        '</a>'
+    );
+}
 
 //$("li.existing_map_item").off("click", "a.add_map_item");
 $('body').off("click", "li.existing_map_item a.add_map_item");
