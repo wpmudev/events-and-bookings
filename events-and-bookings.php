@@ -145,6 +145,7 @@ class Eab_EventsHub {
 		
 		add_action('wp_ajax_eab_cancel_attendance', array($this, 'handle_attendance_cancel'));		
 		add_action('wp_ajax_eab_delete_attendance', array($this, 'handle_attendance_delete'));	
+		add_action('wp_ajax_eab_add_attendance', array($this, 'handle_attendance_add'));	
     }
 
 	function process_recurrent_trashing ($post_id) {
@@ -2095,6 +2096,25 @@ class Eab_EventsHub {
 		$post = get_post($post_id);
 		$event = new Eab_EventModel($post);
 		$event->delete_attendance($user_id);
+		echo $this->meta_box_part_bookings($post);
+		die;
+	}
+
+	function handle_attendance_add () {
+		$data = stripslashes_deep($_POST);
+		$email = $data['user'];
+		$status = $data['status'];
+		$post_id = (int)$data['post_id'];
+		$allowed = array(Eab_EventModel::BOOKING_YES, Eab_EventModel::BOOKING_NO, Eab_EventModel::BOOKING_MAYBE);
+
+		$post = get_post($post_id);
+		if (is_email($email) && $post_id && in_array($status, $allowed)) {
+			$user = get_user_by('email', $email);
+			if ($user && !empty($user->ID)) {
+				$event = new Eab_EventModel($post);
+				$event->add_attendance($user->ID, $status);
+			}
+		}
 		echo $this->meta_box_part_bookings($post);
 		die;
 	}

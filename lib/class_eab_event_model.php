@@ -1095,6 +1095,18 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		global $wpdb;
 		return $wpdb->query($wpdb->prepare("DELETE FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
 	}
+
+	public function add_attendance ($user_id, $status) {
+		$user_id = (int)$this->_to_user_id($user_id);
+		if (!$user_id) return false;
+
+		if ($this->get_user_booking_id($user_id)) return false; // We already have attendance info for this guy.
+
+		global $wpdb;
+		return $wpdb->query(
+		    $wpdb->prepare("INSERT INTO ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), %s) ON DUPLICATE KEY UPDATE `status` = %s;", $this->get_id(), $user_id, $status, $status)
+		);
+	}
 	
 /* ----- Meta operations ----- */
 
