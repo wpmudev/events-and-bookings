@@ -4,7 +4,7 @@
 if ( !class_exists('WPMUDEV_Dashboard_Notice3') ) {
 	class WPMUDEV_Dashboard_Notice3 {
 		
-		var $version = '3.0';
+		var $version = '3.1';
 		var $screen_id = false;
 		var $product_name = false;
 		var $product_update = false;
@@ -22,11 +22,14 @@ if ( !class_exists('WPMUDEV_Dashboard_Notice3') ) {
 			if ( class_exists( 'WPMUDEV_Dashboard' ) || ( isset($wpmudev_un->version) && version_compare($wpmudev_un->version, '3.4', '<') ) )
 				return;
 			
-			// Schedule update jobs
-			if ( !wp_next_scheduled('wpmudev_scheduled_jobs') ) {
-				wp_schedule_event(time(), 'twicedaily', 'wpmudev_scheduled_jobs');
+			// Schedule update cron on main site only
+			if ( is_main_site() ) {
+				if ( ! wp_next_scheduled( 'wpmudev_scheduled_jobs' ) ) {
+					wp_schedule_event( time(), 'twicedaily', 'wpmudev_scheduled_jobs' );
+				}
+
+				add_action( 'wpmudev_scheduled_jobs', array( $this, 'updates_check') );
 			}
-			add_action( 'wpmudev_scheduled_jobs', array( $this, 'updates_check') );
 			add_action( 'delete_site_transient_update_plugins', array( &$this, 'updates_check' ) ); //refresh after upgrade/install
 			add_action( 'delete_site_transient_update_themes', array( &$this, 'updates_check' ) ); //refresh after upgrade/install
 			
@@ -34,8 +37,8 @@ if ( !class_exists('WPMUDEV_Dashboard_Notice3') ) {
 				
 				add_action( 'site_transient_update_plugins', array( &$this, 'filter_plugin_count' ) );
 				add_action( 'site_transient_update_themes', array( &$this, 'filter_theme_count' ) );
-				add_filter( 'plugins_api', array( &$this, 'filter_plugin_info' ), 20, 3 ); //run later to work with bad autoupdate plugins
-				add_filter( 'themes_api', array( &$this, 'filter_plugin_info' ), 20, 3 ); //run later to work with bad autoupdate plugins
+				add_filter( 'plugins_api', array( &$this, 'filter_plugin_info' ), 101, 3 ); //run later to work with bad autoupdate plugins
+				add_filter( 'themes_api', array( &$this, 'filter_plugin_info' ), 101, 3 ); //run later to work with bad autoupdate plugins
 				add_action( 'admin_init', array( &$this, 'filter_plugin_rows' ), 15 ); //make sure it runs after WP's
 				add_action( 'core_upgrade_preamble', array( &$this, 'disable_checkboxes' ) );
 				add_action( 'activated_plugin', array( &$this, 'set_activate_flag' ) );
