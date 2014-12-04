@@ -185,7 +185,7 @@ class Eab_Calendars_GoogleImporter {
 		);
 ?>
 <div id="eab-settings-gcal_importer" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Google Calendar import settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Google Calendar import settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<p>
 			<ol>

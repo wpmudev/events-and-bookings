@@ -132,7 +132,7 @@ class Eab_GuestList_ShowAdditionalInfo {
 		$show_in_export = $this->_data->get_option('guest_lists-sai-show_in_export') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-guest_lists" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Guest Lists Options :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Guest Lists Options', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
 			<label><?php _e('Guest avatars', Eab_EventsHub::TEXT_DOMAIN); ?></label>

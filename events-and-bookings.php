@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.7.8-BETA-1
+ Version: 1.7.8-BETA-2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.7.8-BETA-1';
+    const CURRENT_VERSION = '1.7.8-BETA-2';
     
     /**
      * Translation domain
@@ -1892,7 +1892,7 @@ class Eab_EventsHub {
 		<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
 		    <?php do_action('eab-settings-before_plugin_settings'); ?>
 		    <div id="eab-settings-general" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Plugin settings :', self::TEXT_DOMAIN); ?></h3>
+				<h3 class="eab-hndle"><?php _e('Plugin settings', self::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-slug" id="incsub_event_label-slug"><?php _e('Set your root slug here:', self::TEXT_DOMAIN); ?></label>
@@ -1920,8 +1920,8 @@ class Eab_EventsHub {
 				</div>
 		    </div>
 		    <?php if (!$theme_tpls_present) { ?>
-		    <div id="eab-settings-general" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Appearance settings :', self::TEXT_DOMAIN); ?></h3>
+		    <div id="eab-settings-appearance" class="eab-metabox postbox">
+				<h3 class="eab-hndle"><?php _e('Appearance settings', self::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-override_appearance_defaults" id="incsub_event_label-override_appearance_defaults"><?php _e('Override default appearance?', self::TEXT_DOMAIN); ?></label>
@@ -1967,7 +1967,7 @@ class Eab_EventsHub {
 		    <?php } ?>
 		    <!-- Payment settings -->
 		    <div id="eab-settings-paypal" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Payment settings :', self::TEXT_DOMAIN); ?></h3>
+				<h3 class="eab-hndle"><?php _e('Payment settings', self::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-currency" id="incsub_event_label-currency"><?php _e('Currency', self::TEXT_DOMAIN); ?></label>
@@ -1992,7 +1992,7 @@ class Eab_EventsHub {
 		   <?php $this->_api->render_settings($tips); // API settings ?>
 		    <!-- Addon settings -->
 		    <div id="eab-settings-addons" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Events comes with a range of extras just activate them below :', self::TEXT_DOMAIN); ?></h3>
+				<h3 class="eab-hndle"><?php _e('Add-ons', self::TEXT_DOMAIN); ?></h3>
 				<!--<div class="eab-inside">-->
 		    		<?php Eab_AddonHandler::create_addon_settings(); ?>
 		    		<br />

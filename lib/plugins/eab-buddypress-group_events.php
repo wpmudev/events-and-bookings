@@ -144,7 +144,7 @@ class Eab_BuddyPress_GroupEvents {
 		$user_groups_only_unless_superadmin = $this->_data->get_option('bp-group_event-user_groups_only-unless_superadmin') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-group_events" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Group Events settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Group Events settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item">
 	    	<label for="eab_event-bp-group_event-auto_join_groups"><?php _e('Automatically join the group by RSVPing to events', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>

@@ -304,7 +304,7 @@ class Eab_Addon_LimitCapacity {
 		$checked_cancel    = $this->_data->get_option( 'eab-limit_capacity-show_cancel' ) ? 'checked="checked"' : '';
 		?>
 		<div id="eab-settings-limit_capacity" class="eab-metabox postbox">
-			<h3 class="eab-hndle"><?php _e( 'Limited capacity events settings :', Eab_EventsHub::TEXT_DOMAIN ); ?></h3>
+			<h3 class="eab-hndle"><?php _e( 'Limited capacity events settings', Eab_EventsHub::TEXT_DOMAIN ); ?></h3>
 
 			<div class="eab-inside">
 				<div class="eab-settings-settings_item">

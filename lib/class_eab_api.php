@@ -605,7 +605,7 @@ class Eab_Api {
 		?>
 	 	<!-- API settings -->
 	    <div id="eab-settings-apis" class="eab-metabox postbox">
-			<h3 class="eab-hndle"><?php _e('API settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+			<h3 class="eab-hndle"><?php _e('API settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 			<div class="eab-inside">
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-facebook-app_id" id="incsub_event_label-facebook-app_id"><?php _e('Facebook App ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>

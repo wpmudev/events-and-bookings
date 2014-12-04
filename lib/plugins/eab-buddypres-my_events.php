@@ -204,7 +204,7 @@ class Eab_BuddyPress_MyEvents {
 		);
 ?>
 <div id="eab-settings-my_events" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('My Events settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('My Events settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
 	    	<label for="eab_event-bp-my_events-premium_events"><?php _e('Non-paid premium events with positive RSPVs', Eab_EventsHub::TEXT_DOMAIN); ?>:</label>

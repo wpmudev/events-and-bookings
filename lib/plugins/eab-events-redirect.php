@@ -210,7 +210,7 @@ class Eab_Events_EventControlledRedirect {
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 		?>
 		<div id="eab-settings-paypal" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Event Controlled Redirect settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+				<h3 class="eab-hndle"><?php _e('Event Controlled Redirect settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-global_redirect_source" ><?php _e('Global source page ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>

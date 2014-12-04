@@ -407,7 +407,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 		?>
 		<div id="eab-settings-weekly_calendar" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Weekly Event Calendar settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+				<h3 class="eab-hndle"><?php _e('Weekly Event Calendar settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-weekly_calendar_start" ><?php _e('Calendar start hour', Eab_EventsHub::TEXT_DOMAIN); ?></label>

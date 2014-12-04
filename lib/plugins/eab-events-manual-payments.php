@@ -156,7 +156,7 @@ class Eab_Events_ManualPayments {
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 		?>
 		<div id="eab-settings-paypal" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Manual Payment settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+				<h3 class="eab-hndle"><?php _e('Manual Payment settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-manual_payment_select" ><?php _e('Select button text', Eab_EventsHub::TEXT_DOMAIN); ?></label>

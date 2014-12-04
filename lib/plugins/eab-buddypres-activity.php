@@ -195,7 +195,7 @@ class Eab_BuddyPress_AutoUpdateActivity {
 		$user_rsvp_group_post = class_exists('Eab_BuddyPress_GroupEvents') && $this->_data->get_option('bp-activity_autoupdate-user_rsvp_group_post') ? 'checked="checked"' : false;
 ?>
 <div id="eab-settings-activity_autoupdate" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Activity auto-update settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Activity auto-update settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
 			<label><?php _e('Automatically update Activity feed when an Event is created:', Eab_EventsHub::TEXT_DOMAIN); ?></label>	

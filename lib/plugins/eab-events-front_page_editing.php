@@ -63,7 +63,7 @@ class Eab_Events_FrontPageEditing {
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 ?>
 <div id="eab-settings-fpe" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Front-page editing :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Front-page editing', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item">
 			<label for="eab-events-fpe-use_slug">

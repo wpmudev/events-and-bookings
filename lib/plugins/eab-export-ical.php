@@ -76,7 +76,7 @@ class Eab_Export_iCal {
 		$checked_dload = $this->_data->get_option('eab_export-ical-download_links') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-ical_export" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('iCal export settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('iCal export settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 	    <div class="eab-settings-settings_item">
 			<b><?php _e('Exported event times', Eab_EventsHub::TEXT_DOMAIN); ?></b>

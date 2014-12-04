@@ -331,7 +331,7 @@ class Eab_Calendars_MeetupImporter {
 		$member_id = $this->_data->get_option('meetup_importer-user_id');
 ?>
 <div id="eab-settings-meetup_importer" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Meetup.com import settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Meetup.com import settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 	    <div class="eab-settings-settings_item">
 			<b><?php _e('API settings', Eab_EventsHub::TEXT_DOMAIN); ?></b>

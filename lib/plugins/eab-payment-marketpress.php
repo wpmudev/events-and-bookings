@@ -435,7 +435,7 @@ class Eab_Payments_PaymentViaProducts {
 		));
 ?>
 <div id="eab-settings-mp_payments" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Payments via MarketPress Products settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Payments via MarketPress Products settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item">
 	    	<label for="eab_event-payment-ppvp-category"><?php _e('Limit Products selection to this Product Category', Eab_EventsHub::TEXT_DOMAIN); ?>: </label>

@@ -55,7 +55,7 @@ class Eab_Events_Nre {
 		$archives = (int)$this->_options['noindex_archives'] ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-nre" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Noindex meta for Events :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Noindex meta for Events', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
 			<label for="eab-events-nre-noindex_scope"><?php _e('Add <code>noindex</code> to my recurring events instances', Eab_EventsHub::TEXT_DOMAIN); ?>:</label><br />

@@ -143,7 +143,7 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 		);
 		?>
 <div id="eab-settings-eab_arf" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Additional Fields :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Additional Fields', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div id="eab-arf-additional_fields">
 		<?php foreach ($fields as $field) { ?>

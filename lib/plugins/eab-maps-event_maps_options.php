@@ -63,7 +63,7 @@ class Eab_Maps_EventMapsOptions {
 		$options = $this->_data->get_option('google_maps-overrides');
 ?>
 <div id="eab-settings-event_maps_options" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Events Maps Options :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Events Maps Options', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<p><em><?php _e('Any setting you leave empty here will be inherited from the default Google Maps plugin settings.', Eab_EventsHub::TEXT_DOMAIN); ?></em></p>
 		<table class="form-table">

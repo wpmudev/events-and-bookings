@@ -111,7 +111,7 @@ class Eab_Events_Colors {
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 ?>
 <div id="eab-settings-colors" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Event Colors :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Event Colors', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 	<?php foreach ($categories as $category) { ?>
 		<div class="eab-settings-settings_item">
