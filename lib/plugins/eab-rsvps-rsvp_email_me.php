@@ -120,9 +120,13 @@ class Eab_Events_RsvpEmailMe {
 		if (!$event_id) die;
 		$user = wp_get_current_user();
 		$codec = new Eab_Events_RsvpEmailMe_Codec($event_id, $user->ID);
+		$body = !empty($data['body'])
+			? $data['body']
+			: $this->_data->get_option('eab_rsvps-email_me-body')
+		;
 		die(
 			'<strong>' . $codec->expand($data['subject'], Eab_Macro_Codec::FILTER_TITLE) . '</strong>' .
-			'<div>' . $codec->expand($data['body'], Eab_Macro_Codec::FILTER_BODY) . '</div>'
+			'<div>' . $codec->expand($body, Eab_Macro_Codec::FILTER_BODY) . '</div>'
 		);
 	}
 
