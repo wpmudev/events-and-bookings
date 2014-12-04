@@ -205,8 +205,8 @@ jQuery(function() {
 (function ($) {
 // API toggling
 function toggle_api_settings () {
-	if ($("#incsub_event-accept_api_logins").is(":checked")) $("#eab-settings-apis").show();
-	else $("#eab-settings-apis").hide();
+	if ($("#incsub_event-accept_api_logins").is(":checked")) $("#eab-settings-apis .eab-inside").show();
+	else $("#eab-settings-apis .eab-inside").hide();
 }
 
 // Appearance toggling
@@ -375,6 +375,69 @@ $(function () {
 	});
 
 });
+})(jQuery);
+
+// Main settings page tabbing
+(function ($) {
+
+if (!window.location.search.match('page=eab_settings')) return false; // Only on settings page
+if ($(window).width() < 640) return false; // Only if we have enough space
+
+function reveal_page (e) {
+	e.preventDefault();
+	e.stopPropagation();
+	var me = $(this),
+		box_id = me.attr('data-box_id'),
+		box = false
+	;
+	if (box_id) box = $("#" + box_id);
+	if (box_id && box_id.length) {
+		$("#eab-root-settings_nav h3").removeClass("active");
+		me.addClass("active");
+		$('.eab-metabox.postbox').hide();
+		box.show();
+	}
+}
+
+$(function () {
+	var boxes = $('.eab-metabox.postbox'),
+		box_root = $(".eab-metaboxcol.metabox-holder")
+	;
+	if (!boxes.length) return false;
+	
+	var root = $("#eab-root-settings_nav");
+	if (root.length) return false;
+	
+	box_root.append('<div id="eab-root-settings_nav"></div>');
+	root = $("#eab-root-settings_nav");
+
+	boxes.each(function () {
+		var me = $(this),
+			box_id = me.attr("id"),
+			title = me.find("h3.eab-hndle"),
+			new_title = title.clone()
+		;
+		if (box_id) {
+			new_title
+				.attr("data-box_id", box_id)
+				.on('click', reveal_page)
+			;
+			root.append(new_title);
+			me.hide();
+		}
+	});
+	
+	setTimeout(function () {
+		var first = root.find("h3:first");
+		if (first.length) {
+			box_root.addClass("tabbed");
+			var submit = box_root.siblings(".submit");
+			box_root.append(submit);
+			first.click();
+		}
+	}, 0);
+});
+
 })(jQuery);
 
 });

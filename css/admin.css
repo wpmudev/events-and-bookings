@@ -260,3 +260,27 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 .eab_deactivate_plugin {
     color: #BC0B0B;
 }
+
+
+.tabbed #eab-root-settings_nav {
+    width: 19%;
+    float: left;
+}
+.tabbed #eab-root-settings_nav h3 {
+    border: 1px solid #eee;
+    background: none repeat scroll 0 0 #fefefe;
+    cursor: pointer;
+}
+.tabbed #eab-root-settings_nav h3.active {
+    background: #2ea2cc;
+    border: 1px solid #2ea2cc;
+    color: white;
+}
+.tabbed .eab-metabox.postbox {
+    width: 80%;
+    float: right;
+}
+.tabbed .submit {
+    text-align: right;
+    clear: right;
+}
