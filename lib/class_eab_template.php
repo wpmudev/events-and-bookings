@@ -616,8 +616,15 @@ class Eab_Template {
 					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date"><var class="eab-date_format-date">' . $end_date_str . '</var></span> <span class="wpmudevevents-date_format-end_time"><var class="eab-date_format-time">' . date_i18n(get_option('time_format'), $end) . '</var></span>')
 				;
 			}
-			$time_date_start = esc_attr(date_i18n("Y-m-d\TH:i:sO", $start));
-			$time_date_end = esc_attr(date_i18n("Y-m-d\TH:i:sO", $end));
+			// Why, thank you `date_i18n` for working so well with properly parsing 'O' argument when offsets are set in UTC values... >.<
+			$gmt_offset = (float)get_option('gmt_offset');
+			$hour_tz = sprintf('%02d', abs((int)$gmt_offset));
+			$minute_offset = (abs($gmt_offset) - abs((int)$gmt_offset)) * 60;
+			$min_tz = sprintf('%02d', $minute_offset);
+			$timezone = ($gmt_offset > 0 ? '+' : '-') . $hour_tz . $min_tz;
+
+			$time_date_start = esc_attr(date_i18n("Y-m-d\TH:i:s", $start)) . $timezone;
+			$time_date_end = esc_attr(date_i18n("Y-m-d\TH:i:s", $end)) . $timezone;
 			$content .= apply_filters('eab-events-event_date_string', "<time itemprop='startDate' datetime='{$time_date_start}'>{$start_string}</time> <time itemprop='endDate' datetime='{$time_date_end}'>{$end_string}</time>", $event->get_id(), $start, $end);
 			/*
 			$content .= apply_filters('eab-events-event_date_string', sprintf(
