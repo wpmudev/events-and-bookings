@@ -658,6 +658,9 @@ class Eab_Api {
 					
 				</div>
 			</div>
+		<?php if (!$this->_data->get_option('accept_api_logins')) { ?>
+			<p><em><?php _e('To configure and accept API logins, please mark it as &quot;allowed&quot; in plugin settings', Eab_EventsHub::TEXT_DOMAIN); ?></em></p>
+		<?php } ?>
 	    </div>
 	    <?php 
 	    do_action('eab-settings-after_api_settings');
