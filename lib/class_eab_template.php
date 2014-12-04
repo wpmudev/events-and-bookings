@@ -231,7 +231,7 @@ class Eab_Template {
 
 	private static function get_admin_attendance_addition_form ($event, $statuses) {
 		if (!method_exists($event, 'get_id') || !is_array($statuses)) return false;
-		if ($event->is_paid()) return ''; // Won't deal with the paid events
+		if ($event->is_premium()) return ''; // Won't deal with the paid events
 
 		$content = '';
 
