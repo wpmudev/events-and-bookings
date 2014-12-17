@@ -477,21 +477,29 @@ class Eab_Events_FrontPageEditing {
 			$ret .= '</div>'; // eab-events-fpe-col_wrapper
 		}
 
-		/* Added by Ashok */
 		$featured_image = $event->get_featured_image_url();
 		$featured_image_id = (int)$event->get_featured_image_id();
-		$ret .= '<div class="eab-events-fpe-col_wrapper">';
+		if (current_user_can('upload_files')) {
+			/* Added by Ashok */
+			$ret .= '<div class="eab-events-fpe-col_wrapper">';
+				$ret .= '<label>' . __('Feature Image', Eab_EventsHub::TEXT_DOMAIN) . '</label>' .
+					'<br />' .
+					'<a href="#featured_image" class="eab-fpe-upload">' .
+					'<input type="hidden" id="eab-fpe-attach_id" name="" value="' . esc_url($featured_image) . '" />' .
+					'<input type="hidden" name="featured" value="' . esc_attr($featured_image_id) . '" />' .
+					'<img src="' . esc_url($featured_image) . '" id="eab-fpe-preview-upload" ' . (empty($featured_image) ? 'style="display:none"' : '') . ' />' .
+					'<br />' .
+					'<span>' . __('Change the featured image', Eab_EventsHub::TEXT_DOMAIN) . '</span>' .
+				'</a>';
+			$ret .= '</div>';
+			/* End of adding by Ashok */
+		} else if (!empty($featured_image_id) && !empty($featured_image)) {
+			$ret .= '<div class="eab-events-fpe-col_wrapper">';
 			$ret .= '<label>' . __('Feature Image', Eab_EventsHub::TEXT_DOMAIN) . '</label>' .
-				'<br />' .
-				'<a href="#featured_image" class="eab-fpe-upload">' .
-				'<input type="hidden" id="eab-fpe-attach_id" name="" value="' . esc_url($featured_image) . '" />' .
-				'<input type="hidden" name="featured" value="' . esc_attr($featured_image_id) . '" />' .
-				'<img src="' . esc_url($featured_image) . '" id="eab-fpe-preview-upload" ' . (empty($featured_image) ? 'style="display:none"' : '') . ' />' .
-				'<br />' .
-				'<span>' . __('Change the featured image', Eab_EventsHub::TEXT_DOMAIN) . '</span>' .
-			'</a>';
-		$ret .= '</div>';
-		/* End of adding by Ashok */
+				'<img src="' . esc_url($featured_image) . '" id="eab-fpe-preview-upload" />' .
+				'<input type="hidden" id="eab-fpe-attach_id" name="featured" value="' . esc_attr($featured_image_id) . '" />' .
+			'</div>';
+		}
 
 		// OK/Cancel
 		$ok_label = $event->get_id() ?  __('Update', Eab_EventsHub::TEXT_DOMAIN) : __('Publish', Eab_EventsHub::TEXT_DOMAIN);
