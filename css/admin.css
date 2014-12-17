@@ -240,7 +240,14 @@ input.error {
 border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 
 #eab_addons_hub {
-	line-height: 1.6em;
+    line-height: 1.6em;
+}
+#eab_addons_hub .filters {
+    font-size: .9em;
+}
+#eab_addons_hub .filters a.selected {
+    font-weight: bold;
+    color: #333;
 }
 
 #eab-add-more-rows .eab-event-remove_time {

@@ -380,8 +380,14 @@ $(function () {
 // Main settings page tabbing
 (function ($) {
 
+var MIN_SIZE = 768,
+	$win = $(window),
+	$submit = false
+;
+
 if (!window.location.search.match('page=eab_settings')) return false; // Only on settings page
-if ($(window).width() < 640) return false; // Only if we have enough space
+if ($win.width() < MIN_SIZE) return false; // Only if we have enough space
+if (!$(".wrap").is(".tabbable")) return false; // Allow override
 
 function reveal_page (e) {
 	e.preventDefault();
@@ -399,17 +405,28 @@ function reveal_page (e) {
 	}
 }
 
-$(function () {
+function boot () {
 	var boxes = $('.eab-metabox.postbox'),
 		box_root = $(".eab-metaboxcol.metabox-holder")
 	;
-	if (!boxes.length) return false;
+	$submit = $submit.length ? $submit : box_root.siblings(".submit")
+	if (!boxes.length) return;
 	
 	var root = $("#eab-root-settings_nav");
-	if (root.length) return false;
+	if (root.length) {
+		if ($win.width() < MIN_SIZE) {
+			box_root.removeClass("tabbed");
+			root.remove();
+			boxes.show();
+		}
+		box_root.append($submit);
+		return;
+	}
 	
 	box_root.append('<div id="eab-root-settings_nav"></div>');
 	root = $("#eab-root-settings_nav");
+
+	root.empty();
 
 	boxes.each(function () {
 		var me = $(this),
@@ -426,17 +443,13 @@ $(function () {
 			me.hide();
 		}
 	});
-	
-	setTimeout(function () {
-		var first = root.find("h3:first");
-		if (first.length) {
-			box_root.addClass("tabbed");
-			var submit = box_root.siblings(".submit");
-			box_root.append(submit);
-			first.click();
-		}
-	}, 0);
-});
+	box_root.append($submit);
+	root.find("h3:first").click();
+	box_root.addClass("tabbed");
+}
+
+$(boot);
+$win.on("resize", boot);
 
 })(jQuery);
 
