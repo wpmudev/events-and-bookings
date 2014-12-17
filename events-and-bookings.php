@@ -1845,6 +1845,11 @@ class Eab_EventsHub {
 		if (!class_exists('WpmuDev_HelpTooltips')) require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
 		$tips = new WpmuDev_HelpTooltips();
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+
+		$tabbable = !(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)
+			? 'tabbable'
+			: false
+		;
 		
 		$archive_tpl = file_exists(get_stylesheet_directory().'/archive-incsub_event.php') 
 			? get_stylesheet_directory() . '/archive-incsub_event.php'
@@ -1881,7 +1886,7 @@ class Eab_EventsHub {
 			
 		}
 	?>
-	<div class="wrap">
+	<div class="wrap <?php echo $tabbable; ?>">
 	    <div id="icon-events-general" class="icon32"><br/></div>
 	    <h2><?php _e('Events Settings', self::TEXT_DOMAIN); ?></h2>
 	    <div class="eab-note">
