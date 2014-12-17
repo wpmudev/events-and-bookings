@@ -5,6 +5,7 @@ Description: Allows you to quickly cancel your events and send a notification em
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Events
 */
 
 class Eab_Events_EventCancel {

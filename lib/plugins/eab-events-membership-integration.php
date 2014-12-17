@@ -5,6 +5,7 @@ Description: Allows Events+ to Integrate with our Membership plugin, so that mem
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.3
 Author: WPMU DEV
+AddonType: Integration
 */
 
 /*

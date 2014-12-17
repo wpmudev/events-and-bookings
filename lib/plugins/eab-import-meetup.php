@@ -5,6 +5,7 @@ Description: Allows importing of events from meetup.com, as well as learning the
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Integration
 */
 
 if (!class_exists('WpmuDev_Wp_Meetup')) {

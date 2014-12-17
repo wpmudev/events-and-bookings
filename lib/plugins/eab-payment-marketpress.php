@@ -5,6 +5,7 @@ Description: Allows you to integrate Events+ with MarketPress
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Integration
 */
 
 

@@ -5,6 +5,7 @@ Description: Redirects visitor from a selected page, post or event of the websit
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.25
 Author: WPMU DEV
+AddonType: Events
 */
 
 /*

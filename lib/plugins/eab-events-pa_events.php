@@ -5,6 +5,7 @@ Description: Allows you to create Public Announcement events, which will have no
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.1
 Author: WPMU DEV
+AddonType: Events
 */
 
 class Eab_Events_Pae {

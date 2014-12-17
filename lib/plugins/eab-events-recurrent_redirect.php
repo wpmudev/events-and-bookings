@@ -5,6 +5,7 @@ Description: Redirects from root instance to currently closest to active instanc
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.3
 Author: WPMU DEV
+AddonType: Events
 */
 
 class Eab_Events_RecurrentRootRedirect {

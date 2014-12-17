@@ -5,6 +5,7 @@ Description: Export your Event(s) in iCal format.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.1
 Author: WPMU DEV
+AddonType: Integration
 */
 
 /*

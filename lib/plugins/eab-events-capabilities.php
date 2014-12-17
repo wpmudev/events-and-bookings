@@ -5,6 +5,7 @@ Description: Tweak and edit access privileges for your Events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Integration
 */
 
 class Eab_Events_Capabilities {

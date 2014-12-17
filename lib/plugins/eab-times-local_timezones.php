@@ -4,8 +4,8 @@ Plugin Name: Local Timezones
 Description: Auto-converts your event dates and times for your visitors
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-AddonType: Events
 Author: WPMU DEV
+AddonType: Events
 */
 
 class Eab_Events_LocalTimezones {

@@ -5,6 +5,7 @@ Description: Generates a flexible countdown shortcode for the current or selecte
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.27
 Author: WPMU DEV
+AddonType: Events
 */
 
 /*

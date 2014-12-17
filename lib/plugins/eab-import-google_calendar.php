@@ -5,6 +5,7 @@ Description: Sync events from your Google Calendars. For now, only your regular 
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Integration
 */
 
 if (!class_exists('WpmuDev_Wp_Oauth')) require_once(EAB_PLUGIN_DIR . 'lib/class_wd_wpmu_oauth.php');

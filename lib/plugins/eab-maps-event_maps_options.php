@@ -4,8 +4,8 @@ Plugin Name: Events Maps Options
 Description: Maps will, by default, use the global settings for Google Maps plugin. Use this add-on to apply Events-specific settings.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-AddonType: Maps
 Author: WPMU DEV
+AddonType: Integration
 */
 
 class Eab_Maps_EventMapsOptions {
