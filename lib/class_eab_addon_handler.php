@@ -78,7 +78,8 @@ class Eab_AddonHandler {
 			'Description' => 'Description',
 			'Plugin URI' => 'Plugin URI',
 			'Version' => 'Version',
-			'Detail' => 'Detail'
+			'Detail' => 'Detail',
+			'Type' => 'AddonType'
 		);
 		return get_file_data($path, $default_headers, 'plugin');
 	}
@@ -111,44 +112,69 @@ class Eab_AddonHandler {
 		
 		$all = self::get_all_plugins();
 		$active = self::get_active_plugins();
-		$sections = array('thead');
+		$sections = array();
 
-		echo "<table class='widefat' id='eab_addons_hub'>";
-		echo '<thead>';
-		echo '<tr>';
-		echo '<th width="30%">' . __('Name', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
-		echo '<th>' . __('Description', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
-		echo '</tr>';
-		echo '<thead>';
-		echo "<tbody>";
+		$thead = "<table class='widefat' id='eab_addons_hub'>";
+		$thead .= '<thead>';
+		
+		$tbody = '<thead>';
+		$tbody .= "<tbody>";
 		foreach ($all as $plugin) {
 			$plugin_data = self::get_plugin_info($plugin);
-			if (!@$plugin_data['Name']) continue; // Require the name
+			if (empty($plugin_data['Name'])) continue; // Require the name
+			if (!empty($plugin_data['Type'])) $sections[] = $plugin_data['Type'];
+			
 			$is_active = in_array($plugin, $active);
-			echo "<tr>";
-			echo "<td width='30%'>";
-			echo '<b id="' . esc_attr($plugin) . '">' . $plugin_data['Name'] . '</b>';
-			echo "<br />";
-			echo ($is_active
+			
+			$tbody .= '<tr' . (!empty($plugin_data['Type']) ? ' data-type="' . sanitize_html_class($plugin_data['Type']) : '' ) . '"' . '>';
+			$tbody .= "<td width='30%'>";
+			$tbody .= '<b id="' . esc_attr($plugin) . '">' . $plugin_data['Name'] . '</b>';
+			$tbody .= "<br />";
+			$tbody .= ($is_active
 				?
 				'<a href="#deactivate" class="eab_deactivate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Deactivate', Eab_EventsHub::TEXT_DOMAIN) . '</a>'
 				:
 				'<a href="#activate" class="eab_activate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Activate', Eab_EventsHub::TEXT_DOMAIN) . '</a>'
 			);
-			echo "</td>";
-			echo '<td>' .
+			$tbody .= "</td>";
+			$tbody .= '<td>' .
 				$plugin_data['Description'] .
 				'<br />' .
 				sprintf(__('Version %s', Eab_EventsHub::TEXT_DOMAIN), $plugin_data['Version']) .
 				'&nbsp;|&nbsp;' .
 				sprintf(__('by %s', Eab_EventsHub::TEXT_DOMAIN), '<a href="' . $plugin_data['Plugin URI'] . '">' . $plugin_data['Author'] . '</a>');
-			if ( $plugin_data['Detail'] )
-				echo '&nbsp;' . $tips->add_tip( $plugin_data['Detail'] );
-			echo '</td>';
-			echo "</tr>";
+			if ($plugin_data['Detail']) {
+				$tbody .= '&nbsp;' . $tips->add_tip($plugin_data['Detail']);
+			}
+			$tbody .= '</td>';
+			$tbody .= "</tr>";
 		}
-		echo "</tbody>";
-		echo "</table>";
+		$tbody .= "</tbody>";
+		$tbody .= "</table>";
+
+		if (!(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)) {
+			$sections = array_values(array_unique($sections));
+			array_unshift($sections, '');
+			$links = array();
+			if (!empty($sections)) foreach ($sections as $sect) {
+				$type = !empty($sect) ? "data-type='{$sect}'" : 'class="selected"';
+				$name = !empty($sect) ? $sect : __('Show all', Eab_EventsHub::TEXT_DOMAIN);
+				$links[] = "<a href='#filter' {$type}>{$name}</a>";
+			}
+			if (!empty($links)) {
+				$thead .= '<tr><td class="filters" colspan="2">' . 
+					'<b>' . __('Filter', Eab_EventsHub::TEXT_DOMAIN) . ':</b> ' .
+					join(' | ', $links) . 
+				'</td></tr>';
+			}
+		}
+
+		$thead .= '<tr>';
+		$thead .= '<th width="30%">' . __('Name', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
+		$thead .= '<th>' . __('Description', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
+		$thead .= '</tr>';
+
+		echo $thead . $tbody;
 
 		echo <<<EOWdcpPluginJs
 <script type="text/javascript">
@@ -168,6 +194,21 @@ $(function () {
 		$.post(ajaxurl, {"action": "eab_deactivate_plugin", "plugin": plugin_id}, function (data) {
 			window.location = window.location;
 		});
+		return false;
+	});
+	$("#eab_addons_hub .filters a").click(function (e) {
+		e.preventDefault();
+		var type = $(this).attr("data-type"),
+			selector = '#eab_addons_hub tbody tr[data-type="' + type + '"]'
+		;
+		if (!type) {
+			$("#eab_addons_hub tbody tr").show();
+		} else {
+			$("#eab_addons_hub tbody tr").hide();
+			$(selector).show();
+		}
+		$("#eab_addons_hub .filters a").removeClass('selected');
+		$(this).addClass("selected");
 		return false;
 	});
 });
