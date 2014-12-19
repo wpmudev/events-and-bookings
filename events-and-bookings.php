@@ -2014,6 +2014,9 @@ class Eab_EventsHub {
 		</p>
 	    </form>
 	</div>
+<?php if (!empty($tabbable)) { ?>
+	<div class="eab-loading-cover <?php echo esc_attr($tabbable); ?>"><h1><?php _e('Please, hold on...', self::TEXT_DOMAIN); ?></h1></div>
+<?php } ?>
 	<?php
     }
 
