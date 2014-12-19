@@ -222,50 +222,54 @@ function create_login_interface ($me) {
 			};
 		} else if ($lnk.is(".wpmudevevents-login_link-twitter")) {
 			callback = function () {
-				var init_url = '//api.twitter.com/';
-				var twLogin = window.open(init_url, "twitter_login", "scrollbars=no,resizable=no,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,height=400,width=600");
+				var twLogin = window.open('', "twitter_login", "scrollbars=no,resizable=no,toolbar=no,location=no,directories=no,status=no,menubar=no,copyhistory=no,height=400,width=600");
+				twLogin.document.write(l10nEabApi.please_wait);
 				$.post(_eab_data.ajax_url, {
 					"action": "eab_get_twitter_auth_url",
 					"url": window.location.toString()
 				}, function (data) {
+					var cback = function () {
+						$(twLogin).off("unload", cback);
+						var tTimer = setInterval(function () {
+							try {
+								if (twLogin.location.hostname == window.location.hostname) {
+									// We're back!
+									var location = twLogin.location;
+									var search = '';
+									try { search = location.search; } catch (e) { search = ''; }
+									clearInterval(tTimer);
+									twLogin.close();
+									// change UI
+									$root.html('<img src="' + _eab_data.root_url + 'waiting.gif" /> ' + l10nEabApi.please_wait);
+									$.post(_eab_data.ajax_url, {
+										"action": "eab_twitter_login",
+										"secret": data.secret,
+										"data": search
+									}, function (data) {
+										var status = 0;
+										try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
+										if (!status) { // ... handle error
+											$root.remove();
+											$me.click();
+											return false;
+										}
+										// Get form if all went well
+										$.post(_eab_data.ajax_url, {
+											"action": "eab_get_form",
+											"post_id": post_id
+										}, function (data) {
+											$("body").append('<div id="eab-twitter_form">' + data + '</div>');
+											$("#eab-twitter_form").find("." + $me.removeClass("active").attr("class")).click();
+										});
+									});
+								}
+							} catch (e) {}
+						}, 300);
+					};
+					$(twLogin).on("unload", cback);
 					try {
 						twLogin.location = data.url;
 					} catch (e) { twLogin.location.replace(data.url); }
-					var tTimer = setInterval(function () {
-						try {
-							if (twLogin.location.hostname == window.location.hostname) {
-								// We're back!
-								var location = twLogin.location;
-								var search = '';
-								try { search = location.search; } catch (e) { search = ''; }
-								clearInterval(tTimer);
-								twLogin.close();
-								// change UI
-								$root.html('<img src="' + _eab_data.root_url + 'waiting.gif" /> ' + l10nEabApi.please_wait);
-								$.post(_eab_data.ajax_url, {
-									"action": "eab_twitter_login",
-									"secret": data.secret,
-									"data": search
-								}, function (data) {
-									var status = 0;
-									try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
-									if (!status) { // ... handle error
-										$root.remove();
-										$me.click();
-										return false;
-									}
-									// Get form if all went well
-									$.post(_eab_data.ajax_url, {
-										"action": "eab_get_form",
-										"post_id": post_id
-									}, function (data) {
-										$("body").append('<div id="eab-twitter_form">' + data + '</div>');
-										$("#eab-twitter_form").find("." + $me.removeClass("active").attr("class")).click();
-									});
-								});
-							}
-						} catch (e) {}
-					}, 300);
 				});
 				return false;
 			};
