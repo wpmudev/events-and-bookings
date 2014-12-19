@@ -1850,6 +1850,7 @@ class Eab_EventsHub {
 			? 'tabbable'
 			: false
 		;
+		$hide = !empty($tabbable) ? 'hide' : '';
 		
 		$archive_tpl = file_exists(get_stylesheet_directory().'/archive-incsub_event.php') 
 			? get_stylesheet_directory() . '/archive-incsub_event.php'
@@ -1886,7 +1887,7 @@ class Eab_EventsHub {
 			
 		}
 	?>
-	<div class="wrap <?php echo $tabbable; ?>">
+	<div class="wrap <?php echo esc_attr($tabbable); ?> <?php echo esc_attr($hide); ?>">
 	    <div id="icon-events-general" class="icon32"><br/></div>
 	    <h2><?php _e('Events Settings', self::TEXT_DOMAIN); ?></h2>
 	    <div class="eab-note">

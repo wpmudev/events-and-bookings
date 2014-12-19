@@ -290,6 +290,7 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 .tabbed .submit {
     text-align: right;
     clear: right;
+}
 
 .eab-loading-cover {
     display: none;
@@ -307,4 +308,6 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
     margin: 0; padding: 0;
     color: #ddd;
 }
+.wrap.tabbable.hide {
+    display: none;
 }

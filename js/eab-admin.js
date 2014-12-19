@@ -446,7 +446,9 @@ function boot () {
 	box_root.append($submit);
 	root.find("h3:first").click();
 	box_root.addClass("tabbed");
+
 	$(".eab-loading-cover.tabbable").remove();
+	$(".wrap.tabbable.hide").removeClass("hide");
 }
 
 $(boot);
