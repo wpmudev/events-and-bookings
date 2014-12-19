@@ -156,7 +156,7 @@ class Eab_Events_ManualPayments {
 		$tips = new WpmuDev_HelpTooltips();
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 		?>
-		<div id="eab-settings-paypal" class="eab-metabox postbox">
+		<div id="eab-settings-manual_payments" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Manual Payment settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 				<div class="eab-inside">
 					<div class="eab-settings-settings_item">

@@ -162,7 +162,7 @@ function send_email_non_paid_members_callback() {
 
 		$events = Eab_CollectionFactory::get_upcoming_events(eab_current_time(), array('posts_per_page' => 10));
 		?>
-<div id="eab-settings-eab_rsvps" class="eab-metabox postbox">
+<div id="eab-settings-eab_rsvps_non_paid" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Reminder Email settings for non paid members', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		 <div class="eab-settings-settings_item">
