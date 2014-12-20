@@ -527,7 +527,7 @@ class Eab_EventsHub {
 	    	    exit(0);
 		}
 		
-		if ($pay_to_email != @$eab_options['paypal_email']) {
+		if (strtolower($pay_to_email) != strtolower(@$eab_options['paypal_email'])) {
 		    header('HTTP/1.0 400 Bad Request');
 		    header('Content-type: text/plain; charset=UTF-8');
 		    print 'We were not expecting you. REF: PP3';
