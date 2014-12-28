@@ -291,6 +291,29 @@ $(function () {
 
 		return false;
 	});
+	$("#eab_addons_hub .filters .section.check .actions button").click(function (e) {
+		e.preventDefault();
+
+		var selection = $("#eab_addons_hub tbody tr :checkbox:checked"),
+			action = $(this).is(".eab-activate_selected") ? 'eab-activate-selected' : 'eab-deactivate-selected',
+			nag = $(this).attr("data-nag"),
+			plugins = []
+		;
+		if (!selection.length) return false;
+		selection.each(function () {
+			plugins.push($(this).val());
+		})
+		
+		if (!plugins.length) return false;
+		if (nag) {
+			if (!confirm(nag)) return false;
+		}
+		$.post(ajaxurl, {action: action, plugins: plugins}, function (data) {
+			window.location = window.location;
+		});
+
+		return false;
+	});
 });
 })(jQuery);
 </script>
