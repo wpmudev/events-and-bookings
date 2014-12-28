@@ -15,6 +15,9 @@ class Eab_AddonHandler {
 	private function _add_hooks () {
 		add_action('wp_ajax_eab_activate_plugin', array($this, 'json_activate_plugin'));
 		add_action('wp_ajax_eab_deactivate_plugin', array($this, 'json_deactivate_plugin'));
+		
+		add_action('wp_ajax_eab-activate-selected', array($this, 'json_activate_selected'));
+		add_action('wp_ajax_eab-deactivate-selected', array($this, 'json_deactivate_selected'));
 	}
 	
 	private function _load_active_plugins () {
@@ -37,6 +40,32 @@ class Eab_AddonHandler {
 
 	function json_deactivate_plugin () {
 		$status = $this->_deactivate_plugin($_POST['plugin']);
+		echo json_encode(array(
+			'status' => $status ? 1 : 0,
+		));
+		exit();
+	}
+
+	function json_activate_selected () {
+		$data = stripslashes_deep($_POST);
+		$plugins = $data['plugins'];
+		$status = true;
+		if (!empty($plugins) && is_array($plugins)) foreach($plugins as $plugin) {
+			$status = $status && $this->_activate_plugin($plugin);
+		}
+		echo json_encode(array(
+			'status' => $status ? 1 : 0,
+		));
+		exit();
+	}
+
+	function json_deactivate_selected () {
+		$data = stripslashes_deep($_POST);
+		$plugins = $data['plugins'];
+		$status = true;
+		if (!empty($plugins) && is_array($plugins)) foreach($plugins as $plugin) {
+			$status = $status && $this->_deactivate_plugin($plugin);
+		}
 		echo json_encode(array(
 			'status' => $status ? 1 : 0,
 		));
