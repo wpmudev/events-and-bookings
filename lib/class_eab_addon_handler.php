@@ -126,7 +126,6 @@ class Eab_AddonHandler {
 		foreach ($all as $plugin) {
 			$plugin_data = self::get_plugin_info($plugin);
 			if (empty($plugin_data['Name'])) continue; // Require the name
-			if (!empty($plugin_data['Type'])) $sections[] = $plugin_data['Type'];
 			
 			// Merge in the sections
 			$types = array();
@@ -137,8 +136,12 @@ class Eab_AddonHandler {
 			
 			$is_active = in_array($plugin, $active);
 			
-			$tbody .= '<tr' . (!empty($plugin_data['Type']) ? ' data-type="' . sanitize_html_class($plugin_data['Type']) : '' ) . '"' . '>';
 			$tbody .= '<tr' . (!empty($types) ? ' data-type="' . esc_attr(join(',', $types)) : '' ) . '" class="' . ($is_active ? 'active' : 'inactive') . '">';
+			if (!(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)) {
+				$tbody .= '<td>' .
+					'<input type="checkbox" value="' . esc_attr($plugin) . '" />' .
+				'</td>';
+			}
 			$tbody .= "<td width='30%'>";
 			$tbody .= '<b id="' . esc_attr($plugin) . '">' . $plugin_data['Name'] . '</b>';
 			$tbody .= "<br />";
@@ -173,16 +176,37 @@ class Eab_AddonHandler {
 				$name = !empty($sect) ? $sect : __('Show all', Eab_EventsHub::TEXT_DOMAIN);
 				$links[] = "<a href='#filter' {$type}>{$name}</a>";
 			}
+			$thead .= '<tr>';
+			$thead .= '<td class="filters" colspan="3">';
+			
 			if (!empty($links)) {
-				$thead .= '<tr><td class="filters" colspan="2">' . 
+				$thead .= '<span class="section type">' .
 					'<b>' . __('Filter', Eab_EventsHub::TEXT_DOMAIN) . ':</b> ' .
 					join(' | ', $links) . 
-				'</td></tr>';
+				'</span>';
 			}
+
+			$thead .= '<span class="section show">' .
+				'<b>' . __('Show', Eab_EventsHub::TEXT_DOMAIN) . ':</b> ' .
+				join(' | ', array(
+					'<a href="#show-all" class="selected">' . __('All', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
+					'<a href="#show-active" data-type="active">' . __('Active', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
+					'<a href="#show-inactive" data-type="inactive">' . __('Inactive', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
+				)) . 
+			'</span>';
+			
+			$thead .= '<span class="section actions">' .
+				'<button type="button" class="eab-activate_selected">' . __('Activate selected', Eab_EventsHub::TEXT_DOMAIN) . '</button>' .
+				'&nbsp;' .
+				'<button type="button" class="eab-deactivate_selected">' . __('Deactivate selected', Eab_EventsHub::TEXT_DOMAIN) . '</button>' .
+			'</span>';
+
+			$thead .= '</td>';
+			$thead .= '</tr>';
 		}
 
 		$thead .= '<tr>';
-		$thead .= '<th width="30%">' . __('Name', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
+		$thead .= '<th></th><th width="30%">' . __('Name', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
 		$thead .= '<th>' . __('Description', Eab_EventsHub::TEXT_DOMAIN) . '</th>';
 		$thead .= '</tr>';
 
@@ -208,10 +232,10 @@ $(function () {
 		});
 		return false;
 	});
-	$("#eab_addons_hub .filters a").click(function (e) {
+	$("#eab_addons_hub .filters .section.type a").click(function (e) {
 		e.preventDefault();
 		var type = $(this).attr("data-type"),
-			selector = '#eab_addons_hub tbody tr[data-type="' + type + '"]'
+			selector = '#eab_addons_hub tbody tr[data-type*="' + type + '"]'
 		;
 		if (!type) {
 			$("#eab_addons_hub tbody tr").show();
@@ -219,8 +243,32 @@ $(function () {
 			$("#eab_addons_hub tbody tr").hide();
 			$(selector).show();
 		}
-		$("#eab_addons_hub .filters a").removeClass('selected');
+		$("#eab_addons_hub .filters .section.type a").removeClass('selected');
 		$(this).addClass("selected");
+
+		$("#eab_addons_hub .filters .section.show a")
+			.addClass('selected')
+			.filter('[data-type]').removeClass("selected")
+		;
+
+		return false;
+	});
+	$("#eab_addons_hub .filters .section.show a").click(function (e) {
+		e.preventDefault();
+		var type = $(this).attr("data-type");
+		
+		$("#eab_addons_hub tbody tr").show();
+		if ('active' === type) $("#eab_addons_hub tbody tr.inactive").hide();
+		if ('inactive' === type) $("#eab_addons_hub tbody tr.active").hide();
+
+		$("#eab_addons_hub .filters .section.show a").removeClass('selected');
+		$(this).addClass("selected");
+
+		$("#eab_addons_hub .filters .section.type a")
+			.addClass('selected')
+			.filter('[data-type]').removeClass("selected")
+		;
+
 		return false;
 	});
 });
