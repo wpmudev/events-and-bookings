@@ -128,9 +128,17 @@ class Eab_AddonHandler {
 			if (empty($plugin_data['Name'])) continue; // Require the name
 			if (!empty($plugin_data['Type'])) $sections[] = $plugin_data['Type'];
 			
+			// Merge in the sections
+			$types = array();
+			if (!empty($plugin_data['Type'])) {
+				$types = array_map('trim', array_values(explode(',', $plugin_data['Type'])));
+				$sections = array_merge($sections, $types);
+			}
+			
 			$is_active = in_array($plugin, $active);
 			
 			$tbody .= '<tr' . (!empty($plugin_data['Type']) ? ' data-type="' . sanitize_html_class($plugin_data['Type']) : '' ) . '"' . '>';
+			$tbody .= '<tr' . (!empty($types) ? ' data-type="' . esc_attr(join(',', $types)) : '' ) . '" class="' . ($is_active ? 'active' : 'inactive') . '">';
 			$tbody .= "<td width='30%'>";
 			$tbody .= '<b id="' . esc_attr($plugin) . '">' . $plugin_data['Name'] . '</b>';
 			$tbody .= "<br />";
