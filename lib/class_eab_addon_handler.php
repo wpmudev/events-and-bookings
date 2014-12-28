@@ -173,33 +173,42 @@ class Eab_AddonHandler {
 			$links = array();
 			if (!empty($sections)) foreach ($sections as $sect) {
 				$type = !empty($sect) ? "data-type='{$sect}'" : 'class="selected"';
-				$name = !empty($sect) ? $sect : __('Show all', Eab_EventsHub::TEXT_DOMAIN);
+				$name = !empty($sect) ? $sect : __('All', Eab_EventsHub::TEXT_DOMAIN);
 				$links[] = "<a href='#filter' {$type}>{$name}</a>";
 			}
 			$thead .= '<tr>';
 			$thead .= '<td class="filters" colspan="3">';
 			
 			if (!empty($links)) {
-				$thead .= '<span class="section type">' .
+				$thead .= '<div class="section type">' .
 					'<b>' . __('Filter', Eab_EventsHub::TEXT_DOMAIN) . ':</b> ' .
 					join(' | ', $links) . 
-				'</span>';
+				'</div>';
 			}
 
-			$thead .= '<span class="section show">' .
+			$thead .= '<div class="section show">' .
 				'<b>' . __('Show', Eab_EventsHub::TEXT_DOMAIN) . ':</b> ' .
 				join(' | ', array(
 					'<a href="#show-all" class="selected">' . __('All', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
 					'<a href="#show-active" data-type="active">' . __('Active', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
 					'<a href="#show-inactive" data-type="inactive">' . __('Inactive', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
 				)) . 
-			'</span>';
-			
-			$thead .= '<span class="section actions">' .
-				'<button type="button" class="eab-activate_selected">' . __('Activate selected', Eab_EventsHub::TEXT_DOMAIN) . '</button>' .
-				'&nbsp;' .
-				'<button type="button" class="eab-deactivate_selected">' . __('Deactivate selected', Eab_EventsHub::TEXT_DOMAIN) . '</button>' .
-			'</span>';
+			'</div>';
+
+			$thead .= '<div class="section check">' .
+				'<b>' . __('Check', Eab_EventsHub::TEXT_DOMAIN) . ':</b> ' .
+				join(' | ', array(
+					'<a href="#check-none">' . __('None', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
+					'<a href="#check-active" data-type="active">' . __('Active', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
+					//'<a href="#check-inactive" data-type="inactive">' . __('Inactive', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
+					//'<a href="#check-all" data-type="all">' . __('All', Eab_EventsHub::TEXT_DOMAIN) . '</a>',
+				)) . 
+				'<div class="actions">' .
+					'<button type="button" class="eab-activate_selected" data-nag="' . esc_attr(__('You are about to activate multiple add-ons. Are you sure you want to do this?', Eab_EventsHub::TEXT_DOMAIN)) . '">' . __('Activate selected', Eab_EventsHub::TEXT_DOMAIN) . '</button>' .
+					'&nbsp;' .
+					'<button type="button" class="eab-deactivate_selected" data-nag="' . esc_attr(__('You are about to deactivate multiple add-ons. Are you sure you want to do this?', Eab_EventsHub::TEXT_DOMAIN)) . '">' . __('Deactivate selected', Eab_EventsHub::TEXT_DOMAIN) . '</button>' .
+				'</div>';
+			'</div>';
 
 			$thead .= '</td>';
 			$thead .= '</tr>';
@@ -268,6 +277,17 @@ $(function () {
 			.addClass('selected')
 			.filter('[data-type]').removeClass("selected")
 		;
+
+		return false;
+	});
+	$("#eab_addons_hub .filters .section.check a").click(function (e) {
+		e.preventDefault();
+		var type = $(this).attr("data-type");
+		
+		$("#eab_addons_hub tbody tr :checkbox").attr("checked", false);
+		if ('active' === type) $("#eab_addons_hub tbody tr.active :checkbox").attr("checked", true);
+		if ('inactive' === type) $("#eab_addons_hub tbody tr.inactive :checkbox").attr("checked", true);
+		if ('all' === type) $("#eab_addons_hub tbody tr :checkbox").attr("checked", true);
 
 		return false;
 	});
