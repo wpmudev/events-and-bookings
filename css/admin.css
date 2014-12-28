@@ -250,6 +250,11 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
     color: #333;
 }
 
+#eab_addons_hub .section {
+    float: left;
+    margin-right: 2em;
+}
+
 #eab-add-more-rows .eab-event-remove_time {
     font-style: normal;
     padding-left: 2em;
