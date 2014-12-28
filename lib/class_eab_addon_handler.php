@@ -85,6 +85,8 @@ class Eab_AddonHandler {
 	}
 
 	private function _activate_plugin ($plugin) {
+		if (!current_user_can('manage_options')) return false;
+		
 		$active = self::get_active_plugins();
 		if (in_array($plugin, $active)) return true; // Already active
 
@@ -93,6 +95,8 @@ class Eab_AddonHandler {
 	}
 
 	private function _deactivate_plugin ($plugin) {
+		if (!current_user_can('manage_options')) return false;
+		
 		$active = self::get_active_plugins();
 		if (!in_array($plugin, $active)) return true; // Already deactivated
 
