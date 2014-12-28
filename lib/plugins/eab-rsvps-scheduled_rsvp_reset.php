@@ -5,7 +5,7 @@ Description: Automatically resets RSVP status on your paid events after a precon
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
-AddonType: Events
+AddonType: Events, RSVP
 */
 
 class Eab_Rsvps_RsvpAutoReset {

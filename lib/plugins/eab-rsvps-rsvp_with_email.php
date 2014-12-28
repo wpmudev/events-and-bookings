@@ -5,7 +5,7 @@ Description: Allows your users to RSVP to events just with their e-mail address
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
-AddonType: Email
+AddonType: Email, RSVP
 */
 
 class Eab_Events_RsvpWithEmail {

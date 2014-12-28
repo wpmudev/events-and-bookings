@@ -5,7 +5,7 @@ Description: Automatically send a notification to yourself and/or event author w
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
-AddonType: Email
+AddonType: Email, RSVP
 */
 
 
