@@ -316,3 +316,17 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 .wrap.tabbable.hide {
     display: none;
 }
+
+/**
+ * Pointer tutorial fixes...
+ */
+.eab_tutorial-pointer .dismiss {
+    margin: 0 .7em;
+}
+.eab_tutorial-pointer .wp-pointer-buttons {
+    text-align: center;
+}
+.eab_tutorial-pointer .wp-pointer-buttons a {
+    float: none;
+    line-height: 2em;
+}
