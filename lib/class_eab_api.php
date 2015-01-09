@@ -612,23 +612,23 @@ class Eab_Api {
 					<input type="text" id="incsub_event-facebook-app_id" name="event_default[facebook-app_id]" value="<?php echo esc_attr($this->_data->get_option('facebook-app_id')); ?>" />
 					<span><?php echo $tips->add_tip(sprintf(__('Enter your App ID number here. If you don\'t have a Facebook App yet, you will need to create one <a href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://developers.facebook.com/apps')); ?></span>
 				</div>
-	
+
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-facebook-no_init" id="incsub_event_label-facebook-no_init"><?php _e('My pages already load scripts from Facebook', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 				    <input type="hidden" name="event_default[facebook-no_init]" value="" />
 					<input type="checkbox" id="incsub_event-facebook-no_init" name="event_default[facebook-no_init]" <?php print ($this->_data->get_option('facebook-no_init') ? "checked='checked'" : ''); ?> value="1" />
 					<span><?php echo $tips->add_tip(__('Check this box if you\'re already using Facebook scripts on your WordPress site. (If you\'re not sure what this means, leave the box unchecked).', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 				</div>
-	
+
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-twitter-app_id" id="incsub_event_label-twitter-app_id"><?php _e('Twitter Consumer Key', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 					<input type="text" id="incsub_event-twitter-app_id" name="event_default[twitter-app_id]" value="<?php echo esc_attr($this->_data->get_option('twitter-app_id')); ?>" />
-					<span><?php echo $tips->add_tip(sprintf(__('Enter your Twitter App ID number here. If you don\'t have a Twitter App yet, you will need to create one <a href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://dev.twitter.com/apps/new')); ?></span>
+					<span><?php echo $tips->add_tip(sprintf(__('Enter your Twitter App ID number here. If you don\'t have a Twitter App yet, you will need to create one <a href="%s">here</a>.<br />When setting up your app, please remember to also set the <b>Callback URL</b> to appropriate value (<code>%s</code>)', Eab_EventsHub::TEXT_DOMAIN), 'https://dev.twitter.com/apps/new', home_url())); ?></span>
 				</div>
-				    
+
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-twitter-app_secret" id="incsub_event_label-twitter-app_secret"><?php _e('Twitter Consumer Secret', Eab_EventsHub::TEXT_DOMAIN); ?></label>
-					<input type="text" id="incsub_event-twitter-app_secret" name="event_default[twitter-app_secret]" value="<?php echo esc_attr($this->_data->get_option('twitter-app_secret')); ?>" />
+					<input type="password" id="incsub_event-twitter-app_secret" name="event_default[twitter-app_secret]" value="<?php echo esc_attr($this->_data->get_option('twitter-app_secret')); ?>" />
 					<span><?php echo $tips->add_tip(__('Enter your Twitter App secret here.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 				</div>
 
