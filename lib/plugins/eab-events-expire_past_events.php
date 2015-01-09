@@ -34,15 +34,19 @@ class Eab_Events_ExpirePastEvents {
 		'</p></div>';
 		define('EAB_EXPIRY_CLASS_NAG_RENDERED', true);
 	}
-	
+
 	function expire_archived_events () {
 		if (class_exists('Eab_Events_ExpireMonthOldEvents')) return false;
 		$args = array();
 		$collection = new Eab_ArchivedCollection($args);
 		$events = $collection->to_collection();
 		foreach ($events as $event) {
-			$event->set_status(Eab_EventModel::STATUS_EXPIRED);
+			$this->_expire_event($event);
 		}
+	}
+
+	private function _expire_event ($event) {
+		$event->set_status(Eab_EventModel::STATUS_EXPIRED);
 	}
 }
 

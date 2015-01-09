@@ -261,14 +261,15 @@ class Eab_OrganizerCollection extends Eab_Collection {
  * but not yet expired.
  */
 class Eab_OldCollection extends Eab_TimedCollection {
-	
+
 	public function build_query_args ($args) {
-		
+
 		$args = array_merge(
 			$args,
 			array(
 			 	'post_type' => 'incsub_event',
-				'suppress_filters' => false, 
+				'post_status' => 'any',
+				'suppress_filters' => false,
 				'posts_per_page' => EAB_OLD_EVENTS_EXPIRY_LIMIT,
 				'meta_query' => array(
 					array(
@@ -292,13 +293,14 @@ class Eab_OldCollection extends Eab_TimedCollection {
  * All archived events
  */
 class Eab_ArchivedCollection extends Eab_Collection {
-	
+
 	public function build_query_args ($args) {
-		
+
 		$args = array_merge(
 			$args,
 			array(
 			 	'post_type' => 'incsub_event',
+				'post_status' => 'any',
 				'posts_per_page' => -1,
 				'meta_query' => array(
 					array(
@@ -356,15 +358,29 @@ class Eab_AllRecurringChildrenCollection extends Eab_Collection {
 	}
 }
 
+class Eab_ArchivedRecurringChildrenCollection extends Eab_AllRecurringChildrenCollection {
+	public function build_query_args ($arg) {
+		$args = parent::build_query_args($arg);
+		$args['meta_query'] = array(
+			array(
+				'key' => 'incsub_event_status',
+				'value' => Eab_EventModel::STATUS_ARCHIVED,
+			),
+		);
+		return $args;
+	}
+
+}
+
 
 /**
  * Factory class for spawning collections.
  * Pure static class.
  */
 class Eab_CollectionFactory {
-	
+
 	private function __construct () {}
-	
+
 	/**
 	 * Upcoming events query factory method
 	 * @return object Eab_UpcomingCollection instance

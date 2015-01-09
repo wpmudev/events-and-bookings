@@ -53,10 +53,9 @@ abstract class WpmuDev_DatedItem {
 	 */
 	public function get_last_end_date () {
 		$dates = $this->get_end_dates();
-		$idx = count($dates);
-		return isset($dates[$idx]) ? $dates[$idx] : false;
+		return end($dates);
 	}
-	
+
 	/**
 	 * Gets indexed start date timestamp.
 	 * @param int Date index
