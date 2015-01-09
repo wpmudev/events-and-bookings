@@ -1,6 +1,8 @@
 ;(function ($) {
 
-function create_interface () {
+function create_interface (e) {
+	if (e && e.preventDefault) e.preventDefault();
+	
 	if ($("#eab-rsvps-rsvp_with_email-wrapper").length) {
 		$("#eab-rsvps-rsvp_with_email-wrapper").remove();
 	}
