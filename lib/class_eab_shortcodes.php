@@ -278,6 +278,7 @@ class Eab_Shortcodes extends Eab_Codec {
 
 		if ($args['paged']) {
 			$requested_page = get_query_var('page');
+			$requested_page = $requested_page ? $requested_page : get_query_var('paged');
 			$args['page'] = $requested_page ? $requested_page : $args['page'];
 		}
 
