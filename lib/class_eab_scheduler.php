@@ -4,24 +4,24 @@
  * Performs scheduled operations against events.
  */
 class Eab_Scheduler {
-	
+
 	private function __construct () {
-		
+
 	}
-	
+
 	public static function serve () {
 		$me = new Eab_Scheduler;
 		$me->_add_hooks();
 	}
-	
+
 	private function _add_hooks () {
 		add_action('eab_scheduled_jobs', array($this, 'archive_old_events'));
-		
+
 		if (!wp_next_scheduled('eab_scheduled_jobs')) {
 			wp_schedule_event(eab_current_time(), 'hourly', 'eab_scheduled_jobs');
 		}
 	}
-	
+
 	/**
 	 * Sets status of old events to STATUS_ARCHIVED
 	 */

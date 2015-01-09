@@ -4,12 +4,12 @@
  * Abstract collection root class.
  */
 abstract class WpmuDev_Collection {
-	
+
 	/**
 	 * Holds a WP_Query instance.
 	 */
 	private $_query;
-	
+
 	/**
 	 * Constructs WP_Query object with overriden arugment set.
 	 * NEVER NEVER EVER call this directly. Use Factory instead.
@@ -19,14 +19,14 @@ abstract class WpmuDev_Collection {
 		$query = $this->build_query_args($args);
 		$this->_query = new WP_Query($query);
 	}
-	
+
 	/**
 	 * Returns a WP_Query instance.
 	 */
 	public function to_query () {
 		return apply_filters('wpmudev-query', $this->_query);
 	}
-	
+
 	abstract public function build_query_args ($args);
 	abstract public function to_collection ();
 }
@@ -35,7 +35,7 @@ abstract class WpmuDev_Collection {
  * Abstract Event collection root class.
  */
 abstract class Eab_Collection extends WpmuDev_Collection {
-	
+
 	/**
 	 * Converts WP_Query result set into an array of Eab_EventModel objects.
 	 * @return array
@@ -57,9 +57,9 @@ abstract class Eab_Collection extends WpmuDev_Collection {
  * General purpose time-restricted collection.
  */
 abstract class Eab_TimedCollection extends Eab_Collection {
-	
+
 	protected $_timestamp;
-	
+
 	/**
 	 * NEVER NEVER EVER call this directly. Use Factory instead.
 	 */
@@ -68,11 +68,11 @@ abstract class Eab_TimedCollection extends Eab_Collection {
 		$query = $this->build_query_args($args);
 		parent::__construct($query);
 	}
-	
+
 	public function get_timestamp () {
 		return $this->_timestamp;
 	}
-	
+
 }
 
 
@@ -91,19 +91,19 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 	public function propagate_direction_filter ($direction) {
 		return apply_filters('eab-collection-date_ordering_direction', $direction);
 	}
-	
+
 	public function build_query_args ($args) {
 		$time = $this->get_timestamp();
 		$year = (int)date('Y', $time);
 		$month = date('m', $time);
 		$time = strtotime("{$year}-{$month}-01");
-		
+
 		$forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
 		if (!isset($args['incsub_event'])) { // If not single
 			$forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
 		}
 		$forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
-		
+
 		$start_month = $month ? sprintf("%02d", $month) : date('m');
 		if ($start_month < 12) {
 			$end_month = sprintf("%02d", (int)$month+1);
@@ -112,15 +112,15 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 			$end_month = '01';
 			$end_year = $year+1;
 		}
-		
-		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);		
-		
+
+		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);
+
 		$args = array_merge(
 			$args,
 			array(
-			 	'post_type' => 'incsub_event', 
+			 	'post_type' => 'incsub_event',
 			 	'post_status' => array('publish', Eab_EventModel::RECURRENCE_STATUS),
-				'suppress_filters' => false, 
+				'suppress_filters' => false,
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_start',
@@ -172,14 +172,14 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 		// Changes by Hakan
 		// Commented lines were not removed intentionally.
 		$time = $this->get_timestamp();
-		
+
 		$forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
 		if (!isset($args['incsub_event'])) { // If not single
 			$forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
 		}
 		$forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
 
-		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;	
+		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;
 
 		$weeks = apply_filters('eab-collection-upcoming_weeks-week_number', EAB_COLLECTION_UPCOMING_WEEKS_COUNT);
 		$weeks = is_numeric($weeks) ? $weeks : self::WEEK_COUNT;
@@ -187,9 +187,9 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 		$args = array_merge(
 			$args,
 			array(
-			 	'post_type' => 'incsub_event', 
+			 	'post_type' => 'incsub_event',
 			 	'post_status' => array('publish', Eab_EventModel::RECURRENCE_STATUS),
-				'suppress_filters' => false, 
+				'suppress_filters' => false,
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_start',
@@ -220,7 +220,7 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
  * Popular (most RSVPd) events collection implementation.
  */
 class Eab_PopularCollection extends Eab_Collection {
-	
+
 	public function build_query_args ($args) {
 		global $wpdb;
 		$result = $wpdb->get_col("SELECT event_id, COUNT(event_id) as cnt FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE status IN ('yes', 'maybe') GROUP BY event_id ORDER BY cnt DESC");
@@ -234,7 +234,7 @@ class Eab_PopularCollection extends Eab_Collection {
 			)
 		);
 		return $args;
-	}	
+	}
 }
 
 
@@ -242,7 +242,7 @@ class Eab_PopularCollection extends Eab_Collection {
  * Events organized by the user
  */
 class Eab_OrganizerCollection extends Eab_Collection {
-	
+
 	public function build_query_args ($arg) {
 		$arg = (int)$arg;
 		$args = array(
@@ -252,7 +252,7 @@ class Eab_OrganizerCollection extends Eab_Collection {
 			'posts_per_page' => EAB_OLD_EVENTS_EXPIRY_LIMIT,
 		);
 		return $args;
-	}	
+	}
 }
 
 /**
@@ -318,9 +318,9 @@ class Eab_ArchivedCollection extends Eab_Collection {
  * All expired events
  */
 class Eab_ExpiredCollection extends Eab_Collection {
-	
+
 	public function build_query_args ($original) {
-		
+
 		$args = array_merge(
 			$original,
 			array(
@@ -340,10 +340,10 @@ class Eab_ExpiredCollection extends Eab_Collection {
 }
 
 class Eab_AllRecurringChildrenCollection extends Eab_Collection {
-	
+
 	public function build_query_args ($arg) {
 		if (!$arg instanceof WpmuDev_DatedVenuePremiumModel) return $arg;
-		$status = $arg->is_trashed() 
+		$status = $arg->is_trashed()
 			? WpmuDev_RecurringDatedItem::RECURRENCE_TRASH_STATUS
 			: WpmuDev_RecurringDatedItem::RECURRENCE_STATUS
 		;
@@ -389,7 +389,7 @@ class Eab_CollectionFactory {
 		$me = new Eab_UpcomingCollection($timestamp, $args);
 		return $me->to_query();
 	}
-	
+
 	/**
 	 * Upcoming events factory method
 	 * @return array Upcoming events list
@@ -416,7 +416,7 @@ class Eab_CollectionFactory {
 		$me = new Eab_UpcomingWeeksCollection($timestamp, $args);
 		return $me->to_collection();
 	}
-	
+
 	/**
 	 * Old events query factory method.
 	 * @return object Eab_OldCollection instance
@@ -425,7 +425,7 @@ class Eab_CollectionFactory {
 		$me = new Eab_OldCollection($timestamp, $args);
 		return $me->to_query();
 	}
-	
+
 	/**
 	 * Old events factory method
 	 * @return array Old events list
@@ -443,7 +443,7 @@ class Eab_CollectionFactory {
 		$me = new Eab_PopularCollection($args);
 		return $me->to_query();
 	}
-	
+
 	/**
 	 * Popular events factory method
 	 * @return array Popular events list
@@ -452,16 +452,16 @@ class Eab_CollectionFactory {
 		$me = new Eab_PopularCollection($args);
 		return $me->to_collection();
 	}
-	
+
 	public static function get_all_recurring_children_events ($event) {
 		$me = new Eab_AllRecurringChildrenCollection($event);
 		return $me->to_collection();
-	} 
-	
+	}
+
 	public static function get_user_organized_events ($user_id) {
 		$me = new Eab_OrganizerCollection($user_id);
 		return $me->to_collection();
-	} 
+	}
 
 	public static function get_expired_events ($args=array()) {
 		$me = new Eab_ExpiredCollection($args);

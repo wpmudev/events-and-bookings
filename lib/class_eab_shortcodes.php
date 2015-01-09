@@ -1,7 +1,7 @@
 <?php
 
 class Eab_Shortcodes extends Eab_Codec {
-	
+
 	protected $_shortcodes = array (
 		'calendar' => 'eab_calendar',
 		'archive' => 'eab_archive',
@@ -10,7 +10,7 @@ class Eab_Shortcodes extends Eab_Codec {
 		'events_map' => 'eab_events_map',
 		'my_events' => 'eab_my_events',
 	);
-	
+
 	public static function serve () {
 		$me = new Eab_Shortcodes;
 		$me->_register();
@@ -24,10 +24,10 @@ class Eab_Shortcodes extends Eab_Codec {
 	 */
 	function process_events_map_shortcode ($args=array(), $content=false) {
 		if (!class_exists('AgmMapModel') || !class_exists('AgmMarkerReplacer')) return $content;
-		
+
 		$map_args = $args;
 		$args = $this->_preparse_arguments($args, array(
-		// Date arguments	
+		// Date arguments
 			'relative_date' => false, // A date relative to _now_ or to date argument - using a strtotime string
 			'date' => false, // Starting date - default to now
 			'lookahead' => false, // Don't use default monthly page - use weeks count instead
@@ -82,7 +82,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			$model = new AgmMapModel;
 			$raw_maps = $model->get_custom_maps($events->query);
 			if (empty($raw_maps)) return $content;
-			
+
 			foreach ($raw_maps as $key => $map) {
 				if (empty($map['markers']) || count($map['markers']) > 1) continue;
 				$event = !empty($map['post_ids']) && !empty($map['post_ids'][0])
@@ -140,7 +140,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				$maps[] = $map;
 			}
 		}
-		
+
 		if (!$maps) return $content;
 
 		if (!is_array($map_args)) $map_args = array();
@@ -174,7 +174,7 @@ class Eab_Shortcodes extends Eab_Codec {
 		);
 		return $help;
 	}
-	
+
 	/**
 	 * Calendar shortcode handler.
 	 */
@@ -208,9 +208,9 @@ class Eab_Shortcodes extends Eab_Codec {
 		}
 
 		$query = $this->_to_query_args($args);
-		
-		$events = ($args['network'] && is_multisite()) 
-			? Eab_Network::get_upcoming_events(30) 
+
+		$events = ($args['network'] && is_multisite())
+			? Eab_Network::get_upcoming_events(30)
 			: Eab_CollectionFactory::get_upcoming_events($args['date'], $query)
 		;
 
@@ -249,14 +249,14 @@ class Eab_Shortcodes extends Eab_Codec {
 		);
 		return $help;
 	}
-	
+
 	/**
 	 * Archive shortcode handler.
 	 */
 	function process_archive_shortcode ($args=array(), $content=false) {
 		$args = $this->_preparse_arguments($args, array(
 			'network' => false, // Query type
-		// Date arguments	
+		// Date arguments
 			'date' => false, // Starting date - default to now
 			'relative_date' => false,
 			'lookahead' => false, // Don't use default monthly page - use weeks count instead
@@ -374,7 +374,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'override_styles' => false,
 			'override_scripts' => false,
 		));
-		
+
 		$query = $this->_to_query_args($args);
 		$events = Eab_CollectionFactory::get_expired_events($query);
 
@@ -404,7 +404,7 @@ class Eab_Shortcodes extends Eab_Codec {
 		);
 		return $help;
 	}
-	
+
 	/**
 	 * Single event shortcode handler.
 	 */
@@ -431,7 +431,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			if (isset($q->posts[0])) $event = new Eab_EventModel($q->posts[0]);
 		}
 		if (!$event) return $content;
-		
+
 		$output = Eab_Template::util_apply_shortcode_template($event, $args);
 		$output = $output ? $output : $content;
 

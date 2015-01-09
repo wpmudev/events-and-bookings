@@ -13,19 +13,19 @@ Detail: Your <em>archived</em> events will be shown in archives, but visitors wo
 */
 
 class Eab_Events_ExpirePastEvents {
-	
+
 	private function __construct () {}
-	
+
 	public static function serve () {
 		$me = new Eab_Events_ExpirePastEvents;
 		$me->_add_hooks();
 	}
-	
+
 	private function _add_hooks () {
 		add_action('admin_notices', array($this, 'show_nags'));
 		add_action('eab_scheduled_jobs', array($this, 'expire_archived_events'), 99);
 	}
-	
+
 	function show_nags () {
 		if (!class_exists('Eab_Events_ExpireMonthOldEvents')) return false;
 		if (defined('EAB_EXPIRY_CLASS_NAG_RENDERED')) return false;

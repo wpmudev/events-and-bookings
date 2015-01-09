@@ -1,21 +1,21 @@
 <?php
 
 abstract class WpmuDev_DatedItem {
-	
+
 	/**
 	 * Packs event start dates as an array of (string)MySQL dates.
-	 * @return array Start dates. 
+	 * @return array Start dates.
 	 */
 	abstract public function get_start_dates ();
 	abstract public function has_no_start_time ($key=0);
-	
+
 	/**
 	 * Packs event end dates as an array of (string)MySQL dates.
-	 * @return array End dates. 
+	 * @return array End dates.
 	 */
 	abstract public function get_end_dates ();
 	abstract public function has_no_end_time ($key=0);
-	
+
 	/**
 	 * Gets indexed start date as (string)MySQL date.
 	 * Calls get_start_dates() if needed.
@@ -26,7 +26,7 @@ abstract class WpmuDev_DatedItem {
 		$dates = $this->get_start_dates();
 		return isset($dates[$idx]) ? $dates[$idx] : false;
 	}
-	
+
 	/**
 	 * Gets indexed start date timestamp.
 	 * @param int Date index
@@ -76,32 +76,32 @@ abstract class WpmuDev_DatedItem {
 
 
 abstract class WpmuDev_RecurringDatedItem extends WpmuDev_DatedItem {
-	
+
 	const RECURRANCE_DAILY = 'daily';
 	const RECURRANCE_WEEKLY = 'weekly';
 	const RECURRANCE_WEEK_COUNT = 'week_count';
 	const RECURRANCE_DOW = 'dow';
 	const RECURRANCE_MONTHLY = 'monthly';
 	const RECURRANCE_YEARLY = 'yearly';
-	
+
 	const RECURRENCE_STATUS = 'recurrent';
 	const RECURRENCE_TRASH_STATUS = 'recurrent_trash';
-	
+
 	/**
 	 * @return array Hash of supported recurrance items and their labels
 	 */
 	abstract public function get_supported_recurrence_intervals ();
-	
+
 	/**
 	 * @return array A list of instances occuring between start and end dates.
 	 */
 	abstract public function spawn_recurring_instances ($start, $end, $interval, $time_parts); // @TODO: REFACTOR
-	
+
 	/**
 	 * @return mixed Recurrence interval (see constants)
 	 */
 	abstract public function get_recurrence ();
-	
+
 	/**
 	 * @param mixed $key See constants. Optional recurrence constant. If not passed, will check if the item recurs at all.
 	 * @return bool
@@ -119,25 +119,25 @@ abstract class WpmuDev_RecurringDatedItem extends WpmuDev_DatedItem {
 
 
 abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
-	
+
 	const VENUE_AS_ADDRESS = 'address';
 	const VENUE_AS_MAP = 'map';
-	
+
 	/**
 	 * Pack venue info, and return it.
 	 * Venue type agnostic.
 	 * @return string Venue
 	 */
 	abstract public function get_venue ();
-	
+
 	/**
 	 * Does the event has venue info set?
 	 * @return bool
 	 */
 	public function has_venue () {
-		return $this->get_venue() ? true : false; 
+		return $this->get_venue() ? true : false;
 	}
-	
+
 	/**
 	 * Returns venue as requested type.
 	 * @param mixed $as Venue type (see constants)
@@ -149,7 +149,7 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 		$venue = $this->get_venue();
 		return (self::VENUE_AS_ADDRESS == $as) ? $this->_venue_to_address($venue) : $this->_venue_to_map($venue, $args);
 	}
-	
+
 	/**
 	 * Is the event venue a map?
 	 * @param string $venue Optional venue
@@ -183,7 +183,7 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 			: false
 		;
 	}
-	
+
 	/**
 	 * Convert venue map to address.
 	 * @param string $venue Venue
@@ -194,7 +194,7 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 		$map = $this->_get_venue_map($venue);
 		return @$map['markers'][0]['title'];
 	}
-	
+
 	/**
 	 * Venue address getting dispatcher.
 	 * @param string $venue Venue
@@ -204,7 +204,7 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 		$venue = $venue ? $venue : $this->get_venue();
 		return $this->has_venue_map($venue) ? $this->_venue_map_to_address($venue) : $venue;
 	}
-	
+
 	/**
 	 * Get venue map tag.
 	 * @param string $venue Venue
@@ -234,20 +234,20 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 		} else if (!isset($matches[1]) || !isset($matches[1][0])) return false;
 		return $map_id ? $map_id : $matches[1][0];
 	}
-	
+
 	/**
 	 * Get map object.
 	 * @param string $venue Venue
 	 * @param array $args Optional map overrides
 	 * @return object Map object
 	 */
-	private function _get_venue_map ($venue, $args=array()) { 
+	private function _get_venue_map ($venue, $args=array()) {
 		$venue = $venue ? $venue : $this->get_venue();
 		if (!class_exists('AgmMapModel')) return $venue;
-		
+
 		$map_id = $this->_get_venue_map_id($venue);
 		if (!$map_id) return $venue;
-		
+
 		$model = new AgmMapModel();
 
 		return $model->get_map($map_id);
@@ -257,7 +257,7 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 
 
 abstract class WpmuDev_DatedVenuePremiumItem extends WpmuDev_DatedVenueItem {
-	
+
 	/**
 	 * Does the event require payment?
 	 * @return bool
@@ -265,21 +265,21 @@ abstract class WpmuDev_DatedVenuePremiumItem extends WpmuDev_DatedVenueItem {
 	public function is_premium () {
 		return $this->get_price() ? true : false;
 	}
-	
+
 	/**
 	 * Packs price meta info and returns it.
 	 * @return price
 	 */
 	abstract public function get_price ();
-	
+
 	abstract public function user_paid ($user_id=false);
 }
 
 
 abstract class WpmuDev_DatedVenuePremiumModel extends WpmuDev_DatedVenuePremiumItem {
-	
+
 	const POST_STATUS_TRASH = 'trash';
-	
+
 	abstract public function get_id();
 	abstract public function get_title();
 	abstract public function get_author();
@@ -294,35 +294,35 @@ abstract class WpmuDev_DatedVenuePremiumModel extends WpmuDev_DatedVenuePremiumI
 
 
 class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
-	
+
 	const POST_TYPE = 'incsub_event';
-	
+
 	const STATUS_OPEN = 'open';
 	const STATUS_CLOSED = 'closed';
 	const STATUS_ARCHIVED = 'archived';
 	const STATUS_EXPIRED = 'expired';
-	
+
 	const BOOKING_YES = 'yes';
 	const BOOKING_MAYBE = 'maybe';
 	const BOOKING_NO = 'no';
-	
+
 	private $_event_id;
 	private $_event;
-	
+
 	private $_start_dates;
 	private $_no_start_dates;
 	private $_end_dates;
 	private $_no_end_dates;
-	
+
 	private $_venue;
 	private $_price;
 	private $_status;
-	
+
 	public function __construct ($post=false) {
 		$this->_event_id = is_object($post) ? (int)@$post->ID : $post;
 		$this->_event = $post;
 	}
-	
+
 	/**
 	 * General purpose get_* override.
 	 * Used for getting post properties.
@@ -338,7 +338,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return false;
 	}
 	*/
-	
+
 	public function get_id () {
 		return $this->_event_id;
 	}
@@ -393,7 +393,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			: false
 		;
 	}
-	
+
 	public function get_type () {
 		return !empty($this->_event)
 			? $this->_event->post_type
@@ -463,7 +463,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		}
 		return isset($this->_no_start_dates[$key]) ? $this->_no_start_dates[$key] : false;
 	}
-	
+
 	public function has_no_end_time ($key=0) {
 		if (empty($this->_no_end_dates) && !is_array($this->_no_end_dates)) {
 			$raw = get_post_meta($this->get_id(), 'incsub_event_no_end');
@@ -472,28 +472,28 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		}
 		return isset($this->_no_end_dates[$key]) ? $this->_no_end_dates[$key] : false;
 	}
-	
+
 	/**
 	 * Packs event start dates as an array of (string)MySQL dates.
-	 * @return array Start dates. 
+	 * @return array Start dates.
 	 */
 	public function get_start_dates () {
 		if ($this->_start_dates) return $this->_start_dates;
 		$this->_start_dates = get_post_meta($this->get_id(), 'incsub_event_start');
 		return $this->_start_dates;
 	}
-	
+
 	/**
 	 * Packs event end dates as an array of (string)MySQL dates.
-	 * @return array End dates. 
+	 * @return array End dates.
 	 */
 	public function get_end_dates () {
 		if ($this->_end_dates) return $this->_end_dates;
 		$this->_end_dates = get_post_meta($this->get_id(), 'incsub_event_end');
 		return $this->_end_dates;
 	}
-	
-	
+
+
 /* ----- Recurrence methods ----- */
 
 	public function get_supported_recurrence_intervals () {
@@ -506,23 +506,23 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			self::RECURRANCE_YEARLY => __('Year', Eab_EventsHub::TEXT_DOMAIN),
 		);
 	}
-	
+
 	public function get_recurrence () {
 		return get_post_meta($this->get_id(), 'eab_event_recurring', true);
 	}
-	
+
 	public function get_recurrence_parts () {
 		return get_post_meta($this->get_id(), 'eab_event_recurrence_parts', true);
 	}
-	
+
 	public function get_recurrence_starts () {
 		return get_post_meta($this->get_id(), 'eab_event_recurrence_starts', true);
 	}
-	
+
 	public function get_recurrence_ends () {
 		return get_post_meta($this->get_id(), 'eab_event_recurrence_ends', true);
 	}
-	
+
 	protected function _get_recurring_children_ids () {
 		$events = Eab_CollectionFactory::get_all_recurring_children_events($this);
 		$ids = array();
@@ -531,7 +531,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		}
 		return $ids;
 	}
-	
+
 	public function trash_recurring_instances () {
 		global $wpdb;
 		$ids = $this->_get_recurring_children_ids();
@@ -545,7 +545,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$id_str = join(',', $ids);
 		$wpdb->query("UPDATE {$wpdb->posts} SET post_status='" . self::RECURRENCE_STATUS . "' WHERE ID IN ({$id_str})");
 	}
-	
+
 	public function delete_recurring_instances () {
 		global $wpdb;
 		$ids = $this->_get_recurring_children_ids();
@@ -553,7 +553,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$wpdb->query("DELETE FROM {$wpdb->posts} WHERE ID IN ({$id_str})");
 		$wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE post_id IN ({$id_str})");
 	}
-	
+
 	public function spawn_recurring_instances ($start, $end, $interval, $time_parts) {
 		$old_post_ids = false;
 		if ($this->is_recurring()) {
@@ -584,12 +584,12 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			__('Invalid end boundary after start: [%s] - [%s]', Eab_EventsHub::TEXT_DOMAIN),
 			$start, $end
 		));
-		
+
 		$instances = $this->_get_recurring_instances_timestamps($start, $end, $interval, $time_parts);
-	
+
 		$duration = (float)@$time_parts['duration'];
 		$duration = $duration ? $duration : 1;
-		
+
 		$venue = $this->get_venue();
 		$creation_time = date("Y-m-d H:i:s", eab_current_time());
 		foreach ($instances as $key => $instance) {
@@ -609,7 +609,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 // Also propagate discussion settings
 			if (!empty($this->_event->comment_status)) $post['comment_status'] = $this->_event->comment_status;
 			if (!empty($this->_event->ping_status)) $post['ping_status'] = $this->_event->ping_status;
-			
+
 			global $wpdb;
 			if (false !== $wpdb->insert($wpdb->posts, $post)) {
 				$post_id = $wpdb->insert_id;
@@ -623,7 +623,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 					wp_set_post_terms($post_id, $event_cats, 'eab_events_category', false);
 					do_action('eab-events-recurrent_event_child-assigned_taxonomies', $post_id, $event_cats);
 				}
-				
+
 				update_post_meta($post_id, 'incsub_event_start', date("Y-m-d H:i:s", $instance));
 				update_post_meta($post_id, 'incsub_event_end', date("Y-m-d H:i:s", $instance + ($duration * 3600)));
 				update_post_meta($post_id, 'incsub_event_venue', $venue);
@@ -659,7 +659,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		global $wpdb;
 		return $wpdb->query($sql);
 	}
-	
+
 	protected function _get_recurring_instances_timestamps ($start, $end, $interval, $time_parts) {
 		$instances = array();
 
@@ -747,25 +747,25 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 						// (4) to see if we already have this timestamp
 						if (
 							$start < $day && $start < $this_day_week_before // 1
-							&& 
-							date("m", $day) === date("m", $this_day_week_before) // 2 
-							&& 
+							&&
+							date("m", $day) === date("m", $this_day_week_before) // 2
+							&&
 							strtolower($weekday) == strtolower(date("l", $this_day_week_before)) // 3
-							&& 
+							&&
 							!in_array($this_day_week_before, $instances) // 4
 						) {
 							// First up, log this for support purposes
 							do_action('eab-debug-log_error', sprintf(
 								__('Possible DOW precision bug detected, overriding %s with %s for expression [%s %s this month], for %s pivot', Eab_EventsHub::TEXT_DOMAIN),
 								$day, $this_day_week_before, // timestamps
-								$week_count, $weekday, // expression 
+								$week_count, $weekday, // expression
 								$first // pivot
 							));
 							$day = $this_day_week_before;
 						}
 					}
 				}
-				
+
 				if (!$day) do_action('eab-debug-log_error', sprintf(
 					__('Invalid %s instance timestamp: [%s %s for %s]', Eab_EventsHub::TEXT_DOMAIN),
 					$interval,
@@ -788,7 +788,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				$instances[] = $day;
 			}
 		}
-		
+
 		if (self::RECURRANCE_MONTHLY == $interval) {
 			$month_days = date('t', $start)*86400;
 			for ($i = $start; $i <= $end; $i+=$month_days) {
@@ -820,12 +820,12 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				$instances[] = $unix_timestamp;
 			}
 		}
-		return $instances;	
+		return $instances;
 	}
-	
+
 
 /* ----- Venue methods ----- */
-	
+
 	/**
 	 * Pack venue info, and return it.
 	 * Venue type agnostic.
@@ -836,8 +836,8 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$this->_venue = get_post_meta($this->get_id(), 'incsub_event_venue', true);
 		return $this->_venue;
 	}
-	
-	
+
+
 /* ----- Price methods ----- */
 
 	/**
@@ -849,13 +849,13 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$this->_price = get_post_meta($this->get_id(), 'incsub_event_fee', true);
 		return apply_filters('eab-payment-event_price', $this->_price, $this->get_id());
 	}
-	
+
 	public function user_paid ($user_id=false) {
 		$user_id = $this->_to_user_id($user_id);
 		$booking_id = $this->get_user_booking_id($user_id);
 		return $this->get_booking_paid($booking_id);
 	}
-	
+
 /* ----- Status methods ----- */
 
 	/**
@@ -865,7 +865,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	public function is_open () {
 		return (self::STATUS_OPEN == $this->get_status()) ? true : false;
 	}
-	
+
 	/**
 	 * Is event closed?
 	 * @return bool
@@ -873,7 +873,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	public function is_closed () {
 		return (self::STATUS_CLOSED == $this->get_status()) ? true : false;
 	}
-	
+
 	/**
 	 * Is event archived?
 	 * @return bool
@@ -881,7 +881,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	public function is_archived () {
 		return (self::STATUS_ARCHIVED == $this->get_status()) ? true : false;
 	}
-	
+
 	/**
 	 * Is event expired?
 	 * @return bool
@@ -889,7 +889,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	public function is_expired () {
 		return (self::STATUS_EXPIRED == $this->get_status()) ? true : false;
 	}
-	
+
 	/**
 	 * Pack and return event status info.
 	 * @return mixed Event status (see constants)
@@ -910,7 +910,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		update_post_meta($this->get_id(), 'incsub_event_status', $status);
 		return $this->_status;
 	}
-	
+
 /* ----- Booking methods ----- */
 
 	/**
@@ -988,7 +988,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		global $wpdb;
 		return $wpdb->get_results($wpdb->prepare("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE {$status} {$since} AND event_id = %d ORDER BY timestamp", $this->get_id()));
 	}
-	
+
 	public function get_rsvps () {
 		global $wpdb;
 		$rsvps = array(
@@ -1003,71 +1003,71 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		}
 		return $rsvps;
 	}
-	
+
 	public function get_user_booking_id ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
 		if (!$user_id) return false;
-		
+
 		global $wpdb;
 		return (int)$wpdb->get_var($wpdb->prepare("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND user_id = %d;", $this->get_id(), $user_id));
 	}
-	
+
 	public static function get_booking ($booking_id) {
 		$booking_id = (int)$booking_id;
 		if (!$booking_id) return false;
-		
-		global $wpdb;   
+
+		global $wpdb;
 		return $wpdb->get_row($wpdb->prepare("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE id = %d;", $booking_id));
 	}
 
 	public function get_user_booking ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
 		if (!$user_id) return false;
-		
+
 		global $wpdb;
 		return $wpdb->get_row($wpdb->prepare("SELECT * FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND user_id = %d;", $this->get_id(), $user_id));
 	}
-	
+
 	public static function get_booking_status ($booking_id) {
 		$booking_id = (int)$booking_id;
 		if (!$booking_id) return false;
-		
-		global $wpdb;   
+
+		global $wpdb;
 		return $wpdb->get_var($wpdb->prepare("SELECT status FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE id = %d;", $booking_id));
 	}
-	
+
 	public function get_user_booking_status ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
 		if (!$user_id) return false;
-		
+
 		global $wpdb;
 		return $wpdb->get_var($wpdb->prepare("SELECT status FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " WHERE event_id = %d AND user_id = %d;", $this->get_id(), $user_id));
 	}
-	
+
 	public function user_is_coming ($strict=false, $user_id=false) {
 		$user_id = $this->_to_user_id($user_id);
 		$checks = array(self::BOOKING_YES);
 		if (!$strict) $checks[] = self::BOOKING_MAYBE;
 		return in_array($this->get_user_booking_status($user_id), $checks);
 	}
-	
+
 	public function get_booking_paid ($booking_id) {
 		return $this->get_booking_meta($booking_id, 'booking_transaction_key');
 	}
-	
+
 	public static function get_booking_meta ($booking_id, $meta_key, $default=false) {
 		$booking_id = (int)$booking_id;
 		if (!$booking_id) return $default;
-		
+
 		global $wpdb;
 		$meta_value = $wpdb->get_var($wpdb->prepare("SELECT meta_value FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_META_TABLE) . " WHERE booking_id = %d AND meta_key = %s;", $booking_id, $meta_key));
 		return $meta_value ? $meta_value : $default;
 	}
-	
+
 	public static function update_booking_meta ($booking_id, $meta_key, $meta_value) {
 		$booking_id = (int)$booking_id;
 		if (!$booking_id) return false;
-		
+
 		global $wpdb;
 		$meta_id = $wpdb->get_var($wpdb->prepare("SELECT id FROM " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_META_TABLE) . " WHERE booking_id = %d AND meta_key = %s;", $booking_id, $meta_key));
 		if (!$meta_id) {
@@ -1076,16 +1076,16 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			return $wpdb->query($wpdb->prepare("UPDATE " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_META_TABLE) . " SET meta_value = %s WHERE id = %d;", $meta_value, $meta_id));
 		}
 	}
-	
+
 	public function cancel_attendance ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
 		if (!$user_id) return false;
 		if ($this->is_premium() && $this->user_paid()) return false; // Can't edit attendance for paid premium events
-		
+
 		global $wpdb;
 		return $wpdb->query($wpdb->prepare("UPDATE " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " SET status='no' WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
 	}
-	
+
 	public function delete_attendance ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
 		if (!$user_id) return false;
@@ -1106,7 +1106,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		    $wpdb->prepare("INSERT INTO ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), %s) ON DUPLICATE KEY UPDATE `status` = %s;", $this->get_id(), $user_id, $status, $status)
 		);
 	}
-	
+
 /* ----- Meta operations ----- */
 
 	public function set_meta ($key, $value) {
@@ -1116,8 +1116,8 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	public function get_meta ($key) {
 		return get_post_meta($this->get_id(), $key, true);
 	}
-	
-	
+
+
 	private function _to_user_id ($user_id) {
 		$user_id = (int)$user_id;
 		if (!$user_id) {

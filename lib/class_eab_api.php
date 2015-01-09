@@ -13,22 +13,22 @@ class Eab_Api {
 		if ($this->_data->get_option('accept_api_logins')) {
 			add_action('wp_ajax_nopriv_eab_facebook_login', array($this, 'handle_facebook_login'));
 			add_action('wp_ajax_nopriv_eab_get_form', array($this, 'handle_get_form'));
-			
+
 			add_action('wp_ajax_nopriv_eab_get_twitter_auth_url', array($this, 'handle_get_twitter_auth_url'));
 			add_action('wp_ajax_nopriv_eab_twitter_login', array($this, 'handle_twitter_login'));
-			
+
 			add_action('wp_ajax_nopriv_eab_get_google_auth_url', array($this, 'handle_get_google_auth_url'));
 			add_action('wp_ajax_nopriv_eab_google_login', array($this, 'handle_google_login'));
 			add_action('wp_ajax_nopriv_eab_google_plus_login', array($this, 'handle_google_plus_login'));
 
 			add_action('wp_ajax_nopriv_eab_wordpress_login', array($this, 'handle_wordpress_login'));
 			add_action('wp_ajax_nopriv_eab_wordpress_register', array($this, 'handle_wordpress_register'));
-			
+
 			add_action('wp_ajax_eab_get_form', array($this, 'handle_get_form'));
-			
+
 			// API avatars
 			add_filter('get_avatar', array($this, 'get_social_api_avatar'), 10, 3);
-			
+
 			// Google
 			if (!session_id()) session_start();
 			if (!class_exists('LightOpenID')) include_once  EAB_PLUGIN_DIR . 'lib/lightopenid/openid.php';
@@ -43,7 +43,7 @@ class Eab_Api {
 				}
 			}
 			$this->_google_user_cache = isset($_SESSION['wdcp_google_user_cache']) ? $_SESSION['wdcp_google_user_cache'] : false;
-			
+
 		}
 	}
 
@@ -61,23 +61,23 @@ class Eab_Api {
 		if ($show_facebook) $registration_services[] = 'Facebook';
 		if ($show_twitter) $registration_services[] = 'Twitter';
 		if ($show_google) $registration_services[] = 'Google';
-		
+
 		// Properly enumerate supported service IDs and construct the registration supplement message.
 		if (!empty($registration_services)) {
 			if (count($registration_services) > 1) {
 				$supported_ids = sprintf(
-					_x('%s or %s', 'Supported registration services: the first variable can be single service or comma-separated enumeration', Eab_EventsHub::TEXT_DOMAIN), 
+					_x('%s or %s', 'Supported registration services: the first variable can be single service or comma-separated enumeration', Eab_EventsHub::TEXT_DOMAIN),
 					join(', ', array_slice(
-						$registration_services, 
-						0, 
+						$registration_services,
+						0,
 						count($registration_services)-1
-					)), 
+					)),
 					end($registration_services)
 				);
 			} else $supported_ids = end($registration_services);
 			$registration_msg = sprintf(_x(' - or just click cancel to register using your %s ID', 'Registration supplemental message part', Eab_EventsHub::TEXT_DOMAIN), $supported_ids);
 		}
-		
+
 		wp_enqueue_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
 			'facebook' => __('Login with Facebook', Eab_EventsHub::TEXT_DOMAIN),
@@ -86,18 +86,18 @@ class Eab_Api {
 			'wordpress' => sprintf(__('Login with %s', Eab_EventsHub::TEXT_DOMAIN), $domain),
 			'cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
 			'please_wait' => __('Please, wait...', Eab_EventsHub::TEXT_DOMAIN),
-			
-			'wp_register' => __('Register', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_registration_msg' => sprintf(_x('Create a username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg), 
-			'wp_login' => __('Log in', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_login_msg' => sprintf(_x('Login with your existing username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg), 
-			'wp_username' => __('Username', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_password' => __('Password', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_email' => __('Email', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_toggle_on' => __('Already a member? Log in here', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_toggle_off' => __('Click here to register', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_submit' => __('Submit', Eab_EventsHub::TEXT_DOMAIN), 
-			'wp_cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN), 
+
+			'wp_register' => __('Register', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_registration_msg' => sprintf(_x('Create a username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
+			'wp_login' => __('Log in', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_login_msg' => sprintf(_x('Login with your existing username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
+			'wp_username' => __('Username', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_password' => __('Password', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_email' => __('Email', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_toggle_on' => __('Already a member? Log in here', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_toggle_off' => __('Click here to register', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_submit' => __('Submit', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
 			// Vars
 			'data' => array(
 				'show_facebook' => $show_facebook,
@@ -154,7 +154,7 @@ class Eab_Api {
 			if ($user) $wp_uid = $user->ID;
 		} else return $avatar;
 		if (!$wp_uid) return $avatar;
-		
+
 		$fb = get_user_meta($wp_uid, '_eab_fb', true);
 		if ($fb && isset($fb['id'])) {
 			return "<img class='avatar avatar-{$size} photo eab-avatar eab-avatar-facebook' width='{$size}' height='{$size}' src='https://graph.facebook.com/" . $fb['id'] . "/picture' />";
@@ -163,7 +163,7 @@ class Eab_Api {
 		if ($tw && isset($tw['avatar'])) {
 			return "<img class='avatar avatar-{$size} photo eab-avatar eab-avatar-twitter' width='{$size}' height='{$size}' src='" . $tw['avatar'] . "' />";
 		}
-		
+
 		return $avatar;
 	}
 
@@ -178,29 +178,29 @@ class Eab_Api {
 		$fb_uid = @$_POST['user_id'];
 		$token = @$_POST['token'];
 		if (!$token) die(json_encode($resp));
-		
+
 		$request = new WP_Http;
 		$result = $request->request(
-			'https://graph.facebook.com/me?oauth_token=' . $token, 
+			'https://graph.facebook.com/me?oauth_token=' . $token,
 			array('sslverify' => false) // SSL certificate issue workaround
 		);
 		if (200 != $result['response']['code']) die(json_encode($resp)); // Couldn't fetch info
-		
+
 		$data = json_decode($result['body']);
 		if (!$data->email) die(json_encode($resp)); // No email, can't go further
-		
+
 		$email = is_email($data->email);
 		if (!$email) die(json_encode($resp)); // Wrong email
-		
+
 		$wordp_user = get_user_by('email', $email);
-		
+
 		if (!$wordp_user) { // Not an existing user, let's create a new one
 			$password = wp_generate_password(12, false);
 			$username = @$data->name
 				? preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->name))
 				: preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->first_name)) . '_' . preg_replace('/[^_0-9a-z]/i', '_', strtolower($data->last_name))
 			;
-	
+
 			$wordp_user = wp_create_user($username, $password, $email);
 			if (is_wp_error($wordp_user)) die(json_encode($resp)); // Failure creating user
 			else {
@@ -210,19 +210,19 @@ class Eab_Api {
 		} else {
 			$wordp_user = $wordp_user->ID;
 		}
-		
+
 		update_user_meta($wordp_user, '_eab_fb', array(
 			'id' => $fb_uid,
 			'token' => $token,
 		));
 		do_action('eab-user_logged_in-facebook', $wordp_user, $fb_uid, $token);
-		
+
 		$user = get_userdata($wordp_user);
 
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with Facebook, yay
 		do_action('wp_login', $user->user_login);
-		
+
 		die(json_encode(array(
 			"status" => 1,
 		)));
@@ -234,13 +234,13 @@ class Eab_Api {
 	private function _get_twitter_object ($token=false, $secret=false) {
 		if (!class_exists('TwitterOAuth')) include_once EAB_PLUGIN_DIR . 'lib/twitteroauth/twitteroauth.php';
 		$twitter = new TwitterOAuth(
-			$this->_data->get_option('twitter-app_id'), 
+			$this->_data->get_option('twitter-app_id'),
 			$this->_data->get_option('twitter-app_secret'),
 			$token, $secret
 		);
 		return $twitter;
 	}
-	
+
 	/**
 	 * Get OAuth request URL and token.
 	 */
@@ -271,7 +271,7 @@ class Eab_Api {
 		));
 		die;
 	}
-	
+
 	/**
 	 * Login or create a new user using whatever data we get from Twitter.
 	 */
@@ -286,7 +286,7 @@ class Eab_Api {
 		$data = array();
 		parse_str($data_str, $data);
 		if (!$data) die(json_encode($resp));
-		
+
 		$twitter = $this->_get_twitter_object($data['oauth_token'], $secret);
 
 		/* --- Start delta time correction --- */
@@ -306,7 +306,7 @@ class Eab_Api {
 		/* --- End delta time correction --- */
 
 		$access = $twitter->getAccessToken($data['oauth_verifier']);
-		
+
 		$twitter = $this->_get_twitter_object($access['oauth_token'], $access['oauth_token_secret']);
 		$tw_user = $twitter->get('account/verify_credentials');
 
@@ -315,7 +315,7 @@ class Eab_Api {
 		$username = preg_replace('/[^_0-9a-z]/i', '_', strtolower($tw_user->name));
 		$email = $username . '@twitter.' . $domain; //STUB email
 		$wordp_user = get_user_by('email', $email);
-		
+
 		if (!$wordp_user) { // Not an existing user, let's create a new one
 			$password = wp_generate_password(12, false);
 			$count = 0;
@@ -323,7 +323,7 @@ class Eab_Api {
 				$username .= rand(0,9);
 				if (++$count > 10) break;
 			}
-	
+
 			$wordp_user = wp_create_user($username, $password, $email);
 			if (is_wp_error($wordp_user)) die(json_encode($resp)); // Failure creating user
 			else {
@@ -334,19 +334,19 @@ class Eab_Api {
 		} else {
 			$wordp_user = $wordp_user->ID;
 		}
-		
+
 		update_user_meta($wordp_user, '_eab_tw', array(
 			'id' => $tw_user->id,
 			'avatar' => $tw_user->profile_image_url,
 			'token' => $access,
 		));
 		do_action('eab-user_logged_in-twitter', $wordp_user, $tw_user->id, $tw_user->profile_image_url, $access);
-		
+
 		$user = get_userdata($wordp_user);
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with Twitter, yay
 		do_action('wp_login', $user->user_login);
-		
+
 		die(json_encode(array(
 			"status" => 1,
 		)));
@@ -357,15 +357,15 @@ class Eab_Api {
 	 */
 	function handle_get_google_auth_url () {
 		header("Content-type: application/json");
-		
+
 		$this->openid->returnUrl = $_POST['url'];
-		
+
 		echo json_encode(array(
 			'url' => $this->openid->authUrl()
 		));
 		exit();
 	}
-	
+
 	/**
 	 * Login or create a new user using whatever data we get from Google.
 	 */
@@ -374,9 +374,9 @@ class Eab_Api {
 		$resp = array(
 			"status" => 0,
 		);
-		
+
 		$cache = $this->openid->getAttributes();
-		
+
 		if (isset($cache['namePerson/first']) || isset($cache['namePerson/last']) || isset($cache['namePerson/friendly']) || isset($cache['contact/email'])) {
 			$this->_google_user_cache = $cache;
 		}
@@ -386,7 +386,7 @@ class Eab_Api {
 			$username = $this->_google_user_cache['namePerson/first'];
 		$email = $this->_google_user_cache['contact/email'];
 		$wordp_user = get_user_by('email', $email);
-		
+
 		if (!$wordp_user) { // Not an existing user, let's create a new one
 			$password = wp_generate_password(12, false);
 			$count = 0;
@@ -394,25 +394,25 @@ class Eab_Api {
 				$username .= rand(0,9);
 				if (++$count > 10) break;
 			}
-	
+
 			$wordp_user = wp_create_user($username, $password, $email);
-			if (is_wp_error($wordp_user)) 
+			if (is_wp_error($wordp_user))
 				die(json_encode($resp)); // Failure creating user
 			else {
 				update_user_meta($wordp_user, 'first_name', $this->_google_user_cache['namePerson/first']);
 				update_user_meta($wordp_user, 'last_name', $this->_google_user_cache['namePerson/last']);
 			}
-		} 
+		}
 		else {
 			$wordp_user = $wordp_user->ID;
 		}
-		
-		
+
+
 		$user = get_userdata($wordp_user);
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with Google, yay
 		do_action('wp_login', $user->user_login);
-		
+
 		die(json_encode(array(
 			"status" => 1,
 		)));
@@ -498,14 +498,14 @@ class Eab_Api {
 		$login = @$data['username'];
 		$pass = @$data['password'];
 		if (!user_pass_ok($login, $pass)) die(json_encode($resp));
-		
+
 		$user = get_user_by('login', $login);
 		if (is_wp_error($user)) die(json_encode($resp));
-		
+
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with WordPress, yay
 		do_action('wp_login', $user->user_login);
-		
+
 		die(json_encode(array(
 			"status" => 1,
 		)));
@@ -519,7 +519,7 @@ class Eab_Api {
 		$data = stripslashes_deep(@$_POST['data']);
 		$login = @$data['username'];
 		$email = @$data['email'];
-		
+
 		// Check the username
 		if ( empty($login) ) {
 			//$errors[] = __('Please enter a username.');
@@ -552,21 +552,21 @@ class Eab_Api {
 
 		$status = apply_filters('eab-user_registration-wordpress-field_validation', true, $data);
 		if (!$status) die(json_encode($resp));
-		
+
 		$wordp_user = wp_create_user($login, $password, $email);
 		if (is_wp_error($wordp_user)) die(json_encode($resp));
 
 		do_action('eab-user_registered-wordpress', $wordp_user, $data);
-		
+
 		$user = get_userdata($wordp_user);
-		
+
 		//notify
 		wp_new_user_notification($user->ID, $password);
-		
+
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with WordPress, yay
 		do_action('wp_login', $user->user_login);
-		
+
 		die(json_encode(array(
 			"status" => 1,
 		)));
@@ -578,7 +578,7 @@ class Eab_Api {
 	function handle_get_form () {
 		$post_id = (int)@$_POST['post_id'];
 		if (!$post_id) die;
-		
+
 		$post = get_post($post_id);
 		echo Eab_Template::get_rsvp_form($post);
 		die;
@@ -587,12 +587,12 @@ class Eab_Api {
 	public function save_settings ($options) {
 		$options['facebook-app_id'] = $_POST['event_default']['facebook-app_id'];
 		$options['facebook-no_init'] = $_POST['event_default']['facebook-no_init'];
-		
+
 		$options['twitter-app_id'] = $_POST['event_default']['twitter-app_id'];
 		$options['twitter-app_secret'] = $_POST['event_default']['twitter-app_secret'];
-		
+
 		$options['google-client_id'] = $_POST['event_default']['google-client_id'];
-		
+
 		$options['api_login-hide-facebook'] = !empty($_POST['event_default']['api_login-hide-facebook']);
 		$options['api_login-hide-twitter'] = !empty($_POST['event_default']['api_login-hide-twitter']);
 		$options['api_login-hide-google'] = !empty($_POST['event_default']['api_login-hide-google']);
@@ -655,14 +655,14 @@ class Eab_Api {
 					<br />
 					<input type="checkbox" name="event_default[api_login-hide-wordpress]" id="eab-api_login-hide-wordpress" value="1" <?php echo ($this->_data->get_option('api_login-hide-wordpress') ? 'checked="checked"' : '') ?> />
 					<label for="eab-api_login-hide-wordpress"><?php _e('Hide WordPress login button', Eab_EventsHub::TEXT_DOMAIN); ?></label>
-					
+
 				</div>
 			</div>
 		<?php if (!$this->_data->get_option('accept_api_logins')) { ?>
 			<p><em><?php _e('To configure and accept API logins, please mark it as &quot;allowed&quot; in plugin settings', Eab_EventsHub::TEXT_DOMAIN); ?></em></p>
 		<?php } ?>
 	    </div>
-	    <?php 
+	    <?php
 	    do_action('eab-settings-after_api_settings');
 	    return false;
 	}
