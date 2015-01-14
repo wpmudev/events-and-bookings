@@ -86,8 +86,8 @@ if (window.openMapEditor) {
 }
 
 $('body')
-    .off("click", "li.existing_map_item a.add_map_item")
-    .on("click", "li.existing_map_item a.add_map_item", insert_map_item_handler)
+    .off("click", "li.existing_map_item .add_map_item")
+    .on("click", "li.existing_map_item .add_map_item", insert_map_item_handler)
 ;
 
 $('#add_map').hide();
