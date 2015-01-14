@@ -49,12 +49,15 @@ class Eab_AddonHandler {
 	function json_activate_selected () {
 		$data = stripslashes_deep($_POST);
 		$plugins = $data['plugins'];
-		$status = true;
+		$error = false;
 		if (!empty($plugins) && is_array($plugins)) foreach($plugins as $plugin) {
-			$status = $status && $this->_activate_plugin($plugin);
+			$status = $this->_activate_plugin($plugin);
+			if (!$status) $error = true;
+		} else {
+			$error = true;
 		}
 		echo json_encode(array(
-			'status' => $status ? 1 : 0,
+			'status' => !$error ? 1 : 0,
 		));
 		exit();
 	}
@@ -62,12 +65,15 @@ class Eab_AddonHandler {
 	function json_deactivate_selected () {
 		$data = stripslashes_deep($_POST);
 		$plugins = $data['plugins'];
-		$status = true;
+		$error = false;
 		if (!empty($plugins) && is_array($plugins)) foreach($plugins as $plugin) {
-			$status = $status && $this->_deactivate_plugin($plugin);
+			$status = $this->_deactivate_plugin($plugin);
+			if (!$status) $error = true;
+		} else {
+			$error = true;
 		}
 		echo json_encode(array(
-			'status' => $status ? 1 : 0,
+			'status' => !$error ? 1 : 0,
 		));
 		exit();
 	}
@@ -115,9 +121,9 @@ class Eab_AddonHandler {
 
 	private function _activate_plugin ($plugin) {
 		if (!current_user_can('manage_options')) return false;
-		
+
 		$active = self::get_active_plugins();
-		if (in_array($plugin, $active)) return true; // Already active
+		if (in_array($plugin, $active)) return false; // Already active
 
 		$active[] = $plugin;
 		return update_option('eab_activated_plugins', $active);
@@ -125,9 +131,9 @@ class Eab_AddonHandler {
 
 	private function _deactivate_plugin ($plugin) {
 		if (!current_user_can('manage_options')) return false;
-		
+
 		$active = self::get_active_plugins();
-		if (!in_array($plugin, $active)) return true; // Already deactivated
+		if (!in_array($plugin, $active)) return false; // Already deactivated
 
 		$key = array_search($plugin, $active);
 		if ($key === false) return false; // Haven't found it
