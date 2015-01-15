@@ -4,6 +4,17 @@ Author: Incsub
 Change Log:
 ----------------------------------------------------------------------
 
+1.8 - 2015-01-15
+----------------------------------------------------------------------
+- Fix for issue with `date_i18n` and UTC times with TZ offsets.
+- Fix for group updates on RSVP change.
+- Fix for initial Twitter connection dialog output.
+- Fix for maps integration.
+- Fix for archive shortcode pagination.
+- Added settings page and filterable add-ons selection.
+- Added admin attendance management.
+- Added group feed updates on event creation.
+
 1.7.7 - 2014-10-30
 ----------------------------------------------------------------------
 - Fix for Twitter login issues.
@@ -249,7 +260,7 @@ Change Log:
 - Fix for author link for singular events.
 - Fix for singular event rewrites.
 - Fix for additional table checks.
-- Fix for custom loops. 
+- Fix for custom loops.
 - Fix for PayPal integration issues.
 - Removed unneeded scripts.
 - Added PayPal sandbox mode support.
