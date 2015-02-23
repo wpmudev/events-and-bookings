@@ -36,7 +36,8 @@ function do_submit (selector, post_id) {
 	if (!email) return false;
 	$.post(_eab_data.ajax_url, {
 		action: "eab-rsvps-rsvp_with_email",
-		email: email
+		email: email,
+        location: location.href
 	}, function (data) {
 		var status = 0;
 		try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
