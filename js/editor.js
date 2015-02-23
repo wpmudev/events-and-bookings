@@ -1,5 +1,5 @@
 /**
- * Responsible for hooking Maps to the Events interface. 
+ * Responsible for hooking Maps to the Events interface.
  */
 
 (function($){
@@ -9,47 +9,48 @@ $(function() {
 /**
  * Creates tag markup.
  */
-function createMapIdMarkerMarkup (id) {
-        if (!id) return '';
-        return ' [map id="' + id + '"] ';
+function create_map_marker (id) {
+    if (!id) return '';
+
+//Deal with this at later stage
+/*
+    var shortcode = window._agmConfig && window._agmConfig.shortcode
+        ? window._agmConfig.shortcode
+        : 'map'
+    ;
+*/
+    var shortcode = 'map';
+    return '[' + shortcode + ' id="' + id + '"] ';
+}
+
+function close_editor_window () {
+    if ("function" === typeof closeMapEditor) return closeMapEditor();
+
+    var $cls = $(".wpmui-wnd-close:visible");
+    if ($cls.length) $cls.click();
 }
 
 /**
  * Inserts the map marker into editor.
  * Supports TinyMCE and regular editor (textarea).
  */
-function updateEditorContents (mapMarker) {	
-	insertAtCursor($("#incsub_event_venue").get(0), mapMarker);
+function insert_map_text (mapMarker) {
+	$("#incsub_event_venue").text(mapMarker);
 }
 
-/**
- * Inserts map marker into regular (textarea) editor.
- */
-function insertAtCursor(fld, text) {
-    // IE
-    if (document.selection && !window.opera) {
-        fld.focus();
-        sel = window.opener.document.selection.createRange();
-        sel.text = text;
-    }
-    // Rest
-    else if (fld.selectionStart || fld.selectionStart == '0') {
-        var startPos = fld.selectionStart;
-        var endPos = fld.selectionEnd;
-        fld.value = fld.value.substring(0, startPos)
-        + text
-        + fld.value.substring(endPos, fld.value.length);
-    } else {
-        fld.value += text;
-    }
+function insert_map_item_handler () {
+    var $me = $(this);
+    var mapMarker = create_map_marker($me.parents('li').find('input:hidden').val());
+    insert_map_text(mapMarker);
+    close_editor_window();
+    return false;
 }
 
-function insertMapItem () {
-        var $me = $(this);
-        var mapMarker = createMapIdMarkerMarkup($me.parents('li').find('input:hidden').val());
-        updateEditorContents(mapMarker);
-        closeMapEditor();
-        return false;
+function insert_map_preview_handler (e, id) {
+    var mapMarker = create_map_marker(id);
+    insert_map_text(mapMarker);
+    close_editor_window();
+    return false;
 }
 
 // Find Media Buttons strip and add the new one
@@ -60,24 +61,34 @@ var maps_url = ("undefined" != typeof _agm && _agm.root_url
     eab_mbuttons_container = $('#eab_insert_map')
 ;
 if (!eab_mbuttons_container.length) return;
+if (window.openMapEditor) {
+    // Old API
+    eab_mbuttons_container.append('' +
+    	'<a onclick="return openMapEditor();" title="' + eab_l10nEditor.add_map + '" class="thickbox" id="eab_add_map" href="#TB_inline?width=640&height=594&inlineId=map_container">' +
+    		'<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + maps_url + '/img/system/globe-button.gif">' +
+    	'</a>'
+    );
+    $('#map_preview_container')
+        .unbind('agm_map_insert')
+        .bind('agm_map_insert', insert_map_preview_handler)
+    ;
+} else {
+    // New API
+    eab_mbuttons_container.append('' +
+        '<a class="add_map" title="' + eab_l10nEditor.add_map + '">' +
+            '<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + maps_url + '/img/system/globe-button.gif">' +
+        '</a>'
+    );
+    $(document)
+        .off('agm_map_insert', '.agm-editor .map_preview_container')
+        .on('agm_map_insert', '.agm-editor .map_preview_container', insert_map_preview_handler)
+    ;
+}
 
-eab_mbuttons_container.append('' + 
-	'<a onclick="return openMapEditor();" title="' + eab_l10nEditor.add_map + '" class="thickbox" id="eab_add_map" href="#TB_inline?width=640&height=594&inlineId=map_container">' +
-		'<img onclick="return false;" alt="' + eab_l10nEditor.add_map + '" src="' + maps_url + '/img/system/globe-button.gif">' +
-	'</a>'
-);
-
-//$("li.existing_map_item").off("click", "a.add_map_item");
-$('body').off("click", "li.existing_map_item a.add_map_item");
-//$("li.existing_map_item").on("click", "a.add_map_item", insertMapItem);
-$('body').on("click", "li.existing_map_item a.add_map_item", insertMapItem);
-
-$('#map_preview_container').unbind('agm_map_insert');
-$('#map_preview_container').bind('agm_map_insert', function (e, id) {
-        var mapMarker = createMapIdMarkerMarkup(id);
-        updateEditorContents(mapMarker);
-        closeMapEditor();
-});
+$('body')
+    .off("click", "li.existing_map_item .add_map_item")
+    .on("click", "li.existing_map_item .add_map_item", insert_map_item_handler)
+;
 
 $('#add_map').hide();
 

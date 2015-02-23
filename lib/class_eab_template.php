@@ -229,6 +229,33 @@ class Eab_Template {
 		return $ret;
 	}
 
+	private static function get_admin_attendance_addition_form ($event, $statuses) {
+		if (!method_exists($event, 'get_id') || !is_array($statuses)) return false;
+		if ($event->is_premium()) return ''; // Won't deal with the paid events
+
+		$content = '';
+
+		$content = '<div class="eab-add_attendance-container">';
+
+		$content .= '<fieldset class="eab-add_attendance">';
+		$content .= '<legend>' . __('Add user', Eab_EventsHub::TEXT_DOMAIN) . '</legend>';
+		
+		$content .= '<label>' . __('User email', Eab_EventsHub::TEXT_DOMAIN) . '</label>&nbsp;';
+		$content .= '<input type="hidden" class="eab-attendance-event_id" value="' . (int)$event->get_id() . '" />';
+		$content .= '<input type="email" class="eab-attendance-email" />';
+		$content .= '<select class="eab-attendance-status">';
+		foreach ($statuses as $status => $label) {
+			$content .= '<option value="' . esc_attr($status) . '">' . esc_html($label) . '</option>';
+		}
+		$content .= '</select>';
+		$content .= '<input type="button" class="button" value="' . esc_attr(__('Add', Eab_EventsHub::TEXT_DOMAIN)) . '" />';
+		$content .= '</fieldset>';
+		
+		$content .= '</div>';
+		
+		return $content;
+	}
+
 	public static function get_admin_bookings ($status, $post) {
 		global $wpdb;
 		if (!current_user_can('edit_posts')) return false; // Basic sanity check
@@ -241,8 +268,9 @@ class Eab_Template {
 		);
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
-		
-		$content = '';		
+
+		$content = Eab_Template::get_admin_attendance_addition_form($event, $statuses);
+
 		$content .= '<h4>'. __($status_name, Eab_EventsHub::TEXT_DOMAIN). '</h4>';
 		$content .= '<ul class="eab-guest-list">';
 
@@ -588,8 +616,15 @@ class Eab_Template {
 					: sprintf(__('<span class="wpmudevevents-date_format-end">to %s</span><br />', Eab_EventsHub::TEXT_DOMAIN), '<span class="wpmudevevents-date_format-end_date"><var class="eab-date_format-date">' . $end_date_str . '</var></span> <span class="wpmudevevents-date_format-end_time"><var class="eab-date_format-time">' . date_i18n(get_option('time_format'), $end) . '</var></span>')
 				;
 			}
-			$time_date_start = esc_attr(date_i18n("Y-m-d\TH:i:sO", $start));
-			$time_date_end = esc_attr(date_i18n("Y-m-d\TH:i:sO", $end));
+			// Why, thank you `date_i18n` for working so well with properly parsing 'O' argument when offsets are set in UTC values... >.<
+			$gmt_offset = (float)get_option('gmt_offset');
+			$hour_tz = sprintf('%02d', abs((int)$gmt_offset));
+			$minute_offset = (abs($gmt_offset) - abs((int)$gmt_offset)) * 60;
+			$min_tz = sprintf('%02d', $minute_offset);
+			$timezone = ($gmt_offset > 0 ? '+' : '-') . $hour_tz . $min_tz;
+
+			$time_date_start = esc_attr(date_i18n("Y-m-d\TH:i:s", $start)) . $timezone;
+			$time_date_end = esc_attr(date_i18n("Y-m-d\TH:i:s", $end)) . $timezone;
 			$content .= apply_filters('eab-events-event_date_string', "<time itemprop='startDate' datetime='{$time_date_start}'>{$start_string}</time> <time itemprop='endDate' datetime='{$time_date_end}'>{$end_string}</time>", $event->get_id(), $start, $end);
 			/*
 			$content .= apply_filters('eab-events-event_date_string', sprintf(

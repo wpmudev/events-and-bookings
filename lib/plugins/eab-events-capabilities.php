@@ -5,6 +5,7 @@ Description: Tweak and edit access privileges for your Events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Integration
 */
 
 class Eab_Events_Capabilities {
@@ -68,7 +69,7 @@ class Eab_Events_Capabilities {
 		$_roles = $wp_roles->get_names();
 ?>
 <div id="eab-settings-capabilities" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Event Capabilities :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Event Capabilities', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item">
 			<select id="eab-event-capabilities-switch_hub">

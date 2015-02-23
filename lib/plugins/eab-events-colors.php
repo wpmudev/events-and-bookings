@@ -5,6 +5,7 @@ Description: Allows you to easily tweak the background color for your events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.1
 Author: WPMU DEV
+AddonType: Events
 */
 
 class Eab_Events_Colors {
@@ -144,7 +145,7 @@ class Eab_Events_Colors {
 		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 ?>
 <div id="eab-settings-colors" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Event Colors :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Event Colors', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 	<?php foreach ($categories as $category) { ?>
 		<div class="eab-settings-settings_item">

@@ -4,6 +4,7 @@ Plugin Name: Email: E-Newsletter integration
 Description: Allows you to automatically send newsletters about your events created with e-Newsletter plugin. <br /><b>Requires <a href="http://premium.wpmudev.org/project/e-newsletter">e-Newsletter plugin</a>.</b>
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.1
+AddonType: Integration
 Author: WPMU DEV
 */
 
@@ -175,15 +176,42 @@ class Eab_Emi_Model {
 		if (empty($group_pack)) return false;
 
 		$group_ids = array();
+		$other_groups = array();
 		foreach ($group_pack as $key => $status) {
 			if (in_array($rsvp, $status)) $group_ids[] = $key;
+			else $other_groups[] = $key;
 		}
 		if (empty($group_ids)) return false;
 
 		foreach ($group_ids as $group_id) {
 			$this->_newsletter->add_members_to_groups($user_id, $group_id, false);
 		}
-		// @TODO: check if the RSVP booking status changed for the member and drop from all old groups
+
+		// Alright, so by now, we added the user to the group.
+		// Check her other groups for this event, and see if we need any cleanup/removal
+
+		// Populate drop groups.
+		$drop_groups = array();
+		if (!empty($other_groups)) {
+			$member_groups = $this->_newsletter->get_memeber_groups($user_id);
+			$member_groups = !empty($member_groups) && is_array($member_groups)
+				? $member_groups
+				: array()
+			;
+			if (!empty($member_groups)) foreach ($other_groups as $other_id) {
+				if (in_array($other_id, $member_groups)) $drop_groups[] = $other_id;
+			}
+		}
+
+		// Process drop groups.
+		if (!empty($drop_groups)) {
+			$members = array($user_id);
+			foreach ($drop_groups as $drop_id) {
+				$this->_newsletter->delete_members_group($members, $drop_id);
+			}
+		}
+
+		
 		return true;
 	}
 

@@ -5,6 +5,7 @@ Description: Allows you to add additional registration fields.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Events, RSVP
 */
 
 class Eab_Rsvps_AdditionalRegistrationFields {
@@ -143,7 +144,7 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 		);
 		?>
 <div id="eab-settings-eab_arf" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Additional Fields :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Additional Fields', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div id="eab-arf-additional_fields">
 		<?php foreach ($fields as $field) { ?>

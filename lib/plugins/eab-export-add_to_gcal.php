@@ -5,6 +5,7 @@ Description: Adds a convenience button for your vistors to schedule events in th
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.1
 Author: WPMU DEV
+AddonType: Integration
 */
 
 class Eab_Export_GCalButton {

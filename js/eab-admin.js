@@ -205,8 +205,8 @@ jQuery(function() {
 (function ($) {
 // API toggling
 function toggle_api_settings () {
-	if ($("#incsub_event-accept_api_logins").is(":checked")) $("#eab-settings-apis").show();
-	else $("#eab-settings-apis").hide();
+	if ($("#incsub_event-accept_api_logins").is(":checked")) $("#eab-settings-apis .eab-inside").show();
+	else $("#eab-settings-apis .eab-inside").hide();
 }
 
 // Appearance toggling
@@ -350,6 +350,24 @@ $(function () {
 		return false;
 	});
 
+	$("body").on("click", ".eab-add_attendance .button", function () {
+		var $root = $(".eab-add_attendance"),
+			event_id = $root.find(".eab-attendance-event_id").val()
+			email = $root.find(".eab-attendance-email").val(),
+			status = $root.find(".eab-attendance-status").val()
+		;
+		if (!event_id || !email || !status) return false;
+		$.post(ajaxurl, {
+			action: "eab_add_attendance",
+			user: email,
+			post_id: event_id,
+			status: status
+		}, function (data) {
+			$("#eab-bookings-response").html(data);
+		});
+		return false;
+	});
+
 	var $times = $("#incsub-event input.incsub_event");
 	$times.each(function () {
 		var _c = $(this).attr('id').replace(/incsub_event_[a-z_]+_/gi, '');
@@ -357,6 +375,85 @@ $(function () {
 	});
 
 });
+})(jQuery);
+
+// Main settings page tabbing
+(function ($) {
+
+var MIN_SIZE = 768,
+	$win = $(window),
+	$submit = false
+;
+
+if (!window.location.search.match('page=eab_settings')) return false; // Only on settings page
+if ($win.width() < MIN_SIZE) return false; // Only if we have enough space
+if (!$(".wrap").is(".tabbable")) return false; // Allow override
+
+function reveal_page (e) {
+	e.preventDefault();
+	e.stopPropagation();
+	var me = $(this),
+		box_id = me.attr('data-box_id'),
+		box = false
+	;
+	if (box_id) box = $("#" + box_id);
+	if (box_id && box_id.length) {
+		$("#eab-root-settings_nav h3").removeClass("active");
+		me.addClass("active");
+		$('.eab-metabox.postbox').hide();
+		box.show();
+	}
+}
+
+function boot () {
+	var boxes = $('.eab-metabox.postbox'),
+		box_root = $(".eab-metaboxcol.metabox-holder")
+	;
+	$submit = $submit.length ? $submit : box_root.siblings(".submit")
+	if (!boxes.length) return;
+	
+	var root = $("#eab-root-settings_nav");
+	if (root.length) {
+		if ($win.width() < MIN_SIZE) {
+			box_root.removeClass("tabbed");
+			root.remove();
+			boxes.show();
+		}
+		box_root.append($submit);
+		return;
+	}
+	
+	box_root.append('<div id="eab-root-settings_nav"></div>');
+	root = $("#eab-root-settings_nav");
+
+	root.empty();
+
+	boxes.each(function () {
+		var me = $(this),
+			box_id = me.attr("id"),
+			title = me.find("h3.eab-hndle"),
+			new_title = title.clone()
+		;
+		if (box_id) {
+			new_title
+				.attr("data-box_id", box_id)
+				.on('click', reveal_page)
+			;
+			root.append(new_title);
+			me.hide();
+		}
+	});
+	box_root.append($submit);
+	root.find("h3:first").click();
+	box_root.addClass("tabbed");
+
+	$(".eab-loading-cover.tabbable").remove();
+	$(".wrap.tabbable.hide").removeClass("hide");
+}
+
+$(boot);
+$win.on("resize", boot);
+
 })(jQuery);
 
 });

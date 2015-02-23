@@ -6,6 +6,7 @@ Description: Allows you to limit the number of attendees for each of your events
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0.2
 Author: WPMU DEV
+AddonType: Events
 */
 
 class Eab_Addon_LimitCapacity {
@@ -304,7 +305,7 @@ class Eab_Addon_LimitCapacity {
 		$checked_cancel    = $this->_data->get_option( 'eab-limit_capacity-show_cancel' ) ? 'checked="checked"' : '';
 		?>
 		<div id="eab-settings-limit_capacity" class="eab-metabox postbox">
-			<h3 class="eab-hndle"><?php _e( 'Limited capacity events settings :', Eab_EventsHub::TEXT_DOMAIN ); ?></h3>
+			<h3 class="eab-hndle"><?php _e( 'Limited capacity events settings', Eab_EventsHub::TEXT_DOMAIN ); ?></h3>
 
 			<div class="eab-inside">
 				<div class="eab-settings-settings_item">

@@ -5,6 +5,7 @@ Description: Allows you to send reminder email who wanted to attend in the event
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Email, RSVP
 */
 
 class Eab_Events_RsvpEmailNonPaid {
@@ -161,8 +162,8 @@ function send_email_non_paid_members_callback() {
 
 		$events = Eab_CollectionFactory::get_upcoming_events(eab_current_time(), array('posts_per_page' => 10));
 		?>
-<div id="eab-settings-eab_rsvps" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Reminder Email settings for non paid members :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+<div id="eab-settings-eab_rsvps_non_paid" class="eab-metabox postbox">
+	<h3 class="eab-hndle"><?php _e('Reminder Email settings for non paid members', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		 <div class="eab-settings-settings_item">
 			<label for="eab_event-eab_rsvps-non_paid-from" id="eab_event-eab_rsvps-non_paid-from"><?php _e('Email from:', Eab_EventsHub::TEXT_DOMAIN); ?></label>

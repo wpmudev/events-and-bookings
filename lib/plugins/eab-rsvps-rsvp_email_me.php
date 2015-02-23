@@ -5,6 +5,7 @@ Description: Automatically send a notification to yourself and/or event author w
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Email, RSVP
 */
 
 
@@ -120,9 +121,13 @@ class Eab_Events_RsvpEmailMe {
 		if (!$event_id) die;
 		$user = wp_get_current_user();
 		$codec = new Eab_Events_RsvpEmailMe_Codec($event_id, $user->ID);
+		$body = !empty($data['body'])
+			? $data['body']
+			: $this->_data->get_option('eab_rsvps-email_me-body')
+		;
 		die(
 			'<strong>' . $codec->expand($data['subject'], Eab_Macro_Codec::FILTER_TITLE) . '</strong>' .
-			'<div>' . $codec->expand($data['body'], Eab_Macro_Codec::FILTER_BODY) . '</div>'
+			'<div>' . $codec->expand($body, Eab_Macro_Codec::FILTER_BODY) . '</div>'
 		);
 	}
 
@@ -153,8 +158,8 @@ class Eab_Events_RsvpEmailMe {
 
 		$events = Eab_CollectionFactory::get_upcoming_events(eab_current_time(), array('posts_per_page' => 10));
 		?>
-<div id="eab-settings-eab_rsvps" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('RSVP Notification Email settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+<div id="eab-settings-eab_rsvps_me" class="eab-metabox postbox">
+	<h3 class="eab-hndle"><?php _e('RSVP Notification Email settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item">
 	    	<label><?php _e('Send an update', Eab_EventsHub::TEXT_DOMAIN); ?></label>

@@ -5,6 +5,7 @@ Description: Sync your local and Facebook events.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Integration
 */
 
 
@@ -190,7 +191,7 @@ class Eab_Calendars_FacebookEventsImporter {
 		);
 ?>
 <div id="eab-settings-fbe_importer" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('Facebook Events import settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('Facebook Events import settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
 			<label for="incsub_event-fbe_importer-client_id" id="incsub_event_label-fbe_importer-client_id"><?php _e('App ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>

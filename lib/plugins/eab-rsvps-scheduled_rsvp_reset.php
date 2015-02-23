@@ -4,8 +4,8 @@ Plugin Name: RSVP status auto-reset
 Description: Automatically resets RSVP status on your paid events after a preconfigured time if the user hasn't paid yet.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
-AddonType: BuddyPress
 Author: WPMU DEV
+AddonType: Events, RSVP
 */
 
 class Eab_Rsvps_RsvpAutoReset {
@@ -94,7 +94,7 @@ class Eab_Rsvps_RsvpAutoReset {
 		;
 ?>
 <div id="eab-settings-rsvp_status_auto_reset" class="eab-metabox postbox">
-	<h3 class="eab-hndle"><?php _e('RSVP status auto-reset settings :', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
+	<h3 class="eab-hndle"><?php _e('RSVP status auto-reset settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item">
 	    	<label><?php _e('Schedule checks to run every:', Eab_EventsHub::TEXT_DOMAIN); ?></label>

@@ -5,6 +5,7 @@ Description: If no year or month arguments are passed to your archive page reque
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
+AddonType: Events
 */
 
 /*
