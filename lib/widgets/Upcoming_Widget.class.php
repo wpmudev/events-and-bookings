@@ -23,7 +23,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		
 		extract($args);
 		
-		$instace = apply_filters('eab-widgets-upcoming-instance_read', $instance, $this);
+		$instance = apply_filters('eab-widgets-upcoming-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
 		
 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Upcoming', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
