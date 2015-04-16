@@ -831,7 +831,7 @@ class Eab_Template {
 		return $output;
 	}
 
-	public static function util_shortcode_argument_type_string ($raw_type, $argument, $tag) {
+	private static function _shortcode_arg_type_map_values ($raw_type, $argument, $tag) {
 		$type_map = array(
 			'boolean' => array(
 				'type' => __('boolean', Eab_EventsHub::TEXT_DOMAIN),
@@ -889,13 +889,31 @@ class Eab_Template {
 				'example' => sprintf(__('%s="http://example.com/something"', Eab_EventsHub::TEXT_DOMAIN), $argument),
 			),
 		);
-		if (empty($type_map[$raw_type])) return "<code>({$raw_type})</code>";
 
-		$type = $type_map[$raw_type];
-		$title = 'title="' . esc_attr(
-			sprintf(__("%s, e.g. [%s ... %s]", Eab_EventsHub::TEXT_DOMAIN), $type['value'], $tag, $type['example'])
-		) . '"';
-		return "<abbr {$title}>({$type['type']})</abbr>";
+		$type = !empty($type_map[$raw_type])
+			? $type_map[$raw_type]
+			: false
+		;
+		$title = sprintf(__("%s, e.g. [%s ... %s]", Eab_EventsHub::TEXT_DOMAIN), $type['value'], $tag, $type['example']);
+		return array(
+			'type' => $type['type'],
+			'title' => $title,
+		);
+	}
+
+	public static function util_shortcode_argument_type_string_info ($raw_type, $argument, $tag, $tips=false) {
+		if (!is_object($tips)) return Eab_Template::util_shortcode_argument_type_string($raw_type, $argument, $tag);
+		$resolved = Eab_Template::_shortcode_arg_type_map_values($raw_type, $argument, $tag);
+		if (empty($resolved['type']) || empty($resolved['title'])) return "<code>({$raw_type})</code>";
+
+		return "<span>({$resolved['type']})</span>&nbsp;" . $tips->add_tip($resolved['title']);
+	}
+
+	public static function util_shortcode_argument_type_string ($raw_type, $argument, $tag) {
+		$resolved = Eab_Template::_shortcode_arg_type_map_values($raw_type, $argument, $tag);
+		if (empty($resolved['type']) || empty($resolved['title'])) return "<code>({$raw_type})</code>";
+		$title = 'title="' . esc_attr($resolved['title']) . '"';
+		return "<abbr {$title}>({$resolved['type']})</abbr>";
 	}
 	
 }
