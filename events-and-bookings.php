@@ -59,7 +59,7 @@ class Eab_EventsHub {
      * @param	string	$table	Table name
      * @return	string			Table name complete with prefixes
      */
-    function tablename($table) {
+    public static function tablename($table) {
 		global $wpdb;
     	// We use per-blog tables for network events
 		return $wpdb->prefix.'eab_'.$table;
@@ -622,7 +622,8 @@ class Eab_EventsHub {
 		if ( 'incsub_event' != $post->post_type )
 		    return $path;
 
-		$type = reset( explode( '_', current_filter() ) );
+		$current_filter = explode('_', current_filter());
+		$type = reset($current_filter);
 
 		$file = basename( $path );
 

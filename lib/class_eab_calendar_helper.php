@@ -231,7 +231,7 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 		$cls = $this->get_calendar_root_class();
 		return $this->_class 
 			? sanitize_html_class($cls) . ' ' . sanitize_html_class($this->_class)
-			: $cls
+			: sanitize_html_class($cls)
 		; 
 	}
 	public function get_calendar_root_class () {

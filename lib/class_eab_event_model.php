@@ -686,6 +686,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		}
 
 		if (self::RECURRANCE_WEEKLY == $interval) {
+			$time_parts['weekday'] = is_array($time_parts['weekday']) ? $time_parts['weekday'] : array();
 			for ($i = 0; $i<=6; $i++) {
 				if (!in_array($i, $time_parts['weekday'])) continue;
 				$sunday = strtotime("this Sunday", $start) < $start
@@ -1122,7 +1123,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$user_id = (int)$user_id;
 		if (!$user_id) {
 			global $current_user;
-			$user_id = $current_user->id;
+			$user_id = $current_user->ID;
 		}
 		return (int)$user_id;
 	}
