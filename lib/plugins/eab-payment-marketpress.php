@@ -483,13 +483,15 @@ class Eab_Payments_PaymentViaProducts {
 			? $this->_get_quick_product_price($product_id) 
 			: false
 		;
-		
+
 		if ($product_id) {
 			// Cross-link
 			// 1. Ensure uniqueness
 			global $wpdb;
 			$wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE (meta_key='eab_product_id' AND meta_value='{$product_id}') OR (meta_key='eab_event_id' AND meta_value='{$event_id}')");
-		
+			// So after this is done, drop any caching for current event
+			clean_post_cache($event_id);
+
 			// Set up cross-linking
 			update_post_meta($event_id, 'eab_product_id', $product_id);
 			update_post_meta($product_id, 'eab_event_id', $event_id);
