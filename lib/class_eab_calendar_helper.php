@@ -322,7 +322,7 @@ class Eab_CalendarTable_UpcomingCalendarWidget extends Eab_CalendarTable {
 	 * Override the main method to allow output caching.
 	 * Calendar widget could be used often, so make sure we're quick.
 	 */
-	public function get_month_calendar ($timestamp) {
+	public function get_month_calendar ($timestamp=false) {
 		if (!(defined('EAB_CALENDAR_USE_CACHE') && EAB_CALENDAR_USE_CACHE)) return parent::get_month_calendar($timestamp);
 
 		$key = md5(serialize($this->_events)) . '-eab_ucw';
@@ -427,7 +427,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 		return $activity;
 	}
 	
-	public function get_month_calendar ($timestamp) {
+	public function get_month_calendar ($timestamp=false) {
 		return parent::get_month_calendar($timestamp) . $this->_get_js();
 	}
 	
