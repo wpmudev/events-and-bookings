@@ -1972,8 +1972,8 @@ class Eab_EventsHub {
 
 				</div>
 		    </div>
-		    <?php do_action('eab-settings-after_appearance_settings'); ?>
 		    <?php } ?>
+		    <?php do_action('eab-settings-after_appearance_settings'); /* the hook happens whether we have appearance settings or not */ ?>
 		    <!-- Payment settings -->
 		    <div id="eab-settings-paypal" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Payment settings', self::TEXT_DOMAIN); ?></h3>
