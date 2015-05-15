@@ -12,6 +12,8 @@ Author: WPMU DEV
 Detail: Allows deeper integration of your Events with BuddyPress groups. <br /> <b>Requires BuddyPress Groups component</b>
 */ 
 
+if( ! defined( 'EAB_SHOW_HIDDEN_GROUP' ) ) define( 'EAB_SHOW_HIDDEN_GROUP', false );
+
 class Eab_BuddyPress_GroupEvents {
 	
 	const SLUG = 'group-events';
@@ -187,7 +189,7 @@ class Eab_BuddyPress_GroupEvents {
 			? EAB_BP_GROUPS_LIST_GROUP_LIMIT
 			: groups_get_total_group_count()
 		;
-		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical');
+		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical', 'show_hidden' => EAB_SHOW_HIDDEN_GROUP );
 		if ($this->_data->get_option('bp-group_event-user_groups_only')) {
 			if (!(is_super_admin() && $this->_data->get_option('bp-group_event-user_groups_only-unless_superadmin'))) $group_params['user_id'] = $current_user->id;
 		}
@@ -224,7 +226,7 @@ class Eab_BuddyPress_GroupEvents {
 			? EAB_BP_GROUPS_LIST_GROUP_LIMIT
 			: groups_get_total_group_count()
 		;
-		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical');
+		$group_params = array('per_page' => $group_count , 'type' => 'alphabetical', 'show_hidden' => EAB_SHOW_HIDDEN_GROUP);
 		if ($this->_data->get_option('bp-group_event-user_groups_only')) {
 			if (!(is_super_admin() && $this->_data->get_option('bp-group_event-user_groups_only-unless_superadmin'))) $group_params['user_id'] = $current_user->id;
 		}
