@@ -485,7 +485,7 @@ class Eab_Events_FrontPageEditing {
 				$ret .= '<label>' . __('Feature Image', Eab_EventsHub::TEXT_DOMAIN) . '</label>' .
 					'<br />' .
 					'<a href="#featured_image" class="eab-fpe-upload">' .
-					'<input type="hidden" id="eab-fpe-attach_id" name="" value="' . esc_url($featured_image) . '" />' .
+					'<input type="hidden" id="eab-fpe-attach_id" name="" value="' . $featured_image_id . '" />' .
 					'<input type="hidden" name="featured" value="' . esc_attr($featured_image_id) . '" />' .
 					'<img src="' . esc_url($featured_image) . '" id="eab-fpe-preview-upload" ' . (empty($featured_image) ? 'style="display:none"' : '') . ' />' .
 					'<br />' .
