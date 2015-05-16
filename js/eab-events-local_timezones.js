@@ -14,8 +14,18 @@ $(function () {
 			))
 		;
 		if (!$time.length || !datetime || !$dts.length) return true;
-
-		var date = new Date(Date.parse(datetime));
+		//2015-05-23T10:00:00-0000
+	
+		if( navigator.userAgent.indexOf("Safari") > -1 ){
+			datetime = datetime.split( '-0000' );
+			dateValue = datetime[0];
+		}
+		else{
+			dateValue = datetime;	
+		}
+		
+		
+		var date = new Date(Date.parse(dateValue));
 		if (isNaN(date)) return false;
 		$dts.each(function () {
 			var $me = $(this),
@@ -24,8 +34,8 @@ $(function () {
 			$me
 				.text((
 					$me.is(".eab-date_format-time")
-						? date.toLocaleTimeString(locale)
-						: date.toLocaleDateString(locale)
+						? date.toLocaleTimeString(locale).split( ' GMT' )[0]
+						: date.toLocaleDateString(locale).split( ' GMT' )[0]
 				))
 				.attr("title", old)
 			;
