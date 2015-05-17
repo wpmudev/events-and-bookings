@@ -119,6 +119,9 @@ function create_wordpress_login_popup ($action, post_id) {
 						"<label for='eab-wordpress_login-login_password'>" + l10nEabApi.wp_password + "</label>" +
 							"<input type='password' id='eab-wordpress_login-login_password' placeholder='' />" +
 					"</p>" +
+					"<p class='forgot_password' style='margin: 5px 0'>" +
+						"<a href='"+ l10nEabApi.wp_lost_pw_url +"'>" + l10nEabApi.wp_lost_pw_text + "</a>" +
+					"</p>" +
 				"</div>" +
 				"<div id='eab-wordpress_login-mode_toggle'><a href='#' data-on='" + l10nEabApi.wp_toggle_on + "' data-off='" + l10nEabApi.wp_toggle_off + "'>" + l10nEabApi.wp_toggle_on + "</a></div>" +
 				"<div id='eab-wordpress_login-command_wrapper'>" +
