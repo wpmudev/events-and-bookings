@@ -13,7 +13,7 @@ AddonType: Integration
 Detail: Adds a field to the Event page so that you can select which membership(s) will be exempt from payments for a selected paid event.
 */
 
-class Eab_Events_Membership2Integration {
+class Eab_Events_Membership2_Integration {
 
 	/**
 	 * Add-on specific data is saved in this post-meta element.
@@ -26,7 +26,7 @@ class Eab_Events_Membership2Integration {
 	 *
 	 * @type MS_Controller_Api
 	 */
-	private $api = null;
+	protected $api = null;
 
 	/**
 	 * Creates the Addon instance - this is the starting point of the Add-on.
@@ -34,7 +34,11 @@ class Eab_Events_Membership2Integration {
 	 * @since 1.0
 	 */
 	public static function serve() {
-		$me = new Eab_Events_Membership2Integration;
+		static $Inst = null;
+
+		if ( null === $Inst ) {
+			$Inst = new Eab_Events_Membership2_Integration();
+		}
 	}
 
 	/**
@@ -142,14 +146,14 @@ class Eab_Events_Membership2Integration {
 		 */
 		?>
 		<style>
-		.ms-membership-wrap label{
+		.ms-membership-wrap label {
 			width: 120px;
 			display: inline-block;
 		}
-		.ms-membership-wrap input{
+		.ms-membership-wrap input {
 			width: 120px;
 		}
-		.ms-membership{
+		.ms-membership {
 			display: inline-block;
 			border-radius: 3px;
 			color: #FFF;
@@ -445,4 +449,4 @@ class Eab_Events_Membership2Integration {
 	}
 }
 
-Eab_Events_Membership2Integration::serve();
+Eab_Events_Membership2_Integration::serve();
