@@ -114,9 +114,11 @@ class Eab_AddonHandler {
 			'Plugin URI' => 'Plugin URI',
 			'Version' => 'Version',
 			'Detail' => 'Detail',
-			'Type' => 'AddonType'
+			'Type' => 'AddonType',
+			'Deprecated' => 'Deprecated',
+			'Required Class' => 'Required Class',
 		);
-		return get_file_data($path, $default_headers, 'plugin');
+		return get_file_data($path, $default_headers, 'eab_addon');
 	}
 
 	private function _activate_plugin ($plugin) {
@@ -172,6 +174,16 @@ class Eab_AddonHandler {
 			}
 
 			$is_active = in_array($plugin, $active);
+
+			if ('yes' == $plugin_data['Deprecated']) {
+				if ( empty( $plugin_data['Required Class'] ) ) {
+					// No dependency, so hide the add-on if it is deactivated.
+					if ( ! $is_active ) { continue; }
+				} elseif ( ! class_exists( $plugin_data['Required Class'] ) ) {
+					// Only hide the deprecated add-on when required class is missing.
+					continue;
+				}
+			}
 
 			$tbody .= '<tr' . (!empty($types) ? ' data-type="' . esc_attr(join(',', $types)) : '' ) . '" class="' . ($is_active ? 'active' : 'inactive') . '">';
 			if (!(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)) {
