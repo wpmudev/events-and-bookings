@@ -286,10 +286,14 @@ class Eab_Events_FrontPageEditing {
 
 		wp_set_post_terms($post_id, array((int)$data['category']), 'eab_events_category', false);
 
-		$message = current_user_can($post_type->cap->publish_posts)
-			? __('Event saved and published', Eab_EventsHub::TEXT_DOMAIN)
-			: __('Event saved and waiting for approval', Eab_EventsHub::TEXT_DOMAIN)
-		;
+		if( current_user_can($post_type->cap->publish_posts) ){
+			$message = __('Event saved and published', Eab_EventsHub::TEXT_DOMAIN);
+			do_action( 'eab_bp_event_published', $post_id );
+		}else{
+			$message = __('Event saved and waiting for approval', Eab_EventsHub::TEXT_DOMAIN);
+			do_action( 'eab_bp_event_saved_for_approval', $post_id );
+		}
+		
 		die(json_encode(array(
 			'status' => 1,
 			'post_id' => $post_id,
