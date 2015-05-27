@@ -96,6 +96,8 @@ class Eab_Api {
 			'wp_email' => __('Email', Eab_EventsHub::TEXT_DOMAIN),
 			'wp_toggle_on' => __('Already a member? Log in here', Eab_EventsHub::TEXT_DOMAIN),
 			'wp_toggle_off' => __('Click here to register', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_lost_pw_text' => __('Forgot your password', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_lost_pw_url' => wp_lostpassword_url(),
 			'wp_submit' => __('Submit', Eab_EventsHub::TEXT_DOMAIN),
 			'wp_cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
 			// Vars
