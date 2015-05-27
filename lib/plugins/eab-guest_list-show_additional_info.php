@@ -188,7 +188,7 @@ class Eab_GuestList_ShowAdditionalInfo {
 			<p></p>
 	    </div>
 	    <div class="eab-settings-settings_item" style="line-height:1.8em">
-			<label><?php _e('Show prettified gues list names in...', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+			<label><?php _e('Show prettified guest list names in...', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 			<br />
 			<input type="hidden" name="event_default[guest_lists-sai-show_in_admin]" value="" />
 			<input type="checkbox" id="eab_event-guest_lists-sai-show_in_admin" name="event_default[guest_lists-sai-show_in_admin]" value="1" <?php print $show_in_admin; ?> />
