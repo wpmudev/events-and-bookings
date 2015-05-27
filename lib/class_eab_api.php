@@ -577,7 +577,6 @@ class Eab_Api {
 	 * Responds with RSVP form
 	 */
 	function handle_get_form () {
-		echo 100;
 		$post_id = (int)@$_POST['post_id'];
 		if (!$post_id) die;
 
