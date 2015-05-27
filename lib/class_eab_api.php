@@ -10,9 +10,10 @@ class Eab_Api {
 	}
 
 	public function initialize () {
+		add_action('wp_ajax_nopriv_eab_get_form', array($this, 'handle_get_form'));
+		add_action('wp_ajax_eab_get_form', array($this, 'handle_get_form'));
 		if ($this->_data->get_option('accept_api_logins')) {
 			add_action('wp_ajax_nopriv_eab_facebook_login', array($this, 'handle_facebook_login'));
-			add_action('wp_ajax_nopriv_eab_get_form', array($this, 'handle_get_form'));
 
 			add_action('wp_ajax_nopriv_eab_get_twitter_auth_url', array($this, 'handle_get_twitter_auth_url'));
 			add_action('wp_ajax_nopriv_eab_twitter_login', array($this, 'handle_twitter_login'));
@@ -23,8 +24,6 @@ class Eab_Api {
 
 			add_action('wp_ajax_nopriv_eab_wordpress_login', array($this, 'handle_wordpress_login'));
 			add_action('wp_ajax_nopriv_eab_wordpress_register', array($this, 'handle_wordpress_register'));
-
-			add_action('wp_ajax_eab_get_form', array($this, 'handle_get_form'));
 
 			// API avatars
 			add_filter('get_avatar', array($this, 'get_social_api_avatar'), 10, 3);
@@ -578,6 +577,7 @@ class Eab_Api {
 	 * Responds with RSVP form
 	 */
 	function handle_get_form () {
+		echo 100;
 		$post_id = (int)@$_POST['post_id'];
 		if (!$post_id) die;
 
