@@ -40,7 +40,18 @@ class Eab_Events_RsvpWithEmail {
 			$error['msg'] = __('Please, submit a valid email.', Eab_EventsHub::TEXT_DOMAIN);
 			die(json_encode($error));
 		}
-		if (email_exists($email)) die(json_encode($error));
+        if (email_exists($email)){
+        	$current_location = get_permalink();
+        	if (!empty($data['location'])) {
+        		// Let's make this sane first - it's coming from a POST request, so make that sane
+        		$loc = wp_validate_redirect(wp_sanitize_redirect($data['location']));
+        		if (!empty($loc)) $current_location = $loc;
+        	}
+            $login_link = wp_login_url( $current_location );
+            $login_message = sprintf( __( 'The email address already exists. Please <a href="%s">Login</a> and RSVP to the event.', Eab_EventsHub::TEXT_DOMAIN ), $login_link );
+            $error['msg'] = $login_message;
+            die(json_encode($error));
+        }
 		
 		$wordp_user = $this->_create_user($email);
 
