@@ -378,6 +378,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 			: get_permalink($event_info['id'])
 		;
 		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:sO", $event_tstamps['start']));
+		$daytime = (int)date("His", $event_tstamps['start']);
 
 		if (!empty($event_info['has_no_start_time'])) {
 			$datetime_format = get_option('date_format');
@@ -387,7 +388,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 			$datetime_class = 'eab-date_format-time';
 		}
 
-		$this->_data[] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
+		$this->_data[$daytime] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' .
 				(
@@ -416,7 +417,9 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 				$day
 			)
 		);
+
 		if ($this->_data) {
+			ksort($this->_data);
 			$activity = '<p>' . 
 				"<span class='eab-date-ordinal'>{$day}</span> <span class='eab-date-full' style='display:none'>{$full_date}</span>" . 
 				'<br />' . join(' ', $this->_data) . 
