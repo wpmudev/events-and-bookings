@@ -28,7 +28,6 @@ jQuery(function() {
 		}
     });
 
-    //jQuery(".eab-event-remove_time").live("click", function () {
     jQuery("body").on("click", ".eab-event-remove_time", function () {
 		var $remove = jQuery(this),
 			$parent = $remove.parents("#eab-add-more-rows"),
@@ -246,6 +245,7 @@ function show_event_recurrence () {
 
 	// Kill WP stuff
 	$("#edit-slug-box").hide();
+	toggle_recurrence_mode(true);
 }
 function hide_event_recurrence () {
 	$("#eab_event-recurring_event").hide();
@@ -256,11 +256,11 @@ function hide_event_recurrence () {
 }
 
 // Recurrence mode toggling
-function toggle_recurrence_mode () {
+function toggle_recurrence_mode (e) {
 	$(".eab_event_recurrence_mode").hide();
 
 	var val = $("#eab_event-repeat_every").val();
-	if (!val) {
+	if (!val && "undefined" !== typeof e) {
 		$("#publish").attr("disabled", true);
 		return false;
 	}
@@ -320,7 +320,6 @@ $(function () {
 	if ($("#eab_event-repeat_every").is(":visible")) $("#edit-slug-box").hide();
 
 	// Attendance canceling
-	//$(".eab-guest-cancel_attendance").live('click', function () {
 	$("body").on("click", ".eab-guest-cancel_attendance", function () {
 		var $me = $(this);
 		var user_id = $me.attr("data-eab-user_id");
@@ -335,7 +334,6 @@ $(function () {
 		return false;
 	});
 	// Attendance deleting
-	//$(".eab-guest-delete_attendance").live('click', function () {
 	$("body").on("click", ".eab-guest-delete_attendance", function () {
 		var $me = $(this);
 		var user_id = $me.attr("data-eab-user_id");
