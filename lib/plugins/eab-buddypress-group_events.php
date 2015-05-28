@@ -144,6 +144,7 @@ class Eab_BuddyPress_GroupEvents {
 		$private = $this->_data->get_option('bp-group_event-private_events') ? 'checked="checked"' : '';
 		$user_groups_only = $this->_data->get_option('bp-group_event-user_groups_only') ? 'checked="checked"' : '';
 		$user_groups_only_unless_superadmin = $this->_data->get_option('bp-group_event-user_groups_only-unless_superadmin') ? 'checked="checked"' : '';
+		$eab_event_bp_group_event_email_grp_member = $this->_data->get_option('eab_event_bp_group_event_email_grp_member') ? 'checked="checked"' : '';
 ?>
 <div id="eab-settings-group_events" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Group Events settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -167,6 +168,10 @@ class Eab_BuddyPress_GroupEvents {
 			<input type="checkbox" id="eab_event-bp-group_event-user_groups_only-unless_superadmin" name="event_default[bp-group_event-user_groups_only-unless_superadmin]" value="1" <?php print $user_groups_only_unless_superadmin; ?> />
 			<span><?php echo $tips->add_tip(__('If you enable this option, your super-admins will be able to assign events to any group.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 	    </div>
+	    <div class="eab-settings-settings_item">
+	    	<label for="eab_event-bp-group_event-private_events"><?php _e('Send email to all group members when a event is created or edited', Eab_EventsHub::TEXT_DOMAIN); ?>?</label>
+			<input type="checkbox" id="eab_event_bp_group_event_email_grp_member" name="event_default[eab_event_bp_group_event_email_grp_member]" value="1" <?php print $eab_event_bp_group_event_email_grp_member; ?> />
+	    </div>
 	</div>
 </div>
 <?php
@@ -177,6 +182,7 @@ class Eab_BuddyPress_GroupEvents {
 		$options['bp-group_event-private_events'] = $_POST['event_default']['bp-group_event-private_events'];
 		$options['bp-group_event-user_groups_only'] = $_POST['event_default']['bp-group_event-user_groups_only'];
 		$options['bp-group_event-user_groups_only-unless_superadmin'] = $_POST['event_default']['bp-group_event-user_groups_only-unless_superadmin'];
+		$options['eab_event_bp_group_event_email_grp_member'] = $_POST['event_default']['eab_event_bp_group_event_email_grp_member'];
 		return $options;
 	}
 
@@ -255,6 +261,22 @@ class Eab_BuddyPress_GroupEvents {
 		//if (!$data) return false;
 		
 		update_post_meta($post_id, 'eab_event-bp-group_event', $data);
+		
+		$email_grp_member = $this->_data->get_option('eab_event_bp_group_event_email_grp_member');
+		if( isset( $email_grp_member ) ) {
+			$grp_members = groups_get_group_members( array( 'group_id' => $data, 'exclude_admins_mods' => false ) );
+			foreach( $grp_members['members'] as $member ){echo "<pre>";
+print_r($grp_members['members']);
+echo "</pre>";
+				//echo $member->user_email;
+				$subject = __( 'Information about a group event', Eab_EventsHub::TEXT_DOMAIN );
+				$subject = apply_filters( 'eab_bp_grp_events_member_mail_subject', $subject, $member, $post_id );
+				$message = __( 'Dear ' . $member->display_name . ',<br><br>An event is created/updated. I hope you will join in that event. Check the event here: ' . get_permalink( $post_id ), Eab_EventsHub::TEXT_DOMAIN );
+				$message = apply_filters( 'eab_bp_grp_events_member_mail_message', $message, $member, $post_id );
+				wp_mail( $member->user_email, $subject, $message );
+			}
+		}
+		
 	}
 	
 	function save_meta ($post_id) {
