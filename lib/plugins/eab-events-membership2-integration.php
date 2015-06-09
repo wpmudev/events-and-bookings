@@ -1,7 +1,7 @@
 <?php
 /*
-Plugin Name: Membership2 Integration
-Description: Allows Events+ to Integrate with our Membership2 plugin, so that members can receive a alternative fee for paid events. <br /><b>Requires <a href="http://premium.wpmudev.org/project/membership">Membership2 plugin</a>.</b>
+Plugin Name: Membership 2 Integration
+Description: Allows Events+ to Integrate with our Membership 2 plugin, so that members can receive a alternative fee for paid events. <br /><b>Requires <a href="http://premium.wpmudev.org/project/membership">Membership 2 plugin</a>.</b>
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
@@ -113,7 +113,7 @@ class Eab_Events_Membership2_Integration {
 	public function show_nag() {
 		printf(
 			'<div class="error"><p>' .
-			__( 'You need to install and activate the %sMembership2%s plugin for the Membership2 Integration to work', Eab_EventsHub::TEXT_DOMAIN ) .
+			__( 'You need to install and activate the %sMembership2%s plugin for the Membership 2 Integration to work', Eab_EventsHub::TEXT_DOMAIN ) .
 			'</p></div>',
 			'<a href="http://premium.wpmudev.org/project/membership">',
 			'</a>'
@@ -187,7 +187,7 @@ class Eab_Events_Membership2_Integration {
 		<div class="eab_meta_box eab-membership2-box <?php echo esc_attr( $close_class ); ?>">
 			<input type="hidden" name="event_membership2_meta" value="1" />
 			<div class="eab_meta_column_box">
-				<?php _e( 'Membership2 Prices', Eab_EventsHub::TEXT_DOMAIN ); ?>
+				<?php _e( 'Membership 2 Prices', Eab_EventsHub::TEXT_DOMAIN ); ?>
 				<div class="handlediv eab-membership2-toggle"></div>
 			</div>
 			<div class="misc-eab-section">
