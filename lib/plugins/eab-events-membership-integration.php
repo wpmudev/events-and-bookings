@@ -6,6 +6,8 @@ Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.3
 Author: WPMU DEV
 AddonType: Integration
+Deprecated: yes
+Required Class: M_Membership
 */
 
 /*
@@ -16,7 +18,7 @@ class Eab_Events_MembershipIntegration {
 
 	/**
 	 * Constructor
-	 */	
+	 */
 	private function __construct () {
 
 		global $wpdb;
@@ -29,7 +31,7 @@ class Eab_Events_MembershipIntegration {
 	/**
 	 * Run the Addon
 	 *
-	 */	
+	 */
 	public static function serve () {
 		$me = new Eab_Events_MembershipIntegration;
 		$me->_add_hooks();
@@ -38,8 +40,15 @@ class Eab_Events_MembershipIntegration {
 	/**
 	 * Hooks to the main plugin Events+
 	 *
-	 */	
+	 */
 	private function _add_hooks () {
+		/*
+		 * Membership plugin is replaced by Membership2 plugin. So this add-on
+		 * is deprecated - we only set up the add-on when the old Membership
+		 * plugin actually is activated.
+		 */
+		if ( ! class_exists( 'M_Membership' ) ) { return; }
+
 		add_action('admin_enqueue_scripts', array( $this, 'load_scripts'));
 		add_action('plugins_loaded', array( $this, 'check_membership_plugin'));
 		add_action('admin_notices', array($this, 'show_nags'));
@@ -55,7 +64,7 @@ class Eab_Events_MembershipIntegration {
 
 	/**
 	 * Load jQuery multiselect
-	 */	
+	 */
 	function load_scripts() {
 		if (function_exists('get_current_screen')) {
 			$screen = get_current_screen();
@@ -67,7 +76,7 @@ class Eab_Events_MembershipIntegration {
 
 	/**
 	 * Warn admin
-	 */	
+	 */
 	function show_nags () {
 		if (!$this->membership_active) {
 			echo '<div class="error"><p>' .
@@ -79,10 +88,10 @@ class Eab_Events_MembershipIntegration {
 	/**
 	 * Check if Membership plugin is active
 	 *
-	 */	
+	 */
 	function check_membership_plugin() {
-		if( ( is_admin() AND class_exists('membershipadmin') ) 
-			OR 
+		if( ( is_admin() AND class_exists('membershipadmin') )
+			OR
 			( !is_admin() AND class_exists('membershippublic') ) )
 				$this->membership_active = true;
 	}
@@ -91,7 +100,7 @@ class Eab_Events_MembershipIntegration {
 	 * Check if 'You havent paid for this event' note will be displayed
 	 * If user is a member and his level is sufficent, return false, i.e don't show pay note
 	 * Otherwise return whatever sent here
-	 */	
+	 */
 	function will_show_pay_note( $show_pay_note, $event_id ) {
 		if ( $this->membership_active ) {
 			global $current_user;
@@ -103,19 +112,19 @@ class Eab_Events_MembershipIntegration {
 				// Load the levels for this member
 				$levels = $member->get_level_ids( );
 				if ( is_array( $levels ) AND is_array( $meta["level"] ) ) {
-					foreach ( $levels as $level ) {	
+					foreach ( $levels as $level ) {
 						if ( in_array( $level->level_id, $meta["level"] ) && !$price[$level->level_id])
 							return false; // Yes, user has sufficent level
 					}
 				}
 			}
-		} 
+		}
 		return $show_pay_note;
 	}
 
 	/**
 	 * Modify payment status text if user is a member with sufficent level
-	 */		
+	 */
 	function status ( $payment_status, $user_id ) {
 		if ( $this->membership_active AND $user_id > 0 ) {
 			global $post;
@@ -137,26 +146,26 @@ class Eab_Events_MembershipIntegration {
 	/**
 	 * Save post meta
 	 *
-	 */	
+	 */
 	function _save_meta ($post_id, $REQUEST) {
-		if (!isset($REQUEST['eab_events_mi'])) 
+		if (!isset($REQUEST['eab_events_mi']))
 			return false;
 		update_post_meta($post_id, 'eab_events_mi', $REQUEST['eab_events_mi']);
 		update_post_meta($post_id, 'eab_events_mi_price', $REQUEST['eab_events_mi_price']);
 	}
 	function save_membership_meta ($post_id) {
-		$this->_save_meta($post_id, $_POST);	
+		$this->_save_meta($post_id, $_POST);
 	}
 
 	/**
 	 * Add HTML codes to the event meta box
 	 *
-	 */	
+	 */
 	function event_meta_box( $content ) {
 		global $post;
-		
+
 		$meta = get_post_meta( $post->ID, 'eab_events_mi', true );
-	
+
 		$content .= '<div class="eab_meta_box">';
 		$content .= '<input type="hidden" name="incsub_event_membership_meta" value="1" />';
 		$content .= '<div class="misc-eab-section">';
@@ -247,26 +256,26 @@ class Eab_Events_MembershipIntegration {
 		}
 		else
 			$content .= __('Membership plugin is not activated.',Eab_EventsHub::TEXT_DOMAIN);
-			
+
 		$content .= '</div>';
 		$content .= '</div>';
-	
+
 		return $content;
-	
+
 	}
 
 	function memeber_event_price ($price, $event_id) {
 		global $current_user;
 		return $this->memeber_event_price_for_user($price, $event_id, $current_user->ID);
 	}
-	
+
 	function memeber_event_price_for_user ($price, $event_id, $user_id) {
 		$mi_price = get_post_meta($event_id, 'eab_events_mi_price', true);
 		if (empty($mi_price)) { // Event price
 			// Check if the user is free to enter
 			$meta = get_post_meta($event_id, 'eab_events_mi', true);
 			if (empty($meta['level'])) return $price;
-			
+
 			global $current_user;
 			$member = new M_Membership($user_id);
 			$levels = $member->get_level_ids();
@@ -287,4 +296,4 @@ class Eab_Events_MembershipIntegration {
 	}
 }
 
-Eab_Events_MembershipIntegration::serve();
+add_action( 'plugins_loaded', array( 'Eab_Events_MembershipIntegration', 'serve' ) );
