@@ -36,6 +36,20 @@ class Eab_Events_Capabilities {
 		add_action('admin_head-incsub_event_page_eab_settings', array($this, 'enqueue_dependencies'));
 		
 		add_filter('eab-capabilities-user_can', array($this, 'check_capability_for'), 10, 4);
+		
+		$eab_protect_media_images = $this->_data->get_option('eab_protect_media_images');
+		if( $eab_protect_media_images == 1 )
+			add_filter( 'posts_where', array( $this, 'eab_protect_media_images' ) );
+	}
+	
+	function eab_protect_media_images( $where ) {
+		global $current_user;
+		if( is_user_logged_in() ){
+			if( ! is_super_admin() )
+				$where .= ' AND post_author=' . $current_user->data->ID;
+		}
+
+		return $where;
 	}
 	
 	function check_capability_for ($capable, $capability, $user, $args) {
@@ -85,6 +99,12 @@ class Eab_Events_Capabilities {
 ?>
 			<p><input type="button" class="button" id="eab-event-capabilities-reset" value="<?php esc_attr_e(__('Reset to defaults', Eab_EventsHub::TEXT_DOMAIN));?>"</p>
 		</div>
+		<p>
+			<?php $eab_protect_media_images = $this->_data->get_option('eab_protect_media_images'); ?>
+			<input <?php echo $eab_protect_media_images == 1 ? 'checked="checked"' : '' ?> type="checkbox" name="eab_protect_media_images" value="1">
+			<?php _e( 'Check the box if you want to restrict the media files to the author only', Eab_EventsHub::TEXT_DOMAIN ); ?>
+		</p>
+		
 	</div>
 </div>
 <?php		
@@ -92,6 +112,7 @@ class Eab_Events_Capabilities {
 	
 	function save_settings ($options) {
 		$options['eab-capabilities_map'] = @$_POST['eab-capabilities_map'];
+		$options['eab_protect_media_images'] = isset( $_POST['eab_protect_media_images'] ) ? $_POST['eab_protect_media_images'] : 0;
 		return $options;
 	}
 	
