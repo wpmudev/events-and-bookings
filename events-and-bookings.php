@@ -1284,8 +1284,7 @@ class Eab_EventsHub {
 		global $wpdb;
 
 		//skip quick edit
-		if ( defined('DOING_AJAX') )
-		    return;
+		if (defined('DOING_AJAX')) return;
 
 	    // Setting up event venue
 		if ( $post->post_type == "incsub_event" && isset( $_POST['incsub_event_where_meta'] ) ) {
@@ -1349,7 +1348,6 @@ class Eab_EventsHub {
 			delete_post_meta($post_id, 'incsub_event_no_start');
 			delete_post_meta($post_id, 'incsub_event_end');
 			delete_post_meta($post_id, 'incsub_event_no_end');
-			//$start = $no_start = $end = $no_end = array();
 		   	if (isset($_POST['incsub_event_start']) && count($_POST['incsub_event_start']) > 0) foreach ($_POST['incsub_event_start'] as $i => $event_start) {
 		   		if (empty($_POST['incsub_event_start'][$i]) || empty($_POST['incsub_event_end'][$i])) continue;
 		   		if (!empty($_POST['incsub_event_start'][$i])) {
@@ -1364,28 +1362,9 @@ class Eab_EventsHub {
 				    if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
 				    else add_post_meta($post_id, 'incsub_event_no_end', 0);
 				}
-			/*
-				if (!empty($_POST['incsub_event_start'][$i]) && !empty($_POST['incsub_event_end'][$i])) {
-					$start_time = @$_POST['incsub_event_no_start_time'][$i] ? '00:01' : @$_POST['incsub_event_start_time'][$i];
-				    //add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}")));
-				    //if (@$_POST['incsub_event_no_start_time'][$i]) add_post_meta($post_id, 'incsub_event_no_start', 1);
-				    $start[$i] = date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}"));
-				    $no_start[$i] = (int)(!empty($_POST['incsub_event_no_start_time'][$i]));
 
-				    $end_time = @$_POST['incsub_event_no_end_time'][$i] ? '23:59' : @$_POST['incsub_event_end_time'][$i];
-				    //add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}")));
-				    //if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
-				    $end[$i] = date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}"));
-				    $no_end[$i] = (int)(!empty($_POST['incsub_event_no_end_time'][$i]));
-				}
-			*/
 			}
-			/*
-			update_post_meta($post_id, 'incsub_event_start', $start);
-			update_post_meta($post_id, 'incsub_event_no_start', $no_start);
-			update_post_meta($post_id, 'incsub_event_end', $end);
-			update_post_meta($post_id, 'incsub_event_no_end', $no_end);
-			*/
+
 		    //for any other plugin to hook into
 		    do_action( 'incsub_event_save_when_meta', $post_id, $meta );
 		}
@@ -1395,7 +1374,7 @@ class Eab_EventsHub {
     }
 
     /**
-     * Kills off the view links im messages when recurring event is being saved.
+     * Kills off the view links in messages when recurring event is being saved.
      *
      * @param array $messages Post updated messages
      *
