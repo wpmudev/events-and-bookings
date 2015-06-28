@@ -104,6 +104,7 @@ class Eab_EventsHub {
 		add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts') );
 		add_action('admin_print_styles', array($this, 'admin_print_styles') );
 		add_action('widgets_init', array($this, 'widgets_init'));
+		add_filter('post_updated_messages', array($this, 'handle_post_updated_messages'));
 
 		add_action('wp_ajax_nopriv_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
 		add_action('wp_ajax_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
@@ -1391,6 +1392,32 @@ class Eab_EventsHub {
 
 		if ('incsub_event' == $post->post_type) do_action('eab-event_meta-save_meta', $post_id);
 		if ('incsub_event' == $post->post_type) do_action('eab-event_meta-after_save_meta', $post_id);
+    }
+
+    /**
+     * Kills off the view links im messages when recurring event is being saved.
+     *
+     * @param array $messages Post updated messages
+     *
+     * @return array Processed messages
+     */
+    function handle_post_updated_messages ($messages) {
+    	if (defined('DOING_AJAX')) return $messages;
+    	if (empty($messages['post'])) return $messages;
+
+    	$post = get_post();
+    	if (empty($post->post_type) || Eab_EventModel::POST_TYPE !== $post->post_type) return $messages;
+
+    	$event = new Eab_EventModel($post);
+    	if (!$event->is_recurring()) return $messages; // Normal events don't need this - just recurring
+
+    	$hub_permalink = preg_quote(get_permalink($post->ID), '/');
+    	foreach ($messages['post'] as $idx => $msg) {
+    		if (!preg_match('/<a .*href=[\'"]' . $hub_permalink . '[\'"]/', $msg)) continue;
+    		$messages['post'][$idx] = preg_replace('/<a .*href=[\'"]' . $hub_permalink . '[\'"].*?<\/a>/', '', $msg);
+    	}
+
+    	return $messages;
     }
 
     function post_type_link($permalink, $post_obj, $leavename) {
