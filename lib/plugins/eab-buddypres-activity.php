@@ -79,6 +79,7 @@ class Eab_BuddyPress_AutoUpdateActivity {
 			'component' => 'eab_events',
 			'type' => 'event_created',
 			'item_id' => $event->get_id(),
+			'user_id' => $event->get_author()
 		);
 		bp_activity_add($activity);
 
