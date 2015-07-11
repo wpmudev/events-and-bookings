@@ -229,9 +229,10 @@ class Eab_Template {
 		return $ret;
 	}
 
-	private static function get_admin_attendance_addition_form ($event, $statuses) {
+	public static function get_admin_attendance_addition_form ($event, $statuses) {
 		if (!method_exists($event, 'get_id') || !is_array($statuses)) return false;
 		if ($event->is_premium()) return ''; // Won't deal with the paid events
+		if ($event->is_recurring() && !$event->is_recurring_child()) return ''; // Won't deal with the recurring hub events
 
 		$content = '';
 
@@ -261,15 +262,11 @@ class Eab_Template {
 		if (!current_user_can('edit_posts')) return false; // Basic sanity check
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
 		
-		$statuses = array(
-			Eab_EventModel::BOOKING_YES => __('Attending', Eab_EventsHub::TEXT_DOMAIN), 
-			Eab_EventModel::BOOKING_MAYBE => __('Maybe', Eab_EventsHub::TEXT_DOMAIN), 
-			Eab_EventModel::BOOKING_NO => __('No', Eab_EventsHub::TEXT_DOMAIN)
-		);
+		$statuses = self::get_rsvp_status_list();
 		if (!in_array($status, array_keys($statuses))) return false; // Unknown status
 		$status_name = $statuses[$status];
 
-		$content = Eab_Template::get_admin_attendance_addition_form($event, $statuses);
+		//$content = Eab_Template::get_admin_attendance_addition_form($event, $statuses); // Moved to actual bookings areas
 
 		$content .= '<h4>'. __($status_name, Eab_EventsHub::TEXT_DOMAIN). '</h4>';
 		$content .= '<ul class="eab-guest-list">';
@@ -636,6 +633,14 @@ class Eab_Template {
 			*/
 		}
 		return $content;
+	}
+
+	public static function get_rsvp_status_list () {
+		return array(
+			Eab_EventModel::BOOKING_YES => __('Attending', Eab_EventsHub::TEXT_DOMAIN), 
+			Eab_EventModel::BOOKING_MAYBE => __('Maybe', Eab_EventsHub::TEXT_DOMAIN), 
+			Eab_EventModel::BOOKING_NO => __('No', Eab_EventsHub::TEXT_DOMAIN)
+		);
 	}
 
 	public static function get_status_class ($post) {

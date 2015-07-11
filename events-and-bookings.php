@@ -1252,6 +1252,8 @@ class Eab_EventsHub {
 		$content .= '<input type="hidden" name="incsub_event_bookings_meta" value="1" />';
 		$content .= '<div class="bookings-list-left">';
 
+		$content .= Eab_Template::get_admin_attendance_addition_form($event, Eab_Template::get_rsvp_status_list());
+
 		if (
 			(!$event->is_recurring() && $event->has_bookings(false))
 			||
