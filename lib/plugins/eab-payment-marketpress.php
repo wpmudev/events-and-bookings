@@ -28,6 +28,7 @@ class Eab_Payments_PaymentViaProducts {
 		add_action('mp_new_order', array($this, 'dispatch_mp_product_if_order_paid'));
 
 		// Admin
+		add_action('admin_notices', array($this, 'show_mp_presence_nag'));
 		add_action('admin_notices', array($this, 'show_event_relationship_for_products'));
 		// Settings
 		add_action('eab-settings-after_payment_settings', array($this, 'show_settings'));
@@ -115,10 +116,25 @@ class Eab_Payments_PaymentViaProducts {
 		echo '<div class="updated"><p>' . sprintf(__('This Product is used as admittance payment for <a href="%s">%s</a>.'), $link, $title) . '</p></div>';
 	}
 
+	private function _is_mp_present () {
+		return class_exists('MarketPress');
+	}
+
+	function show_mp_presence_nag () {
+		if ($this->_is_mp_present()) return false;
+		echo '<div class="error">' .
+			'<p>' .
+				__( 'You need to install and activate the <a href="http://premium.wpmudev.org/project/e-commerce">MarketPress</a> plugin for the &quot;Payments via MarketPress Products&quot; to work', Eab_EventsHub::TEXT_DOMAIN ) .
+			'</p>'.
+		'</div>';
+	}
+
 	/**
 	 * Returns properly formatted product price for Event on the front end.
 	 */
 	function show_product_price ($price, $event_id) {
+		if (!$this->_is_mp_present()) return $price;
+
 		$event = new Eab_EventModel(get_post($event_id));
 		$parent_event_id = $event->is_recurring_child();
 		if (!$parent_event_id) {
@@ -161,6 +177,8 @@ class Eab_Payments_PaymentViaProducts {
 	 * Overrides "Fee" portion of the Events editor dialog.
 	 */
 	function show_event_product_selection ($fee, $event_id) {
+		if (!$this->_is_mp_present()) return $fee;
+
 		$out = '';
 		$category_id = $this->_data->get_option('payment-ppvp-category');
 		$query_args = array(
@@ -338,6 +356,8 @@ class Eab_Payments_PaymentViaProducts {
 	 * Returns related Product instead of standard payment forms for appropriate events.
 	 */
 	function process_event_payment_forms ($form, $event_id) {
+		if (!$this->_is_mp_present()) return $form;
+		
 		$event = new Eab_EventModel(get_post($event_id));
 		$recurring = $event->is_recurring_child();
 		$event_id = $recurring ? $recurring : $event_id;
