@@ -27,12 +27,22 @@ class Eab_Export_GCalButton {
 	}
 
 	function append_export_link ($content, $event) {
-		$time_callback = /*'gmt' == $this->_calculus ? 'gmdate' : */'date';
-		$zulu = 'Z';
+		$time_callback = 'date';
+		$zulu = '';
+		$zone_string = get_option('timezone_string');
+		$gmt_offset = (float)get_option('gmt_offset');
+
+		if (empty($gmt_offset)) $zulu = 'Z';
+		else if (empty($zone_string)) {
+			$hour_tz = sprintf('%02d', abs((int)$gmt_offset));
+			$minute_offset = (abs($gmt_offset) - abs((int)$gmt_offset)) * 60;
+			$min_tz = sprintf('%02d', $minute_offset);
+			$zone_string = 'UTC' . ($gmt_offset > 0 ? '+' : '-') . $hour_tz . ':' . $min_tz;
+		}
 
 		$start = $time_callback("Ymd\THis", $event->get_start_timestamp()) . $zulu;
 		$end = $time_callback("Ymd\THis", $event->get_end_timestamp()) . $zulu;
-		$data = array (
+		$data = array(
 			'action=TEMPLATE',
 			'text=' . esc_attr($event->get_title()),
 			'dates=' . esc_attr("{$start}/{$end}"),
@@ -41,8 +51,11 @@ class Eab_Export_GCalButton {
 			'trp=false',
 			'sprop=' . esc_attr('website:' . parse_url(home_url(), PHP_URL_HOST)),
 		);
-		return "{$content} <a href='http://www.google.com/calendar/event?" . 
-			join('&', $data) . 
+		if (!empty($zone_string) && !empty($gmt_offset)) {
+			$data[] = 'ctz=' . esc_attr($zone_string);
+		}
+		return "{$content} <a href='" .
+			esc_url('http://www.google.com/calendar/event?' . join('&', $data)) .
 		"'><span class='eab_export' style='display:none'>" . __('Export to GCAL', Eab_EventsHub::TEXT_DOMAIN) . '</span><img src="//www.google.com/calendar/images/ext/gc_button1.gif" border=0></a>';
 	}
 }
