@@ -1972,7 +1972,7 @@ class Eab_EventsHub {
 						<?php } ?>
 						</select>
 						<span>
-							<small><em>* templates may not work in all themes</em></small>
+							<small><em><?php _e('* templates may not work in all themes', self::TEXT_DOMAIN); ?></em></small>
 							<?php echo $tips->add_tip(__('Choose how single event listings are displayed on your site.', self::TEXT_DOMAIN)); ?>
 						</span>
 					    <?php } ?>
