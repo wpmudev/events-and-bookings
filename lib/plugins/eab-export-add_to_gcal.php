@@ -12,6 +12,13 @@ class Eab_Export_GCalButton {
 
 	private $_data;
 
+	/**
+	 * Injected/processed event IDs cache
+	 *
+	 * @var array
+	 */
+	private $_added = array();
+
 	function __construct () {
 		$this->_data = Eab_Options::get_instance();
 	}
@@ -24,9 +31,14 @@ class Eab_Export_GCalButton {
 	private function _add_hooks () {
 		add_filter('eab-template-archive_after_view_link', array($this, 'append_export_link'), 10, 2);
 		add_filter('eab-events-after_single_event', array($this, 'append_export_link'), 10, 2);
+		
+		// Catch-all filter, in case we missed the injection previously.
+		add_filter('eab-events-after_event_details', array($this, 'append_export_link'), 10, 2);
 	}
 
 	function append_export_link ($content, $event) {
+		if (in_array($event->get_id(), $this->_added)) return $content;
+
 		$time_callback = 'date';
 		$zulu = '';
 		$zone_string = get_option('timezone_string');
@@ -54,6 +66,9 @@ class Eab_Export_GCalButton {
 		if (!empty($zone_string) && !empty($gmt_offset)) {
 			$data[] = 'ctz=' . esc_attr($zone_string);
 		}
+
+		$this->_added[] = $event->get_id();
+
 		return "{$content} <a href='" .
 			esc_url('http://www.google.com/calendar/event?' . join('&', $data)) .
 		"'><span class='eab_export' style='display:none'>" . __('Export to GCAL', Eab_EventsHub::TEXT_DOMAIN) . '</span><img src="//www.google.com/calendar/images/ext/gc_button1.gif" border=0></a>';
