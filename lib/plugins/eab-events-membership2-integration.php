@@ -3,7 +3,7 @@
 Plugin Name: Membership 2 Integration
 Description: Allows Events+ to Integrate with our Membership 2 plugin, so that members can receive a alternative fee for paid events. <br /><b>Requires <a href="http://premium.wpmudev.org/project/membership">Membership 2 plugin</a>.</b>
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
-Version: 1.0
+Version: 1.0.1
 Author: WPMU DEV
 Developer: Philipp Stracker
 AddonType: Integration
@@ -357,6 +357,8 @@ class Eab_Events_Membership2_Integration {
 	 * @return float Custom price for current user.
 	 */
 	public function get_event_price_for_user( $price, $event_id, $user_id ) {
+		$new_price = $price;
+
 		if ( is_admin() ) {
 			$screen = get_current_screen();
 			if ( ! isset( $screen->base ) ) { $screen->base = ''; }
@@ -365,24 +367,25 @@ class Eab_Events_Membership2_Integration {
 			if ( 'post' == $screen->base && 'incsub_event' == $screen->post_type ) {
 				// An admin is currently editing the event:
 				// Don't modify the price here!
-				return $price;
+				return $new_price;
 			}
 		}
 
-		$data = $this->get_infos( $event_id );
-		$user = $this->api->get_member( $user_id );
-		$new_price = $price;
+		if ( is_user_logged_in() ) {
+			$data = $this->get_infos( $event_id );
+			$user = $this->api->get_member( $user_id );
 
-		foreach ( $data as $membership_id => $membership ) {
-			// Skip this membership if it does not have a custom price.
-			if ( empty( $membership['has_price'] ) ) { continue; }
+			foreach ( $data as $membership_id => $membership ) {
+				// Skip this membership if it does not have a custom price.
+				if ( empty( $membership['has_price'] ) ) { continue; }
 
-			if ( $user->has_membership( $membership_id ) ) {
-				// The member has subscribed to this membership.
+				if ( $user->has_membership( $membership_id ) ) {
+					// The member has subscribed to this membership.
 
-				if ( $membership['price'] < $new_price ) {
-					// Choose the lowest price available.
-					$new_price = $membership['price'];
+					if ( $membership['price'] < $new_price ) {
+						// Choose the lowest price available.
+						$new_price = $membership['price'];
+					}
 				}
 			}
 		}
