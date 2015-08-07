@@ -113,7 +113,7 @@ class Eab_Events_Membership2_Integration {
 	public function show_nag() {
 		printf(
 			'<div class="error"><p>' .
-			__( 'You need to install and activate the %sMembership2%s plugin for the Membership 2 Integration to work', Eab_EventsHub::TEXT_DOMAIN ) .
+			__( 'You need to install and activate the %sMembership 2%s plugin for the Membership 2 Integration to work', Eab_EventsHub::TEXT_DOMAIN ) .
 			'</p></div>',
 			'<a href="http://premium.wpmudev.org/project/membership">',
 			'</a>'
@@ -331,11 +331,17 @@ class Eab_Events_Membership2_Integration {
 	public function get_event_price( $price, $event_id ) {
 		global $current_user;
 
-		return $this->get_event_price_for_user(
+		$custom_price = $this->get_event_price_for_user(
 			$price,
 			$event_id,
 			$current_user->ID
 		);
+
+		if ( is_numeric( $custom_price ) ) {
+			$price = $custom_price;
+		}
+
+		return $price;
 	}
 
 	/**
@@ -367,19 +373,21 @@ class Eab_Events_Membership2_Integration {
 		$user = $this->api->get_member( $user_id );
 		$new_price = $price;
 
-		foreach ( $data as $membership_id => $memberhip ) {
+		foreach ( $data as $membership_id => $membership ) {
 			// Skip this membership if it does not have a custom price.
-			if ( ! $membership->has_price ) { continue; }
+			if ( empty( $membership['has_price'] ) ) { continue; }
 
 			if ( $user->has_membership( $membership_id ) ) {
 				// The member has subscribed to this membership.
 
-				if ( $membership->price < $new_price ) {
+				if ( $membership['price'] < $new_price ) {
 					// Choose the lowest price available.
-					$new_price = $membership->price;
+					$new_price = $membership['price'];
 				}
 			}
 		}
+
+		return $new_price;
 	}
 
 
