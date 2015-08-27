@@ -49,7 +49,7 @@ class Eab_Events_SocialRsvps {
 	}
 	
 	function update_oauth_scope ($public) {
-		$public['fb_scope'] = 'email,publish_stream';
+		$public['fb_scope'] = 'email,publish_actions';
 		return $public;
 	}
 	
