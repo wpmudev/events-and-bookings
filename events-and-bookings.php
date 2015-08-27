@@ -1796,15 +1796,15 @@ class Eab_EventsHub {
 			<ol>
 			    <li>
 				<?php _e('Before creating an event, you\'ll need to configure some basic settings, like your root slug and payment options.', self::TEXT_DOMAIN); ?>
-				<a href="edit.php?post_type=incsub_event&page=eab_settings&eab_step=1" class="eab-goto-step button" id="eab-goto-step-0" ><?php _e('Configure Your Settings', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&page=eab_settings&eab_step=1'); ?>" class="eab-goto-step button" id="eab-goto-step-0" ><?php _e('Configure Your Settings', self::TEXT_DOMAIN); ?></a>
 			    </li>
 			    <li>
 				<?php _e('Now you can create your first event.', self::TEXT_DOMAIN); ?>
-				<a href="post-new.php?post_type=incsub_event&eab_step=2" class="eab-goto-step button"><?php _e('Add an Event', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo esc_url('post-new.php?post_type=incsub_event&eab_step=2'); ?>" class="eab-goto-step button"><?php _e('Add an Event', self::TEXT_DOMAIN); ?></a>
 			    </li>
 			    <li>
 				<?php _e('You can view and edit your existing events whenever you like.', self::TEXT_DOMAIN); ?>
-				<a href="edit.php?post_type=incsub_event&eab_step=3" class="eab-goto-step button"><?php _e('Edit Events', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&eab_step=3'); ?>" class="eab-goto-step button"><?php _e('Edit Events', self::TEXT_DOMAIN); ?></a>
 			    </li>
 			    <li>
 				<?php _e('The archive displays a list of upcoming events on your site.', self::TEXT_DOMAIN); ?>
