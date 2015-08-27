@@ -99,6 +99,12 @@ class Eab_EventsHub {
 		add_action('manage_incsub_event_posts_custom_column', array($this, 'manage_posts_custom_column'));
 		add_filter('manage_incsub_event_posts_columns', array($this, 'manage_posts_columns'), 99);
 
+		/**
+		 * Wipe out the default post actions, because we're using our own
+		 * @since  WP 4.3
+		 */
+		add_filter('post_row_actions', array($this, 'manage_post_actions'), 10, 2);
+
 		add_action('add_meta_boxes_incsub_event', array($this, 'meta_boxes') );
 		add_action('wp_insert_post', array($this, 'save_event_meta'), 10, 2 );
 		add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts') );
@@ -1612,6 +1618,22 @@ class Eab_EventsHub {
 				get_inline_data($post);
 				break;
 		}
+    }
+
+    /**
+     * Filter out the actions because we're splicing in our own, for event post types.
+     *
+     * @param array $actions
+     * @param WP_Post $post
+     *
+     * @return array
+     */
+    public function manage_post_actions ($actions, $post) {
+    	if (empty($post->post_type)) return $actions;
+    	return Eab_EventModel::POST_TYPE !== $post->post_type
+    		? $actions
+    		: array()
+    	;
     }
 
     /**
