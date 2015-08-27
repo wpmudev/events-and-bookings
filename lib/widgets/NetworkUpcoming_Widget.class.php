@@ -3,11 +3,14 @@
 class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 	
 	function __construct () {
-		$widget_ops = array('classname' => __CLASS__, 'description' => __('Displays List of Upcoming Events from your entire network', $this->translation_domain));
-		parent::WP_Widget(__CLASS__, __('Network Upcoming', $this->translation_domain), $widget_ops);
+		$widget_ops = array(
+			'classname' => __CLASS__, 
+			'description' => __('Displays List of Upcoming Events from your entire network', $this->translation_domain),
+		);
+		parent::__construct(__CLASS__, __('Network Upcoming', $this->translation_domain), $widget_ops);
 	}
 	
-	function form($instance) {
+	function form ($instance) {
 		$title = esc_attr($instance['title']);
 		$limit = esc_attr($instance['limit']);
 		
@@ -28,7 +31,7 @@ class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 		echo $html;
 	}
 	
-	function update($new_instance, $old_instance) {
+	function update ($new_instance, $old_instance) {
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['limit'] = strip_tags($new_instance['limit']);
@@ -36,7 +39,7 @@ class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 		return $instance;
 	}
 	
-	function widget($args, $instance) {
+	function widget ($args, $instance) {
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
 		$limit = (int)$instance['limit'];

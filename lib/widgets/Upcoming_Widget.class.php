@@ -13,9 +13,13 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 			'limit' => 5,
 			'dates' => false,
 		));
-		$widget_ops = array('description' => __('Display List of Upcoming Events', $this->translation_domain));
-        $control_ops = array('title' => __('Upcoming', $this->translation_domain));        
-		parent::WP_Widget( 'incsub_event_upcoming', __('Upcoming Events', $this->translation_domain), $widget_ops, $control_ops );
+		$widget_ops = array(
+			'description' => __('Display List of Upcoming Events', $this->translation_domain),
+		);
+        $control_ops = array(
+        	'title' => __('Upcoming', $this->translation_domain),
+        );
+		parent::__construct('incsub_event_upcoming', __('Upcoming Events', $this->translation_domain), $widget_ops, $control_ops);
     }
     
     function widget ($args, $instance) {
