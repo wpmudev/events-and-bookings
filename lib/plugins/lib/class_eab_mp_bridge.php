@@ -358,7 +358,13 @@ class Eab_MP_Bridge {
 		}
 
 		if (!$product_id) return $form;
-		MP_Cart::get_instance()->add_item($product_id);
+
+		$cart = MP_Cart::get_instance();
+		$items = $cart->get_items();
+		if (is_array($items) && false === array_search($product_id, array_keys($items))) {
+			// Only add once, not if it's already in the cart
+			$cart->add_item($product_id);
+		}
 
 		return '<p><a href="' . esc_url(mp_cart_link(false, true)) . '">' . __('Click here to purchase your ticket', Eab_EventsHub::TEXT_DOMAIN) . '</a></p>';
 	}
