@@ -388,7 +388,7 @@ class Eab_MP_Bridge {
 			if ($this->_is_product_id($cart_id)) {
 				$product_id = $cart_id;
 			} else {
-				$variation = get_post($variation);
+				$variation = get_post($cart_id);
 				$product_id = $variation->post_parent;
 			}
 
