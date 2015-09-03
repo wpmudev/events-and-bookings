@@ -75,7 +75,7 @@ class Eab_Payments_PaymentViaProducts {
 		if (!$this->_is_mp_present()) return false;
 		if (!defined('MP_VERSION')) return false;
 
-		return version_compare(MP_VERSION, '3.0', '>=');
+		return version_compare(MP_VERSION, '3.0', '<');
 	}
 
 	function show_mp_presence_nag () {
