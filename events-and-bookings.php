@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.8.1-BETA-3
+ Version: 1.8.2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.8.1-BETA-3';
+    const CURRENT_VERSION = '1.8.2';
 
     /**
      * Translation domain
@@ -99,11 +99,18 @@ class Eab_EventsHub {
 		add_action('manage_incsub_event_posts_custom_column', array($this, 'manage_posts_custom_column'));
 		add_filter('manage_incsub_event_posts_columns', array($this, 'manage_posts_columns'), 99);
 
+		/**
+		 * Wipe out the default post actions, because we're using our own
+		 * @since  WP 4.3
+		 */
+		add_filter('post_row_actions', array($this, 'manage_post_actions'), 10, 2);
+
 		add_action('add_meta_boxes_incsub_event', array($this, 'meta_boxes') );
 		add_action('wp_insert_post', array($this, 'save_event_meta'), 10, 2 );
 		add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts') );
 		add_action('admin_print_styles', array($this, 'admin_print_styles') );
 		add_action('widgets_init', array($this, 'widgets_init'));
+		add_filter('post_updated_messages', array($this, 'handle_post_updated_messages'));
 
 		add_action('wp_ajax_nopriv_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
 		add_action('wp_ajax_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
@@ -288,7 +295,6 @@ class Eab_EventsHub {
 
 		wp_localize_script('eab_admin_js', 'eab_event_localized', $event_localized);
 
-
 		if (isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'incsub_event-update-options')) {
 			$options = array();
 		    $options['slug'] 						= trim(trim($_POST['event_default']['slug'], '/'));
@@ -303,7 +309,6 @@ class Eab_EventsHub {
 			$options['archive_template'] 			= $_POST['event_default']['archive_template'];
 			$options['single_template'] 			= $_POST['event_default']['single_template'];
 
-		    //update_option('incsub_event_default', $this->_options['default']);
 			$options = apply_filters('eab-settings-before_save', $options);
 			$this->_data->set_options($options);
 		    wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
@@ -430,11 +435,11 @@ class Eab_EventsHub {
 
 		// Yes
 		$yes_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".self::tablename(self::BOOKING_TABLE)." WHERE `status` = 'yes' AND event_id = %d;", $event_id));
-	    	update_post_meta($event_id, 'incsub_event_yes_count', $yes_count);
+	    update_post_meta($event_id, 'incsub_event_yes_count', $yes_count);
 
 		// Maybe
 		$maybe_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".self::tablename(self::BOOKING_TABLE)." WHERE `status` = 'maybe' AND event_id = %d;", $event_id));
-	    	update_post_meta($event_id, 'incsub_event_maybe_count', $maybe_count);
+	    update_post_meta($event_id, 'incsub_event_maybe_count', $maybe_count);
 		update_post_meta($event_id, 'incsub_event_attending_count', $maybe_count+$yes_count);
 
 		// No
@@ -511,20 +516,18 @@ class Eab_EventsHub {
 		    exit(0);
 		}
 
-		//if ($amount != get_post_meta($event_id, 'incsub_event_fee', true)) {
-		//if ($amount != $ticket_count * get_post_meta($event_id, 'incsub_event_fee', true)) {
 		if ($amount != $ticket_count * apply_filters('eab-payment-event_price-for_user', get_post_meta($event_id, 'incsub_event_fee', true), $event_id, $booking_obj->user_id)) {
 		    header('HTTP/1.0 400 Bad Request');
 		    header('Content-type: text/plain; charset=UTF-8');
 		    print 'We were not expecting you. REF: PP2';
-	    	    exit(0);
+	    	exit(0);
 		}
 
 		if (!$ticket_count) {
 		    header('HTTP/1.0 400 Bad Request');
 		    header('Content-type: text/plain; charset=UTF-8');
 		    print 'Cheapskate. REF: PP2';
-	    	    exit(0);
+    	    exit(0);
 		}
 
 		if (strtolower($pay_to_email) != strtolower(@$eab_options['paypal_email'])) {
@@ -612,7 +615,6 @@ class Eab_EventsHub {
     function agm_google_maps_options($opts) {
 		$opts['use_custom_fields'] = 1;
 		$opts['custom_fields_options']['associate_map'] = 1;
-		//$opts['custom_fields_options']['autoshow_map'] = 1;
 		return $opts;
     }
 
@@ -1251,6 +1253,8 @@ class Eab_EventsHub {
 		$content .= '<input type="hidden" name="incsub_event_bookings_meta" value="1" />';
 		$content .= '<div class="bookings-list-left">';
 
+		$content .= Eab_Template::get_admin_attendance_addition_form($event, Eab_Template::get_rsvp_status_list());
+
 		if (
 			(!$event->is_recurring() && $event->has_bookings(false))
 			||
@@ -1283,8 +1287,7 @@ class Eab_EventsHub {
 		global $wpdb;
 
 		//skip quick edit
-		if ( defined('DOING_AJAX') )
-		    return;
+		if (defined('DOING_AJAX')) return;
 
 	    // Setting up event venue
 		if ( $post->post_type == "incsub_event" && isset( $_POST['incsub_event_where_meta'] ) ) {
@@ -1348,7 +1351,6 @@ class Eab_EventsHub {
 			delete_post_meta($post_id, 'incsub_event_no_start');
 			delete_post_meta($post_id, 'incsub_event_end');
 			delete_post_meta($post_id, 'incsub_event_no_end');
-			//$start = $no_start = $end = $no_end = array();
 		   	if (isset($_POST['incsub_event_start']) && count($_POST['incsub_event_start']) > 0) foreach ($_POST['incsub_event_start'] as $i => $event_start) {
 		   		if (empty($_POST['incsub_event_start'][$i]) || empty($_POST['incsub_event_end'][$i])) continue;
 		   		if (!empty($_POST['incsub_event_start'][$i])) {
@@ -1363,34 +1365,41 @@ class Eab_EventsHub {
 				    if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
 				    else add_post_meta($post_id, 'incsub_event_no_end', 0);
 				}
-			/*
-				if (!empty($_POST['incsub_event_start'][$i]) && !empty($_POST['incsub_event_end'][$i])) {
-					$start_time = @$_POST['incsub_event_no_start_time'][$i] ? '00:01' : @$_POST['incsub_event_start_time'][$i];
-				    //add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}")));
-				    //if (@$_POST['incsub_event_no_start_time'][$i]) add_post_meta($post_id, 'incsub_event_no_start', 1);
-				    $start[$i] = date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}"));
-				    $no_start[$i] = (int)(!empty($_POST['incsub_event_no_start_time'][$i]));
 
-				    $end_time = @$_POST['incsub_event_no_end_time'][$i] ? '23:59' : @$_POST['incsub_event_end_time'][$i];
-				    //add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}")));
-				    //if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
-				    $end[$i] = date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}"));
-				    $no_end[$i] = (int)(!empty($_POST['incsub_event_no_end_time'][$i]));
-				}
-			*/
 			}
-			/*
-			update_post_meta($post_id, 'incsub_event_start', $start);
-			update_post_meta($post_id, 'incsub_event_no_start', $no_start);
-			update_post_meta($post_id, 'incsub_event_end', $end);
-			update_post_meta($post_id, 'incsub_event_no_end', $no_end);
-			*/
+
 		    //for any other plugin to hook into
 		    do_action( 'incsub_event_save_when_meta', $post_id, $meta );
 		}
 
 		if ('incsub_event' == $post->post_type) do_action('eab-event_meta-save_meta', $post_id);
 		if ('incsub_event' == $post->post_type) do_action('eab-event_meta-after_save_meta', $post_id);
+    }
+
+    /**
+     * Kills off the view links in messages when recurring event is being saved.
+     *
+     * @param array $messages Post updated messages
+     *
+     * @return array Processed messages
+     */
+    function handle_post_updated_messages ($messages) {
+    	if (defined('DOING_AJAX')) return $messages;
+    	if (empty($messages['post'])) return $messages;
+
+    	$post = get_post();
+    	if (empty($post->post_type) || Eab_EventModel::POST_TYPE !== $post->post_type) return $messages;
+
+    	$event = new Eab_EventModel($post);
+    	if (!$event->is_recurring()) return $messages; // Normal events don't need this - just recurring
+
+    	$hub_permalink = preg_quote(get_permalink($post->ID), '/');
+    	foreach ($messages['post'] as $idx => $msg) {
+    		if (!preg_match('/<a .*href=[\'"]' . $hub_permalink . '[\'"]/', $msg)) continue;
+    		$messages['post'][$idx] = preg_replace('/<a .*href=[\'"]' . $hub_permalink . '[\'"].*?<\/a>/', '', $msg);
+    	}
+
+    	return $messages;
     }
 
     function post_type_link($permalink, $post_obj, $leavename) {
@@ -1412,17 +1421,6 @@ class Eab_EventsHub {
 		);
 
 		if ($post && $post->post_type == 'incsub_event' && '' != $permalink) {
-
-		    //$ptype = get_post_type_object($post->post_type);
-		    //$start = false;
-
-		    //$meta = get_post_custom($post->ID);
-		    /*
-		    if (isset($meta["incsub_event_start"])) {// && isset($meta["incsub_event_start"][$event_variation[$post->ID]])) {
-				//$start = strtotime($meta["incsub_event_start"][$event_variation[$post->ID]]);
-				$start = strtotime($meta["incsub_event_start"][0]);
-		    }
-		    */
 		    $starts = get_post_meta($post_id, 'incsub_event_start');
 		    $start = isset($starts[0])
 		    	? strtotime($starts[0])
@@ -1492,8 +1490,6 @@ class Eab_EventsHub {
 	}
 
     function manage_posts_columns($old_columns)	{
-		global $post_status;
-
 		$columns['cb'] = $old_columns['cb'];
 		$columns['event'] = $old_columns['title'];
 
@@ -1507,7 +1503,6 @@ class Eab_EventsHub {
 		$columns['author'] = $old_columns['author'];
 		$columns['date'] = $old_columns['date'];
 		$columns['attendees'] = __('RSVPs', self::TEXT_DOMAIN);
-
 
 		return $columns;
     }
@@ -1593,17 +1588,33 @@ class Eab_EventsHub {
 						$actions['view'] = '<a href="' . get_permalink($event_id) . '" title="' . esc_attr(sprintf(__('View &#8220;%s&#8221;'), $event->get_title())) . '" rel="permalink">' . __('View') . '</a>';
 					}
 				}
-				//echo $title . WP_List_Table::row_actions($actions);
+
 				echo $title;
 				if (!empty($actions)) {
 					foreach ($actions as $action => $link) {
 						$actions[$action] = "<span class='{$action}'>{$link}</span>";
 					}
 				}
-				echo '<div class="row-actions">' . join('|', $actions) . '</div>';
+				echo '<div class="row-actions">' . join('&nbsp;|&nbsp;', $actions) . '</div>';
 				get_inline_data($post);
 				break;
 		}
+    }
+
+    /**
+     * Filter out the actions because we're splicing in our own, for event post types.
+     *
+     * @param array $actions
+     * @param WP_Post $post
+     *
+     * @return array
+     */
+    public function manage_post_actions ($actions, $post) {
+    	if (empty($post->post_type)) return $actions;
+    	return Eab_EventModel::POST_TYPE !== $post->post_type
+    		? $actions
+    		: array()
+    	;
     }
 
     /**
@@ -1766,15 +1777,15 @@ class Eab_EventsHub {
 			<ol>
 			    <li>
 				<?php _e('Before creating an event, you\'ll need to configure some basic settings, like your root slug and payment options.', self::TEXT_DOMAIN); ?>
-				<a href="edit.php?post_type=incsub_event&page=eab_settings&eab_step=1" class="eab-goto-step button" id="eab-goto-step-0" ><?php _e('Configure Your Settings', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&page=eab_settings&eab_step=1'); ?>" class="eab-goto-step button" id="eab-goto-step-0" ><?php _e('Configure Your Settings', self::TEXT_DOMAIN); ?></a>
 			    </li>
 			    <li>
 				<?php _e('Now you can create your first event.', self::TEXT_DOMAIN); ?>
-				<a href="post-new.php?post_type=incsub_event&eab_step=2" class="eab-goto-step button"><?php _e('Add an Event', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo esc_url('post-new.php?post_type=incsub_event&eab_step=2'); ?>" class="eab-goto-step button"><?php _e('Add an Event', self::TEXT_DOMAIN); ?></a>
 			    </li>
 			    <li>
 				<?php _e('You can view and edit your existing events whenever you like.', self::TEXT_DOMAIN); ?>
-				<a href="edit.php?post_type=incsub_event&eab_step=3" class="eab-goto-step button"><?php _e('Edit Events', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&eab_step=3'); ?>" class="eab-goto-step button"><?php _e('Edit Events', self::TEXT_DOMAIN); ?></a>
 			    </li>
 			    <li>
 				<?php _e('The archive displays a list of upcoming events on your site.', self::TEXT_DOMAIN); ?>
@@ -1810,29 +1821,28 @@ class Eab_EventsHub {
     }
 
     function views_list($views) {
-	global $wp_query;
+		global $wp_query;
 
-	$avail_post_stati = wp_edit_posts_query();
-	$num_posts = wp_count_posts( 'incsub_event', 'readable' );
+		$avail_post_stati = wp_edit_posts_query();
+		$num_posts = wp_count_posts( 'incsub_event', 'readable' );
 
-	$argvs = array('post_type' => 'incsub_event');
-	// $argvs = array();
-	foreach ( get_post_stati($argvs, 'objects') as $status ) {
-	    $class = '';
-	    $status_name = $status->name;
-	    if ( !in_array( $status_name, $avail_post_stati ) )
-	        continue;
+		$argvs = array('post_type' => 'incsub_event');
 
-	    if ( empty( $num_posts->$status_name ) )
-	        continue;
+		foreach ( get_post_stati($argvs, 'objects') as $status ) {
+		    $class = '';
+		    $status_name = $status->name;
+		    
+		    if (!in_array($status_name, $avail_post_stati)) continue;
+		    if (empty($num_posts->$status_name)) continue;
 
-	    if ( isset($_GET['post_status']) && $status_name == $_GET['post_status'] )
-	        $class = ' class="current"';
+		    if (isset($_GET['post_status']) && $status_name == $_GET['post_status']) {
+		        $class = ' class="current"';
+		    }
 
-	    $views[$status_name] = "<li><a href='edit.php?post_type=incsub_event&amp;post_status=$status_name'$class>" . sprintf( _n( $status->label_count[0], $status->label_count[1], $num_posts->$status_name ), number_format_i18n( $num_posts->$status_name ) ) . '</a>';
-	}
+		    $views[$status_name] = "<li><a href='edit.php?post_type=incsub_event&amp;post_status=$status_name'$class>" . sprintf( _n( $status->label_count[0], $status->label_count[1], $num_posts->$status_name ), number_format_i18n( $num_posts->$status_name ) ) . '</a>';
+		}
 
-	return $views;
+		return $views;
     }
 
     function settings_render() {
@@ -1964,7 +1974,7 @@ class Eab_EventsHub {
 						<?php } ?>
 						</select>
 						<span>
-							<small><em>* templates may not work in all themes</em></small>
+							<small><em><?php _e('* templates may not work in all themes', self::TEXT_DOMAIN); ?></em></small>
 							<?php echo $tips->add_tip(__('Choose how single event listings are displayed on your site.', self::TEXT_DOMAIN)); ?>
 						</span>
 					    <?php } ?>
@@ -2217,12 +2227,6 @@ if (is_admin()) {
 		'id' => 249,
 		'name' => 'Events +',
 		'screens' => array(
-			/*
-			// No working pages, please
-			'edit-incsub_event',
-			'incsub_event',
-			'edit-eab_events_category',
-			*/
 			'incsub_event_page_eab_welcome',
 			'incsub_event_page_eab_settings',
 			'incsub_event_page_eab_shortcodes',

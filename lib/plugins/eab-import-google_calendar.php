@@ -55,7 +55,7 @@ class Eab_Gcal_Importer_GoogleImporter extends Eab_ScheduledImporter {
 
 	public static function serve () { return new Eab_Gcal_Importer_GoogleImporter; }
 
-	public function check_schedule () {
+	public function check_schedule () {	
 		$last_run = (int)get_option($this->get_schedule_key());
 		$run_each = $this->_data->get_option('gcal_importer-run_each');
 		$run_each = $run_each ? $run_each : 3600;
@@ -89,6 +89,7 @@ class Eab_Gcal_Importer_GoogleImporter extends Eab_ScheduledImporter {
 	public function map_to_post_type ($gevent) {
 		// Basic post info
 		$author = $this->_data->get_option('gcal_importer-calendar_author');
+
 		return array(
 			'post_type' => Eab_EventModel::POST_TYPE,
 			'post_status' => 'publish',
@@ -107,21 +108,39 @@ class Eab_Gcal_Importer_GoogleImporter extends Eab_ScheduledImporter {
 		$meta['incsub_event_status'] = Eab_EventModel::STATUS_OPEN; // Open by default
 
 		// Metadata - timestamps
-		$start = isset($gevent['start']['dateTime']) ? strtotime($gevent['start']['dateTime']) : false;
-		$end = isset($gevent['end']['dateTime']) ? strtotime($gevent['end']['dateTime']) : false;
+		$start = isset($gevent['start']['dateTime']) ? $this->_to_local_time($gevent['start']['dateTime']) : false;
+		$end = isset($gevent['end']['dateTime']) ? $this->_to_local_time($gevent['end']['dateTime']) : false;
 		if ($start) $meta['incsub_event_start'] = date('Y-m-d H:i:s', $start);
 		if ($end) $meta['incsub_event_end'] = date('Y-m-d H:i:s', $end);
 
 		// Metadata - location
 		$venue = isset($gevent['location']) ? $gevent['location'] : false;
 		if ($venue) $meta['incsub_event_venue'] = $venue;
-		
-		
+
 		return $meta;
 	}
 
 	private function get_schedule_key () {
 		return 'last_' . __CLASS__ . '_run';
+	}
+
+	/**
+	 * Convert the GCal event times into locally valid ones.
+	 *
+	 * @param string $str_stamp String timestamp (e.g. 2013-05-30T10:49:26+02:00)
+	 *
+	 * @return int Parsed UNIX timestamp
+	 */
+	private function _to_local_time ($str_stamp) {
+		$stamp = strtotime($str_stamp);
+
+		$convert = $this->_data->get_option('gcal_importer-convert_times');
+		if (empty($convert)) return $stamp;
+
+		$gmt_offset = (float)get_option('gmt_offset');
+		$tdiff = $gmt_offset * 3600;
+
+		return $stamp + $tdiff;
 	}
 
 }
@@ -248,6 +267,11 @@ class Eab_Calendars_GoogleImporter {
 			</select>
 			<span><?php echo $tips->add_tip(__('Select the user you wish to appear as your imported Events host.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 		</div>
+		<div class="eab-settings-settings_item">
+			<input type="hidden" name="gcal_importer[convert_times]" value="" />
+			<input type="checkbox" id="incsub_event-gcal_importer-convert_times" name="gcal_importer[convert_times]" value="1" <?php checked($this->_data->get_option('gcal_importer-convert_times'), 1); ?> />
+			<label for="incsub_event-gcal_importer-convert_times"><?php _e('Attempt to convert event times to local WordPress time', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+		</div>
 		<?php } // end if authenticated ?>
 	</div>
 </div>
@@ -298,6 +322,7 @@ $(function () {
 		$options['gcal_importer-sync_calendars'] = $_POST['gcal_importer']['sync_calendars'];
 		$options['gcal_importer-calendar_author'] = $_POST['gcal_importer']['calendar_author'];
 		$options['gcal_importer-run_each'] = $_POST['gcal_importer']['run_each'];
+		$options['gcal_importer-convert_times'] = !empty($_POST['gcal_importer']['convert_times']) ? 1 : 0;
 		return $options;
 	}
 

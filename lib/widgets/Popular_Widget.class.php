@@ -12,9 +12,13 @@ class Eab_Popular_Widget extends Eab_Widget {
 			'thumbnail' => false,
 			'limit' => 5,
 		));
-		$widget_ops = array( 'description' => __('Display List of Popular events', $this->translation_domain) );
-        $control_ops = array( 'title' => __('Most Popular', $this->translation_domain));     
-		parent::WP_Widget( 'incsub_event_popular', __('Most Popular Events', $this->translation_domain), $widget_ops, $control_ops );
+		$widget_ops = array(
+			'description' => __('Display List of Popular events', $this->translation_domain)
+		);
+        $control_ops = array(
+        	'title' => __('Most Popular', $this->translation_domain)
+        );
+		parent::__construct('incsub_event_popular', __('Most Popular Events', $this->translation_domain), $widget_ops, $control_ops);
     }
     
     function widget ($args, $instance) {

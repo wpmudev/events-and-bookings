@@ -318,6 +318,27 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 }
 
 /**
+ * Add User form bit
+ */
+.eab-add_attendance {
+    border: 1px solid rgb(238, 238, 238);
+    padding: 5px;
+    margin: 5px 0;
+}
+.eab-add_attendance legend {
+    padding: 0 5px;
+}
+.eab-add_attendance label {
+    margin-left: 5px;
+}
+.eab-add_attendance .eab-attendance-email,
+.eab-add_attendance .eab-attendance-status
+{
+    margin-right: 15px;
+}
+
+
+/**
  * Pointer tutorial fixes...
  */
 .eab_tutorial-pointer .dismiss {

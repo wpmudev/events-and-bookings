@@ -3,14 +3,17 @@
 class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	
 	function __construct () {
-		$widget_ops = array('classname' => __CLASS__, 'description' => __('Displays List of Upcoming Events from your entire network', $this->translation_domain));
+		$widget_ops = array(
+			'classname' => __CLASS__, 
+			'description' => __('Displays List of Upcoming Events from your entire network', $this->translation_domain),
+		);
 		
 		add_action('wp_enqueue_scripts', array($this, 'css_load_styles'));
 		add_action('wp_enqueue_scripts', array($this, 'js_load_scripts'));
 		add_action('wp_ajax_eab_cuw_get_calendar', array($this, 'handle_calendar_request'));
 		add_action('wp_ajax_nopriv_eab_cuw_get_calendar', array($this, 'handle_calendar_request'));
 		
-		parent::WP_Widget(__CLASS__, __('Calendar Upcoming', $this->translation_domain), $widget_ops);
+		parent::__construct(__CLASS__, __('Calendar Upcoming', $this->translation_domain), $widget_ops);
 	}
 	
 	function css_load_styles () {

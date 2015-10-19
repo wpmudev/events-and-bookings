@@ -490,6 +490,7 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 	protected $_use_footer = false;
 	protected $_use_scripts = true;
 	protected $_navigation = false;
+	protected $_track = false;
 	protected $_title_format = 'M Y';
 	protected $_short_title_format = 'm-Y';
 	
@@ -519,6 +520,10 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 
 	public function set_navigation ($navigation) {
 		$this->_navigation = (bool)$navigation;
+	}
+
+	public function set_track ($track) {
+		$this->_track = (bool)$track;
 	}
 
 	protected function _get_js () {
@@ -564,20 +569,23 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 				"<span>{$title_format}</span>" . 
 			'</time>' .
 		'</a>';
+		$positional_id = $this->_track ? esc_attr('eab-calendar-' . preg_replace('/[^-_a-z0-9]/', '-', $calendar_class)) : '';
+		$id_attr = $this->_track ? "id='{$positional_id}'" : '';
+		$id_href = $this->_track ? "#{$positional_id}" : '';
 		$title = 'top' == $position
-			? "<h4>{$title_link}</h4>"
+			? "<h4 {$id_attr}>{$title_link}</h4>"
 			: "<b>{$title_link}</b>"
 		;
 		return "<tr class='{$row_class}'>" .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 
-					add_query_arg('date', date('Y-m', $time - (366*86400))) . '">' . 
+					esc_url(add_query_arg('date', date('Y-m', $time - (366*86400)))) . $id_href . '">' . 
 					'&nbsp;&laquo;' .
 				'</a>' .
 			'</td>' .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-month" href="' . 
-					add_query_arg('date', date('Y-m', $time - (28*86400))) . '">' .
+					esc_url(add_query_arg('date', date('Y-m', $time - (28*86400)))) . $id_href . '">' .
 					'&nbsp;&lsaquo;' .
 				'</a>' .
 			'</td>' .
@@ -587,13 +595,13 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 			'</td>' .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-next eab-time_unit-month" href="' . 
-					add_query_arg('date', date('Y-m', $time + (32*86400))) . '">' . 
+					esc_url(add_query_arg('date', date('Y-m', $time + (32*86400)))) . $id_href . '">' . 
 					'&rsaquo;&nbsp;' . 
 				'</a>' .
 			'</td>' .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-next eab-time_unit-year" href="' . 
-					add_query_arg('date', date('Y-m', $time + (366*86400))) . '">' . 
+					esc_url(add_query_arg('date', date('Y-m', $time + (366*86400)))) . $id_href . '">' . 
 					'&raquo;&nbsp;' . 
 				'</a>' .
 			'</td>' .

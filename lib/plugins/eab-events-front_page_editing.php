@@ -518,9 +518,11 @@ class Eab_Events_FrontPageEditing {
 		// RSVPs
 		$ret .= '<div class="eab-events-fpe-meta_box" id="eab-events-fpe-rsvps">';
 
+
 		if ($event->has_bookings()) {
 			$ret .= '<a href="#toggle_rsvps" id="eab-events-fpe-toggle_rsvps">' . __('Toggle RSVPs', Eab_EventsHub::TEXT_DOMAIN) . '</a>';
 			$ret .= '<div id="eab-events-fpe-rsvps-wrapper" style="display:none">';
+			$ret .= Eab_Template::get_admin_attendance_addition_form($event, Eab_Template::get_rsvp_status_list());
 			$ret .= '<div>';
 			$ret .= Eab_Template::get_admin_bookings(Eab_EventModel::BOOKING_YES, $event);
 			$ret .= '</div>';
@@ -533,6 +535,8 @@ class Eab_Events_FrontPageEditing {
 			$ret .= Eab_Template::get_admin_bookings(Eab_EventModel::BOOKING_NO, $event);
 			$ret .= '</div>';
 			$ret .= '</div>'; //eab-events-fpe-rsvps-wrapper
+		} else {
+			$ret .= Eab_Template::get_admin_attendance_addition_form($event, Eab_Template::get_rsvp_status_list());
 		}
 
 		// End RSVPs

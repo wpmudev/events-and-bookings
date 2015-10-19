@@ -1,8 +1,32 @@
 Plugin Name: Events
-Author: Incsub
+Author: WPMU DEV
 
 Change Log:
 ----------------------------------------------------------------------
+
+1.8.2 - 2015-09-03
+----------------------------------------------------------------------
+- Fix some notices.
+- Fix event/product relationship maintenance.
+- Fix appearance settings hook by decoupling from template conditional.
+- Fix the calendar events sorting within individual day cells.
+- Fix event publish disabling action with WPML involved.
+- Fix GCal export timezone setup.
+- Fix event maps repeated insertion.
+- Fix widgets for compatibility.
+- Add MarketPress 3.0 compatibility layer.
+- Add visible tips to dedicated shortcodes help page.
+- Add new track calendar shortcode attribute.
+- Add optional local time conversion for GCal imported event times.
+- Add admin attendance addition form regardless of existing bookings.
+
+1.8.1.1 - 2015-08-07
+----------------------------------------------------------------------
+- Fix integration for Membership 2
+
+1.8.1 - 2015-06-09
+----------------------------------------------------------------------
+- Add integration for Membership 2
 
 1.8 - 2015-01-15
 ----------------------------------------------------------------------
