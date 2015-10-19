@@ -388,7 +388,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 			$datetime_class = 'eab-date_format-time';
 		}
 
-		$this->_data[$daytime] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
+		$this->_data[$daytime][] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' .
 				(
@@ -419,10 +419,17 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 		);
 
 		if ($this->_data) {
-			ksort($this->_data);
+			$html = '';
+			foreach( $this->_data as $key => $val ) {
+				ksort($val);
+				foreach( $val as $v ) {
+					$html .= $v;
+				}
+			}
+			//ksort($this->_data);
 			$activity = '<p>' . 
 				"<span class='eab-date-ordinal'>{$day}</span> <span class='eab-date-full' style='display:none'>{$full_date}</span>" . 
-				'<br />' . join(' ', $this->_data) . 
+				'<br />' . $html . 
 			'</p>';
 		} else {
 			$activity = '<p>' . "<span class='eab-date-ordinal'>{$day}</span> <span class='eab-date-full' style='display:none'>{$full_date}</span>" . '</p>';
