@@ -346,7 +346,7 @@ class Eab_Template {
 		$start = $event->get_start_timestamp();
 		$content = '';
 		
-		$content .= '<a href="' . self::get_root_url() . '" class="parent">' .
+		$content .= '<a href="' . self::get_root_url() . '/" class="parent">' .
 			__("Events", Eab_EventsHub::TEXT_DOMAIN) .
 		'</a> &gt; ';
 		$content .= '<a href="' . self::get_archive_url($start, false) . '" class="parent">' .
