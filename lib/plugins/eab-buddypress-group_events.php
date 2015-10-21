@@ -344,7 +344,7 @@ echo "</pre>";
 
 	private function _get_navigation ($timestamp) {
 		global $bp;
-		$root = $bp->root_domain . '/' . $bp->groups->slug . '/' . $bp->groups->current_group->slug . '/';
+		$root = $bp->root_domain . '/' . $bp->pages->groups->slug . '/' . $bp->groups->current_group->slug . '/';
 		
 		$prev_url = $root . self::SLUG . date_i18n('/Y/m/', $timestamp - (28*86400));
 		$next_url = $root . self::SLUG . date_i18n('/Y/m/', $timestamp + (32*86400));
