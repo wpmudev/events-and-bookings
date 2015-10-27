@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.8.2
+ Version: 1.8.3-beta1
  Author URI: http://premium.wpmudev.org
 */
 

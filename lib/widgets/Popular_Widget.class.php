@@ -26,7 +26,7 @@ class Eab_Popular_Widget extends Eab_Widget {
 		
 		extract($args);
 		
-		$instace = apply_filters('eab-widgets-popular-instance_read', $instance, $this);
+		$instance = apply_filters('eab-widgets-popular-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
 		
 		$title = apply_filters('widget_title', empty($instance['title']) ? __('Most Popular', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
