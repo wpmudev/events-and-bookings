@@ -200,70 +200,8 @@ class Eab_EventsHub {
 		    load_plugin_textdomain(self::TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)).'/languages');
 		}
 
-		$labels = array(
-		    'name' => __('Events', self::TEXT_DOMAIN),
-		    'singular_name' => __('Event', self::TEXT_DOMAIN),
-		    'add_new' => __('Add Event', self::TEXT_DOMAIN),
-		    'add_new_item' => __('Add New Event', self::TEXT_DOMAIN),
-		    'edit_item' => __('Edit Event', self::TEXT_DOMAIN),
-		    'new_item' => __('New Event', self::TEXT_DOMAIN),
-		    'view_item' => __('View Event', self::TEXT_DOMAIN),
-		    'search_items' => __('Search Event', self::TEXT_DOMAIN),
-		    'not_found' =>  __('No event found', self::TEXT_DOMAIN),
-		    'not_found_in_trash' => __('No event found in Trash', self::TEXT_DOMAIN),
-		    'menu_name' => __('Events', self::TEXT_DOMAIN)
-		);
-
-		$supports = array( 'title', 'editor', 'author', 'venue', 'thumbnail', 'comments');
-		$supports = apply_filters('eab-event-post_type-supports', $supports);
-
-		$event_type_args = array(
-			'labels' => $labels,
-			'public' => true,
-			'show_ui' => true,
-			'publicly_queryable' => true,
-			'capability_type' => 'event',
-			'hierarchical' => false,
-			'map_meta_cap' => true,
-			'query_var' => true,
-			'supports' => $supports,
-			'rewrite' => array( 'slug' => $this->_data->get_option('slug'), 'with_front' => false ),
-			'has_archive' => true,
-			'menu_icon' => plugins_url('events-and-bookings/img/small-greyscale.png'),
-		);
-		register_post_type(
-			Eab_EventModel::POST_TYPE,
-			apply_filters('eab-post_type-register', $event_type_args)
-		);
-		register_taxonomy(
-			'eab_events_category',
-			Eab_EventModel::POST_TYPE,
-			array(
-				'labels' => array(
-					'name' => __('Event Categories', self::TEXT_DOMAIN),
-					'singular_name' => __('Event Category', self::TEXT_DOMAIN),
-					'singular_name' => __('Event Category', self::TEXT_DOMAIN),
-				),
-				'hierarchical' => true,
-				'public' => true,
-				'rewrite' => array(
-					'slug' => $this->_data->get_option('slug'),
-					'with_front' => true,
-				),
-				'capabilities' => array(
-					'manage_terms' => 'manage_categories',
-					'edit_terms' => 'manage_categories',
-					'delete_terms' => 'manage_categories',
-					'assign_terms' => 'edit_events',
-				),
-			)
-		);
-
-		$pts_args = array('show_in_admin_all_list' => false, 'label' => __( 'Recurrent', 'eab' ) );
-	    $pts_args['label_count'] = _n_noop( 'Recurrent <span class="count">(%s)</span>', 'Recurrent <span class="count">(%s)</span>', 'eab' );
-		if (is_admin()) $pts_args['protected'] = true;
-		else $pts_args['public'] = true;
-		register_post_status(Eab_EventModel::RECURRENCE_STATUS, $pts_args);
+	    $taxonomies = new Eab_Taxonomies();
+	    $taxonomies->register();
 
 		$event_structure = '/'.$this->_data->get_option('slug').'/%event_year%/%event_monthnum%/%incsub_event%';
 
@@ -861,7 +799,7 @@ class Eab_EventsHub {
 		}
 
 		$style = $event->is_recurring() ? '' : 'style="display:none"';
-		$content .= '<div id="eab_event-recurring_event" ' . $style . '>';
+		$content = '<div id="eab_event-recurring_event" ' . $style . '>';
 
 		$parts = wp_parse_args(
 			$event->get_recurrence_parts(),
@@ -1954,6 +1892,7 @@ require_once EAB_PLUGIN_DIR . 'lib/class_eab_codec.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_event_model.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_template.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_api.php';
+require_once EAB_PLUGIN_DIR . 'lib/class-eab-taxonomies.php';
 
 // Lets get things started
 $__booking = events_and_bookings(); // @TODO: Refactor
@@ -1997,6 +1936,11 @@ function eab_activate() {
 	Eab_Activator::run();
 }
 register_activation_hook(__FILE__, 'eab_activate' );
+
+
+function eab_domain() {
+	return Eab_EventsHub::TEXT_DOMAIN;
+}
 
 function events_and_bookings() {
 	return Eab_EventsHub::get_instance();
