@@ -562,7 +562,7 @@ class Eab_Api {
 		$user = get_userdata($wordp_user);
 
 		//notify
-		wp_new_user_notification($user->ID, $password);
+		wp_new_user_notification($user->ID, '', 'all');
 
 		wp_set_current_user($user->ID, $user->user_login);
 		wp_set_auth_cookie($user->ID); // Logged in with WordPress, yay
