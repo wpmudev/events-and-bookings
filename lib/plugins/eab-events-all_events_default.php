@@ -38,7 +38,9 @@ class Eab_Events_AllEventsDefault {
 	}
 
 	function all_events_start () { return '1971-01-01 00:01'; }
-	function all_events_end () { return date('Y', PHP_INT_MAX) . '-01-01 23:59'; }
+	function all_events_end () {
+		return '2037-01-01 23:59';
+	}
 	function unbind_all_replacements () {
 		remove_filter('eab-collection-upcoming-start_timestamp', array($this, 'all_events_start')); 
 		remove_filter('eab-collection-upcoming-end_timestamp', array($this, 'all_events_end')); 
