@@ -166,32 +166,34 @@ function create_wordpress_login_popup ($action, post_id) {
 	});
 }
 
-function get_google_login_button () {
-	if (!l10nEabApi.data.gg_client_id) return '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-google">' + l10nEabApi.google + '</a></li>';
-	return '<li><span id="signinButton"> <span class="g-signin" data-callback="eab_google_plus_login_callback" data-clientid="' + l10nEabApi.data.gg_client_id + '" data-cookiepolicy="single_host_origin" data-scope="profile email"> </span> </span></li>';
-}
 
 function create_login_interface ($me) {
-	if ($("#wpmudevevents-login_links-wrapper").length) {
-		$("#wpmudevevents-login_links-wrapper").remove();
-	}
-	$me.parents('.wpmudevevents-buttons').after('<div id="wpmudevevents-login_links-wrapper" />');
 	var $root = $("#wpmudevevents-login_links-wrapper");
-	var post_id = $me.parents(".wpmudevevents-buttons").find('input:hidden[name="event_id"]').val();
-	$root.html(
-		'<ul class="wpmudevevents-login_links">' +
-			(l10nEabApi.data.show_facebook ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-facebook">' + l10nEabApi.facebook + '</a></li>' : '') +
-			(l10nEabApi.data.show_twitter ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-twitter">' + l10nEabApi.twitter + '</a></li>' : '') +
-			(l10nEabApi.data.show_google ? get_google_login_button() : '') +
-			(l10nEabApi.data.show_wordpress ? '<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-wordpress">' + l10nEabApi.wordpress + '</a></li>' : '') +
-			'<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-cancel">' + l10nEabApi.cancel + '</a></li>' +
-		'</ul>'
-	);
+	if ( ! $root.length )
+		return;
+
+	var $parentButtons = $me.parents('.wpmudevevents-buttons');
+
+	if ( ! $parentButtons.length )
+		return;
+
+	var post_id = $parentButtons.find('input:hidden[name="event_id"]').val();
+
+	$root = $root.detach().insertAfter( $parentButtons ).show();
+
 	$me.addClass("active");
+
 	$root.find(".wpmudevevents-login_link").each(function () {
 		var $lnk = $(this);
 		var callback = false;
 		if ($lnk.is(".wpmudevevents-login_link-facebook")) {
+
+			function checkFBLoginState() {
+				FB.getLoginStatus(function(response) {
+					statusChangeCallback(response);
+				});
+			}
+
 			// Facebook login
 			callback = function () {
 				FB.login(function (resp) {
