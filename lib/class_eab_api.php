@@ -123,7 +123,8 @@ class Eab_Api {
 					  appId: "%s",
 					  status: true,
 					  cookie: true,
-					  xfbml: true
+					  xfbml: true,
+					  version    : "v2.5"
 					});
 				};
 				// Load the FB SDK Asynchronously
@@ -180,11 +181,7 @@ class Eab_Api {
 		$token = @$_POST['token'];
 		if (!$token) die(json_encode($resp));
 
-		$request = new WP_Http;
-		$result = $request->request(
-			'https://graph.facebook.com/me?oauth_token=' . $token,
-			array('sslverify' => false) // SSL certificate issue workaround
-		);
+		$result = wp_remote_get( 'https://graph.facebook.com/me?fields=email,name,first_name,last_name&oauth_token=' . $token, array('sslverify' => false) );
 		if (200 != $result['response']['code']) die(json_encode($resp)); // Couldn't fetch info
 
 		$data = json_decode($result['body']);
