@@ -114,87 +114,32 @@ class Eab_Api {
 			'wp_signup_error' => __( 'Your email/username is already taken or email is invalid!', Eab_EventsHub::TEXT_DOMAIN ),
 		)));
 		if (!$this->_data->get_option('facebook-no_init')) {
-
-			add_action('wp_head', array( $this, 'init_facebook_api' ), 500 );
-
+			if (defined('EAB_INTERNAL_FLAG__FB_INIT_ADDED')) return false;
+			add_action('wp_footer', create_function('', "echo '" .
+			sprintf(
+				'<div id="fb-root"></div><script type="text/javascript">
+				window.fbAsyncInit = function() {
+					FB.init({
+					  appId: "%s",
+					  status: true,
+					  cookie: true,
+					  xfbml: true
+					});
+				};
+				// Load the FB SDK Asynchronously
+				(function(d){
+					var js, id = "facebook-jssdk"; if (d.getElementById(id)) {return;}
+					js = d.createElement("script"); js.id = id; js.async = true;
+					js.src = "//connect.facebook.net/en_US/all.js";
+					d.getElementsByTagName("head")[0].appendChild(js);
+				}(document));
+				</script>',
+				$this->_data->get_option('facebook-app_id')
+			) .
+			"';"));
+			define('EAB_INTERNAL_FLAG__FB_INIT_ADDED', true, true);
 		}
-
-		add_action( 'wp_footer', array( $this, 'generate_login_interface' ) );
     }
-
-	function generate_login_interface() {
-		$show_facebook = !$this->_data->get_option('api_login-hide-facebook');
-		$show_twitter = !$this->_data->get_option('api_login-hide-twitter');
-		$show_google = !$this->_data->get_option('api_login-hide-google');
-		$show_wordpress = !$this->_data->get_option('api_login-hide-wordpress');
-
-		$google_client_id = $this->_data->get_option('google-client_id');
-
-		?>
-		<div id="wpmudevevents-login_links-wrapper" style="display:none;">
-			<ul class="wpmudevevents-login_links">
-				<?php if ( $show_facebook ): ?>
-					<li><fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button></li>
-				<?php endif; ?>
-
-				<?php if ( $show_twitter ): ?>
-					<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-twitter"><?php esc_html_e( 'Login with Twitter', Eab_EventsHub::TEXT_DOMAIN ); ?></a></li>
-				<?php endif; ?>
-
-				<?php if ( $show_google ): ?>
-
-					<?php if ( ! $google_client_id ): ?>
-						<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-google"><?php esc_html_e( 'Login with Google', Eab_EventsHub::TEXT_DOMAIN ); ?></a></li>
-					<?php else: ?>
-						<li><span id="signinButton"> <span class="g-signin" data-callback="eab_google_plus_login_callback" data-clientid="<?php echo esc_attr( $google_client_id ); ?>" data-cookiepolicy="single_host_origin" data-scope="profile email"> </span> </span></li>
-					<?php endif; ?>
-
-				<?php endif; ?>
-
-				<?php if ( $show_wordpress ): ?>
-					<li><a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-wordpress"><?php esc_html_e( 'Login with WordPress', Eab_EventsHub::TEXT_DOMAIN ); ?></a></li>
-				<?php endif; ?>
-
-			</ul>
-
-			<a href="#" class="wpmudevevents-login_link wpmudevevents-login_link-cancel"><?php esc_html_e( 'Cancel', Eab_EventsHub::TEXT_DOMAIN ); ?></a>
-		</div>
-		<?php
-	}
-
-	function init_facebook_api() {
-		if ( defined( 'EAB_INTERNAL_FLAG__FB_INIT_ADDED' ) )
-			return;
-
-		$app_id = $this->_data->get_option('facebook-app_id');
-		?>
-		<div id="fb-root"></div>
-
-		<script type="text/javascript">
-			window.fbAsyncInit = function() {
-				FB.init({
-					appId: "<?php echo $app_id; ?>",
-					status: true,
-					cookie: true,
-					xfbml: true,
-					version    : "v2.5"
-				});
-			};
-
-			// Load the FB SDK Asynchronously
-			(function(d, s, id){
-				var js, fjs = d.getElementsByTagName(s)[0];
-				if (d.getElementById(id)) {return;}
-				js = d.createElement(s); js.id = id;
-				js.src = "//connect.facebook.net/en_US/sdk.js";
-				fjs.parentNode.insertBefore(js, fjs);
-			}(document, "script", "facebook-jssdk"));
-
-		</script>
-		<?php
-
-		define('EAB_INTERNAL_FLAG__FB_INIT_ADDED', true, true);
-	}
 
 	function get_social_api_avatar ($avatar, $id_or_email, $size = '96') {
 		$wp_uid = false;

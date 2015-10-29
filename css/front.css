@@ -347,6 +347,7 @@ div.wpmudevevents-attendees ul.eab-guest-list {
 }
 
 #wpmudevevents-hide-rsvps, #wpmudevevents-load-rsvps, a.wpmudevevents-login_link-cancel {
+	float: center;	
 	color: #333;
     cursor: pointer;
     display: inline-block;
@@ -557,14 +558,4 @@ var.eab-date_format-date,
 var.eab-date_format-time 
 {
   font-style: normal;
-}
-
-
-#wpmudevevents-login_links-wrapper {
-    clear:both;
-}
-
-#wpmudevevents-login_links-wrapper li {
-    float:left;
-    margin-right:20px;
 }
