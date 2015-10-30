@@ -45,12 +45,12 @@ class Eab_EventsHub {
      * Options instance.
 	 * @var object
      */
-    private $_data;
+    public $_data;
 
     /**
      * API handler instance
      */
-    private $_api;
+    public $_api;
 
 	private static $instance = null;
 
@@ -232,25 +232,7 @@ class Eab_EventsHub {
 
 		wp_localize_script('eab_admin_js', 'eab_event_localized', $event_localized);
 
-		if (isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'incsub_event-update-options')) {
-			$options = array();
-		    $options['slug'] 						= trim(trim($_POST['event_default']['slug'], '/'));
-			$options['accept_payments'] 			= $_POST['event_default']['accept_payments'];
-			$options['accept_api_logins'] 			= $_POST['event_default']['accept_api_logins'];
-			$options['display_attendees'] 			= $_POST['event_default']['display_attendees'];
-			$options['currency'] 					= $_POST['event_default']['currency'];
-			$options['paypal_email'] 				= $_POST['event_default']['paypal_email'];
-			$options['paypal_sandbox'] 				= @$_POST['event_default']['paypal_sandbox'];
 
-			$options['override_appearance_defaults']	= $_POST['event_default']['override_appearance_defaults'];
-			$options['archive_template'] 			= $_POST['event_default']['archive_template'];
-			$options['single_template'] 			= $_POST['event_default']['single_template'];
-
-			$options = apply_filters('eab-settings-before_save', $options);
-			$this->_data->set_options($options);
-		    wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
-		    exit();
-		}
 
 		if (isset($_REQUEST['eab_step'])) {
 		    setcookie('eab_step', $_REQUEST['eab_step'], eab_current_time()+(3600*24));
@@ -1466,6 +1448,7 @@ class Eab_EventsHub {
 
 		$root_key = 'edit.php?post_type=incsub_event';
 
+	    include_once( 'admin/class-eab-settings-menu.php' );
 		if (get_option('eab_setup', false) == false) {
 		    add_submenu_page($root_key, __("Get Started", self::TEXT_DOMAIN), __("Get started", self::TEXT_DOMAIN), 'manage_options', 'eab_welcome', array($this,'welcome_render'));
 
@@ -1476,7 +1459,10 @@ class Eab_EventsHub {
 				}
 		    }
 		}
-		add_submenu_page($root_key, __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array($this, 'settings_render'));
+
+
+	    new Eab_Admin_Settings_Menu( $root_key );
+
 		add_submenu_page($root_key, __("Event Shortcodes", self::TEXT_DOMAIN), __("Shortcodes", self::TEXT_DOMAIN), 'edit_events', 'eab_shortcodes', array($this, 'shortcodes_render'));
 
 		do_action('eab-admin-add_pages', $root_key);
@@ -1576,194 +1562,7 @@ class Eab_EventsHub {
 		return $views;
     }
 
-    function settings_render() {
-		if(!current_user_can('manage_options')) {
-	  		echo "<p>" . __('Nice Try...', self::TEXT_DOMAIN) . "</p>";  //If accessed properly, this message doesn't appear.
-	  		return;
-	  	}
-		if (isset($_GET['incsub_event_settings_saved']) && $_GET['incsub_event_settings_saved'] == 1) {
-		    echo '<div class="updated fade"><p>'.__('Settings saved.', self::TEXT_DOMAIN).'</p></div>';
-	    }
-		if (!class_exists('WpmuDev_HelpTooltips')) require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
-		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 
-		$tabbable = !(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)
-			? 'tabbable'
-			: false
-		;
-		$hide = !empty($tabbable) ? 'hide' : '';
-
-		$archive_tpl = file_exists(get_stylesheet_directory().'/archive-incsub_event.php')
-			? get_stylesheet_directory() . '/archive-incsub_event.php'
-		    : get_template_directory() . '/archive-incsub_event.php'
-		;
-		$archive_tpl_present = apply_filters(
-			'eab-settings-appearance-archive_template_copied',
-			file_exists($archive_tpl)
-		);
-
-		$single_tpl = file_exists(get_stylesheet_directory().'/single-incsub_event.php')
-			? get_stylesheet_directory() . '/single-incsub_event.php'
-		    : get_template_directory() . '/single-incsub_event.php'
-		;
-		$single_tpl_present = apply_filters(
-			'eab-settings-appearance-single_template_copied',
-			file_exists($single_tpl)
-		);
-
-		$theme_tpls_present = apply_filters(
-			'eab-settings-appearance-templates_copied',
-			($archive_tpl_present && $single_tpl_present)
-		);
-		$raw_tpl_sets = glob(EAB_PLUGIN_DIR . 'default-templates/*');
-		$templates = array();
-		foreach ($raw_tpl_sets as $item) {
-			if (!is_dir($item)) continue;
-			$key = basename($item);
-			$label = ucwords(preg_replace('/[^a-z0-9]+/i', ' ', $key));
-			$templates[$key] = sprintf(__("Plugin: %s", self::TEXT_DOMAIN), $label);
-		}
-		foreach (get_page_templates() as $name => $tpl) {
-			$templates[$tpl] = sprintf(__("Theme: %s", self::TEXT_DOMAIN), $name);
-
-		}
-	?>
-	<div class="wrap <?php echo esc_attr($tabbable); ?> <?php echo esc_attr($hide); ?>">
-	    <div id="icon-events-general" class="icon32"><br/></div>
-	    <h2><?php _e('Events Settings', self::TEXT_DOMAIN); ?></h2>
-    <?php if (defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS) { ?>
-	    <div class="eab-note">
-		    <p><?php _e('This is where you manage your general settings for the plugin and how events are displayed on your site.', self::TEXT_DOMAIN); ?>.</p>
-	    </div>
-    <?php } ?>
-	    <form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">
-		<?php wp_nonce_field('incsub_event-update-options'); ?>
-		<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
-		    <?php do_action('eab-settings-before_plugin_settings'); ?>
-		    <div id="eab-settings-general" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Plugin settings', self::TEXT_DOMAIN); ?></h3>
-				<div class="eab-inside">
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-slug" id="incsub_event_label-slug"><?php _e('Set your root slug here:', self::TEXT_DOMAIN); ?></label>
-						/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_data->get_option('slug'); ?>" />
-						<span><?php echo $tips->add_tip(__('This is the URL where your events archive can be found. By default, the format is yoursite.com/events, but you can change this to whatever you want.', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-accept_payments" id="incsub_event_label-accept_payments"><?php _e('Will you be accepting payment for any of your events?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_data->get_option('accept_payments') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Leave this box unchecked if you don\'t intend to collect payment at any time.', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-accept_api_logins" id="incsub_event_label-accept_api_logins"><?php _e('Allow Facebook and Twitter Login?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-accept_api_logins" name="event_default[accept_api_logins]" value="1" <?php print ($this->_data->get_option('accept_api_logins') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Check this box to allow guests to RSVP to an event with their Facebook or Twitter account. (If this feature is not enabled, guests will need a WordPress account to RSVP).', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-display_attendees" id="incsub_event_label-display_attendees"><?php _e('Display public RSVPs?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-display_attendees" name="event_default[display_attendees]" value="1" <?php print ($this->_data->get_option('display_attendees') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Check this box to display a "who\'s attending" list in the event details.', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-				</div>
-		    </div>
-		    <?php if (!$theme_tpls_present) { ?>
-		    <div id="eab-settings-appearance" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Appearance settings', self::TEXT_DOMAIN); ?></h3>
-				<div class="eab-inside">
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-override_appearance_defaults" id="incsub_event_label-override_appearance_defaults"><?php _e('Override default appearance?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-override_appearance_defaults" name="event_default[override_appearance_defaults]" value="1" <?php print ($this->_data->get_option('override_appearance_defaults') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Check this box if you want to customize the appearance of your events with overriding templates.', self::TEXT_DOMAIN)); ?></span>
-					</div>
-
-					<div class="eab-settings-settings_item">
-						<?php if (!$archive_tpl_present) { ?>
-					    <label for="incsub_event-archive_template" id="incsub_event_label-archive_template"><?php _e('Archive template', self::TEXT_DOMAIN); ?></label>
-						<select id="incsub_event-archive_template" name="event_default[archive_template]">
-						<?php foreach ($templates as $tkey => $tlabel) { ?>
-							<?php $selected = ($this->_data->get_option('archive_template') == $tkey) ? 'selected="selected"' : ''; ?>
-							<option value="<?php esc_attr_e($tkey);?>" <?php echo $selected;?>><?php echo $tlabel;?></option>
-						<?php } ?>
-						</select>
-						<span>
-							<small><em><?php _e('* templates may not work in all themes', self::TEXT_DOMAIN); ?></em></small>
-							<?php echo $tips->add_tip(__('Choose how the events archive is displayed on your site.', self::TEXT_DOMAIN)); ?>
-						</span>
-					    <?php } ?>
-					</div>
-
-					<div class="eab-settings-settings_item">
-						<?php if (!$single_tpl_present) { ?>
-					    <label for="incsub_event-single_template" id="incsub_event_label-single_template"><?php _e('Single Event template', self::TEXT_DOMAIN); ?></label>
-						<select id="incsub_event-single_template" name="event_default[single_template]">
-						<?php foreach ($templates as $tkey => $tlabel) { ?>
-							<?php $selected = ($this->_data->get_option('single_template') == $tkey) ? 'selected="selected"' : ''; ?>
-							<option value="<?php esc_attr_e($tkey);?>" <?php echo $selected;?>><?php echo $tlabel;?></option>
-						<?php } ?>
-						</select>
-						<span>
-							<small><em><?php _e('* templates may not work in all themes', self::TEXT_DOMAIN); ?></em></small>
-							<?php echo $tips->add_tip(__('Choose how single event listings are displayed on your site.', self::TEXT_DOMAIN)); ?>
-						</span>
-					    <?php } ?>
-					</div>
-
-				</div>
-		    </div>
-		    <?php } ?>
-		    <?php do_action('eab-settings-after_appearance_settings'); /* the hook happens whether we have appearance settings or not */ ?>
-		    <!-- Payment settings -->
-		    <div id="eab-settings-paypal" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Payment settings', self::TEXT_DOMAIN); ?></h3>
-				<div class="eab-inside">
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-currency" id="incsub_event_label-currency"><?php _e('Currency', self::TEXT_DOMAIN); ?></label>
-						<input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_data->get_option('currency'); ?>" />
-						<span><?php echo $tips->add_tip(sprintf(__('Nominate the currency in which you will be accepting payment for your events. For more information see <a href="%s" target="_blank">Accepted PayPal Currency Codes</a>.', self::TEXT_DOMAIN), 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes')); ?></span>
-					</div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-paypal_email" id="incsub_event_label-paypal_email"><?php _e('PayPal E-Mail address', self::TEXT_DOMAIN); ?></label>
-						<input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_data->get_option('paypal_email'); ?>" />
-						<span><?php echo $tips->add_tip(__('Add the primary email address of the PayPal account you will use to collect payment for your events.', self::TEXT_DOMAIN)); ?></span>
-					</div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-paypal_sandbox" id="incsub_event_label-paypal_sandbox"><?php _e('PayPal Sandbox mode?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-paypal_sandbox" name="event_default[paypal_sandbox]" value="1" <?php print ($this->_data->get_option('paypal_sandbox') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Use PayPal Sandbox mode for testing your payments', self::TEXT_DOMAIN)); ?></span>
-					</div>
-				</div>
-		    </div>
-		    <?php do_action('eab-settings-after_payment_settings'); ?>
-		   <?php $this->_api->render_settings($tips); // API settings ?>
-		    <!-- Addon settings -->
-		    <div id="eab-settings-addons" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Add-ons', self::TEXT_DOMAIN); ?></h3>
-				<!--<div class="eab-inside">-->
-		    		<?php Eab_AddonHandler::create_addon_settings(); ?>
-		    		<br />
-		    	<!--</div>-->
-		    </div>
-		    <?php do_action('eab-settings-after_plugin_settings'); ?>
-		</div>
-
-		<p class="submit">
-		    <input type="submit" class="button-primary" name="submit_settings" value="<?php _e('Save Changes', self::TEXT_DOMAIN) ?>" />
-		    <?php if (isset($_REQUEST['eab_step']) && $_REQUEST['eab_step'] == 1) { ?>
-		    <a href="edit.php?post_type=incsub_event&page=eab_welcome&eab_step=-1" class="button"><?php _e('Go back to Getting started guide', self::TEXT_DOMAIN) ?></a>
-		    <?php } ?>
-		</p>
-	    </form>
-	</div>
-<?php if (!empty($tabbable)) { ?>
-	<div class="eab-loading-cover <?php echo esc_attr($tabbable); ?>"><h1><?php _e('Please, hold on...', self::TEXT_DOMAIN); ?></h1></div>
-<?php } ?>
-	<?php
-    }
 
     function shortcodes_render () {
 		// Filter the help....
@@ -1945,4 +1744,12 @@ function eab_domain() {
 
 function events_and_bookings() {
 	return Eab_EventsHub::get_instance();
+}
+
+function eab_plugin_dir() {
+	return trailingslashit( plugin_dir_path( __FILE__ ) );
+}
+
+function eab_plugin_url() {
+	return trailingslashit( plugin_dir_url( __FILE__ ) );
 }
