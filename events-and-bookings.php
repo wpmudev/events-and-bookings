@@ -789,6 +789,7 @@ class Eab_EventsHub {
 
 		$supported_intervals = $event->get_supported_recurrence_intervals();
 
+		$content = '';
 		if (!$event->is_recurring()) {
 			$content = '<div id="eab-start_recurrence">' .
 				'<input type="button" id="eab-eab-start_recurrence-button" class="button" value="' .
@@ -799,7 +800,7 @@ class Eab_EventsHub {
 		}
 
 		$style = $event->is_recurring() ? '' : 'style="display:none"';
-		$content = '<div id="eab_event-recurring_event" ' . $style . '>';
+		$content .= '<div id="eab_event-recurring_event" ' . $style . '>';
 
 		$parts = wp_parse_args(
 			$event->get_recurrence_parts(),
