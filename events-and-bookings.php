@@ -1035,7 +1035,7 @@ class Eab_EventsHub {
 
     function bookings_meta_box () {
 		global $post;
-		echo '<a href="' . admin_url('?eab_export=attendees&event_id='. $post->ID) . '" class="eab-export_attendees">' .
+		echo '<a class="button" href="' . admin_url('index.php?eab_export=attendees&event_id='. $post->ID) . '" class="eab-export_attendees">' .
 			__('Export', self::TEXT_DOMAIN) .
 		'</a>';
 		echo $this->meta_box_part_bookings($post);
@@ -1316,7 +1316,7 @@ class Eab_EventsHub {
 				printf('<b>' . __('Attending / Undecided', self::TEXT_DOMAIN) . ':</b> %d / %d<br />', $yes, $maybe);
 				printf('<b>' . __('Not Attending', self::TEXT_DOMAIN) . ':</b> %d', $no);
 				echo '&nbsp;';
-				echo '<a href="' . admin_url('?eab_export=attendees&event_id='. $event->get_id()) . '" class="eab-export_attendees">' .
+				echo '<a class="button" href="' . admin_url('index.php?eab_export=attendees&event_id='. $event->get_id()) . '" class="eab-export_attendees">' .
 					__('Export', self::TEXT_DOMAIN) .
 				'</a>';
 				break;

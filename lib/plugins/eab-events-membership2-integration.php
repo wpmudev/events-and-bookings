@@ -360,7 +360,8 @@ class Eab_Events_Membership2_Integration {
 		$new_price = $price;
 
 		if ( is_admin() ) {
-			$screen = get_current_screen();
+			global $current_screen;
+			$screen = $current_screen;
 			if ( ! isset( $screen->base ) ) { $screen->base = ''; }
 			if ( ! isset( $screen->post_type ) ) { $screen->post_type = ''; }
 
