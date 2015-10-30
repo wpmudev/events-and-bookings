@@ -263,11 +263,9 @@ class Eab_BuddyPress_GroupEvents {
 		update_post_meta($post_id, 'eab_event-bp-group_event', $data);
 		
 		$email_grp_member = $this->_data->get_option('eab_event_bp_group_event_email_grp_member');
-		if( isset( $email_grp_member ) ) {
+		if( isset( $email_grp_member ) &&  $email_grp_member == 1 ) {
 			$grp_members = groups_get_group_members( array( 'group_id' => $data, 'exclude_admins_mods' => false ) );
-			foreach( $grp_members['members'] as $member ){echo "<pre>";
-print_r($grp_members['members']);
-echo "</pre>";
+			foreach( $grp_members['members'] as $member ){
 				//echo $member->user_email;
 				$subject = __( 'Information about a group event', Eab_EventsHub::TEXT_DOMAIN );
 				$subject = apply_filters( 'eab_bp_grp_events_member_mail_subject', $subject, $member, $post_id );
@@ -344,7 +342,7 @@ echo "</pre>";
 
 	private function _get_navigation ($timestamp) {
 		global $bp;
-		$root = $bp->root_domain . '/' . $bp->groups->slug . '/' . $bp->groups->current_group->slug . '/';
+		$root = $bp->root_domain . '/' . $bp->pages->groups->slug . '/' . $bp->groups->current_group->slug . '/';
 		
 		$prev_url = $root . self::SLUG . date_i18n('/Y/m/', $timestamp - (28*86400));
 		$next_url = $root . self::SLUG . date_i18n('/Y/m/', $timestamp + (32*86400));

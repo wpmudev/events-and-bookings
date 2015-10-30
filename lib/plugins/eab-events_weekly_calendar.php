@@ -106,7 +106,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
         $c .= '<div id="wpmudevevents-wrapper">';
         $c .= '<h2>'. sprintf(
             	__('Events from %s to %s', Eab_EventsHub::TEXT_DOMAIN),
-            	date($this->date_format, $start_of_calendar ), date($this->date_format, $start_of_calendar + 6*86400 ) 
+            	date_i18n($this->date_format, $start_of_calendar ), date_i18n($this->date_format, $start_of_calendar + 6*86400 ) 
 				) .'</h2>';
         $c .= '<div class="wpmudevevents-list">';
  		$c .= $this->get_weekly_calendar($time, $id, $class);

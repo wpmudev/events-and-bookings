@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.8.2
+ Version: 1.8.3-beta1
  Author URI: http://premium.wpmudev.org
 */
 
@@ -1519,7 +1519,7 @@ class Eab_EventsHub {
 			    </li>
 			    <li>
 				<?php _e('The archive displays a list of upcoming events on your site.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo home_url($this->_data->get_option('slug')); ?>" class="eab-goto-step button"><?php _e('Events Archive', self::TEXT_DOMAIN); ?></a>
+				<a href="<?php echo home_url($this->_data->get_option('slug')) . '/'; ?>" class="eab-goto-step button"><?php _e('Events Archive', self::TEXT_DOMAIN); ?></a>
 			    </li>
 			</ol>
 		    </div>

@@ -101,7 +101,7 @@ class Eab_Events_Alert_RSVP_Event_Modify {
 	}
 	
 	
-	public function save_settings() {
+	public function save_settings( $options ) {
 		if( ! empty( $_POST['eab_alert'] ) ) $options['eab_alert'] = $_POST['eab_alert'];
 		return $options;
 	}
