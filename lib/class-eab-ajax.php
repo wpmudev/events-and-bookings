@@ -63,6 +63,8 @@ class Eab_Ajax {
 			$fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 		}
 
+		define( 'EAB_PROCESSING_PAYPAL_IPN', true );
+
 		$booking_obj = Eab_EventModel::get_booking($booking_id);
 
 		if (!$booking_obj || !$booking_obj->id) {

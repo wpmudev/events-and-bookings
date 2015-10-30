@@ -372,7 +372,7 @@ class Eab_Events_Membership2_Integration {
 			}
 		}
 
-		if ( is_user_logged_in() ) {
+		if ( is_user_logged_in() || defined( 'EAB_PROCESSING_PAYPAL_IPN' ) ) {
 			$data = $this->get_infos( $event_id );
 			$user = $this->api->get_member( $user_id );
 
