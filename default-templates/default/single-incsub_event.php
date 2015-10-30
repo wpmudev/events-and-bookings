@@ -17,7 +17,7 @@ get_header( );
                     
                     <div class="wpmudevevents-header">
                         <h2><?php echo $event->get_title(); ?></h2>
-                        <div class="eab-needtomove"><div id="event-bread-crumbs" ><?php Eab_Template::get_breadcrumbs($event); ?></div></div>
+                        <div class="eab-needtomove"><div id="event-bread-crumbs" ><?php echo Eab_Template::get_breadcrumbs($event); ?></div></div>
                         <?php
                         echo Eab_Template::get_rsvp_form($post);
 						echo Eab_Template::get_inline_rsvps($post);
