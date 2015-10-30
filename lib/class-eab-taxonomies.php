@@ -79,10 +79,22 @@ class Eab_Taxonomies {
 	}
 
 	public function register_post_status() {
-		$pts_args = array('show_in_admin_all_list' => false, 'label' => __( 'Recurrent', 'eab' ) );
-		$pts_args['label_count'] = _n_noop( 'Recurrent <span class="count">(%s)</span>', 'Recurrent <span class="count">(%s)</span>', 'eab' );
-		if (is_admin()) $pts_args['protected'] = true;
-		else $pts_args['public'] = true;
+		$pts_args = array(
+			'show_in_admin_all_list' => false,
+			'label' => __( 'Recurrent', 'eab' )
+		);
+
+		$pts_args['label_count'] = _n_noop(
+			'Recurrent <span class="count">(%s)</span>',
+			'Recurrent <span class="count">(%s)</span>',
+			'eab'
+		);
+
+		if ( is_admin() )
+			$pts_args['protected'] = true;
+		else
+			$pts_args['public'] = true;
+
 		register_post_status(Eab_EventModel::RECURRENCE_STATUS, $pts_args);
 	}
 }
