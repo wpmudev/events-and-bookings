@@ -24,15 +24,12 @@ class Eab_Admin_Settings_Menu {
 			$this->save_options();
 		}
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
 
 	function render() {
 
 		$updated = isset($_GET['incsub_event_settings_saved']) && $_GET['incsub_event_settings_saved'] == 1;
-		if ( $updated ) {
-			echo '<div class="updated fade"><p>'.__('Settings saved.', eab_domain() ).'</p></div>';
-		}
+
 
 		if ( ! class_exists( 'WpmuDev_HelpTooltips' ) )
 			require_once eab_plugin_dir() . 'lib/class_wd_help_tooltips.php';
@@ -91,18 +88,22 @@ class Eab_Admin_Settings_Menu {
 
 	public function save_options() {
 
-		$options = array();
-		$options['slug'] 						= trim(trim($_POST['event_default']['slug'], '/'));
-		$options['accept_payments'] 			= $_POST['event_default']['accept_payments'];
-		$options['accept_api_logins'] 			= $_POST['event_default']['accept_api_logins'];
-		$options['display_attendees'] 			= $_POST['event_default']['display_attendees'];
-		$options['currency'] 					= $_POST['event_default']['currency'];
-		$options['paypal_email'] 				= $_POST['event_default']['paypal_email'];
-		$options['paypal_sandbox'] 				= @$_POST['event_default']['paypal_sandbox'];
+		$defaults = $this->_data->get_default_options();
 
-		$options['override_appearance_defaults']	= $_POST['event_default']['override_appearance_defaults'];
-		$options['archive_template'] 			= $_POST['event_default']['archive_template'];
-		$options['single_template'] 			= $_POST['event_default']['single_template'];
+		$event_default = $_POST['event_default'];
+
+		$options = array();
+		$options['slug'] 						= trim(trim($event_default['slug'], '/'));
+		$options['accept_payments'] 			= empty( $event_default['accept_payments'] ) ? 0 : $event_default['accept_payments'];
+		$options['accept_api_logins'] 			= empty( $event_default['accept_api_logins'] ) ? 0 : $event_default['accept_api_logins'];
+		$options['display_attendees'] 			= empty( $event_default['display_attendees'] ) ? 0 : $event_default['display_attendees'];
+		$options['currency'] 					= $event_default['currency'];
+		$options['paypal_email'] 				= $event_default['paypal_email'];
+		$options['paypal_sandbox'] 				= empty( $event_default['paypal_sandbox'] ) ? 0 : $event_default['paypal_sandbox'];
+
+		$options['override_appearance_defaults']	= empty( $event_default['override_appearance_defaults'] ) ? 0 : $event_default['override_appearance_defaults'];
+		$options['archive_template'] 			= empty( $event_default['archive_template'] ) ? '' : $event_default['archive_template'];
+		$options['single_template'] 			= empty( $event_default['single_template'] ) ? '' : $event_default['single_template'];
 
 		$options = apply_filters('eab-settings-before_save', $options);
 		$this->_data->set_options($options);

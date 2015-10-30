@@ -1,6 +1,9 @@
+<?php if ( $updated ): ?>
+	<div class="updated fade"><p><?php _e('Settings saved.', eab_domain() ); ?></p></div>
+<?php endif; ?>
+
 <div class="wrap <?php echo esc_attr($tabbable); ?> <?php echo esc_attr($hide); ?>">
-	<div id="icon-events-general" class="icon32"><br/></div>
-	<h2><?php _e('Events Settings', eab_domain() ); ?></h2>
+	<h1><?php _e('Events Settings', eab_domain() ); ?></h1>
 	<?php if (defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS) { ?>
 		<div class="eab-note">
 			<p><?php _e('This is where you manage your general settings for the plugin and how events are displayed on your site.', eab_domain() ); ?>.</p>

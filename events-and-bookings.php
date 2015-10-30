@@ -1449,8 +1449,12 @@ class Eab_EventsHub {
 		$root_key = 'edit.php?post_type=incsub_event';
 
 	    include_once( 'admin/class-eab-settings-menu.php' );
+	    include_once( 'admin/class-eab-shortcodes-menu.php' );
+
 		if (get_option('eab_setup', false) == false) {
-		    add_submenu_page($root_key, __("Get Started", self::TEXT_DOMAIN), __("Get started", self::TEXT_DOMAIN), 'manage_options', 'eab_welcome', array($this,'welcome_render'));
+			include_once( 'admin/class-eab-get-started-menu.php' );
+
+			new Eab_Admin_Get_Started_Menu( $root_key );
 
 		    if (isset($submenu[$root_key]) && is_array($submenu[$root_key])) foreach ($submenu[$root_key] as $k=>$item) {
 				if ($item[2] == 'eab_welcome') {
@@ -1460,10 +1464,8 @@ class Eab_EventsHub {
 		    }
 		}
 
-
 	    new Eab_Admin_Settings_Menu( $root_key );
-
-		add_submenu_page($root_key, __("Event Shortcodes", self::TEXT_DOMAIN), __("Shortcodes", self::TEXT_DOMAIN), 'edit_events', 'eab_shortcodes', array($this, 'shortcodes_render'));
+	    new Eab_Admin_Shortcodes_Menu( $root_key );
 
 		do_action('eab-admin-add_pages', $root_key);
 
@@ -1476,66 +1478,6 @@ class Eab_EventsHub {
 		return $schedules;
     }
 
-    function welcome_render() {
-	?>
-	<div class="wrap">
-	    <div id="icon-events-general" class="icon32"><br/></div>
-	    <h2><?php _e('Getting started', self::TEXT_DOMAIN); ?></h2>
-
-	    <p>
-	    	<?php _e('Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.', self::TEXT_DOMAIN) ?>
-	    </p>
-
-	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
-		<div id="eab-actionlist" class="eab-metabox postbox">
-		    <h3 class="eab-hndle"><?php _e('Getting Started', self::TEXT_DOMAIN); ?></h3>
-		    <div class="eab-inside">
-				<div class="eab-note"><?php _e('You\'re almost ready! Follow these steps and start creating events on your WordPress site.', self::TEXT_DOMAIN); ?></div>
-			<ol>
-			    <li>
-				<?php _e('Before creating an event, you\'ll need to configure some basic settings, like your root slug and payment options.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&page=eab_settings&eab_step=1'); ?>" class="eab-goto-step button" id="eab-goto-step-0" ><?php _e('Configure Your Settings', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			    <li>
-				<?php _e('Now you can create your first event.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo esc_url('post-new.php?post_type=incsub_event&eab_step=2'); ?>" class="eab-goto-step button"><?php _e('Add an Event', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			    <li>
-				<?php _e('You can view and edit your existing events whenever you like.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&eab_step=3'); ?>" class="eab-goto-step button"><?php _e('Edit Events', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			    <li>
-				<?php _e('The archive displays a list of upcoming events on your site.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo home_url($this->_data->get_option('slug')) . '/'; ?>" class="eab-goto-step button"><?php _e('Events Archive', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			</ol>
-		    </div>
-		</div>
-	    </div>
-
-		<?php if (!defined('WPMUDEV_REMOVE_BRANDING') || !constant('WPMUDEV_REMOVE_BRANDING')) { ?>
-	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
-			<div id="eab-helpbox" class="eab-metabox postbox">
-			    <h3 class="eab-hndle"><?php _e('Need help?', self::TEXT_DOMAIN); ?></h3>
-			    <div class="eab-inside">
-					<ol>
-					    <li><a href="http://premium.wpmudev.org/project/events-and-booking"><?php _e('Check out the Events plugin page on WPMU DEV', self::TEXT_DOMAIN); ?></a></li>
-					    <li><a href="http://premium.wpmudev.org/forums/tags/events-and-bookings"><?php _e('Post a question about this plugin on our support forums', self::TEXT_DOMAIN); ?></a></li>
-					    <li><a href="http://premium.wpmudev.org/project/events-and-booking/installation/"><?php _e('Watch a video of the Events plugin in action', self::TEXT_DOMAIN); ?></a></li>
-					</ol>
-			    </div>
-			</div>
-	    </div>
-	    <?php } ?>
-
-	    <div class="clear"></div>
-
-	    <div class="eab-dashboard-footer">
-
-	    </div>
-	</div>
-	<?php
-    }
 
     function views_list($views) {
 		global $wp_query;
@@ -1564,54 +1506,7 @@ class Eab_EventsHub {
 
 
 
-    function shortcodes_render () {
-		// Filter the help....
-		$help = apply_filters('eab-shortcodes-shortcode_help', array());
 
-		if (!class_exists('WpmuDev_HelpTooltips')) require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
-		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
-
-		$out = '';
-		$count = 0;
-		$half = (int)(count($help) / 2);
-
-		$out .= '<div class="postbox-container">';
-		foreach ($help as $shortcode) {
-			$out .= '<div class="eab-metabox postbox"><h3 class="eab-hndle">' . $shortcode['title'] . '</h3>';
-			$out .= '<div class="eab-inside">';
-			$out .= '	<div class="eab-settings-settings_item">';
-			$out .= '		<strong>' . __('Tag:', self::TEXT_DOMAIN) . '</strong> <code>[' . $shortcode['tag'] . ']</code>';
-			if (!empty($shortcode['note'])) $out .= '<div class="eab-note">' . $shortcode['note'] . '</div>';
-		    $out .= '	</div>';
-			if (!empty($shortcode['arguments'])) {
-				$out .= ' <div class="eab-settings-settings_item" style="line-height:1.5em"><strong>' . __('Arguments:', self::TEXT_DOMAIN) . '</strong>';
-				foreach ($shortcode['arguments'] as $argument => $data) {
-					if (!empty($shortcode['advanced_arguments']) && !current_user_can('manage_options')) {
-						if (in_array($argument, $shortcode['advanced_arguments'])) continue;
-					}
-					$type = !empty($data['type'])
-						? eab_call_template('util_shortcode_argument_type_string_info', $data['type'], $argument, $shortcode['tag'], $tips)
-						: false
-					;
-					$out .= "<div class='eab-shortcode-attribute_item'><code>{$argument}</code> - {$data['help']} {$type}</div>";
-				}
-				$out .= '</div><!-- Attributes -->';
-			}
-			$out .= '</div></div>';
-			$count++;
-			if ($count == $half) $out .= '</div><div class="postbox-container eab-postbox_container-last">';
-		}
-		$out .= '</div>';
-
-		echo '<div class="wrap">
-				<div id="icon-events-general" class="icon32"><br/></div>
-				<h2>' . __('Events Shortcodes', self::TEXT_DOMAIN) . '</h2>
-				<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center columns-2">';
-		echo $out;
-
-		echo '</div></div>';
-    }
 
     function widgets_init() {
 		require_once dirname(__FILE__) . '/lib/widgets/Widget.class.php';
