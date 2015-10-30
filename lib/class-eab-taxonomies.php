@@ -42,7 +42,7 @@ class Eab_Taxonomies {
 			'supports' => $supports,
 			'rewrite' => array( 'slug' => $data->get_option('slug'), 'with_front' => false ),
 			'has_archive' => true,
-			'menu_icon' => plugins_url('events-and-bookings/img/small-greyscale.png'),
+			'menu_icon' => 'dashicons-calendar-alt',
 		);
 
 		register_post_type(

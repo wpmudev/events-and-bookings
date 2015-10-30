@@ -75,17 +75,7 @@ ul.eab-guest-list li {
     background: url(../img/mid-greyscale.png) no-repeat;
 }
 
-li.menu-icon-incsub_event div.wp-menu-image {
-    background: url(../img/small-menu.png) no-repeat bottom;
-}
 
-li.menu-icon-incsub_event:hover div.wp-menu-image, li.menu-icon-incsub_event.wp-has-current-submenu div.wp-menu-image {
-    background-position: top;
-}
-
-li.menu-icon-incsub_event div.wp-menu-image img {
-    display: none;
-}
 
 a.eab-info {
     width: 30px;
