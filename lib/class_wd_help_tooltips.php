@@ -220,7 +220,6 @@ class WpmuDev_HelpTooltips {
 		if ($this->_icon_url) { 
 ?>
 .wpmudev-help {
-	background: url(<?php echo $this->_icon_url; ?>) no-repeat scroll 10px center #ffffe0;
 	padding-left: 40px;
 }
 .wpmudev-help-trigger span {
@@ -228,12 +227,35 @@ class WpmuDev_HelpTooltips {
 	position: absolute;
 	left: -12000000px;
 }
+
+
+.wpmudev-help,
 .wpmudev-help-trigger {
-	position: relative;
-	background: url(<?php echo $this->_icon_url; ?>) no-repeat scroll center bottom transparent;
-	padding: 1px 12px;
-	text-decoration: none;
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 1;
+	font-family: "dashicons";
+	text-decoration: inherit;
+	font-weight: normal;
+	font-style: normal;
+	vertical-align: top;
+	text-align: center;
+	-webkit-transition: color .1s ease-in 0;
+	transition: color .1s ease-in 0;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	line-height: 12px;
+	vertical-align: middle;
 }
+
+.wpmudev-help:before,
+.wpmudev-help-trigger:before {
+	content: "\f348";
+}
+
+
 <?php 
 		} 
 ?>

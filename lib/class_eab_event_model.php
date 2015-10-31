@@ -797,6 +797,9 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				$timestamp = date("Y-m-" . $time_parts['day'], $i) . ' ' . $time_parts['time'];
 				$unix_timestamp = strtotime($timestamp);
 				$check = $unix_timestamp >= $start && checkdate((int)date('n', $unix_timestamp), (int)date('j', $unix_timestamp), (int)date('Y', $unix_timestamp));
+				if ( date( 'Y-m-d', $unix_timestamp ) > date( 'Y-m-d', $end ) )
+					continue;
+
 				if (!$unix_timestamp || !$check) do_action('eab-debug-log_error', sprintf(
 					__('Invalid %s instance timestamp: [%s]', Eab_EventsHub::TEXT_DOMAIN),
 					$interval,

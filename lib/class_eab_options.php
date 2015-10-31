@@ -6,15 +6,7 @@ class Eab_Options {
 	
 	private static $_instance;
 	private $_data = array();
-	private $_defaults = array(
-    	'currency' => 'USD', 
-    	'slug' => 'events', 
-    	'accept_payments' => 1, 
-    	'display_attendees' => 1, 
-    	'paypal_email' => '', 
-    	'paypal_sandbox' => 0
-	);
-	
+
 	private function __clone () {}
 	private function __construct () {
 		$this->_populate();
@@ -30,6 +22,21 @@ class Eab_Options {
 	 */
 	public function get_options () {
 		return $this->_data;
+	}
+
+	public function get_default_options() {
+		return array(
+			'currency' => 'USD',
+			'slug' => 'events',
+			'accept_payments' => 1,
+			'accept_api_logins' => 0,
+			'display_attendees' => 1,
+			'paypal_email' => '',
+			'paypal_sandbox' => 0,
+			'override_appearance_defaults' => 0,
+			'archive_template' => '',
+			'single_template' => ''
+		);
 	}
 	
 	/**
@@ -62,6 +69,6 @@ class Eab_Options {
 	}
 	
 	private function _populate () {
-		$this->_data = get_option(self::OPTIONS_KEY, $this->_defaults);
+		$this->_data = get_option(self::OPTIONS_KEY, $this->get_default_options() );
 	}
 }

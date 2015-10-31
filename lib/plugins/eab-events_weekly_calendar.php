@@ -91,7 +91,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		extract( shortcode_atts( array(
 		'id'		=> '',
 		'class'		=> ''
-		), $atts ) );
+		), $attr ) );
 		
 		if ( isset( $_GET["wcalendar"] ) )
 			$time = $_GET["wcalendar"];
@@ -358,7 +358,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' . 
 				"<span class='wpmudevevents-calendar-thumbnail'>". get_the_post_thumbnail( $event_info['id'], 'medium' ) . "</span>" .
-				"<span class='wpmudevevents-calendar-start'>" . date_i18n(get_option('date_format'), $event_tstamps['start']) . "</span>".
+				"<span class='wpmudevevents-calendar-start'>" . date_i18n(get_option('date_format'), $current_tstamps['start']) . "</span>".
 				"<span class='wpmudevevents-calendar-venue'>" . $event_info['event_venue'] . "</span>".
 				"<span class='wpmudevevents-calendar-content'>". wp_trim_words( $event_info['event_content'], 20  ). "</span>" .
 				"<span style='clear:both'></span>" .

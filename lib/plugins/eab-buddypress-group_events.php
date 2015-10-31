@@ -178,11 +178,11 @@ class Eab_BuddyPress_GroupEvents {
 	}
 
 	function save_settings ($options) {
-		$options['bp-group_event-auto_join_groups'] = $_POST['event_default']['bp-group_event-auto_join_groups'];
-		$options['bp-group_event-private_events'] = $_POST['event_default']['bp-group_event-private_events'];
-		$options['bp-group_event-user_groups_only'] = $_POST['event_default']['bp-group_event-user_groups_only'];
-		$options['bp-group_event-user_groups_only-unless_superadmin'] = $_POST['event_default']['bp-group_event-user_groups_only-unless_superadmin'];
-		$options['eab_event_bp_group_event_email_grp_member'] = $_POST['event_default']['eab_event_bp_group_event_email_grp_member'];
+		$options['bp-group_event-auto_join_groups'] = empty( $_POST['event_default']['bp-group_event-auto_join_groups'] ) ? 0 : $_POST['event_default']['bp-group_event-auto_join_groups'];
+		$options['bp-group_event-private_events'] = empty( $_POST['event_default']['bp-group_event-private_events'] ) ? 0 : $_POST['event_default']['bp-group_event-private_events'];
+		$options['bp-group_event-user_groups_only'] = empty( $_POST['event_default']['bp-group_event-user_groups_only'] ) ? 0 : $_POST['event_default']['bp-group_event-user_groups_only'];
+		$options['bp-group_event-user_groups_only-unless_superadmin'] = empty( $_POST['event_default']['bp-group_event-user_groups_only-unless_superadmin'] ) ? 0 : $_POST['event_default']['bp-group_event-user_groups_only-unless_superadmin'];
+		$options['eab_event_bp_group_event_email_grp_member'] = empty( $_POST['event_default']['eab_event_bp_group_event_email_grp_member'] ) ? 0 : $_POST['event_default']['eab_event_bp_group_event_email_grp_member'];
 		return $options;
 	}
 
