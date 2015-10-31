@@ -107,7 +107,11 @@ class Eab_Admin_Settings_Menu {
 
 		$options = apply_filters('eab-settings-before_save', $options);
 		$this->_data->set_options($options);
-		wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
+                // Added by Ashok
+                // Removed old redirect
+                // Added new redirect, based on selected tab in Events Settings
+                wp_redirect( add_query_arg( 'incsub_event_settings_saved', 1, $event_default['event_settings_url'] ) );
+		//wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
 		exit();
 	}
 }
