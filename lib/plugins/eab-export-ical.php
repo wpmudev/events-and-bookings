@@ -234,7 +234,10 @@ class Eab_Exporter_Ical extends Eab_Exporter {
 				"DTSTART{$tzid}:" . $time_callback('Ymd', $start) . "T" . $time_callback('His', $start) . "{$zulu}\n" .
 				"DTEND{$tzid}:" . $time_callback('Ymd', $end) . "T" . $time_callback('His', $end) . "{$zulu}\n" .
 				"SUMMARY:" . $event->get_title() . "\n" .
-				"DESCRIPTION:" . strip_tags(preg_replace('/\s\s+/', ' ', preg_replace('/\r|\n/', ' ', $event->get_content()))) . "\n" .
+                                // Old format with no paragraph - all texts are in same paragraph
+				//"DESCRIPTION:" . strip_tags(preg_replace('/\s\s+/', ' ', preg_replace('/\r|\n/', ' ', $event->get_content()))) . "\n" .
+                                // Enable paragraph
+                                "DESCRIPTION:" . str_replace("\r\n", "\\n", $event->get_content()) . "\n" .
 				"URL:" . get_permalink($event->get_id()) . "\n" .
 				($location ? "LOCATION:{$location}\n" : '') .
 			"END:VEVENT\n";
