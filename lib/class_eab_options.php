@@ -8,7 +8,7 @@ class Eab_Options {
 	private $_data = array();
 
 	private function __clone () {}
-	private function __construct () {
+	public function __construct () {
 		$this->_populate();
 	}
 	
