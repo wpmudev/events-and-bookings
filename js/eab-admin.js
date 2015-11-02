@@ -400,6 +400,14 @@ function reveal_page (e) {
 		me.addClass("active");
 		$('.eab-metabox.postbox').hide();
 		box.show();
+                /**
+                 * Added by Ashok
+                 *
+                 * Updating URl with correct hash tag
+                 * based on selected tab in event settings
+                 */
+                window.location.hash = box_id;
+                set_event_url();
 	}
 }
 
@@ -442,11 +450,41 @@ function boot () {
 		}
 	});
 	box_root.append($submit);
-	root.find("h3:first").click();
+        
+        /**
+         * Added by Ashok
+         *
+         * Show the correct page based on
+         * appropriate hash tag in URL
+         */
+        var hash = window.location.hash;
+        hash = hash.split('#')[1];
+        if( hash ) {
+            var obj = root.find('h3[data-box_id="'+ hash +'"]');
+            if( obj.length ){
+                obj.click();
+            }else{
+                root.find("h3:first").click();
+            }
+        }else{
+            root.find("h3:first").click();
+        }
+        set_event_url();
+        
 	box_root.addClass("tabbed");
 
 	$(".eab-loading-cover.tabbable").remove();
 	$(".wrap.tabbable.hide").removeClass("hide");
+}
+
+/**
+ * Added by Ashok
+ *
+ * Updating hidden field with current page url
+ */
+function set_event_url() {
+    var url = window.location;
+    $('.event_settings_url').val(url);
 }
 
 $(boot);

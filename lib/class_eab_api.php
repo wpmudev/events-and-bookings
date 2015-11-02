@@ -657,7 +657,9 @@ class Eab_Api {
 				</div>
 			</div>
 		<?php if (!$this->_data->get_option('accept_api_logins')) { ?>
-			<p><em><?php _e('To configure and accept API logins, please mark it as &quot;allowed&quot; in plugin settings', Eab_EventsHub::TEXT_DOMAIN); ?></em></p>
+                    <div style="padding: 0 12px;">
+			<p><em><?php _e('To configure and accept API logins, please check the box for "Allow Facebook and Twitter Login?" in plugin settings.', Eab_EventsHub::TEXT_DOMAIN); ?></em></p>
+                    </div>
 		<?php } ?>
 	    </div>
 	    <?php

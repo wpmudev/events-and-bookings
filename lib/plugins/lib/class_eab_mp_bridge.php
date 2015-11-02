@@ -17,11 +17,12 @@ class Eab_MP_Bridge {
 	}
 
 	private function _add_hooks () {
-		add_action('mp_order/new_order', array($this, 'dispatch_mp_product_if_order_paid'));
-		add_action('mp_order_order_paid', array($this, 'mp_product_order_paid'));
+		add_action('mp_order/new_order', array($this, 'dispatch_mp_product_if_order_paid'), 10, 1);
+		add_action('mp_order_order_paid', array($this, 'mp_product_order_paid'), 10, 1);
 
 		// Display
 		add_filter('eab-event-payment_forms', array($this, 'process_event_payment_forms'), 10, 2);
+                add_action('incsub_event_booking_yes', array($this, 'add_event_product_to_cart'), 10, 2);
 		add_filter('eab-events-event_details-price', array($this, 'show_product_price'), 10, 2);
 
 		// Regular Events+ product selection
@@ -333,8 +334,8 @@ class Eab_MP_Bridge {
 	/**
 	 * Returns related Product instead of standard payment forms for appropriate events.
 	 */
-	function process_event_payment_forms ($form, $event_id) {
-		if (!$this->_is_mp_present()) return $form;
+	function add_event_product_to_cart($event_id, $user_id) {
+		if (!$this->_is_mp_present()) return;
 		
 		$event = new Eab_EventModel(get_post($event_id));
 		$recurring = $event->is_recurring_child();
@@ -357,7 +358,7 @@ class Eab_MP_Bridge {
 			$product_id = get_post_meta($event_id, 'eab_product_id', true);
 		}
 
-		if (!$product_id) return $form;
+		if (!$product_id) return;
 
 		$cart = MP_Cart::get_instance();
 		$items = $cart->get_items();
@@ -366,6 +367,10 @@ class Eab_MP_Bridge {
 			$cart->add_item($product_id);
 		}
 
+	}
+        
+        function process_event_payment_forms ($form, $event_id) {
+		if (!$this->_is_mp_present()) return $form;
 		return '<p><a href="' . esc_url(mp_cart_link(false, true)) . '">' . __('Click here to purchase your ticket', Eab_EventsHub::TEXT_DOMAIN) . '</a></p>';
 	}
 
@@ -386,7 +391,7 @@ class Eab_MP_Bridge {
 			? $order->get_cart()->get_items()
 			: (isset($order->mp_cart_info) ? $order->mp_cart_info : array())
 		;
-
+                
 		if (is_array($cart_info) && count($cart_info)) foreach($cart_info as $cart_id => $count) {
 			$event_id = $product_id = false;
 
@@ -454,7 +459,7 @@ class Eab_MP_Bridge {
 	 */
 	private function _is_product_id ($cart_id) {
 		$post = get_post($cart_id);
-		return MP_Product::get_post_type() === $post->post_status;
+		return MP_Product::get_post_type() === $post->post_type;
 	}
 
 	/**
@@ -464,7 +469,7 @@ class Eab_MP_Bridge {
 		$event_id = false;
 
 		if ($this->_is_product_id($cart_id)) {
-			$event_id = get_post_meta($product_id, 'eab_event_id', true);
+			$event_id = get_post_meta($cart_id, 'eab_event_id', true);
 		} else {
 			// this is a variation, it has event ID in SKU
 			$event_id = MP_Product::get_variation_meta($cart_id, 'sku');

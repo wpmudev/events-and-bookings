@@ -11,6 +11,7 @@
 	<?php } ?>
 	<form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">
 		<?php wp_nonce_field('incsub_event-update-options'); ?>
+                <input type="hidden" name="event_default[event_settings_url]" value="" class="event_settings_url">
 		<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
 			<?php do_action('eab-settings-before_plugin_settings'); ?>
 			<div id="eab-settings-general" class="eab-metabox postbox">

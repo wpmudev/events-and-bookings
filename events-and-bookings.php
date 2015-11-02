@@ -11,8 +11,8 @@
 */
 
  /*
-Authors - S H Mohanjith (Incsub), Ve Bailovity (Incsub)
-Contributors - Ashok Kumar Nath, Hakan Evin, Hoang Ngo
+Authors - S H Mohanjith (Incsub), Ve Bailovity (Incsub), Ignacio (Incsub)
+Contributors - Ashok Kumar Nath (WPMU DEV), Hoang Ngo (WPMU DEV), Hakan Evin
  */
 
 /**
