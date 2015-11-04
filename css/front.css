@@ -604,6 +604,7 @@ a.export_to_ical:before, a.export_to_gcal:before {
     border-top: 0;
     margin-top: -7px;
     background: transparent;
+    box-sizing: content-box;
 }
 
 a.export_to_ical:after, a.export_to_gcal:after {
