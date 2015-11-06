@@ -128,9 +128,7 @@ class Eab_Events_ManualPayments {
 	function show_nags() {
 		if ( strpos($this->_data->get_option('manual_payment_instructions'), "MANUALPAYMENTBUTTON") === false) {
 			echo '<div class="error"><p>' .
-				__("You do not have MANUALPAYMENTBUTTON keyword in the Instructions field. 
-				This means there will be no button and user will not be able to inform you that he/she made a payment, 
-				which in turn means that Manual Payment will be practically useless.", Eab_EventsHub::TEXT_DOMAIN) .
+				__("You do not have MANUALPAYMENTBUTTON keyword in the Instructions field. This means there will be no button and user will not be able to inform you that he/she made a payment, which in turn means that Manual Payment will be practically useless.", Eab_EventsHub::TEXT_DOMAIN) .
 			'</p></div>';
 		}
 	}

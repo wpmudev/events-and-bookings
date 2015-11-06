@@ -78,12 +78,15 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 	function sunday( $timestamp=false ) {
 	
 		$date = $timestamp ? $timestamp : $this->get_local_time();
+		$test = date( "l", $date );
 		// Return today's timestamp if today is sunday
-		if ( "Sunday" == date( "l", $date ) )
-			return strtotime("today");
+		if ( "Sunday" == date( "l", $date ) ) {
+			return strtotime( "today" );
+		}
 		// Else return last week's timestamp
-		else
-			return strtotime("last Sunday", $date );
+		else {
+			return strtotime( "last Sunday", $date );
+		}
 	}
 	
 	function shortcode( $attr ) {
@@ -197,7 +200,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		
 		if ( !is_object( $options ) )
 			$options = new Eab_Options;
-		
+
 		$timestamp = $timestamp ? $timestamp : $this->get_local_time();
 		$year = date("Y", $timestamp);
 		$month = date("m", $timestamp);
