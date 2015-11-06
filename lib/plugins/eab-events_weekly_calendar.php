@@ -248,6 +248,8 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		
 		for ( $t=$first; $t<$last; $t=$t+$step ) {
 			foreach ( $days as $key=>$i ) {
+                            // Not sure if it's current fix, but it works!
+                            if( $i == 0 ) $i = 7;
 				if ( $i == -1 ) {
 					$from = $this->secs2hours( $t - $sunday );
 					$to = $this->secs2hours( $t - $sunday + $step );
