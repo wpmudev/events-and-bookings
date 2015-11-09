@@ -110,10 +110,10 @@ abstract class Eab_Codec {
 				'terms' => $taxonomy['value'],
 			));
 		}
-		if ($args['limit']) {
+		if (isset( $args['limit'] ) ) {
 			$query['posts_per_page'] = $args['limit'];
 		}
-		if ($args['paged']) {
+		if ( isset( $args['paged'] ) ) {
 			$query['paged'] = $args['page'];
 		}
 		return $query;

@@ -75,17 +75,7 @@ ul.eab-guest-list li {
     background: url(../img/mid-greyscale.png) no-repeat;
 }
 
-li.menu-icon-incsub_event div.wp-menu-image {
-    background: url(../img/small-menu.png) no-repeat bottom;
-}
 
-li.menu-icon-incsub_event:hover div.wp-menu-image, li.menu-icon-incsub_event.wp-has-current-submenu div.wp-menu-image {
-    background-position: top;
-}
-
-li.menu-icon-incsub_event div.wp-menu-image img {
-    display: none;
-}
 
 a.eab-info {
     width: 30px;
@@ -125,6 +115,8 @@ fieldset.eab-settings-section legend {
     -webkit-border-radius: 3px;
 }
 
+
+
 .eab-expand-metabox {
     float: right;
     display: none;
@@ -149,6 +141,7 @@ div.eab-metabox {
 
 .eab-metabox h3.eab-hndle {
 	cursor: default;
+    border-bottom:1px solid #e5e5e5;
 }
 
 div.eab-minimetabox {
@@ -207,10 +200,30 @@ input.error {
 .eab-settings-settings_item {
 	overflow: hidden;
 	border-bottom:1px solid #dddddd;
+    padding:10px;
 }
+
+.eab-inside .eab-settings-settings_item:last-child {
+    border-bottom:none;
+}
+
 .eab-settings-settings_item:hover {
 	background-color: #f2f2f2;
 }
+
+#eab-arf-new_additional_field-add {
+    vertical-align: middle;
+}
+
+.eab-settings-settings_item label {
+    max-width: 175px;
+    display: inline-block;
+    width: 25%;
+    line-height: 20px;
+    margin-right:3%;
+}
+
+
 
 .eab-inside{
 	line-height: 40px;

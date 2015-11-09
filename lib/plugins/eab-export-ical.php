@@ -18,6 +18,8 @@ if (!class_exists('Eab_ExporterFactory')) require_once EAB_PLUGIN_DIR . 'lib/cla
 class Eab_Export_iCal {
 
 	private $_data;
+        
+        private $_added = array();
 
 	function __construct () {
 		$this->_data = Eab_Options::get_instance();
@@ -37,6 +39,7 @@ class Eab_Export_iCal {
 		if ($this->_data->get_option('eab_export-ical-auto_show_links')) {
 			add_filter('eab-template-archive_after_view_link', array($this, 'append_export_link'), 10, 2);
 			add_filter('eab-events-after_single_event', array($this, 'append_export_link'), 10, 2);
+                        add_filter('eab-events-after_event_details', array($this, 'append_export_link'), 10, 2);
 		}
 
 		add_action('eab-events-rsvp_email-codec-macros', array($this, 'rsvp_email_macro_addition'));
@@ -112,8 +115,12 @@ class Eab_Export_iCal {
 	}
 
 	function append_export_link ($content, $event) {
+                
+                if (in_array($event->get_id(), $this->_added)) return $content;
+                $this->_added[] = $event->get_id();
+            
 		$download = $this->_data->get_option('eab_export-ical-download_links') ? '&attachment' : '';
-		return "{$content} <a href='" . 
+		return "{$content} <a class='export_to_ical' href='" . 
 			get_permalink($event->get_id()) . 
 			'?eab_format=ical' . $download .
 		"'><span class='eab_export'>" . __('Export to iCal', Eab_EventsHub::TEXT_DOMAIN) . '</span></a>';
@@ -234,7 +241,10 @@ class Eab_Exporter_Ical extends Eab_Exporter {
 				"DTSTART{$tzid}:" . $time_callback('Ymd', $start) . "T" . $time_callback('His', $start) . "{$zulu}\n" .
 				"DTEND{$tzid}:" . $time_callback('Ymd', $end) . "T" . $time_callback('His', $end) . "{$zulu}\n" .
 				"SUMMARY:" . $event->get_title() . "\n" .
-				"DESCRIPTION:" . strip_tags(preg_replace('/\s\s+/', ' ', preg_replace('/\r|\n/', ' ', $event->get_content()))) . "\n" .
+                                // Old format with no paragraph - all texts are in same paragraph
+				//"DESCRIPTION:" . strip_tags(preg_replace('/\s\s+/', ' ', preg_replace('/\r|\n/', ' ', $event->get_content()))) . "\n" .
+                                // Enable paragraph
+                                "DESCRIPTION:" . str_replace("\r\n", "\\n", $event->get_content()) . "\n" .
 				"URL:" . get_permalink($event->get_id()) . "\n" .
 				($location ? "LOCATION:{$location}\n" : '') .
 			"END:VEVENT\n";

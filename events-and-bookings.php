@@ -6,13 +6,13 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.8.3-beta1
+ Version: 1.9.1-beta1
  Author URI: http://premium.wpmudev.org
 */
 
  /*
-Authors - S H Mohanjith (Incsub), Ve Bailovity (Incsub)
-Contributors - Ashok Kumar Nath, Hakan Evin, Hoang Ngo
+Authors - S H Mohanjith (Incsub), Ve Bailovity (Incsub), Ignacio (Incsub)
+Contributors - Ashok Kumar Nath (WPMU DEV), Hoang Ngo (WPMU DEV), Hakan Evin
  */
 
 /**
@@ -45,12 +45,21 @@ class Eab_EventsHub {
      * Options instance.
 	 * @var object
      */
-    private $_data;
+    public $_data;
 
     /**
      * API handler instance
      */
-    private $_api;
+    public $_api;
+
+	private static $instance = null;
+
+	public static function get_instance() {
+		if ( ! self::$instance )
+			self::$instance = new self();
+
+		return self::$instance;
+	}
 
     /**
      * Get the table name with prefixes
@@ -78,10 +87,6 @@ class Eab_EventsHub {
      */
     function __construct () {
 		global $wpdb, $wp_version;
-
-		// Activation deactivation hooks
-		register_activation_hook(__FILE__, array($this, 'install'));
-		register_deactivation_hook(__FILE__, array($this, 'uninstall'));
 
 		// Actions
 		add_action('init', array($this, 'init'), 0);
@@ -111,11 +116,6 @@ class Eab_EventsHub {
 		add_action('admin_print_styles', array($this, 'admin_print_styles') );
 		add_action('widgets_init', array($this, 'widgets_init'));
 		add_filter('post_updated_messages', array($this, 'handle_post_updated_messages'));
-
-		add_action('wp_ajax_nopriv_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
-		add_action('wp_ajax_eab_paypal_ipn', array($this, 'process_paypal_ipn'));
-		add_action('wp_ajax_nopriv_eab_list_rsvps', array($this, 'process_list_rsvps'));
-		add_action('wp_ajax_eab_list_rsvps', array($this, 'process_list_rsvps'));
 
 		add_filter('single_template', array($this, 'handle_single_template'));
 		add_filter('archive_template', array($this, 'handle_archive_template'));
@@ -148,11 +148,9 @@ class Eab_EventsHub {
 
 		// API login after the options have been initialized
 		$this->_api->initialize();
-		// End API login & form section
 
-		add_action('wp_ajax_eab_cancel_attendance', array($this, 'handle_attendance_cancel'));
-		add_action('wp_ajax_eab_delete_attendance', array($this, 'handle_attendance_delete'));
-		add_action('wp_ajax_eab_add_attendance', array($this, 'handle_attendance_add'));
+
+
     }
 
 	function process_recurrent_trashing ($post_id) {
@@ -202,69 +200,8 @@ class Eab_EventsHub {
 		    load_plugin_textdomain(self::TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)).'/languages');
 		}
 
-		$labels = array(
-		    'name' => __('Events', self::TEXT_DOMAIN),
-		    'singular_name' => __('Event', self::TEXT_DOMAIN),
-		    'add_new' => __('Add Event', self::TEXT_DOMAIN),
-		    'add_new_item' => __('Add New Event', self::TEXT_DOMAIN),
-		    'edit_item' => __('Edit Event', self::TEXT_DOMAIN),
-		    'new_item' => __('New Event', self::TEXT_DOMAIN),
-		    'view_item' => __('View Event', self::TEXT_DOMAIN),
-		    'search_items' => __('Search Event', self::TEXT_DOMAIN),
-		    'not_found' =>  __('No event found', self::TEXT_DOMAIN),
-		    'not_found_in_trash' => __('No event found in Trash', self::TEXT_DOMAIN),
-		    'menu_name' => __('Events', self::TEXT_DOMAIN)
-		);
-
-		$supports = array( 'title', 'editor', 'author', 'venue', 'thumbnail', 'comments');
-		$supports = apply_filters('eab-event-post_type-supports', $supports);
-
-		$event_type_args = array(
-			'labels' => $labels,
-			'public' => true,
-			'show_ui' => true,
-			'publicly_queryable' => true,
-			'capability_type' => 'event',
-			'hierarchical' => false,
-			'map_meta_cap' => true,
-			'query_var' => true,
-			'supports' => $supports,
-			'rewrite' => array( 'slug' => $this->_data->get_option('slug'), 'with_front' => false ),
-			'has_archive' => true,
-			'menu_icon' => plugins_url('events-and-bookings/img/small-greyscale.png'),
-		);
-		register_post_type(
-			Eab_EventModel::POST_TYPE,
-			apply_filters('eab-post_type-register', $event_type_args)
-		);
-		register_taxonomy(
-			'eab_events_category',
-			Eab_EventModel::POST_TYPE,
-			array(
-				'labels' => array(
-					'name' => __('Event Categories', self::TEXT_DOMAIN),
-					'singular_name' => __('Event Category', self::TEXT_DOMAIN),
-					'singular_name' => __('Event Category', self::TEXT_DOMAIN),
-				),
-				'hierarchical' => true,
-				'public' => true,
-				'rewrite' => array(
-					'slug' => $this->_data->get_option('slug'),
-					'with_front' => true,
-				),
-				'capabilities' => array(
-					'manage_terms' => 'manage_categories',
-					'edit_terms' => 'manage_categories',
-					'delete_terms' => 'manage_categories',
-					'assign_terms' => 'edit_events',
-				),
-			)
-		);
-
-		$pts_args = array('show_in_admin_all_list' => false);
-		if (is_admin()) $pts_args['protected'] = true;
-		else $pts_args['public'] = true;
-		register_post_status(Eab_EventModel::RECURRENCE_STATUS, $pts_args);
+	    $taxonomies = new Eab_Taxonomies();
+	    $taxonomies->register();
 
 		$event_structure = '/'.$this->_data->get_option('slug').'/%event_year%/%event_monthnum%/%incsub_event%';
 
@@ -295,25 +232,7 @@ class Eab_EventsHub {
 
 		wp_localize_script('eab_admin_js', 'eab_event_localized', $event_localized);
 
-		if (isset($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'incsub_event-update-options')) {
-			$options = array();
-		    $options['slug'] 						= trim(trim($_POST['event_default']['slug'], '/'));
-			$options['accept_payments'] 			= $_POST['event_default']['accept_payments'];
-			$options['accept_api_logins'] 			= $_POST['event_default']['accept_api_logins'];
-			$options['display_attendees'] 			= $_POST['event_default']['display_attendees'];
-			$options['currency'] 					= $_POST['event_default']['currency'];
-			$options['paypal_email'] 				= $_POST['event_default']['paypal_email'];
-			$options['paypal_sandbox'] 				= @$_POST['event_default']['paypal_sandbox'];
 
-			$options['override_appearance_defaults']	= $_POST['event_default']['override_appearance_defaults'];
-			$options['archive_template'] 			= $_POST['event_default']['archive_template'];
-			$options['single_template'] 			= $_POST['event_default']['single_template'];
-
-			$options = apply_filters('eab-settings-before_save', $options);
-			$this->_data->set_options($options);
-		    wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
-		    exit();
-		}
 
 		if (isset($_REQUEST['eab_step'])) {
 		    setcookie('eab_step', $_REQUEST['eab_step'], eab_current_time()+(3600*24));
@@ -372,7 +291,8 @@ class Eab_EventsHub {
 
     function admin_init() {
     	// Check for tables first
-    	if (!$this->_blog_has_tables()) $this->install();
+    	if ( ! $this->_blog_has_tables() )
+		    eab_activate();
 
 		if (get_option('eab_activation_redirect', false)) {
 		    delete_option('eab_activation_redirect');
@@ -447,143 +367,7 @@ class Eab_EventsHub {
 		update_post_meta($event_id, 'incsub_event_no_count', $no_count);
     }
 
-    function process_paypal_ipn() {
-		$req = 'cmd=_notify-validate';
 
-		$request = $_REQUEST;
-
-		$post_values = "";
-		$cart = array();
-		foreach ($request as $key => $value) {
-		    $value = urlencode(stripslashes($value));
-		    $req .= "&$key=$value";
-		    $post_values .= " $key : $value\n";
-		}
-		$pay_to_email = $request['receiver_email'];
-		$pay_from_email = $request['payer_email'];
-		$transaction_id = $request['txn_id'];
-
-		$status = $request['payment_status'];
-		$amount = $request['mc_gross'];
-		$ticket_count = $request['quantity']; // Ticket count is the number of paid for tickets
-		$currency = $request['mc_currency'];
-		$test_ipn = $request['test_ipn'];
-		$event_id = $request['item_number'];
-		$booking_id = (int)$request['booking_id'];
-		$blog_id = (int)$request['blog_id'];
-
-		if (is_multisite()) switch_to_blog($blog_id);
-		$eab_options = get_option('incsub_event_default');
-
-		$header = "";
-		// post back to PayPal system to validate
-		$header .= "POST /cgi-bin/webscr HTTP/1.1\r\n";
-		// Sandbox host: http://stackoverflow.com/questions/17477815/receiving-error-invalid-host-header-from-paypal-ipn
-		if ((int)@$eab_options['paypal_sandbox'] == 1) $header .= "Host: www.sandbox.paypal.com\r\n";
-		else $header .= "Host: www.paypal.com\r\n";
-
-		// End host
-		$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-		$header .= "Connection: Close\r\n";
-		$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
-
-		if ((int)@$eab_options['paypal_sandbox'] == 1) {
-		    $fp = fsockopen ('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
-		} else {
-		    $fp = fsockopen ('ssl://www.paypal.com', 443, $errno, $errstr, 30);
-		}
-
-		$booking_obj = Eab_EventModel::get_booking($booking_id);
-
-		if (!$booking_obj || !$booking_obj->id) {
-		    header('HTTP/1.0 404 Not Found');
-		    header('Content-type: text/plain; charset=UTF-8');
-		    print 'Booking not found';
-		    exit(0);
-	    }
-
-		if ($booking_obj->event_id != $event_id) {
-		    header('HTTP/1.0 404 Not Found');
-		    header('Content-type: text/plain; charset=UTF-8');
-		    print 'Fake event id. REF: PP0';
-		    exit(0);
-		}
-
-		if (@$eab_options['currency'] != $currency) {
-		    header('HTTP/1.0 400 Bad Request');
-		    header('Content-type: text/plain; charset=UTF-8');
-		    print 'We were not expecting you. REF: PP1';
-		    exit(0);
-		}
-
-		if ($amount != $ticket_count * apply_filters('eab-payment-event_price-for_user', get_post_meta($event_id, 'incsub_event_fee', true), $event_id, $booking_obj->user_id)) {
-		    header('HTTP/1.0 400 Bad Request');
-		    header('Content-type: text/plain; charset=UTF-8');
-		    print 'We were not expecting you. REF: PP2';
-	    	exit(0);
-		}
-
-		if (!$ticket_count) {
-		    header('HTTP/1.0 400 Bad Request');
-		    header('Content-type: text/plain; charset=UTF-8');
-		    print 'Cheapskate. REF: PP2';
-    	    exit(0);
-		}
-
-		if (strtolower($pay_to_email) != strtolower(@$eab_options['paypal_email'])) {
-		    header('HTTP/1.0 400 Bad Request');
-		    header('Content-type: text/plain; charset=UTF-8');
-		    print 'We were not expecting you. REF: PP3';
-		    exit(0);
-		}
-
-		if (!$fp) {
-		    header('HTTP/1.0 400 Bad Request');
-		    header('Content-type: text/plain; charset=UTF-8');
-		    print 'We were not expecting you. REF: PP4';
-		    exit(0);
-		} else {
-		    fputs ($fp, $header . $req);
-		    while (!feof($fp)) {
-		    	$res = trim(fgets ($fp, 1024));
-		    	if (strcmp ($res, "VERIFIED") == 0) break;
-		    	if (strcmp ($res, "INVALID") == 0) break;
-		    }
-			if (strcmp ($res, "VERIFIED") == 0) {
-				if ($test_ipn == 1) {
-				  	if ((int)@$eab_options['paypal_sandbox'] == 1) {
-						// Sandbox, it's allowed so do stuff
-				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_transaction_key', $transaction_id);
-				    	Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_ticket_count', $ticket_count);
-				    	do_action('eab-ipn-event_paid', $event_id, $amount, $booking_obj->id);
-				    } else {
-				    	// Sandbox, not allowed, bail out
-				    	header('HTTP/1.0 400 Bad Request');
-					    header('Content-type: text/plain; charset=UTF-8');
-					    print 'We were not expecting you. REF: PP1';
-					    exit(0);
-				    }
-				} else {
-				    // Paid
-				    Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_transaction_key', $transaction_id);
-					Eab_EventModel::update_booking_meta($booking_obj->id, 'booking_ticket_count', $ticket_count);
-			    	do_action('eab-ipn-event_paid', $event_id, $amount, $booking_obj->id);
-				}
-				header('HTTP/1.0 200 OK');
-				header('Content-type: text/plain; charset=UTF-8');
-				print 'Success';
-			    exit(0);
-			} else if (strcmp ($res, "INVALID") == 0) {
-			    $message = "Invalid PayPal IPN $transaction_id";
-			}
-		    fclose ($fp);
-	    }
-		if (is_multisite()) restore_current_blog();
-		header('HTTP/1.0 200 OK');
-		header('Content-type: text/plain; charset=UTF-8');
-		print 'Thank you very much for letting us know. REF: '.$message;
-		exit(0);
-    }
 
     function agm_google_maps_post_meta_address($location) {
 		global $post;
@@ -761,14 +545,7 @@ class Eab_EventsHub {
 		return Eab_Template::get_single_content($post, $content);
     }
 
-    function process_list_rsvps() {
-		global $post;
 
-		$post = get_post($_REQUEST['pid']);
-		echo Eab_Template::get_rsvps($post);
-
-		exit(0);
-    }
 
     function meta_boxes() {
 		global $post, $current_user;
@@ -994,6 +771,7 @@ class Eab_EventsHub {
 
 		$supported_intervals = $event->get_supported_recurrence_intervals();
 
+		$content = '';
 		if (!$event->is_recurring()) {
 			$content = '<div id="eab-start_recurrence">' .
 				'<input type="button" id="eab-eab-start_recurrence-button" class="button" value="' .
@@ -1239,7 +1017,7 @@ class Eab_EventsHub {
 
     function bookings_meta_box () {
 		global $post;
-		echo '<a href="' . admin_url('?eab_export=attendees&event_id='. $post->ID) . '" class="eab-export_attendees">' .
+		echo '<a class="button" href="' . admin_url('index.php?eab_export=attendees&event_id='. $post->ID) . '" class="eab-export_attendees">' .
 			__('Export', self::TEXT_DOMAIN) .
 		'</a>';
 		echo $this->meta_box_part_bookings($post);
@@ -1520,7 +1298,7 @@ class Eab_EventsHub {
 				printf('<b>' . __('Attending / Undecided', self::TEXT_DOMAIN) . ':</b> %d / %d<br />', $yes, $maybe);
 				printf('<b>' . __('Not Attending', self::TEXT_DOMAIN) . ':</b> %d', $no);
 				echo '&nbsp;';
-				echo '<a href="' . admin_url('?eab_export=attendees&event_id='. $event->get_id()) . '" class="eab-export_attendees">' .
+				echo '<a class="button" href="' . admin_url('index.php?eab_export=attendees&event_id='. $event->get_id()) . '" class="eab-export_attendees">' .
 					__('Export', self::TEXT_DOMAIN) .
 				'</a>';
 				break;
@@ -1617,60 +1395,6 @@ class Eab_EventsHub {
     	;
     }
 
-    /**
-     * Activation hook
-     *
-     * Create tables if they don't exist and add plugin options
-     *
-     * @see     http://codex.wordpress.org/Function_Reference/register_activation_hook
-     *
-     * @global	object	$wpdb
-     */
-    function install () {
-        global $wpdb;
-
-		/**
-		 * WordPress database upgrade/creation functions
-		 */
-		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-		// Get the correct character collate
-		if ( ! empty($wpdb->charset) )
-	            $charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
-		if ( ! empty($wpdb->collate) )
-		    $charset_collate .= " COLLATE $wpdb->collate";
-
-		$sql_main = "CREATE TABLE IF NOT EXISTS ".self::tablename(self::BOOKING_TABLE)." (
-				`id` BIGINT NOT NULL AUTO_INCREMENT,
-	            `event_id` BIGINT NOT NULL ,
-	            `user_id` BIGINT NOT NULL ,
-				`timestamp` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00' ,
-				`status` ENUM( 'paid', 'yes', 'maybe', 'no' ) NOT NULL DEFAULT 'no' ,
-		    		PRIMARY KEY (`id`),
-				UNIQUE KEY `event_id_2` (`event_id`,`user_id`),
-				KEY `event_id` (`event_id`),
-				KEY `user_id` (`user_id`),
-				KEY `timestamp` (`timestamp`),
-				KEY `status` (`status`)
-			    ) ENGINE = InnoDB {$charset_collate};";
-		dbDelta($sql_main);
-
-	        $sql_main = "CREATE TABLE IF NOT EXISTS ".self::tablename(self::BOOKING_META_TABLE)." (
-				`id` BIGINT NOT NULL AUTO_INCREMENT,
-				`booking_id` BIGINT NOT NULL ,
-	            `meta_key` VARCHAR(255) NOT NULL ,
-	            `meta_value` TEXT NOT NULL,
-		    		PRIMARY KEY (`id`),
-				KEY `booking_id` (`booking_id`),
-				KEY `meta_key` (`meta_key`)
-			    ) ENGINE = InnoDB {$charset_collate};"; // MySQL strict mode fix, thanks @KJA!
-		dbDelta($sql_main);
-
-
-    	if (!get_option('event_default', false)) add_option('event_default', array());
-		if (!get_option('eab_activation_redirect', true)) add_option('eab_activation_redirect', true);
-    }
-
     function user_has_cap($allcaps, $caps = null, $args = null) {
 		global $current_user, $blog_id, $post;
 
@@ -1713,17 +1437,6 @@ class Eab_EventsHub {
 		return $allcaps;
     }
 
-    /**
-     * Deactivation hook
-     *
-     * @see		http://codex.wordpress.org/Function_Reference/register_deactivation_hook
-     *
-     * @global	object	$wpdb
-     */
-    function uninstall() {
-    	global $wpdb;
-	// Nothing to do
-    }
 
     /**
      * Add the admin menus
@@ -1735,8 +1448,13 @@ class Eab_EventsHub {
 
 		$root_key = 'edit.php?post_type=incsub_event';
 
+	    include_once( 'admin/class-eab-settings-menu.php' );
+	    include_once( 'admin/class-eab-shortcodes-menu.php' );
+
 		if (get_option('eab_setup', false) == false) {
-		    add_submenu_page($root_key, __("Get Started", self::TEXT_DOMAIN), __("Get started", self::TEXT_DOMAIN), 'manage_options', 'eab_welcome', array($this,'welcome_render'));
+			include_once( 'admin/class-eab-get-started-menu.php' );
+
+			new Eab_Admin_Get_Started_Menu( $root_key );
 
 		    if (isset($submenu[$root_key]) && is_array($submenu[$root_key])) foreach ($submenu[$root_key] as $k=>$item) {
 				if ($item[2] == 'eab_welcome') {
@@ -1745,8 +1463,9 @@ class Eab_EventsHub {
 				}
 		    }
 		}
-		add_submenu_page($root_key, __("Event Settings", self::TEXT_DOMAIN), __("Settings", self::TEXT_DOMAIN), 'manage_options', 'eab_settings', array($this, 'settings_render'));
-		add_submenu_page($root_key, __("Event Shortcodes", self::TEXT_DOMAIN), __("Shortcodes", self::TEXT_DOMAIN), 'edit_events', 'eab_shortcodes', array($this, 'shortcodes_render'));
+
+	    new Eab_Admin_Settings_Menu( $root_key );
+	    new Eab_Admin_Shortcodes_Menu( $root_key );
 
 		do_action('eab-admin-add_pages', $root_key);
 
@@ -1759,66 +1478,6 @@ class Eab_EventsHub {
 		return $schedules;
     }
 
-    function welcome_render() {
-	?>
-	<div class="wrap">
-	    <div id="icon-events-general" class="icon32"><br/></div>
-	    <h2><?php _e('Getting started', self::TEXT_DOMAIN); ?></h2>
-
-	    <p>
-	    	<?php _e('Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.', self::TEXT_DOMAIN) ?>
-	    </p>
-
-	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
-		<div id="eab-actionlist" class="eab-metabox postbox">
-		    <h3 class="eab-hndle"><?php _e('Getting Started', self::TEXT_DOMAIN); ?></h3>
-		    <div class="eab-inside">
-				<div class="eab-note"><?php _e('You\'re almost ready! Follow these steps and start creating events on your WordPress site.', self::TEXT_DOMAIN); ?></div>
-			<ol>
-			    <li>
-				<?php _e('Before creating an event, you\'ll need to configure some basic settings, like your root slug and payment options.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&page=eab_settings&eab_step=1'); ?>" class="eab-goto-step button" id="eab-goto-step-0" ><?php _e('Configure Your Settings', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			    <li>
-				<?php _e('Now you can create your first event.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo esc_url('post-new.php?post_type=incsub_event&eab_step=2'); ?>" class="eab-goto-step button"><?php _e('Add an Event', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			    <li>
-				<?php _e('You can view and edit your existing events whenever you like.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo esc_url('edit.php?post_type=incsub_event&eab_step=3'); ?>" class="eab-goto-step button"><?php _e('Edit Events', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			    <li>
-				<?php _e('The archive displays a list of upcoming events on your site.', self::TEXT_DOMAIN); ?>
-				<a href="<?php echo home_url($this->_data->get_option('slug')) . '/'; ?>" class="eab-goto-step button"><?php _e('Events Archive', self::TEXT_DOMAIN); ?></a>
-			    </li>
-			</ol>
-		    </div>
-		</div>
-	    </div>
-
-		<?php if (!defined('WPMUDEV_REMOVE_BRANDING') || !constant('WPMUDEV_REMOVE_BRANDING')) { ?>
-	    <div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
-			<div id="eab-helpbox" class="eab-metabox postbox">
-			    <h3 class="eab-hndle"><?php _e('Need help?', self::TEXT_DOMAIN); ?></h3>
-			    <div class="eab-inside">
-					<ol>
-					    <li><a href="http://premium.wpmudev.org/project/events-and-booking"><?php _e('Check out the Events plugin page on WPMU DEV', self::TEXT_DOMAIN); ?></a></li>
-					    <li><a href="http://premium.wpmudev.org/forums/tags/events-and-bookings"><?php _e('Post a question about this plugin on our support forums', self::TEXT_DOMAIN); ?></a></li>
-					    <li><a href="http://premium.wpmudev.org/project/events-and-booking/installation/"><?php _e('Watch a video of the Events plugin in action', self::TEXT_DOMAIN); ?></a></li>
-					</ol>
-			    </div>
-			</div>
-	    </div>
-	    <?php } ?>
-
-	    <div class="clear"></div>
-
-	    <div class="eab-dashboard-footer">
-
-	    </div>
-	</div>
-	<?php
-    }
 
     function views_list($views) {
 		global $wp_query;
@@ -1845,243 +1504,9 @@ class Eab_EventsHub {
 		return $views;
     }
 
-    function settings_render() {
-		if(!current_user_can('manage_options')) {
-	  		echo "<p>" . __('Nice Try...', self::TEXT_DOMAIN) . "</p>";  //If accessed properly, this message doesn't appear.
-	  		return;
-	  	}
-		if (isset($_GET['incsub_event_settings_saved']) && $_GET['incsub_event_settings_saved'] == 1) {
-		    echo '<div class="updated fade"><p>'.__('Settings saved.', self::TEXT_DOMAIN).'</p></div>';
-	    }
-		if (!class_exists('WpmuDev_HelpTooltips')) require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
-		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
 
-		$tabbable = !(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)
-			? 'tabbable'
-			: false
-		;
-		$hide = !empty($tabbable) ? 'hide' : '';
 
-		$archive_tpl = file_exists(get_stylesheet_directory().'/archive-incsub_event.php')
-			? get_stylesheet_directory() . '/archive-incsub_event.php'
-		    : get_template_directory() . '/archive-incsub_event.php'
-		;
-		$archive_tpl_present = apply_filters(
-			'eab-settings-appearance-archive_template_copied',
-			file_exists($archive_tpl)
-		);
 
-		$single_tpl = file_exists(get_stylesheet_directory().'/single-incsub_event.php')
-			? get_stylesheet_directory() . '/single-incsub_event.php'
-		    : get_template_directory() . '/single-incsub_event.php'
-		;
-		$single_tpl_present = apply_filters(
-			'eab-settings-appearance-single_template_copied',
-			file_exists($single_tpl)
-		);
-
-		$theme_tpls_present = apply_filters(
-			'eab-settings-appearance-templates_copied',
-			($archive_tpl_present && $single_tpl_present)
-		);
-		$raw_tpl_sets = glob(EAB_PLUGIN_DIR . 'default-templates/*');
-		$templates = array();
-		foreach ($raw_tpl_sets as $item) {
-			if (!is_dir($item)) continue;
-			$key = basename($item);
-			$label = ucwords(preg_replace('/[^a-z0-9]+/i', ' ', $key));
-			$templates[$key] = sprintf(__("Plugin: %s", self::TEXT_DOMAIN), $label);
-		}
-		foreach (get_page_templates() as $name => $tpl) {
-			$templates[$tpl] = sprintf(__("Theme: %s", self::TEXT_DOMAIN), $name);
-
-		}
-	?>
-	<div class="wrap <?php echo esc_attr($tabbable); ?> <?php echo esc_attr($hide); ?>">
-	    <div id="icon-events-general" class="icon32"><br/></div>
-	    <h2><?php _e('Events Settings', self::TEXT_DOMAIN); ?></h2>
-    <?php if (defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS) { ?>
-	    <div class="eab-note">
-		    <p><?php _e('This is where you manage your general settings for the plugin and how events are displayed on your site.', self::TEXT_DOMAIN); ?>.</p>
-	    </div>
-    <?php } ?>
-	    <form method="post" action="edit.php?post_type=incsub_event&page=eab_settings">
-		<?php wp_nonce_field('incsub_event-update-options'); ?>
-		<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center">
-		    <?php do_action('eab-settings-before_plugin_settings'); ?>
-		    <div id="eab-settings-general" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Plugin settings', self::TEXT_DOMAIN); ?></h3>
-				<div class="eab-inside">
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-slug" id="incsub_event_label-slug"><?php _e('Set your root slug here:', self::TEXT_DOMAIN); ?></label>
-						/<input type="text" size="20" id="incsub_event-slug" name="event_default[slug]" value="<?php print $this->_data->get_option('slug'); ?>" />
-						<span><?php echo $tips->add_tip(__('This is the URL where your events archive can be found. By default, the format is yoursite.com/events, but you can change this to whatever you want.', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-accept_payments" id="incsub_event_label-accept_payments"><?php _e('Will you be accepting payment for any of your events?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-accept_payments" name="event_default[accept_payments]" value="1" <?php print ($this->_data->get_option('accept_payments') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Leave this box unchecked if you don\'t intend to collect payment at any time.', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-accept_api_logins" id="incsub_event_label-accept_api_logins"><?php _e('Allow Facebook and Twitter Login?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-accept_api_logins" name="event_default[accept_api_logins]" value="1" <?php print ($this->_data->get_option('accept_api_logins') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Check this box to allow guests to RSVP to an event with their Facebook or Twitter account. (If this feature is not enabled, guests will need a WordPress account to RSVP).', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-display_attendees" id="incsub_event_label-display_attendees"><?php _e('Display public RSVPs?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-display_attendees" name="event_default[display_attendees]" value="1" <?php print ($this->_data->get_option('display_attendees') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Check this box to display a "who\'s attending" list in the event details.', self::TEXT_DOMAIN)); ?></span>
-				    </div>
-				</div>
-		    </div>
-		    <?php if (!$theme_tpls_present) { ?>
-		    <div id="eab-settings-appearance" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Appearance settings', self::TEXT_DOMAIN); ?></h3>
-				<div class="eab-inside">
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-override_appearance_defaults" id="incsub_event_label-override_appearance_defaults"><?php _e('Override default appearance?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-override_appearance_defaults" name="event_default[override_appearance_defaults]" value="1" <?php print ($this->_data->get_option('override_appearance_defaults') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Check this box if you want to customize the appearance of your events with overriding templates.', self::TEXT_DOMAIN)); ?></span>
-					</div>
-
-					<div class="eab-settings-settings_item">
-						<?php if (!$archive_tpl_present) { ?>
-					    <label for="incsub_event-archive_template" id="incsub_event_label-archive_template"><?php _e('Archive template', self::TEXT_DOMAIN); ?></label>
-						<select id="incsub_event-archive_template" name="event_default[archive_template]">
-						<?php foreach ($templates as $tkey => $tlabel) { ?>
-							<?php $selected = ($this->_data->get_option('archive_template') == $tkey) ? 'selected="selected"' : ''; ?>
-							<option value="<?php esc_attr_e($tkey);?>" <?php echo $selected;?>><?php echo $tlabel;?></option>
-						<?php } ?>
-						</select>
-						<span>
-							<small><em><?php _e('* templates may not work in all themes', self::TEXT_DOMAIN); ?></em></small>
-							<?php echo $tips->add_tip(__('Choose how the events archive is displayed on your site.', self::TEXT_DOMAIN)); ?>
-						</span>
-					    <?php } ?>
-					</div>
-
-					<div class="eab-settings-settings_item">
-						<?php if (!$single_tpl_present) { ?>
-					    <label for="incsub_event-single_template" id="incsub_event_label-single_template"><?php _e('Single Event template', self::TEXT_DOMAIN); ?></label>
-						<select id="incsub_event-single_template" name="event_default[single_template]">
-						<?php foreach ($templates as $tkey => $tlabel) { ?>
-							<?php $selected = ($this->_data->get_option('single_template') == $tkey) ? 'selected="selected"' : ''; ?>
-							<option value="<?php esc_attr_e($tkey);?>" <?php echo $selected;?>><?php echo $tlabel;?></option>
-						<?php } ?>
-						</select>
-						<span>
-							<small><em><?php _e('* templates may not work in all themes', self::TEXT_DOMAIN); ?></em></small>
-							<?php echo $tips->add_tip(__('Choose how single event listings are displayed on your site.', self::TEXT_DOMAIN)); ?>
-						</span>
-					    <?php } ?>
-					</div>
-
-				</div>
-		    </div>
-		    <?php } ?>
-		    <?php do_action('eab-settings-after_appearance_settings'); /* the hook happens whether we have appearance settings or not */ ?>
-		    <!-- Payment settings -->
-		    <div id="eab-settings-paypal" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Payment settings', self::TEXT_DOMAIN); ?></h3>
-				<div class="eab-inside">
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-currency" id="incsub_event_label-currency"><?php _e('Currency', self::TEXT_DOMAIN); ?></label>
-						<input type="text" size="4" id="incsub_event-currency" name="event_default[currency]" value="<?php print $this->_data->get_option('currency'); ?>" />
-						<span><?php echo $tips->add_tip(sprintf(__('Nominate the currency in which you will be accepting payment for your events. For more information see <a href="%s" target="_blank">Accepted PayPal Currency Codes</a>.', self::TEXT_DOMAIN), 'https://cms.paypal.com/us/cgi-bin/?cmd=_render-content&content_ID=developer/e_howto_api_nvp_currency_codes')); ?></span>
-					</div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-paypal_email" id="incsub_event_label-paypal_email"><?php _e('PayPal E-Mail address', self::TEXT_DOMAIN); ?></label>
-						<input type="text" size="20" id="incsub_event-paypal_email" name="event_default[paypal_email]" value="<?php print $this->_data->get_option('paypal_email'); ?>" />
-						<span><?php echo $tips->add_tip(__('Add the primary email address of the PayPal account you will use to collect payment for your events.', self::TEXT_DOMAIN)); ?></span>
-					</div>
-
-					<div class="eab-settings-settings_item">
-					    <label for="incsub_event-paypal_sandbox" id="incsub_event_label-paypal_sandbox"><?php _e('PayPal Sandbox mode?', self::TEXT_DOMAIN); ?></label>
-						<input type="checkbox" size="20" id="incsub_event-paypal_sandbox" name="event_default[paypal_sandbox]" value="1" <?php print ($this->_data->get_option('paypal_sandbox') == 1)?'checked="checked"':''; ?> />
-						<span><?php echo $tips->add_tip(__('Use PayPal Sandbox mode for testing your payments', self::TEXT_DOMAIN)); ?></span>
-					</div>
-				</div>
-		    </div>
-		    <?php do_action('eab-settings-after_payment_settings'); ?>
-		   <?php $this->_api->render_settings($tips); // API settings ?>
-		    <!-- Addon settings -->
-		    <div id="eab-settings-addons" class="eab-metabox postbox">
-				<h3 class="eab-hndle"><?php _e('Add-ons', self::TEXT_DOMAIN); ?></h3>
-				<!--<div class="eab-inside">-->
-		    		<?php Eab_AddonHandler::create_addon_settings(); ?>
-		    		<br />
-		    	<!--</div>-->
-		    </div>
-		    <?php do_action('eab-settings-after_plugin_settings'); ?>
-		</div>
-
-		<p class="submit">
-		    <input type="submit" class="button-primary" name="submit_settings" value="<?php _e('Save Changes', self::TEXT_DOMAIN) ?>" />
-		    <?php if (isset($_REQUEST['eab_step']) && $_REQUEST['eab_step'] == 1) { ?>
-		    <a href="edit.php?post_type=incsub_event&page=eab_welcome&eab_step=-1" class="button"><?php _e('Go back to Getting started guide', self::TEXT_DOMAIN) ?></a>
-		    <?php } ?>
-		</p>
-	    </form>
-	</div>
-<?php if (!empty($tabbable)) { ?>
-	<div class="eab-loading-cover <?php echo esc_attr($tabbable); ?>"><h1><?php _e('Please, hold on...', self::TEXT_DOMAIN); ?></h1></div>
-<?php } ?>
-	<?php
-    }
-
-    function shortcodes_render () {
-		// Filter the help....
-		$help = apply_filters('eab-shortcodes-shortcode_help', array());
-
-		if (!class_exists('WpmuDev_HelpTooltips')) require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
-		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
-
-		$out = '';
-		$count = 0;
-		$half = (int)(count($help) / 2);
-
-		$out .= '<div class="postbox-container">';
-		foreach ($help as $shortcode) {
-			$out .= '<div class="eab-metabox postbox"><h3 class="eab-hndle">' . $shortcode['title'] . '</h3>';
-			$out .= '<div class="eab-inside">';
-			$out .= '	<div class="eab-settings-settings_item">';
-			$out .= '		<strong>' . __('Tag:', self::TEXT_DOMAIN) . '</strong> <code>[' . $shortcode['tag'] . ']</code>';
-			if (!empty($shortcode['note'])) $out .= '<div class="eab-note">' . $shortcode['note'] . '</div>';
-		    $out .= '	</div>';
-			if (!empty($shortcode['arguments'])) {
-				$out .= ' <div class="eab-settings-settings_item" style="line-height:1.5em"><strong>' . __('Arguments:', self::TEXT_DOMAIN) . '</strong>';
-				foreach ($shortcode['arguments'] as $argument => $data) {
-					if (!empty($shortcode['advanced_arguments']) && !current_user_can('manage_options')) {
-						if (in_array($argument, $shortcode['advanced_arguments'])) continue;
-					}
-					$type = !empty($data['type'])
-						? eab_call_template('util_shortcode_argument_type_string_info', $data['type'], $argument, $shortcode['tag'], $tips)
-						: false
-					;
-					$out .= "<div class='eab-shortcode-attribute_item'><code>{$argument}</code> - {$data['help']} {$type}</div>";
-				}
-				$out .= '</div><!-- Attributes -->';
-			}
-			$out .= '</div></div>';
-			$count++;
-			if ($count == $half) $out .= '</div><div class="postbox-container eab-postbox_container-last">';
-		}
-		$out .= '</div>';
-
-		echo '<div class="wrap">
-				<div id="icon-events-general" class="icon32"><br/></div>
-				<h2>' . __('Events Shortcodes', self::TEXT_DOMAIN) . '</h2>
-				<div class="eab-metaboxcol metabox-holder eab-metaboxcol-one eab-metaboxcol-center columns-2">';
-		echo $out;
-
-		echo '</div></div>';
-    }
 
     function widgets_init() {
 		require_once dirname(__FILE__) . '/lib/widgets/Widget.class.php';
@@ -2104,46 +1529,7 @@ class Eab_EventsHub {
 		@file_put_contents( WP_PLUGIN_DIR . "/events-and-bookings/log.txt", $message . chr(10). chr(13), FILE_APPEND );
 	}
 
-	function handle_attendance_cancel () {
-		$user_id = (int)$_POST['user_id'];
-		$post_id = (int)$_POST['post_id'];
 
-		$post = get_post($post_id);
-		$event = new Eab_EventModel($post);
-		$event->cancel_attendance($user_id);
-		echo $this->meta_box_part_bookings($post);
-		die;
-	}
-
-	function handle_attendance_delete () {
-		$user_id = (int)$_POST['user_id'];
-		$post_id = (int)$_POST['post_id'];
-
-		$post = get_post($post_id);
-		$event = new Eab_EventModel($post);
-		$event->delete_attendance($user_id);
-		echo $this->meta_box_part_bookings($post);
-		die;
-	}
-
-	function handle_attendance_add () {
-		$data = stripslashes_deep($_POST);
-		$email = $data['user'];
-		$status = $data['status'];
-		$post_id = (int)$data['post_id'];
-		$allowed = array(Eab_EventModel::BOOKING_YES, Eab_EventModel::BOOKING_NO, Eab_EventModel::BOOKING_MAYBE);
-
-		$post = get_post($post_id);
-		if (is_email($email) && $post_id && in_array($status, $allowed)) {
-			$user = get_user_by('email', $email);
-			if ($user && !empty($user->ID)) {
-				$event = new Eab_EventModel($post);
-				$event->add_attendance($user->ID, $status);
-			}
-		}
-		echo $this->meta_box_part_bookings($post);
-		die;
-	}
 
 	/**
 	 * Proper query rewriting.
@@ -2183,6 +1569,9 @@ function eab_autoshow_map_off ($opts) {
 
 include_once 'template-tags.php';
 
+if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
+	include_once( 'lib/class-eab-ajax.php' );
+
 define('EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ), true);
 define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . EAB_PLUGIN_BASENAME . '/');
 
@@ -2198,9 +1587,10 @@ require_once EAB_PLUGIN_DIR . 'lib/class_eab_codec.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_event_model.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_template.php';
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_api.php';
+require_once EAB_PLUGIN_DIR . 'lib/class-eab-taxonomies.php';
 
 // Lets get things started
-$__booking = new Eab_EventsHub(); // @TODO: Refactor
+$__booking = events_and_bookings(); // @TODO: Refactor
 
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_network.php';
 Eab_Network::serve();
@@ -2233,4 +1623,28 @@ if (is_admin()) {
 		),
 	);
 	require_once EAB_PLUGIN_DIR . '/lib/wpmudev-dash-notification.php';
+}
+
+
+function eab_activate() {
+	include_once( 'lib/class-eab-activator.php' );
+	Eab_Activator::run();
+}
+register_activation_hook(__FILE__, 'eab_activate' );
+
+
+function eab_domain() {
+	return Eab_EventsHub::TEXT_DOMAIN;
+}
+
+function events_and_bookings() {
+	return Eab_EventsHub::get_instance();
+}
+
+function eab_plugin_dir() {
+	return trailingslashit( plugin_dir_path( __FILE__ ) );
+}
+
+function eab_plugin_url() {
+	return trailingslashit( plugin_dir_url( __FILE__ ) );
 }

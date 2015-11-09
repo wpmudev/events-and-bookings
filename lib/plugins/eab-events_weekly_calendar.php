@@ -78,12 +78,15 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 	function sunday( $timestamp=false ) {
 	
 		$date = $timestamp ? $timestamp : $this->get_local_time();
+		$test = date( "l", $date );
 		// Return today's timestamp if today is sunday
-		if ( "Sunday" == date( "l", $date ) )
-			return strtotime("today");
+		if ( "Sunday" == date( "l", $date ) ) {
+			return strtotime( "today" );
+		}
 		// Else return last week's timestamp
-		else
-			return strtotime("last Sunday", $date );
+		else {
+			return strtotime( "last Sunday", $date );
+		}
 	}
 	
 	function shortcode( $attr ) {
@@ -91,7 +94,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		extract( shortcode_atts( array(
 		'id'		=> '',
 		'class'		=> ''
-		), $atts ) );
+		), $attr ) );
 		
 		if ( isset( $_GET["wcalendar"] ) )
 			$time = $_GET["wcalendar"];
@@ -197,7 +200,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		
 		if ( !is_object( $options ) )
 			$options = new Eab_Options;
-		
+
 		$timestamp = $timestamp ? $timestamp : $this->get_local_time();
 		$year = date("Y", $timestamp);
 		$month = date("m", $timestamp);
@@ -245,6 +248,8 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		
 		for ( $t=$first; $t<$last; $t=$t+$step ) {
 			foreach ( $days as $key=>$i ) {
+                            // Not sure if it's current fix, but it works!
+                            if( $i == 0 ) $i = 7;
 				if ( $i == -1 ) {
 					$from = $this->secs2hours( $t - $sunday );
 					$to = $this->secs2hours( $t - $sunday + $step );
@@ -358,7 +363,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 			$event_info['title'] .
 			'<span class="wpmudevevents-calendar-event-info">' . 
 				"<span class='wpmudevevents-calendar-thumbnail'>". get_the_post_thumbnail( $event_info['id'], 'medium' ) . "</span>" .
-				"<span class='wpmudevevents-calendar-start'>" . date_i18n(get_option('date_format'), $event_tstamps['start']) . "</span>".
+				"<span class='wpmudevevents-calendar-start'>" . date_i18n(get_option('date_format'), $current_tstamps['start']) . "</span>".
 				"<span class='wpmudevevents-calendar-venue'>" . $event_info['event_venue'] . "</span>".
 				"<span class='wpmudevevents-calendar-content'>". wp_trim_words( $event_info['event_content'], 20  ). "</span>" .
 				"<span style='clear:both'></span>" .

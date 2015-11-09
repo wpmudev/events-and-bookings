@@ -17,11 +17,12 @@ class Eab_MP_Bridge {
 	}
 
 	private function _add_hooks () {
-		add_action('mp_order/new_order', array($this, 'dispatch_mp_product_if_order_paid'));
-		add_action('mp_order_order_paid', array($this, 'mp_product_order_paid'));
+		add_action('mp_order/new_order', array($this, 'dispatch_mp_product_if_order_paid'), 10, 1);
+		add_action('mp_order_order_paid', array($this, 'mp_product_order_paid'), 10, 1);
 
 		// Display
 		add_filter('eab-event-payment_forms', array($this, 'process_event_payment_forms'), 10, 2);
+                add_action('incsub_event_booking_yes', array($this, 'add_event_product_to_cart'), 10, 2);
 		add_filter('eab-events-event_details-price', array($this, 'show_product_price'), 10, 2);
 
 		// Regular Events+ product selection
@@ -36,6 +37,7 @@ class Eab_MP_Bridge {
 
 		// Archiving
 		add_action('eab-scheduler-event_archived', array($this, 'archived_event_mp_cleanup'));
+                add_action( 'eab-rsvps-button-no', array( &$this, 'eab_mp_variation_check' ), 99, 2 );
 	}
 
 	/**
@@ -333,8 +335,8 @@ class Eab_MP_Bridge {
 	/**
 	 * Returns related Product instead of standard payment forms for appropriate events.
 	 */
-	function process_event_payment_forms ($form, $event_id) {
-		if (!$this->_is_mp_present()) return $form;
+	function add_event_product_to_cart($event_id, $user_id) {
+		if (!$this->_is_mp_present()) return;
 		
 		$event = new Eab_EventModel(get_post($event_id));
 		$recurring = $event->is_recurring_child();
@@ -357,20 +359,29 @@ class Eab_MP_Bridge {
 			$product_id = get_post_meta($event_id, 'eab_product_id', true);
 		}
 
-		if (!$product_id) return $form;
+		if (!$product_id) return;
 
 		$cart = MP_Cart::get_instance();
 		$items = $cart->get_items();
 		if (is_array($items) && false === array_search($product_id, array_keys($items))) {
 			// Only add once, not if it's already in the cart
-			$cart->add_item($product_id);
+                        $product = new MP_Product( $product_id );
+                        if( $product->has_variations() ) {
+                            $cart->add_item( $_POST['action_variation'] );
+                        }else{
+                            $cart->add_item( $product_id );
+                        }
 		}
 
+	}
+        
+        function process_event_payment_forms ($form, $event_id) {
+		if (!$this->_is_mp_present()) return $form;
 		return '<p><a href="' . esc_url(mp_cart_link(false, true)) . '">' . __('Click here to purchase your ticket', Eab_EventsHub::TEXT_DOMAIN) . '</a></p>';
 	}
 
 	function dispatch_mp_product_if_order_paid ($order) {
-		if ('mp_order' != $order->post_type || 'order_paid' != $order->post_status) return false;
+		if ('mp_order' != $order->post_type || ! in_array( $order->post_status, array( 'order_shipped', 'order_paid' ) ) ) return false;
 		$this->mp_product_order_paid($order);
 	}
 
@@ -386,7 +397,7 @@ class Eab_MP_Bridge {
 			? $order->get_cart()->get_items()
 			: (isset($order->mp_cart_info) ? $order->mp_cart_info : array())
 		;
-
+                
 		if (is_array($cart_info) && count($cart_info)) foreach($cart_info as $cart_id => $count) {
 			$event_id = $product_id = false;
 
@@ -454,7 +465,7 @@ class Eab_MP_Bridge {
 	 */
 	private function _is_product_id ($cart_id) {
 		$post = get_post($cart_id);
-		return MP_Product::get_post_type() === $post->post_status;
+		return MP_Product::get_post_type() === $post->post_type;
 	}
 
 	/**
@@ -464,10 +475,11 @@ class Eab_MP_Bridge {
 		$event_id = false;
 
 		if ($this->_is_product_id($cart_id)) {
-			$event_id = get_post_meta($product_id, 'eab_event_id', true);
+			$event_id = get_post_meta($cart_id, 'eab_event_id', true);
 		} else {
 			// this is a variation, it has event ID in SKU
-			$event_id = MP_Product::get_variation_meta($cart_id, 'sku');
+                        $cart = get_post($cart_id);
+			$event_id = get_post_meta( $cart->post_parent, 'eab_event_id', true );
 		}
 
 		return $event_id;
@@ -477,7 +489,14 @@ class Eab_MP_Bridge {
 	 * Quickly scans product for default (first-available) price.
 	 */
 	private function _get_quick_product_price ($product_id) {
-		$meta = get_post_custom($product_id);
+            
+            $product = new MP_Product( $product_id );
+            if( $product->has_variations() ) {
+                $variation_price = $product->get_price();
+                $price = mp_format_currency( '', $variation_price['highest'] );
+                $price = substr( $price, 6 );
+            }else{
+                $meta = get_post_custom($product_id);
 		$mp_price = !empty($meta['mp_price'][0]) ? maybe_unserialize($meta['mp_price'][0]) : array();
 		if (empty($mp_price)) {
 			// MP3.0 price format
@@ -485,7 +504,8 @@ class Eab_MP_Bridge {
 		}
 		rsort($mp_price, SORT_NUMERIC);
 		$price = !empty($mp_price[0]) ? (float)$mp_price[0] : false;
-		return $price;
+            }
+	    return $price;
 	}
 
 	/**
@@ -517,4 +537,24 @@ class Eab_MP_Bridge {
 			update_post_meta($old_product_id, 'eab_event_id', false);
 		}
 	}
+        
+        public function eab_mp_variation_check( $content, $event_id ) {
+            $event = new Eab_EventModel( get_post( $event_id ) );
+            $product_id = get_post_meta( $event_id, 'eab_product_id', true );
+            if( isset( $product_id ) && (int) $product_id > 0 ){
+                $product = new MP_Product( $product_id );
+                if( $product->has_variations() ) {
+                    $variations = $product->get_variations();
+                    
+                    $html = '<select name="action_variation" style="width: 100%; margin-bottom: 10px;">';
+                    foreach( $variations as $variation ){
+                        $price = $variation->get_price();
+                        $html .= '<option value="' . $variation->ID . '">' . $variation->get_meta( 'name' ) . ' - ' . mp_format_currency( '', $price['regular'] ) . '</option>';
+                    }
+                    $html .= '</select><br>';
+                    $content = $html . $content;
+                }
+            }
+            return $content;
+        }
 }

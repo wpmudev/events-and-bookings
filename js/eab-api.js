@@ -195,6 +195,7 @@ function create_login_interface ($me) {
 			// Facebook login
 			callback = function () {
 				FB.login(function (resp) {
+					console.log(resp);
 					if (resp.authResponse && resp.authResponse.userID) {
 						// change UI
 						$root.html('<img src="' + _eab_data.root_url + 'waiting.gif" /> ' + l10nEabApi.please_wait);

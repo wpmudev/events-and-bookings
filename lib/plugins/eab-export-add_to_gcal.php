@@ -69,9 +69,18 @@ class Eab_Export_GCalButton {
 
 		$this->_added[] = $event->get_id();
 
-		return "{$content} <a href='" .
+		/*return "{$content} <a class='export_to_gcal' href='" .
 			esc_url('http://www.google.com/calendar/event?' . join('&', $data)) .
-		"'><span class='eab_export' style='display:none'>" . __('Export to GCAL', Eab_EventsHub::TEXT_DOMAIN) . '</span><img src="//www.google.com/calendar/images/ext/gc_button1.gif" border=0></a>';
+		"'><span class='eab_export' style='display:none'>" . __('Export to GCAL', Eab_EventsHub::TEXT_DOMAIN) . '</span><img src="//www.google.com/calendar/images/ext/gc_button1.gif" border=0></a>';*/
+                
+                /**
+                 * Added by Ashok
+                 *
+                 * New Export to gCal button
+                 */
+                return "{$content} <a class='export_to_gcal' href='" .
+			esc_url('http://www.google.com/calendar/event?' . join('&', $data)) .
+		"'><span class='eab_export'>" . __('Export to GCAL', Eab_EventsHub::TEXT_DOMAIN) . '</span></a>';
 	}
 }
 
