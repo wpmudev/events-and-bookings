@@ -377,7 +377,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 			? get_blog_permalink($event_info['blog_id'], $event_info['id'])
 			: get_permalink($event_info['id'])
 		;
-		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:sO", $event_tstamps['start']));
+		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:sO", $current_tstamps['start']));
 		$daytime = (int)date("His", $event_tstamps['start']);
 
 		if (!empty($event_info['has_no_start_time'])) {
@@ -397,7 +397,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 						: ''
 				) .
 				'<time datetime="' . $tstamp . '">' .
-					'<var class="' . sanitize_html_class($datetime_class) . '">' . apply_filters('eab-calendar-event_archive-start_time', date_i18n($datetime_format, $event_tstamps['start']), $event_tstamps['start'], $event_info['id']) . '</var>' .
+					'<var class="' . sanitize_html_class($datetime_class) . '">' . apply_filters('eab-calendar-event_archive-start_time', date_i18n($datetime_format, $current_tstamps['start']), $current_tstamps['start'], $event_info['id']) . '</var>' .
 				'</time> ' . 
 				$event_info['event_venue'] .
 				(!empty($this->_excerpt['show_excerpt']) ? ' <span class="eab-calendar-event_excerpt">' . esc_html($event_info['excerpt']) . '</span>' : '') .
