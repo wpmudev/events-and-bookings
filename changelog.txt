@@ -29,6 +29,9 @@ Change Log:
 - Fix: When "Alert RSVPs on event modification" add-on is activated on site then saving settings in Events dont work
 - Fix: Preview of Groupevents doesnt work as expected
 - Fix: Events at the same time dont show on calendar
+- Fix: Featured image issues and BuddyPress Events
+- Fix: Error message when posting a group event using BuddyPress
+- Fix: Fatal error when exporting BuddyPress fields in CSV
 
 1.8.2 - 2015-09-03
 ----------------------------------------------------------------------
