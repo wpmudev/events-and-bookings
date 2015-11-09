@@ -1,8 +1,9 @@
 <?php
 global $booking, $wpdb, $wp_query;
-$year = $wp_query->query_vars['event_year'];
+$now = current_time( 'timestamp' );
+$year = isset( $wp_query->query_vars['event_year'] ) ? $wp_query->query_vars['event_year'] : date( 'Y', $now );
 $year = $year ? $year : date_i18n('Y'); // date_i18n uses current_time when called like this
-$month = $wp_query->query_vars['event_monthnum'];
+$month = isset( $wp_query->query_vars['event_monthnum'] ) ? $wp_query->query_vars['event_monthnum'] : date( 'm', $now );
 $month = $month ? $month : date_i18n('m');
 $time = strtotime("{$year}-{$month}-01");
 
