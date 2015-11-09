@@ -2,16 +2,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Events +\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 15:24+0100\n"
-"PO-Revision-Date: 2015-11-02 15:25+0100\n"
+"POT-Creation-Date: 2015-11-09 20:05+0100\n"
+"PO-Revision-Date: 2015-11-09 20:05+0100\n"
 "Last-Translator: \n"
 "Language-Team: WPMU DEV\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-KeywordsList: __;_e;_x:1,2c;esc_html_e;esc_html__;_n_noop;"
-"esc_attr__;esc_attr_e\n"
+"X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
+"_n_noop:1,2;_c;_nc:4c,1,2;_x:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;_ex:1,2c;"
+"esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
 "X-Poedit-Basepath: ..\n"
 "X-Generator: Poedit 1.8.2\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -281,7 +282,7 @@ msgstr ""
 msgid "Please, hold on..."
 msgstr ""
 
-#: default-templates/calendar/archive-incsub_event.php:19
+#: default-templates/calendar/archive-incsub_event.php:20
 #, php-format
 msgid "Events for %s"
 msgstr ""
@@ -772,7 +773,9 @@ msgstr ""
 #: lib/class-eab-taxonomies.php:88
 #, php-format
 msgid "Recurrent <span class=\"count\">(%s)</span>"
-msgstr ""
+msgid_plural "Recurrent <span class=\"count\">(%s)</span>"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lib/class_eab_addon_handler.php:199
 msgid "Deactivate"
@@ -1130,37 +1133,37 @@ msgid ""
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:141
-#: lib/plugins/eab-events_weekly_calendar.php:337
+#: lib/plugins/eab-events_weekly_calendar.php:339
 msgid "Sunday"
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:142
-#: lib/plugins/eab-events_weekly_calendar.php:338
+#: lib/plugins/eab-events_weekly_calendar.php:340
 msgid "Monday"
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:143
-#: lib/plugins/eab-events_weekly_calendar.php:339
+#: lib/plugins/eab-events_weekly_calendar.php:341
 msgid "Tuesday"
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:144
-#: lib/plugins/eab-events_weekly_calendar.php:340
+#: lib/plugins/eab-events_weekly_calendar.php:342
 msgid "Wednesday"
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:145
-#: lib/plugins/eab-events_weekly_calendar.php:341
+#: lib/plugins/eab-events_weekly_calendar.php:343
 msgid "Thursday"
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:146
-#: lib/plugins/eab-events_weekly_calendar.php:342
+#: lib/plugins/eab-events_weekly_calendar.php:344
 msgid "Friday"
 msgstr ""
 
 #: lib/class_eab_calendar_helper.php:147
-#: lib/plugins/eab-events_weekly_calendar.php:343
+#: lib/plugins/eab-events_weekly_calendar.php:345
 msgid "Saturday"
 msgstr ""
 
@@ -2899,58 +2902,58 @@ msgstr ""
 msgid "Events from %s to %s"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:330
+#: lib/plugins/eab-events_weekly_calendar.php:332
 msgid " "
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:414
+#: lib/plugins/eab-events_weekly_calendar.php:416
 msgid "Weekly Event Calendar settings"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:417
+#: lib/plugins/eab-events_weekly_calendar.php:419
 msgid "Calendar start hour"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:419
+#: lib/plugins/eab-events_weekly_calendar.php:421
 msgid ""
 "Enter the hour of the day calendar starts in 24 hour format, without am/pm "
 "and minutes, e.g. 13. Default is 10 (10am)."
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:423
+#: lib/plugins/eab-events_weekly_calendar.php:425
 msgid "Calendar end hour"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:425
+#: lib/plugins/eab-events_weekly_calendar.php:427
 msgid ""
 "Enter the hour of the day calendar ends in 24 hour format, without am/pm and "
 "minutes, e.g. 22. Default is 24 (12pm)."
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:429
+#: lib/plugins/eab-events_weekly_calendar.php:431
 msgid "Calendar step interval (minutes)"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:431
+#: lib/plugins/eab-events_weekly_calendar.php:433
 msgid ""
 "Enter the number of minutes which will determine how many rows the calendar "
 "table will have. Default is 120 (2 hours). Minimum allowed value is 10. Too "
 "small values may result a long table."
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:435
+#: lib/plugins/eab-events_weekly_calendar.php:437
 msgid "Display in tooltip"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:437
+#: lib/plugins/eab-events_weekly_calendar.php:439
 msgid "Event venue, thumbnail, starting date and content"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:438
+#: lib/plugins/eab-events_weekly_calendar.php:440
 msgid "Author name, avatar and bio"
 msgstr ""
 
-#: lib/plugins/eab-events_weekly_calendar.php:441
+#: lib/plugins/eab-events_weekly_calendar.php:443
 msgid ""
 "Select which items should be displayed in the tooltip, i.e. when visitor "
 "places the mouse over the event."
@@ -3611,17 +3614,17 @@ msgid ""
 "option if you wish to remove their attendance records entirely instead."
 msgstr ""
 
-#: lib/plugins/lib/class_eab_mp_bridge.php:196
+#: lib/plugins/lib/class_eab_mp_bridge.php:197
 #: lib/plugins/lib/class_eab_mp_bridge_legacy.php:161
 msgid "... or, please select a Product"
 msgstr ""
 
-#: lib/plugins/lib/class_eab_mp_bridge.php:198
+#: lib/plugins/lib/class_eab_mp_bridge.php:199
 #: lib/plugins/lib/class_eab_mp_bridge_legacy.php:163
 msgid "Select a pricing Product"
 msgstr ""
 
-#: lib/plugins/lib/class_eab_mp_bridge.php:374
+#: lib/plugins/lib/class_eab_mp_bridge.php:380
 msgid "Click here to purchase your ticket"
 msgstr ""
 
