@@ -87,7 +87,9 @@
 					</div>
 				</div>
 			<?php } ?>
+
 			<?php do_action('eab-settings-after_appearance_settings'); /* the hook happens whether we have appearance settings or not */ ?>
+
 			<!-- Payment settings -->
 			<div id="eab-settings-paypal" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Payment settings', eab_domain() ); ?></h3>
@@ -124,7 +126,7 @@
 			<?php do_action('eab-settings-after_plugin_settings'); ?>
 		</div>
 
-		<p class="submit">
+		<p class="submit clear">
 			<input type="submit" class="button-primary" name="submit_settings" value="<?php _e('Save Changes', eab_domain() ) ?>" />
 			<?php if (isset($_REQUEST['eab_step']) && $_REQUEST['eab_step'] == 1) { ?>
 				<a href="edit.php?post_type=incsub_event&page=eab_welcome&eab_step=-1" class="button"><?php _e('Go back to Getting started guide', eab_domain() ) ?></a>
