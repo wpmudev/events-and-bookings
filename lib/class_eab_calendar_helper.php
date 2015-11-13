@@ -383,9 +383,12 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 		if (!empty($event_info['has_no_start_time'])) {
 			$datetime_format = get_option('date_format');
 			$datetime_class = 'eab-date_format-date';
+			$event_datetime_start = $current_tstamps['start'];
 		} else {
 			$datetime_format = get_option('time_format');
 			$datetime_class = 'eab-date_format-time';
+			$event_datetime_start = $event_tstamps['start'];
+
 		}
 
 		$this->_data[$daytime][] = '<a class="wpmudevevents-calendar-event ' . $css_classes . '" href="' . $event_permalink . '">' . 
@@ -397,7 +400,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 						: ''
 				) .
 				'<time datetime="' . $tstamp . '">' .
-					'<var class="' . sanitize_html_class($datetime_class) . '">' . apply_filters('eab-calendar-event_archive-start_time', date_i18n($datetime_format, $current_tstamps['start']), $current_tstamps['start'], $event_info['id']) . '</var>' .
+					'<var class="' . sanitize_html_class($datetime_class) . '">' . apply_filters('eab-calendar-event_archive-start_time', date_i18n($datetime_format, $event_datetime_start), $event_datetime_start, $event_info['id']) . '</var>' .
 				'</time> ' . 
 				$event_info['event_venue'] .
 				(!empty($this->_excerpt['show_excerpt']) ? ' <span class="eab-calendar-event_excerpt">' . esc_html($event_info['excerpt']) . '</span>' : '') .
