@@ -147,7 +147,7 @@ class Eab_Exporter_Csv extends Eab_Exporter {
 	}
 
 	public function export_attendees () {
-		error_reporting(0);
+		//error_reporting(0);
 		if (!$this->_event_id) wp_die(__('No event to export', Eab_EventsHub::TEXT_DOMAIN));
 		$event = new Eab_EventModel(get_post($this->_event_id));
 		$attendees = array();
