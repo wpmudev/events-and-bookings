@@ -1178,7 +1178,7 @@ class Eab_EventsHub {
 
 	function flush_rewrite() {
 		global $wp_rewrite;
-		$wp_rewrite->flush_rules();
+//		$wp_rewrite->flush_rules();
 	}
 
 
