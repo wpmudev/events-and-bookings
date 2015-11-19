@@ -1178,7 +1178,7 @@ class Eab_EventsHub {
 
 	function flush_rewrite() {
 		global $wp_rewrite;
-//		$wp_rewrite->flush_rules();
+		$wp_rewrite->flush_rules();
 	}
 
 
@@ -1385,18 +1385,18 @@ if (is_admin()) {
 	Eab_AdminHelp::serve();
 
 	// Dashboard notification
-//	global $wpmudev_notices;
-//	if (!is_array($wpmudev_notices)) $wpmudev_notices = array();
-//	$wpmudev_notices[] = array(
-//		'id' => 249,
-//		'name' => 'Events +',
-//		'screens' => array(
-//			'incsub_event_page_eab_welcome',
-//			'incsub_event_page_eab_settings',
-//			'incsub_event_page_eab_shortcodes',
-//		),
-//	);
-//	require_once EAB_PLUGIN_DIR . '/lib/wpmudev-dash-notification.php';
+	global $wpmudev_notices;
+	if (!is_array($wpmudev_notices)) $wpmudev_notices = array();
+	$wpmudev_notices[] = array(
+		'id' => 249,
+		'name' => 'Events +',
+		'screens' => array(
+			'incsub_event_page_eab_welcome',
+			'incsub_event_page_eab_settings',
+			'incsub_event_page_eab_shortcodes',
+		),
+	);
+	require_once EAB_PLUGIN_DIR . '/lib/wpmudev-dash-notification.php';
 }
 
 

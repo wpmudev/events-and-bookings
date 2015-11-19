@@ -91,53 +91,8 @@ class Eab_AddonHandler {
 	}
 
 	public static function get_all_plugins () {
-		//$all = glob(EAB_PLUGIN_ADDONS_DIR . '/*.php');
-		$all = array(
-			EAB_PLUGIN_ADDONS_DIR . "/eab-buddypres-activity.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-buddypres-my_events.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-buddypress-group_events.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-email-enewsletter_integration.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-event-alert-rsvp.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-event-recurring-calendar-shortcode.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-event-recurring-shortcode.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-all_events_default.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-capabilities.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-colors.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-countdown-for-next-event.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-event-countdown.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-event_cancelation.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-expire_month_old_events.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-expire_past_events.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-front_page_editing.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-limit_capacity.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-manual-payments.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-membership-integration.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-membership2-integration.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-next-event-shortcode.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-noindex_meta.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-pa_events.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-recurrent_redirect.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-redirect.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events-social_rsvp.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-events_weekly_calendar.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-export-add_to_gcal.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-export-ical.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-guest_list-show_additional_info.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-import-facebook_events.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-import-google_calendar.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-import-meetup.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-maps-event_maps_options.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-payment-marketpress.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-payment-multiple_prices.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-rsvps-additional_registration_fields.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-rsvps-email-non_paid.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-rsvps-rsvp_email.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-rsvps-rsvp_email_me.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-rsvps-rsvp_with_email.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-rsvps-scheduled_rsvp_reset.php",
-			EAB_PLUGIN_ADDONS_DIR . "/eab-times-local_timezones.php",
-		);
-
+		$all = glob(EAB_PLUGIN_ADDONS_DIR . '/*.php');
+		$all = $all ? $all : array();
 		$ret = array();
 		foreach ($all as $path) {
 			$ret[] = pathinfo($path, PATHINFO_FILENAME);

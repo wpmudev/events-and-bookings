@@ -282,7 +282,7 @@ class LightOpenID
 
         $context = stream_context_create ($opts);
 
-        return campus_remote_get_contents($url);
+        return file_get_contents($url, false, $context);
     }
 
     protected function request($url, $method='GET', $params=array())

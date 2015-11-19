@@ -69,17 +69,7 @@ class Eab_Admin_Settings_Menu {
 			($archive_tpl_present && $single_tpl_present)
 		);
 
-		//$raw_tpl_sets = glob(EAB_PLUGIN_DIR . 'default-templates/*');
-
-		$raw_tpl_sets = array(
-				EAB_PLUGIN_DIR . "default-templates/calendar",
-				EAB_PLUGIN_DIR . "default-templates/default",
-				EAB_PLUGIN_DIR . "default-templates/full-width",
-				EAB_PLUGIN_DIR . "default-templates/shortcode-archive-default.php",
-				EAB_PLUGIN_DIR . "default-templates/shortcode-calendar-default.php",
-				EAB_PLUGIN_DIR . "default-templates/shortcode-event_map-marker_body-default.php",
-				EAB_PLUGIN_DIR . "default-templates/shortcode-single-default.php"
-		);
+		$raw_tpl_sets = glob(EAB_PLUGIN_DIR . 'default-templates/*');
 
 		$templates = array();
 		foreach ($raw_tpl_sets as $item) {

@@ -72,7 +72,7 @@ class Eab_Events_SocialRsvps {
 		);
 		$resp = wp_remote_post('https://graph.facebook.com/' . $fb['id'] . '/feed', array(
 			'method' => 'POST',
-			'timeout' => 5,
+			'timeout' => 45,
 			'redirection' => 5,
 			'blocking' => true,
 			'body' => $send,
