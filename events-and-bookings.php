@@ -1348,7 +1348,7 @@ if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
 	include_once( 'lib/class-eab-ajax.php' );
 
 define('EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ), true);
-define('EAB_PLUGIN_DIR', WP_PLUGIN_DIR . '/' . EAB_PLUGIN_BASENAME . '/');
+define('EAB_PLUGIN_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 if (!defined('EAB_OLD_EVENTS_EXPIRY_LIMIT')) define('EAB_OLD_EVENTS_EXPIRY_LIMIT', 100, true);
 if (!defined('EAB_MAX_UPCOMING_EVENTS')) define('EAB_MAX_UPCOMING_EVENTS', 500, true);
