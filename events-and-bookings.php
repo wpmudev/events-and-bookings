@@ -417,7 +417,8 @@ class Eab_EventsHub {
 		if ( 'incsub_event' != $post->post_type )
 		    return $path;
 
-		$type = reset( explode( '_', current_filter() ) );
+	    $type = explode( '_', current_filter() );
+		$type = reset( $type );
 
 		$file = basename( $path );
 
