@@ -6,7 +6,7 @@
  Author: WPMU DEV
  Text Domain: eab
  WDP ID: 249
- Version: 1.9.1
+ Version: 1.9.2
  Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.8.2';
+    const CURRENT_VERSION = '1.9.2';
 
     /**
      * Translation domain
@@ -1143,7 +1143,8 @@ class Eab_EventsHub {
     	return array(
 			"{$slug}/([0-9]{4})/?$" => 'index.php?event_year=$matches[1]&post_type=incsub_event',
 			"{$slug}/([0-9]{4})/([0-9]{1,2})/?$" => 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&post_type=incsub_event',
-			"{$slug}/([0-9]{4})/([0-9]{1,2})/(.+?)/?$" => 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]',
+			"{$slug}/([0-9]{4})/([0-9]{1,2})/(.+?)/(^feed)/?$" => 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]',
+			"{$slug}/([0-9]{4})/([0-9]{1,2})/(.+?)/feed/?$" => 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&incsub_event=$matches[3]&feed=rss2&post_type=incsub_event'
     	);
     }
 
