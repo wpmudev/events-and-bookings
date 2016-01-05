@@ -135,6 +135,8 @@ class Eab_EventsHub {
 		// Listen to transition from drafts and (re)spawn the recurring instances
 		add_action('draft_to_publish', array($this, 'respawn_recurring_instances'));
 
+	    add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
+
 	    if ( is_admin() ) {
 		    require_once( 'admin/class-eab-admin.php' );
 		    new Eab_Admin();
@@ -143,6 +145,16 @@ class Eab_EventsHub {
 		$this->_api->initialize();
 
     }
+
+	public function maybe_upgrade() {
+		$current_version = get_option( 'eab_version' );
+		if ( false === $current_version ) {
+			// Added on 1.9.2
+			flush_rewrite_rules();
+			update_option( 'eab_version', self::CURRENT_VERSION );
+			return;
+		}
+	}
 
 	function process_recurrent_trashing ($post_id) {
 		$event = new Eab_EventModel(get_post($post_id));
@@ -199,6 +211,7 @@ class Eab_EventsHub {
 		$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
 		$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
 		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
+	    add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
 		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
@@ -413,6 +426,10 @@ class Eab_EventsHub {
 
     function handle_single_template( $path ) {
 		global $wp_query, $post;
+
+	    if ( ! is_a( $post, 'WP_Post' ) ) {
+		    return $path;
+	    }
 
 		if ( 'incsub_event' != $post->post_type )
 		    return $path;
