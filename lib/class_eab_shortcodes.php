@@ -256,6 +256,7 @@ class Eab_Shortcodes extends Eab_Codec {
 	 * Archive shortcode handler.
 	 */
 	function process_archive_shortcode ($args=array(), $content=false) {
+		include_once( 'shortcodes/class-eab-archive-shortcode.php' );
 		$args = $this->_preparse_arguments($args, array(
 			'network' => false, // Query type
 		// Date arguments
@@ -278,59 +279,8 @@ class Eab_Shortcodes extends Eab_Codec {
 			'override_scripts' => false,
 		));
 
-		if ($args['paged']) {
-			$requested_page = get_query_var('page');
-			$requested_page = $requested_page ? $requested_page : get_query_var('paged');
-			$args['page'] = $requested_page ? $requested_page : $args['page'];
-		}
-
-		$events = array();
-		if (is_multisite() && $args['network']) {
-			$events = Eab_Network::get_upcoming_events(30);
-		} else {
-			$query = $this->_to_query_args($args);
-
-			$order_method = $args['order']
-				? create_function('', 'return "' . $args['order'] . '";')
-				: false
-			;
-			if ($order_method) add_filter('eab-collection-date_ordering_direction', $order_method);
-
-			// Lookahead - depending on presence, use regular upcoming query, or poll week count
-			if ($args['lookahead']) {
-				$method = $args['weeks']
-					? create_function('', 'return ' . $args['weeks'] . ';')
-					: false;
-				;
-				if ($method) add_filter('eab-collection-upcoming_weeks-week_number', $method);
-				$events = Eab_CollectionFactory::get_upcoming_weeks_events($args['date'], $query);
-				if ($method) remove_filter('eab-collection-upcoming_weeks-week_number', $method);
-			} else {
-				// No lookahead, get the full month only
-				$events = Eab_CollectionFactory::get_upcoming_events($args['date'], $query);
-			}
-			if ($order_method) remove_filter('eab-collection-date_ordering_direction', $order_method);
-		}
-
-		$output = Eab_Template::util_apply_shortcode_template($events, $args);
-		if ($output) {
-			if ($args['paged'] && !(is_multisite() && $args['network'])) {
-				if ($method) add_filter('eab-collection-upcoming_weeks-week_number', $method);
-				$events_query = $args['lookahead']
-					? Eab_CollectionFactory::get_upcoming_weeks($args['date'], $query)
-					: Eab_CollectionFactory::get_upcoming($args['date'], $query)
-				;
-				if ($method) remove_filter('eab-collection-upcoming_weeks-week_number', $method);
-				$output .= eab_call_template('get_shortcode_paging', $events_query, $args);
-			}
-		} else $output = $content;
-
-		if (!$args['override_styles']) wp_enqueue_style('eab_front');
-		if (!$args['override_scripts']) {
-			wp_enqueue_script('eab_event_js');
-			do_action('eab-javascript-do_enqueue_api_scripts');
-		}
-		return $output;
+		$shortcode = new Eab_Archive_Shortcode( $args );
+		return $shortcode->output( $content );
 	}
 
 	function add_archive_shortcode_help ($help) {
