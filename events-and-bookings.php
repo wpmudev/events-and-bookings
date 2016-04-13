@@ -1241,6 +1241,7 @@ class Eab_EventsHub {
     }
 
     function check_rewrite_rules ($values) {
+		remove_action('option_rewrite_rules', array($this, 'check_rewrite_rules'));
 		//prevent an infinite loop
 		if (!post_type_exists(Eab_EventModel::POST_TYPE)) return $values;
 
