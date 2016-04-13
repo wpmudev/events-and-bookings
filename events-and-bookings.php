@@ -1,13 +1,13 @@
 <?php
 /*
- Plugin Name: Events +
- Plugin URI: http://premium.wpmudev.org/project/events-and-booking
- Description: Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.
- Author: WPMU DEV
- Text Domain: eab
- WDP ID: 249
- Version: 1.9.2
- Author URI: http://premium.wpmudev.org
+Plugin Name: Events +
+Plugin URI: http://premium.wpmudev.org/project/events-and-booking
+Description: Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.
+Author: WPMU DEV
+Text Domain: eab
+WDP ID: 249
+Version: 1.9.2
+Author URI: http://premium.wpmudev.org
 */
 
  /*
