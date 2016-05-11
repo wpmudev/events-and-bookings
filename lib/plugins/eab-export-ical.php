@@ -116,8 +116,8 @@ class Eab_Export_iCal {
 
 	function append_export_link ($content, $event) {
                 
-                if (in_array($event->get_id(), $this->_added)) return $content;
-                $this->_added[] = $event->get_id();
+		if (in_array($event->get_id(), $this->_added)) return $content;
+            $this->_added[] = $event->get_id();
             
 		$download = $this->_data->get_option('eab_export-ical-download_links') ? '&attachment' : '';
 		return "{$content} <a class='export_to_ical' href='" . 

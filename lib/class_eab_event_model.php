@@ -306,8 +306,8 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	const BOOKING_MAYBE = 'maybe';
 	const BOOKING_NO = 'no';
 
-	private $_event_id;
-	private $_event;
+	public $_event_id;
+	public $_event;
 
 	private $_start_dates;
 	private $_no_start_dates;

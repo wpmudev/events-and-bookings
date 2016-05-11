@@ -293,8 +293,10 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 }
 .tabbed #eab-root-settings_nav h3 {
     border: 1px solid #eee;
-    background: none repeat scroll 0 0 #fefefe;
+    background: transparent;
     cursor: pointer;
+    font-size: 1.1em;
+    padding: 3px;
 }
 .tabbed #eab-root-settings_nav h3.active {
     background: #2ea2cc;
