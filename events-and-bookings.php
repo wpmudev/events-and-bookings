@@ -6,7 +6,7 @@ Description: Events gives you a flexible WordPress-based system for organizing p
 Author: WPMU DEV
 Text Domain: eab
 WDP ID: 249
-Version: 1.9.2
+Version: 1.9.3 - Beta
 Author URI: http://premium.wpmudev.org
 */
 
