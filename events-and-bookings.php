@@ -1,13 +1,13 @@
 <?php
 /*
- Plugin Name: Events +
- Plugin URI: http://premium.wpmudev.org/project/events-and-booking
- Description: Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.
- Author: WPMU DEV
- Text Domain: eab
- WDP ID: 249
- Version: 1.9.2
- Author URI: http://premium.wpmudev.org
+Plugin Name: Events +
+Plugin URI: http://premium.wpmudev.org/project/events-and-booking
+Description: Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.
+Author: WPMU DEV
+Text Domain: eab
+WDP ID: 249
+Version: 1.9.2
+Author URI: http://premium.wpmudev.org
 */
 
  /*
@@ -1174,6 +1174,7 @@ class Eab_EventsHub {
     }
 
     function check_rewrite_rules ($values) {
+		remove_action('option_rewrite_rules', array($this, 'check_rewrite_rules'));
 		//prevent an infinite loop
 		if (!post_type_exists(Eab_EventModel::POST_TYPE)) return $values;
 
