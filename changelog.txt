@@ -7,6 +7,8 @@ Change Log:
 ----------------------------------------------------------------------
 - Added: Only one digit is allowed in hour field while creating a new event
 - Fixed: Wrong URL in event calendar when event slug in main site is same as a subsite url
+- Fixed: Additional field addon fixed
+- Fixed: Date picker was not working in backend in mobile view
 
 
 ----------------------------------------------------------------------

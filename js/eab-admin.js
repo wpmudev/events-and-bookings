@@ -1,6 +1,9 @@
 
 jQuery(function() {
-	if (!("ontouchstart" in window)) {
+        /**
+         * Commenting the following if as datepicker doesn't work in mobile
+         */
+	//if (!("ontouchstart" in window)) {
 		jQuery(".incsub_event_picker").datepicker({
 			"dateFormat": "yy-mm-dd",
 			"changeMonth": true,
@@ -8,7 +11,7 @@ jQuery(function() {
 			"defaultDate": new Date(),
 			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
 		});
-	}
+	//}
 
     jQuery('[href*="preview=true"]').hide(); // Preview won't work
     jQuery("#eab-add-more").show();
