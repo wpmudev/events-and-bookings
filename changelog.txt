@@ -9,7 +9,7 @@ Change Log:
 - Fixed: Wrong URL in event calendar when event slug in main site is same as a subsite url
 - Fixed: Additional field addon fixed
 - Fixed: Date picker was not working in backend in mobile view
-
+- Fixed: Time On Events+ Calendar Wrong in calendar archive when local timezone addon is active
 
 ----------------------------------------------------------------------
 1.9.2 - 2016-04-13
