@@ -372,6 +372,9 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 	public function reset_event_info_storage () { $this->_data = array(); }
 	
 	public function set_event_info ($event_tstamps, $current_tstamps, $event_info) {
+            
+                if( is_multisite() ) switch_to_blog( $event_info['blog_id'] );
+            
 		$css_classes = $event_info['status_class'];
 		$event_permalink = !empty($event_info['blog_id'])
 			? get_blog_permalink($event_info['blog_id'], $event_info['id'])
@@ -405,7 +408,10 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 				$event_info['event_venue'] .
 				(!empty($this->_excerpt['show_excerpt']) ? ' <span class="eab-calendar-event_excerpt">' . esc_html($event_info['excerpt']) . '</span>' : '') .
 			'</span>' . 
-		'</a>'; 
+		'</a>';
+                
+                if( is_multisite() ) restore_current_blog();
+                
 	}
 	
 	public function get_event_info_as_string ($day) {

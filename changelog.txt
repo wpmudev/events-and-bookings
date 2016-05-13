@@ -3,6 +3,13 @@ Author: WPMU DEV
 
 Change Log:
 ----------------------------------------------------------------------
+1.9.3 - 
+----------------------------------------------------------------------
+- Added: Only one digit is allowed in hour field while creating a new event
+- Fixed: Wrong URL in event calendar when event slug in main site is same as a subsite url
+
+
+----------------------------------------------------------------------
 1.9.2 - 2016-04-13
 ----------------------------------------------------------------------
 - Fixed: Conflict with changes introduced in WP 4.5.

@@ -1064,12 +1064,22 @@ class Eab_EventsHub {
 		   	if (isset($_POST['incsub_event_start']) && count($_POST['incsub_event_start']) > 0) foreach ($_POST['incsub_event_start'] as $i => $event_start) {
 		   		if (empty($_POST['incsub_event_start'][$i]) || empty($_POST['incsub_event_end'][$i])) continue;
 		   		if (!empty($_POST['incsub_event_start'][$i])) {
+                                    
+                                    if( strpos( ':', $_POST['incsub_event_start_time'][$i] ) === false ){
+                                        $_POST['incsub_event_start_time'][$i] = $_POST['incsub_event_start_time'][$i] . ':00';
+                                    }
+                                    
 					$start_time = @$_POST['incsub_event_no_start_time'][$i] ? '00:01' : @$_POST['incsub_event_start_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}")));
 				    if (@$_POST['incsub_event_no_start_time'][$i]) add_post_meta($post_id, 'incsub_event_no_start', 1);
 				    else add_post_meta($post_id, 'incsub_event_no_start', 0);
 				}
 				if (!empty($_POST['incsub_event_end'][$i])) {
+                                    
+                                        if( strpos( ':', $_POST['incsub_event_end_time'][$i] ) === false ){
+                                            $_POST['incsub_event_end_time'][$i] = $_POST['incsub_event_end_time'][$i] . ':00';
+                                        }
+                                    
 		   			$end_time = @$_POST['incsub_event_no_end_time'][$i] ? '23:59' : @$_POST['incsub_event_end_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}")));
 				    if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
