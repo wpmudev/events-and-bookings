@@ -1065,7 +1065,7 @@ class Eab_EventsHub {
 		   		if (empty($_POST['incsub_event_start'][$i]) || empty($_POST['incsub_event_end'][$i])) continue;
 		   		if (!empty($_POST['incsub_event_start'][$i])) {
                                     
-                                    if( strpos( ':', $_POST['incsub_event_start_time'][$i] ) === false ){
+                                    if( $_POST['incsub_event_start_time'][$i] != '' && strpos( ':', $_POST['incsub_event_start_time'][$i] ) === false ){
                                         $_POST['incsub_event_start_time'][$i] = $_POST['incsub_event_start_time'][$i] . ':00';
                                     }
                                     
@@ -1076,7 +1076,7 @@ class Eab_EventsHub {
 				}
 				if (!empty($_POST['incsub_event_end'][$i])) {
                                     
-                                        if( strpos( ':', $_POST['incsub_event_end_time'][$i] ) === false ){
+                                        if( $_POST['incsub_event_end_time'][$i] != '' && strpos( ':', $_POST['incsub_event_end_time'][$i] ) === false ){
                                             $_POST['incsub_event_end_time'][$i] = $_POST['incsub_event_end_time'][$i] . ':00';
                                         }
                                     
