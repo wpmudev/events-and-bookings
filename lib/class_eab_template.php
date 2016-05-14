@@ -412,7 +412,7 @@ class Eab_Template {
 		return $content;
 	}
 
-	public function get_root_url () {
+	static public function get_root_url () {
 		global $blog_id;
 		$data = Eab_Options::get_instance();
 		return get_home_url($blog_id, $data->get_option('slug'));
