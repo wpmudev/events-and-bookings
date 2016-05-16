@@ -599,6 +599,15 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 			? "<h4 {$id_attr}>{$title_link}</h4>"
 			: "<b>{$title_link}</b>"
 		;
+                
+                $title = apply_filters(
+                                'eab_calendar_title',
+                                $title,
+                                $position,
+                                $id_attr,
+                                $title_link
+                            );
+                
 		return "<tr class='{$row_class}'>" .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 
