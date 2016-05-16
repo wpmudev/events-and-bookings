@@ -211,7 +211,9 @@ class Eab_EventsHub {
 		$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
 		$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
 		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
-	    add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
+	    //add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
+            add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/(.+)?/comment-page-([0-9]{1,})/?$', 'index.php?incsub_event=$matches[1]&cpage=$matches[2]', 'top' );
+            
 		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
