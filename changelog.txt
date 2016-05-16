@@ -10,6 +10,7 @@ Change Log:
 - Fixed: Additional field addon fixed
 - Fixed: Date picker was not working in backend in mobile view
 - Fixed: Time On Events+ Calendar Wrong in calendar archive when local timezone addon is active
+- Fixed: Comment pagination
 
 ----------------------------------------------------------------------
 1.9.2 - 2016-04-13
