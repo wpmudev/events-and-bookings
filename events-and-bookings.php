@@ -6,7 +6,7 @@ Description: Events gives you a flexible WordPress-based system for organizing p
 Author: WPMU DEV
 Text Domain: eab
 WDP ID: 249
-Version: 1.9.2
+Version: 1.9.3 - Beta
 Author URI: http://premium.wpmudev.org
 */
 
@@ -211,7 +211,9 @@ class Eab_EventsHub {
 		$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
 		$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
 		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
-	    add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
+	    //add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
+            add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/(.+)?/comment-page-([0-9]{1,})/?$', 'index.php?incsub_event=$matches[1]&cpage=$matches[2]', 'top' );
+            
 		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
@@ -1064,12 +1066,22 @@ class Eab_EventsHub {
 		   	if (isset($_POST['incsub_event_start']) && count($_POST['incsub_event_start']) > 0) foreach ($_POST['incsub_event_start'] as $i => $event_start) {
 		   		if (empty($_POST['incsub_event_start'][$i]) || empty($_POST['incsub_event_end'][$i])) continue;
 		   		if (!empty($_POST['incsub_event_start'][$i])) {
+                                    
+                                    if( $_POST['incsub_event_start_time'][$i] != '' && strpos( ':', $_POST['incsub_event_start_time'][$i] ) === false ){
+                                        $_POST['incsub_event_start_time'][$i] = $_POST['incsub_event_start_time'][$i] . ':00';
+                                    }
+                                    
 					$start_time = @$_POST['incsub_event_no_start_time'][$i] ? '00:01' : @$_POST['incsub_event_start_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}")));
 				    if (@$_POST['incsub_event_no_start_time'][$i]) add_post_meta($post_id, 'incsub_event_no_start', 1);
 				    else add_post_meta($post_id, 'incsub_event_no_start', 0);
 				}
 				if (!empty($_POST['incsub_event_end'][$i])) {
+                                    
+                                        if( $_POST['incsub_event_end_time'][$i] != '' && strpos( ':', $_POST['incsub_event_end_time'][$i] ) === false ){
+                                            $_POST['incsub_event_end_time'][$i] = $_POST['incsub_event_end_time'][$i] . ':00';
+                                        }
+                                    
 		   			$end_time = @$_POST['incsub_event_no_end_time'][$i] ? '23:59' : @$_POST['incsub_event_end_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}")));
 				    if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);

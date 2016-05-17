@@ -68,8 +68,10 @@ class Eab_Events_ManualPayments {
 					die();
 			}
 		}
+                
 		array_push( $payments, array( "id"=>$user_id, "stat"=>"pending"));
-		$payments = array_filter( array_unique( $payments ) ); // Clear empty records, just in case
+		//$payments = array_filter( array_unique( $payments ) ); // Clear empty records, just in case
+                $payments = array_map( "unserialize", array_unique( array_map( "serialize", $payments ) ) );
 		Eab_EventModel::update_booking_meta( $event_id, "manual_payment", serialize( $payments ) );
 		die();
 	}
@@ -227,7 +229,8 @@ class Eab_Events_ManualPayments {
 			foreach ( $payments as $key=>$payment ) { 
 				if ( $payment["id"] == $user_id ) {
 					$payments[$key]["stat"] = "paid";
-					$payments = array_filter( array_unique( $payments ) );
+					//$payments = array_filter( array_unique( $payments ) );
+                                        $payments = array_map( "unserialize", array_unique( array_map( "serialize", $payments ) ) );
 					Eab_EventModel::update_booking_meta( $event_id, "manual_payment", serialize( $payments ) );
 					die();
 				}

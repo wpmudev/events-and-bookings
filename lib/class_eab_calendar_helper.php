@@ -372,12 +372,22 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 	public function reset_event_info_storage () { $this->_data = array(); }
 	
 	public function set_event_info ($event_tstamps, $current_tstamps, $event_info) {
+            
+                if( is_multisite() && isset( $event_info['blog_id'] ) ) switch_to_blog( $event_info['blog_id'] );
+            
 		$css_classes = $event_info['status_class'];
 		$event_permalink = !empty($event_info['blog_id'])
 			? get_blog_permalink($event_info['blog_id'], $event_info['id'])
 			: get_permalink($event_info['id'])
 		;
-		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:sO", $current_tstamps['start']));
+                
+                $gmt_offset = (float)get_option('gmt_offset');
+                $hour_tz = sprintf('%02d', abs((int)$gmt_offset));
+                $minute_offset = (abs($gmt_offset) - abs((int)$gmt_offset)) * 60;
+                $min_tz = sprintf('%02d', $minute_offset);
+                $timezone = ($gmt_offset > 0 ? '+' : '-') . $hour_tz . $min_tz;
+                
+		$tstamp = esc_attr(date_i18n("Y-m-d\TH:i:s{$timezone}", $event_tstamps['start']));
 		$daytime = (int)date("His", $event_tstamps['start']);
 
 		if (!empty($event_info['has_no_start_time'])) {
@@ -405,7 +415,10 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 				$event_info['event_venue'] .
 				(!empty($this->_excerpt['show_excerpt']) ? ' <span class="eab-calendar-event_excerpt">' . esc_html($event_info['excerpt']) . '</span>' : '') .
 			'</span>' . 
-		'</a>'; 
+		'</a>';
+                
+                if( is_multisite() && isset( $event_info['blog_id'] ) ) restore_current_blog();
+                
 	}
 	
 	public function get_event_info_as_string ($day) {
@@ -586,6 +599,15 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 			? "<h4 {$id_attr}>{$title_link}</h4>"
 			: "<b>{$title_link}</b>"
 		;
+                
+                $title = apply_filters(
+                                'eab_calendar_title',
+                                $title,
+                                $position,
+                                $id_attr,
+                                $title_link
+                            );
+                
 		return "<tr class='{$row_class}'>" .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 
