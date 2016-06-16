@@ -218,7 +218,7 @@ function add_new_field () {
 		data[name] = value;
 	});
 	data._value = JSON.stringify(data);
-	$root.append(_.template(tpl, data));
+	$root.append( _.template( tpl )( data ) );
 	return false;
 }
 

@@ -69,6 +69,6 @@ class Eab_Network {
 			$count++;
 			restore_current_blog();
 		}
-		return $result;
+		return apply_filters( 'eab_get_upcoming_events', $result, $limit );
 	}
 }

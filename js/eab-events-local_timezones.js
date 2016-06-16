@@ -31,14 +31,25 @@ $(function () {
 			var $me = $(this),
 				old = $me.text()
 			;
-			$me
-				.text((
-					$me.is(".eab-date_format-time")
-						? date.toLocaleTimeString(locale).split( ' GMT' )[0]
-						: date.toLocaleDateString(locale).split( ' GMT' )[0]
-				))
-				.attr("title", old)
-			;
+			
+                        if( $me.is(".eab-date_format-time") && old != '' )
+                        {
+                            var modified_time = date.toLocaleTimeString(locale).split( ' GMT' )[0];
+                            var splitted_time = modified_time.split( ':' );
+                            var count = splitted_time.length - 1;
+                            if( count > 1 )
+                            {
+                                var seconds = splitted_time[2].split( ' ' )[1];
+                                modified_time = splitted_time[0] + ':' + splitted_time[1] + ' ' + seconds;
+                            }
+                            $me.text( modified_time );
+                        }
+                        else if( $me.hasClass(".eab-date_format-date") && old != '' )
+                        {
+                            var modified_date = date.toLocaleDateString(locale).split( ' GMT' )[0];
+                            $me.text( modified_date );
+                        }
+                        
 		});
 
 	});

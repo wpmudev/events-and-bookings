@@ -202,9 +202,26 @@ class Eab_Events_Colors {
 (function ($) {
 $(function () {
 	var $fields = $('#eab-settings-colors input[type="color"]');
+        
 	if ($fields.length && $fields.wpColorPicker) $fields.wpColorPicker();
-	$("#eab-colors-reset_to_defaults").click(function () {
-		$fields.val('');
+	$("#eab-colors-reset_to_defaults").click(function (e) {
+            e.preventDefault();
+            for( var i = 0; i < $fields.length; i++ )
+            {
+                var labelAttr = $( $fields[i] ).closest( 'label' ).attr( 'for' );
+                if( labelAttr == 'eab-colors-__default__-bg' )
+                {
+                    // For some reason .val( '#'75AB24 ) is not working here!
+                    $( $fields[i] ).attr( 'value', '#75AB24' );
+                }
+                else if( labelAttr == 'eab-colors-__default__-fg' )
+                {
+                    $( $fields[i] ).attr( 'value', '#FFFFFF' );
+                }
+            }
+            
+            $( 'input[name="submit_settings"]' ).click();
+		//$fields.val('');
 	});
 });
 })(jQuery);
