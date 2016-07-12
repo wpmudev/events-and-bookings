@@ -22,7 +22,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 
 		$events = array();
 		if ( is_multisite() && $this->args['network'] ) {
-			$events = Eab_Network::get_upcoming_events( 30 );
+			$events = Eab_Network::get_archive_events( 30 );
 		} else {
 			$order_method = $this->args['order']
 				? create_function( '', 'return "' . $this->args['order'] . '";' )
@@ -55,6 +55,15 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				remove_filter( 'eab-collection-date_ordering_direction', $order_method );
 			}
 		}
+                
+                if( $this->args['network'] && is_multisite() && $this->args['categories'] )
+                {
+                    $events = $this->_get_network_events_by_categories( $events );
+                }
+                elseif( $this->args['network'] && is_multisite() && $this->args['category'] )
+                {
+                    $events = $this->_get_network_events_by_category( $events );
+                }
 
 		$args = $this->args;
 		$output = Eab_Template::util_apply_shortcode_template( $events, $args );
@@ -84,4 +93,112 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 
 		return $output;
 	}
+        
+        private function _get_network_events_by_categories( $events )
+        {
+            if( $this->args['categories']['type'] == 'id' )
+            {
+                if( count( $this->args['categories']['value'] ) > 1 )
+                {
+                    $sites = wp_get_sites();
+                    $cats = array();
+
+                    foreach( $sites as $site )
+                    {
+                        switch_to_blog( $site['blog_id'] );
+
+                        foreach( $this->args['categories']['value'] as $cat )
+                        {
+                            $term = get_term( $cat, 'eab_events_category' );
+                            
+                            if( ! is_object( $term ) ) continue;
+                            
+                            if( $term->slug != '' )
+                            {
+                                $cats[] = $term->slug;
+                            }
+                        }
+
+                        restore_current_blog();
+                    }
+                }
+            }
+
+            $modified_events = array();
+            foreach( $events as $event )
+            {
+                switch_to_blog( $event->blog_id );
+
+                $terms = wp_get_object_terms( $event->ID,  'eab_events_category' );
+                $t = array();
+                foreach( $terms as $val )
+                {
+                    $t[] = $val->slug;
+                }
+
+                $commonElements = array_intersect( $t, $cats );
+
+                if( count( $commonElements ) > 0 )
+                {
+                    $modified_events[] = $event;
+                }
+
+                restore_current_blog();
+            }
+
+            return count( $modified_events ) > 0 ? $modified_events : $events;
+        }
+        
+        private function _get_network_events_by_category( $events )
+        {
+            if( $this->args['category']['type'] == 'id' )
+            {
+                $sites = wp_get_sites();
+                $cats = array();
+
+                foreach( $sites as $site )
+                {
+                    switch_to_blog( $site['blog_id'] );
+
+                        $term = get_term( $this->args['category']['value'], 'eab_events_category' );
+                        
+                        if( ! is_object( $term ) ) continue;
+                        
+                        if( $term->slug != '' )
+                        {
+                            $cats[] = $term->slug;
+                        }
+
+                    restore_current_blog();
+                }
+            }
+            elseif( $this->args['category']['type'] == 'slug' )
+            {
+                $cats = array( $this->args['category']['value'] );
+            }
+
+            $modified_events = array();
+            foreach( $events as $event )
+            {
+                switch_to_blog( $event->blog_id );
+
+                $terms = wp_get_object_terms( $event->ID,  'eab_events_category' );
+                $t = array();
+                foreach( $terms as $val )
+                {
+                    $t[] = $val->slug;
+                }
+
+                $commonElements = array_intersect( $t, $cats );
+
+                if( count( $commonElements ) > 0 )
+                {
+                    $modified_events[] = $event;
+                }
+
+                restore_current_blog();
+            }
+
+            return count( $modified_events ) > 0 ? $modified_events : $events;
+        }
 }
