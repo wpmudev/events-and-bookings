@@ -131,7 +131,8 @@ function send_save_request () {
         var modified_start_time = start_time_parts.join(':');
         var modified_end_time = end_time_parts.join(':');
         
-        modified_start_time
+        modified_start_time = modified_start_time.replace(/ /g, '');
+        modified_end_time = modified_end_time.replace(/ /g, '');
         
 	var data = {
 		"id": $("#eab-events-fpe-event_id").val(),
