@@ -131,7 +131,7 @@ function send_save_request () {
 		"id": $("#eab-events-fpe-event_id").val(),
 		"title": $("#eab-events-fpe-event_title").val(),
 		"content": content,
-		"start": $start_date.val() + ' ' + start_time_parts.join(':'),
+		"start": $start_date.val() + ' ' + start_time_parts.join(':').trim(),
 		"end": $end_date.val() + ' ' + end_time_parts.join(':'),
 		"venue": $("#eab-events-fpe-venue").val(),
 		"status": $("#eab-events-fpe-status").val(),
