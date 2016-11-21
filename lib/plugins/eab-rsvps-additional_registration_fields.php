@@ -193,15 +193,21 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 </div>
 <script id="eab-arf-additional_fields-template" type="text/template">
 	<div class="eab-arf-field">
-		<b><%= label %></b> <em><small>(<%= type %>)</small></em>
+		<b>{{= label }}</b> <em><small>({{= type }})</small></em>
 		<br />
-		<?php echo esc_html('Required', Eab_EventsHub::TEXT_DOMAIN); ?>: <b><%= required ? '<?php echo esc_js(__("Yes", Eab_EventsHub::TEXT_DOMAIN)); ?>' : '<?php echo esc_js(__("No", Eab_EventsHub::TEXT_DOMAIN)); ?>' %></b>
-		<input type="hidden" name="eab-arf-additional_fields[]" value="<%= escape(_value) %>" />
+		<?php echo esc_html('Required', Eab_EventsHub::TEXT_DOMAIN); ?>: <b>{{= required ? '<?php echo esc_js(__("Yes", Eab_EventsHub::TEXT_DOMAIN)); ?>' : '<?php echo esc_js(__("No", Eab_EventsHub::TEXT_DOMAIN)); ?>' }}</b>
+		<input type="hidden" name="eab-arf-additional_fields[]" value="{{= escape(_value) }}" />
 		<a href="#remove" class="eab-arf-additional_fields-remove"><?php echo esc_html('Remove', Eab_EventsHub::TEXT_DOMAIN); ?></a>
 	</div>
 </script>
 <script>
 (function ($) {
+    
+    var WPMU_UnderscoreSettingsOverride = {
+        evaluate: /\{\{(.+?)\}\}/gim,
+        interpolate: /\{\{=(.+?)\}\}/gim,
+        escape: /\{\{-(.+?)\}\}/gim
+    };
 
 var tpl = $("#eab-arf-additional_fields-template").html();
 
@@ -218,7 +224,7 @@ function add_new_field () {
 		data[name] = value;
 	});
 	data._value = JSON.stringify(data);
-	$root.append( _.template( tpl )( data ) );
+	$root.append( _.template( tpl, WPMU_UnderscoreSettingsOverride )( data ) );
 	return false;
 }
 
