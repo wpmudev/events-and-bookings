@@ -132,7 +132,7 @@ function send_save_request () {
 		"title": $("#eab-events-fpe-event_title").val(),
 		"content": content,
 		"start": $start_date.val() + ' ' + start_time_parts.join(':').trim(),
-		"end": $end_date.val() + ' ' + end_time_parts.join(':'),
+		"end": $end_date.val() + ' ' + end_time_parts.join(':').trim(),
 		"venue": $("#eab-events-fpe-venue").val(),
 		"status": $("#eab-events-fpe-status").val(),
 		"is_premium": ($("#eab-events-fpe-is_premium").length ? $("#eab-events-fpe-is_premium").val() : 0),
