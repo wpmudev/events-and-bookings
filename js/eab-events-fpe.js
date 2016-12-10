@@ -127,12 +127,19 @@ function send_save_request () {
 		'<img src="' + _eab_events_fpe_data.root_url + '/waiting.gif" id="eab-events-fpe-waiting_indicator" />'
 	);
 	var content = $("#eab-events-fpe-content").is(":visible") ? $("#eab-events-fpe-content").val() : tinyMCE.activeEditor.getContent();
+        
+        var modified_start_time = start_time_parts.join(':');
+        var modified_end_time = end_time_parts.join(':');
+        
+        modified_start_time = modified_start_time.replace(/ /g, '');
+        modified_end_time = modified_end_time.replace(/ /g, '');
+        
 	var data = {
 		"id": $("#eab-events-fpe-event_id").val(),
 		"title": $("#eab-events-fpe-event_title").val(),
 		"content": content,
-		"start": $start_date.val() + ' ' + start_time_parts.join(':'),
-		"end": $end_date.val() + ' ' + end_time_parts.join(':'),
+		"start": $start_date.val() + ' ' + modified_start_time,
+		"end": $end_date.val() + ' ' + modified_end_time,
 		"venue": $("#eab-events-fpe-venue").val(),
 		"status": $("#eab-events-fpe-status").val(),
 		"is_premium": ($("#eab-events-fpe-is_premium").length ? $("#eab-events-fpe-is_premium").val() : 0),
