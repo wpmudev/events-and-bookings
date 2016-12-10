@@ -245,7 +245,7 @@ class Eab_Calendars_MeetupImporter {
 		foreach ($imported as $event_id) {
 			if (empty($event_id)) continue;
 			$event = new Eab_EventModel(get_post($event_id));
-			$result[] = '<a href="' . admin_url('post.php?action=edit&post=' . $event->get_id()) . '">' . $event->get_title() . '</a>';
+			$result[] = '<a target="_blank" href="' . admin_url('post.php?action=edit&post=' . $event->get_id()) . '">' . $event->get_title() . '</a>';
 		}
 		$result[] = sprintf(__('%s events successfully imported', Eab_EventsHub::TEXT_DOMAIN), count($result));
 		wp_send_json(array(
@@ -270,13 +270,16 @@ class Eab_Calendars_MeetupImporter {
 			: false
 		;
 		if (!$time) return false;
+                $offset = apply_filters( 'eab_meetup_offset_adjust', get_option( 'gmt_offset' ) );
+                $time = $time + ( $offset * 60 * 60 );
+                
 		if (empty($event['status']) || 'upcoming' != $event['status']) return false;
 
 		// Is the event already imported?
 		global $wpdb;
 		$id = esc_sql($event['id']);
 		$is_imported = $wpdb->get_var("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='_eab_meetup_id' AND meta_value='{$id}'");
-		if (!empty($is_imported)) return false;
+		//if (!empty($is_imported)) return false;
 
 		$post = array(
 			'post_type' => Eab_EventModel::POST_TYPE,
@@ -387,6 +390,7 @@ $(function () {
 	$("#eab-meetup_importer-import_location_events").on("click", function (e) {
 		e.preventDefault();
 		write_status("<?php echo esc_js(__('Please, hold on...', Eab_EventsHub::TEXT_DOMAIN)); ?>");
+                
 		navigator.geolocation.getCurrentPosition(function (resp) {
 			$.post(ajaxurl, {
 				action: 'eab_meetup-import_nearby_events',
