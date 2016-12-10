@@ -356,6 +356,11 @@ class Eab_Calendars_MeetupImporter {
 	    	<button type="button" class="button" id="eab-meetup_importer-import_user_events"><?php echo esc_html(__('Import my events', Eab_EventsHub::TEXT_DOMAIN)); ?></button>
 	    	<button type="button" class="button" id="eab-meetup_importer-import_location_events"><?php echo esc_html(__('Import events close to my current location', Eab_EventsHub::TEXT_DOMAIN)); ?></button>
 	    	<button type="button" class="button" id="eab-meetup_importer-import_user_topics"><?php echo esc_html(__('Import my topics as event categories', Eab_EventsHub::TEXT_DOMAIN)); ?></button>
+                <?php if( ! is_ssl() ) : ?>
+                <br>
+                <em><?php _e( 'Important: To import events close to your current location, you must need SSL', Eab_EventsHub::TEXT_DOMAIN ); ?></em>
+                <br>
+                <?php endif; ?>
 	    	<div id="eab-meetup_importer-status" style="display:none"></div>
 	    <?php } else { ?>
 			<p class="note"><?php _e('To start, fill up the API information above and save your settings', Eab_EventsHub::TEXT_DOMAIN); ?></p>
