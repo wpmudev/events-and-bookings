@@ -43,10 +43,14 @@ abstract class Eab_Importer {
 /* ----- Shared code, helpers ----- */
 	
 	public function import_events ($source) {
-		$events = $this->map_to_raw_events_array($source);
+                remove_action( 'transition_post_status',     '_transition_post_status',                  5, 3 );
+		$events = (array)$this->map_to_raw_events_array($source);
 		foreach ($events as $raw) {
-			if (!$this->is_imported($raw)) $this->import_event($raw);
+			if (!$this->is_imported($raw)){
+                                $this->import_event($raw);
+                        }
 		}
+                add_action( 'transition_post_status',     '_transition_post_status',                  5, 3 );
 	}
 
 	public function import_event ($source) {
@@ -56,6 +60,7 @@ abstract class Eab_Importer {
 		$post['post_type'] = Eab_EventModel::POST_TYPE;
 		
 		$meta = $this->map_to_post_meta($source);
+                
 		$post_id = wp_insert_post($post);
 		if (!$post_id) return false; // Log error
 
