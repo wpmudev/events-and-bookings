@@ -39,11 +39,13 @@ class Eab_Events_Capabilities {
 		
 		$eab_protect_media_images = $this->_data->get_option('eab_protect_media_images');
 		if( $eab_protect_media_images == 1 )
-			add_filter( 'posts_where', array( $this, 'eab_protect_media_images' ) );
+			add_filter( 'posts_where', array( $this, 'eab_protect_media_images' ), 10, 2 );
 	}
 	
-	function eab_protect_media_images( $where ) {
+	function eab_protect_media_images( $where, $query ) {
+                if( $query->query['post_type'] != 'attachment' ) return $where;
 		global $current_user;
+                
 		if( is_user_logged_in() ){
 			if( ! is_super_admin() )
 				$where .= ' AND post_author=' . $current_user->data->ID;
