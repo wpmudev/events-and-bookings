@@ -283,7 +283,7 @@ class Eab_Events_Membership2_Integration {
 			if ( $user->has_membership( $membership_id ) ) {
 				// The member has subscribed to this membership.
 
-				if ( $membership->has_price && 0 == $membership->price ) {
+				if ( isset( $membership['has_price'] ) && 0 == $membership['price'] ) {
 					// The membership has a custom price and custom price is 0.
 					return false;
 				}
