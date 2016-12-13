@@ -108,8 +108,11 @@ class Eab_Gcal_Importer_GoogleImporter extends Eab_ScheduledImporter {
 		$meta['incsub_event_status'] = Eab_EventModel::STATUS_OPEN; // Open by default
 
 		// Metadata - timestamps
-		$start = isset($gevent['start']['dateTime']) ? $this->_to_local_time($gevent['start']['dateTime']) : false;
-		$end = isset($gevent['end']['dateTime']) ? $this->_to_local_time($gevent['end']['dateTime']) : false;
+                $startDateTime = isset($gevent['start']['dateTime']) ? $gevent['start']['dateTime'] : $gevent['start']['date'];
+                $endDateTime = isset($gevent['end']['dateTime']) ? $gevent['end']['dateTime'] : $gevent['end']['date'];
+                
+		$start = isset($startDateTime) ? $this->_to_local_time($startDateTime) : false;
+		$end = isset($endDateTime) ? $this->_to_local_time($endDateTime) : false;
 		if ($start) $meta['incsub_event_start'] = date('Y-m-d H:i:s', $start);
 		if ($end) $meta['incsub_event_end'] = date('Y-m-d H:i:s', $end);
 

@@ -392,6 +392,10 @@ class Eab_EventsHub {
 						}
 				    }
 				}
+                                else
+                                {
+                                        delete_post_meta( $post->ID, 'agm_map_created' );
+                                }
 		    }
 
 		    return $venue;
