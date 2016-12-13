@@ -494,7 +494,7 @@ abstract class Eab_FB_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 	public function is_authenticated () {
 		$token_data = $this->get_token_data();
 
-		return $token_data['access_token'];
+		return isset( $token_data['access_token'] ) ? $token_data['access_token'] : '';
 	}
 
 	public function get_authentication () {

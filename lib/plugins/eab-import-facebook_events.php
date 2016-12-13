@@ -8,11 +8,10 @@ Author: WPMU DEV
 AddonType: Integration
 */
 
-
 if (!class_exists('WpmuDev_Wp_Oauth')) require_once(EAB_PLUGIN_DIR . 'lib/class_wd_wpmu_oauth.php');
 if (!class_exists('Eab_Importer')) require_once(EAB_PLUGIN_DIR . 'lib/class_eab_importer.php');
 
-
+require_once dirname( __FILE__ ) . '/lib/Facebook/autoload.php';
 
 class Eab_Fbe_Oauth_FacebookEventsImporter extends Eab_FB_Plugin_Oauth_RO {
 	public function get_data_key ($key) {
@@ -67,7 +66,7 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 
 	public function map_to_post_type ($source) {
  		$author = $this->_data->get_option('fbe_importer-calendar_author');
-		return array(
+		$data = array(
 			'post_type' => Eab_EventModel::POST_TYPE,
 			'post_status' => 'publish',
 			'post_title' => isset($source['name']) ? $source['name']  : '',
@@ -75,6 +74,8 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 			'post_date' => date('Y-m-d H:i:s', strtotime($source['updated_time'])),
 			'post_author' => $author,
 		);
+                
+                return $data;
 	}
 
 	public function map_to_post_meta ($source) {
@@ -100,7 +101,9 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 	public function is_imported ($source) {
 		global $wpdb;
 		$id = esc_sql($source['id']);
-		return $wpdb->get_var("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='eab_fbe_event' AND meta_value='{$id}'");
+                $res = $wpdb->get_var("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='eab_fbe_event' AND meta_value='{$id}'");
+                
+                return $res;
 	}
 
 	public function is_recurring ($source) {
@@ -109,12 +112,36 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 
 	private function _get_request_items ($id) {
 		$token = $this->_oauth->get_token();
-		$page = wp_remote_request("https://graph.facebook.com/{$id}/events/?access_token={$token}&fields=id,name,description,start_time,end_time,location,updated_time", $this->_http_headers);
+                
+                $api_key = $this->_data->get_option('fbe_importer-client_id');
+		$api_secret = $this->_data->get_option('fbe_importer-client_secret');
+                $fb_user = $this->_oauth->get_fb_user();
+                $sync_user = !empty($fb_user['id'])
+                        ? $fb_user['id']
+                        : false
+                ;
+                
+                $fb = new Facebook\Facebook(array(
+                        'app_id' => $api_key,
+                        'app_secret' => $api_secret,
+                ));
+                
+                $response = $fb->get('/me/events?fields=id,name,description,start_time,end_time,updated_time', $token);
+                $items = $response->getDecodedBody();
+                
+                ob_start();
+                print_r($items['data']);
+                $x = ob_get_clean();
+                error_log($x);
+                
+		/*$page = wp_remote_request("https://graph.facebook.com/{$id}/events/?access_token={$token}&fields=id,name,description,start_time,end_time,location,updated_time", $this->_http_headers);
 		if (is_wp_error($page)) return array(); // Request fail
 		if (wp_remote_retrieve_response_code($page) != 200) return array(); // Request fail
 		$raw = wp_remote_retrieve_body($page);
-		$items = json_decode($raw, true);
-		return !empty($items['data'])
+		$items = json_decode($raw, true);*/
+		
+                
+                return !empty($items['data'])
 			? $items['data']
 			: array()
 		;
@@ -328,3 +355,21 @@ $(function () {
 
 Eab_Calendars_FacebookEventsImporter::serve();
 Eab_Fbe_Importer_FacebookEventsImporter::serve();
+
+/*
+
+$oauth = new Eab_Fbe_Oauth_FacebookEventsImporter;
+$token = $oauth->get_token();
+
+
+$fb = new Facebook\Facebook(array(
+  'app_id' => '1177835542311758',
+  'app_secret' => 'd8773fe2b0ce2b208ea1917d63558c5d',
+  ));
+
+
+$response = $fb->get('/me/events?fields=id,name,description,start_time,end_time,updated_time', $token);
+$events = $response->getDecodedBody();
+echo "<pre>";
+print_r($events);
+echo "</pre>";*/
