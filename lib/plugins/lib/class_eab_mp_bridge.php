@@ -177,7 +177,7 @@ class Eab_MP_Bridge {
 		$out = '';
 		$category_id = $this->_data->get_option('payment-ppvp-category');
 		$query_args = array(
-			'post_type' => 'product',
+			'post_type' => MP_Product::get_post_type(),
 			'posts_per_page' => -1,
 		);
 		if ($category_id) {
