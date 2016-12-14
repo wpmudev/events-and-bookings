@@ -23,6 +23,7 @@ class Eab_MP_Bridge {
 		// Display
 		add_filter('eab-event-payment_forms', array($this, 'process_event_payment_forms'), 10, 2);
                 add_action('incsub_event_booking_yes', array($this, 'add_event_product_to_cart'), 10, 2);
+                add_action('incsub_event_booking_maybe', array($this, 'add_event_product_to_cart'), 10, 2);
 		add_filter('eab-events-event_details-price', array($this, 'show_product_price'), 10, 2);
 
 		// Regular Events+ product selection
