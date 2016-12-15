@@ -113,13 +113,26 @@ abstract class WpmuDev_CalendarTable {
 			;
 			$ret .= "<td {$class_attribute}>{$activity}</td>";
 		}
+                
+                $final_last = $last + 1;
+                $final_last = $final_last > 6 ? $final_last - 7 : $final_last;
+                if ( $final_last == $this->start_of_week )
+                {
+                        $ret .= '</tr>'; 
+                }
+                else
+                {
+                        $cal_diff = 6 - $last + $this->start_of_week;
+                        if( $cal_diff > 6 ) $cal_diff -= 7;
+                        $ret .= '<td class="no-right-border" colspan="' . $cal_diff . '">&nbsp;</td></tr>';
+                }
 		
-		if ( $last > $this->start_of_week )
+		/*if ( $last > $this->start_of_week )
 			$ret .= '<td class="no-right-border" colspan="' . (6 - $last + $this->start_of_week) . '">&nbsp;</td></tr>'; 
 		else if ( $last + 1 == $this->start_of_week )
 			$ret .= '</tr>'; 
 		else
-			$ret .= '<td class="no-right-border" colspan="' . (6 + $last - $this->start_of_week) . '">&nbsp;</td></tr>';
+			$ret .= '<td class="no-right-border" colspan="' . (6 + $last - $this->start_of_week) . '">&nbsp;</td></tr>';*/
 		
 		$ret .= $this->_get_last_row();
 		
