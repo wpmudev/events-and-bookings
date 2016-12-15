@@ -136,6 +136,8 @@ class Eab_EventsHub {
 		add_action('draft_to_publish', array($this, 'respawn_recurring_instances'));
 
 	    add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
+            
+                add_action( 'ms_rule_cptgroup_model_protect_posts', array( $this, 'reverse_m2_modified_event_cpt' ), 99, 2 );
 
 	    if ( is_admin() ) {
 		    require_once( 'admin/class-eab-admin.php' );
@@ -144,6 +146,14 @@ class Eab_EventsHub {
 		// API login after the options have been initialized
 		$this->_api->initialize();
 
+    }
+    
+    public function reverse_m2_modified_event_cpt( $wp_query, $obj )
+    {
+        if( is_array( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'][0] == 'incsub_event' )
+        {
+                $wp_query->query_vars['post_type'] = 'incsub_event';
+        }
     }
 
 	public function maybe_upgrade() {
