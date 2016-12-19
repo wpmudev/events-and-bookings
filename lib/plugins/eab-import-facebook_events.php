@@ -352,24 +352,18 @@ $(function () {
 	}
 }
 
-
-Eab_Calendars_FacebookEventsImporter::serve();
-Eab_Fbe_Importer_FacebookEventsImporter::serve();
-
-/*
-
-$oauth = new Eab_Fbe_Oauth_FacebookEventsImporter;
-$token = $oauth->get_token();
-
-
-$fb = new Facebook\Facebook(array(
-  'app_id' => '1177835542311758',
-  'app_secret' => 'd8773fe2b0ce2b208ea1917d63558c5d',
-  ));
-
-
-$response = $fb->get('/me/events?fields=id,name,description,start_time,end_time,updated_time', $token);
-$events = $response->getDecodedBody();
-echo "<pre>";
-print_r($events);
-echo "</pre>";*/
+if( strnatcmp( phpversion(), '5.4.0' ) >= 0 )
+{
+        Eab_Calendars_FacebookEventsImporter::serve();
+        Eab_Fbe_Importer_FacebookEventsImporter::serve();
+}
+else
+{
+        add_action( 'admin_notices', function() {
+                ?>
+                <div class="notice notice-error is-dismissible">
+                        <p><?php _e( 'You must need php 5.4 or greater to use <b>Import: Facebook Events</b> addon.', Eab_EventsHub::TEXT_DOMAIN ); ?></p>
+                </div>
+                <?php
+        } );
+}
