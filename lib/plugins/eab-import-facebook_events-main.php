@@ -120,12 +120,15 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
                 $response = $fb->get('/me/events?fields=id,name,description,start_time,end_time,updated_time', $token);
                 $items = $response->getDecodedBody();
                 
-                ob_start();
+                /**
+                 * Debug code
+                 */
+                /*ob_start();
                 print_r($items['data']);
                 $x = ob_get_clean();
                 error_log($x);
                 
-		/*$page = wp_remote_request("https://graph.facebook.com/{$id}/events/?access_token={$token}&fields=id,name,description,start_time,end_time,location,updated_time", $this->_http_headers);
+		$page = wp_remote_request("https://graph.facebook.com/{$id}/events/?access_token={$token}&fields=id,name,description,start_time,end_time,location,updated_time", $this->_http_headers);
 		if (is_wp_error($page)) return array(); // Request fail
 		if (wp_remote_retrieve_response_code($page) != 200) return array(); // Request fail
 		$raw = wp_remote_retrieve_body($page);
@@ -212,13 +215,24 @@ class Eab_Calendars_FacebookEventsImporter {
 	<h3 class="eab-hndle"><?php _e('Facebook Events import settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
-			<label for="incsub_event-fbe_importer-client_id" id="incsub_event_label-fbe_importer-client_id"><?php _e('App ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>
-			<input type="text" size="90" id="incsub_event-fbe_importer-client_id" name="fbe_importer[client_id]" value="<?php print $api_key; ?>" />
-			<span><?php echo $tips->add_tip(__('Enter your App ID number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
-			<br />
-			<label for="incsub_event-fbe_importer-client_id" id="incsub_event_label-fbe_importer-client_id"><?php _e('App secret', Eab_EventsHub::TEXT_DOMAIN); ?></label>
-			<input type="text" size="85" id="incsub_event-fbe_importer-client_id" name="fbe_importer[client_secret]" value="<?php print $api_secret; ?>" />
-			<span><?php echo $tips->add_tip(__('Enter your App secret number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+                        <table cellpadding="5" cellspacing="5" width="100%">
+                                <tr>
+                                        <td>
+                                                <label style="width: 100%" for="incsub_event-fbe_importer-client_id" id="incsub_event_label-fbe_importer-client_id"><?php _e('App ID', Eab_EventsHub::TEXT_DOMAIN); ?> <?php echo $tips->add_tip(__('Enter your App ID number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></label>
+                                        </td>
+                                        <td>
+                                                <input type="text" size="85" id="incsub_event-fbe_importer-client_id" name="fbe_importer[client_id]" value="<?php print $api_key; ?>" />
+                                        </td>
+                                </tr>
+                                <tr>
+                                        <td>
+                                                <label style="width: 100%" for="incsub_event-fbe_importer-client_id" id="incsub_event_label-fbe_importer-client_id"><?php _e('App secret', Eab_EventsHub::TEXT_DOMAIN); ?> <?php echo $tips->add_tip(__('Enter your App secret number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></label>
+                                        </td>
+                                        <td>
+                                                <input type="text" size="85" id="incsub_event-fbe_importer-client_id" name="fbe_importer[client_secret]" value="<?php print $api_secret; ?>" />
+                                        </td>
+                                </tr>
+                        </table>
 			<div class="fbe_importer-auth_actions">
 		<?php if ($is_authenticated && $api_key && $api_secret) { ?>
 				<a href="#reset" class="button" id="fbe_import-reset"><?php _e('Reset', Eab_EventsHub::TEXT_DOMAIN); ?></a>
