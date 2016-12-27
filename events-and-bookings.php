@@ -6,7 +6,7 @@ Description: Events gives you a flexible WordPress-based system for organizing p
 Author: WPMU DEV
 Text Domain: eab
 WDP ID: 249
-Version: 1.9.3
+Version: 1.9.4
 Author URI: http://premium.wpmudev.org
 */
 
@@ -136,7 +136,7 @@ class Eab_EventsHub {
 		add_action('draft_to_publish', array($this, 'respawn_recurring_instances'));
 
 	    add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
-            
+
                 add_action( 'ms_rule_cptgroup_model_protect_posts', array( $this, 'reverse_m2_modified_event_cpt' ), 99, 2 );
 
 	    if ( is_admin() ) {
@@ -147,7 +147,7 @@ class Eab_EventsHub {
 		$this->_api->initialize();
 
     }
-    
+
     public function reverse_m2_modified_event_cpt( $wp_query, $obj )
     {
         if( is_array( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'][0] == Eab_EventModel::POST_TYPE )
@@ -223,7 +223,7 @@ class Eab_EventsHub {
 		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
 	    //add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
             add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/(.+)?/comment-page-([0-9]{1,})/?$', 'index.php?incsub_event=$matches[1]&cpage=$matches[2]', 'top' );
-            
+
 		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
@@ -319,16 +319,16 @@ class Eab_EventsHub {
 
 		return $message;
     }
-    
+
     function update_rsvp_per_event( $event_id, $user_id, $status )
     {
         global $wpdb;
-        
+
         if ( class_exists( 'SitePress' ) ) {
                 global $sitepress;
                 $trid = $sitepress->get_element_trid( $event_id );
                 $translations = $sitepress->get_element_translations( $trid );
-                
+
                 foreach( $translations as $key => $val )
                 {
                         $wpdb->query(
@@ -346,26 +346,26 @@ class Eab_EventsHub {
 
     function recount_bookings( $event_id ) {
 		global $wpdb;
-                
+
                 // If WPML Enabled
                 if ( class_exists( 'SitePress' ) ) {
                         global $sitepress;
                         $trid = $sitepress->get_element_trid( $event_id );
                         $translations = $sitepress->get_element_translations( $trid );
-                        
+
                         foreach( $translations as $key => $val )
                         {
                                 $this->update_count_rsvp_meta( $val->element_id );
                         }
                 }
-                
-		$this->update_count_rsvp_meta( $event_id );           
+
+		$this->update_count_rsvp_meta( $event_id );
     }
-    
+
     public function update_count_rsvp_meta( $event_id )
     {
         global $wpdb;
-        
+
         // Yes
         $yes_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".self::tablename(self::BOOKING_TABLE)." WHERE `status` = 'yes' AND event_id = %d;", $event_id));
     update_post_meta($event_id, 'incsub_event_yes_count', $yes_count);
@@ -1130,22 +1130,22 @@ class Eab_EventsHub {
 		   	if (isset($_POST['incsub_event_start']) && count($_POST['incsub_event_start']) > 0) foreach ($_POST['incsub_event_start'] as $i => $event_start) {
 		   		if (empty($_POST['incsub_event_start'][$i]) || empty($_POST['incsub_event_end'][$i])) continue;
 		   		if (!empty($_POST['incsub_event_start'][$i])) {
-                                    
+
                                     if( $_POST['incsub_event_start_time'][$i] != '' && strpos( ':', $_POST['incsub_event_start_time'][$i] ) === false ){
                                         $_POST['incsub_event_start_time'][$i] = $_POST['incsub_event_start_time'][$i] . ':00';
                                     }
-                                    
+
 					$start_time = @$_POST['incsub_event_no_start_time'][$i] ? '00:01' : @$_POST['incsub_event_start_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_start', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_start'][$i]} {$start_time}")));
 				    if (@$_POST['incsub_event_no_start_time'][$i]) add_post_meta($post_id, 'incsub_event_no_start', 1);
 				    else add_post_meta($post_id, 'incsub_event_no_start', 0);
 				}
 				if (!empty($_POST['incsub_event_end'][$i])) {
-                                    
+
                                         if( $_POST['incsub_event_end_time'][$i] != '' && strpos( ':', $_POST['incsub_event_end_time'][$i] ) === false ){
                                             $_POST['incsub_event_end_time'][$i] = $_POST['incsub_event_end_time'][$i] . ':00';
                                         }
-                                    
+
 		   			$end_time = @$_POST['incsub_event_no_end_time'][$i] ? '23:59' : @$_POST['incsub_event_end_time'][$i];
 				    add_post_meta($post_id, 'incsub_event_end', date('Y-m-d H:i:s', strtotime("{$_POST['incsub_event_end'][$i]} {$end_time}")));
 				    if (@$_POST['incsub_event_no_end_time'][$i]) add_post_meta($post_id, 'incsub_event_no_end', 1);
@@ -1360,7 +1360,7 @@ class Eab_EventsHub {
 		foreach ( get_post_stati($argvs, 'objects') as $status ) {
 		    $class = '';
 		    $status_name = $status->name;
-		    
+
 		    if (!in_array($status_name, $avail_post_stati)) continue;
 		    if (empty($num_posts->$status_name)) continue;
 
