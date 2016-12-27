@@ -3,14 +3,40 @@ Author: WPMU DEV
 
 Change Log:
 ----------------------------------------------------------------------
-1.9.3 - 
+1.9.3 - 2016-12-27
 ----------------------------------------------------------------------
+- Added: New Upcoming events filter - eab_get_upcoming_events
+- Added: New filter added - eab_calendar_title
 - Added: Only one digit is allowed in hour field while creating a new event
+- Improved: Import events from Facebook is now compatible up to v2.8 (PHP version must be greater than 5.3)
+- Improved: Style issue in Facebook import addon settings
 - Fixed: Wrong URL in event calendar when event slug in main site is same as a subsite url
 - Fixed: Additional field addon fixed
 - Fixed: Date picker was not working in backend in mobile view
 - Fixed: Time On Events+ Calendar Wrong in calendar archive when local timezone addon is active
 - Fixed: Comment pagination
+- Fixed: For multidays event, time is not required
+- Fixed: When using manual payments in Events+ admin can only approve one time
+- Fixed: Set correct start time while importing from meetup.com
+- Fixed: Notice for calling a non-static method as static method
+- Fixed: Reset to default issue in colors addon
+- Fixed: Local time zone issue in cross browser
+- Fixed: Category and categories attribute fix for eab_archive shortcode in network mode
+- Fixed: Sometimes the calendar was breaking when the week start day is not Monday
+- Fixed: Conflict of asp.net tag
+- Fixed: Space is not allowed in start and end time in front page editing
+- Fixed: Conflict with WPMU DEV Directory plugin
+- Fixed: Issue with WPMU DEV Membership2 integration
+- Fixed: Conflict with WPMU DEV Membership2 - year archive page was not correct
+- Fixed: Conflict with WPML - attendees count and capacity
+- Fixed: Conflict with WPMU DEV Maps plugin - map was not removed once it was added
+- Fixed: Import from google events - start date-time issue
+- Fixed: MarketPress integration - compatible with mp_product CPT
+- Fixed: MarketPress integration - Selecting "maybe" in single event doesn't add event in the cart
+
+
+
+
 
 ----------------------------------------------------------------------
 1.9.2 - 2016-04-13
