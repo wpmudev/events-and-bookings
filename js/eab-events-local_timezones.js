@@ -24,7 +24,6 @@ $(function () {
 			dateValue = datetime;	
 		}
 		
-		
 		var date = new Date(Date.parse(dateValue));
 		if (isNaN(date)) return false;
 		$dts.each(function () {
@@ -40,7 +39,10 @@ $(function () {
                             if( count > 1 )
                             {
                                 var seconds = splitted_time[2].split( ' ' )[1];
-                                modified_time = splitted_time[0] + ':' + splitted_time[1] + ' ' + seconds;
+                                if( seconds == undefined )
+                                        modified_time = splitted_time[0] + ':' + splitted_time[1];
+                                else
+                                        modified_time = splitted_time[0] + ':' + splitted_time[1] + ' ' + seconds;
                             }
                             $me.text( modified_time );
                         }

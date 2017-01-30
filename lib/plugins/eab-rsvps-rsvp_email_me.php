@@ -78,9 +78,13 @@ class Eab_Events_RsvpEmailMe {
 		$subject = $this->_data->get_option('eab_rsvps-email_me-subject');
 		$body = $this->_data->get_option('eab_rsvps-email_me-body');
 		$admin_email = get_option('admin_email');
+                
+                $from = $this->_data->get_option('eab_rsvps-email_me-from');
+		$from = $from ? $from : get_option('admin_email');
 
 		if (empty($subject) || empty($body)) return false;
 		$headers = array(
+                        'From: ' . $from,
 			'Content-Type: ' . $this->email_charset() . '; charset="' . get_option('blog_charset') . '"'
 		);
 
@@ -110,6 +114,7 @@ class Eab_Events_RsvpEmailMe {
 				}
 			}
 		}
+                
 		remove_filter('wp_mail_content_type', array($this, 'email_charset'));
 	}
 
@@ -138,6 +143,7 @@ class Eab_Events_RsvpEmailMe {
 		$options['eab_rsvps-email_me-notify_admin'] = @$data['eab_rsvps_me']['email-notify_admin'];
 		$options['eab_rsvps-email_me-notify_author'] = @$data['eab_rsvps_me']['email-notify_author'];
 		$options['eab_rsvps-email_me-subject'] = @$data['eab_rsvps_me']['email-subject'];
+                $options['eab_rsvps-email_me-from'] = @$data['eab_rsvps_me']['email-from'];
 		$options['eab_rsvps-email_me-body'] = @$data['eab_rsvps-email_me-body'];
 		return $options;
 	}
@@ -151,6 +157,7 @@ class Eab_Events_RsvpEmailMe {
 		$notify_admin = $this->_data->get_option('eab_rsvps-email_me-notify_admin') ? 'checked="checked"' : '';
 		$notify_author = $this->_data->get_option('eab_rsvps-email_me-notify_author') ? 'checked="checked"' : '';
 		$subject = $this->_data->get_option('eab_rsvps-email_me-subject');
+                $from = $this->_data->get_option('eab_rsvps-email_me-from');
 		$body = $this->_data->get_option('eab_rsvps-email_me-body');
 		
 		$codec = new Eab_Events_RsvpEmailMe_Codec;
@@ -188,6 +195,11 @@ class Eab_Events_RsvpEmailMe {
 				<input type="checkbox" id="eab_event-eab_rsvps-me-notify_author" name="eab_rsvps_me[email-notify_author]" value="1" <?php echo $notify_author; ?> />
 				<?php _e('Event author', Eab_EventsHub::TEXT_DOMAIN); ?>
 			</label>
+	    </div>
+            <div class="eab-settings-settings_item">
+	    	<label for="eab_event-eab_rsvps-me-from"><?php _e('Email from', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+			<span><?php echo $tips->add_tip('This is your email from address'); ?></span>
+			<input type="text" class="widefat" id="eab_event-eab_rsvps-me-from" name="eab_rsvps_me[email-from]" value="<?php esc_attr_e($from); ?>" />
 	    </div>
 	    <div class="eab-settings-settings_item">
 	    	<label for="eab_event-eab_rsvps-me-subject"><?php _e('Email subject', Eab_EventsHub::TEXT_DOMAIN); ?></label>

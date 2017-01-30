@@ -350,7 +350,7 @@ $(function () {
 		});
 		return false;
 	});
-
+        
 	$("body").on("click", ".eab-add_attendance .button", function () {
 		var $root = $(".eab-add_attendance"),
 			event_id = $root.find(".eab-attendance-event_id").val()
