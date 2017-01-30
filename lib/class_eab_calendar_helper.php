@@ -494,7 +494,8 @@ EabEctEacJs;
 
 	protected function _get_item_data ($post) {
 		$data = parent::_get_item_data($post);
-		if (isset($post->blog_id)) return $data;
+                // Enabling excerpt in calendar
+		// if (isset($post->blog_id)) return $data;
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
 		
 		if (!empty($this->_thumbnail['with_thumbnail'])) {
