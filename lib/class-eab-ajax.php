@@ -202,9 +202,22 @@ class Eab_Ajax {
 		if (is_email($email) && $post_id && in_array($status, $allowed)) {
 			$user = get_user_by('email', $email);
 			if ($user && !empty($user->ID)) {
-				$event = new Eab_EventModel($post);
-				$event->add_attendance($user->ID, $status);
+                                $user_id = $user->ID;
 			}
+                        else
+                        {
+                                list($username, $domain) = explode('@', $email, 2);
+                                $username = sanitize_user(trim($username));
+                                while (username_exists($username)) {
+                                        $username .= rand(0,9);
+                                }
+                
+                                $password = wp_generate_password(12, false);
+                                $user_id = wp_create_user($username, $password, $email);
+                        }
+                        
+                        $event = new Eab_EventModel($post);
+			$event->add_attendance($user_id, $status);
 		}
 		echo $eab->meta_box_part_bookings($post);
 		die;

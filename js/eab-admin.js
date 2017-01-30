@@ -350,6 +350,10 @@ $(function () {
 		});
 		return false;
 	});
+        
+        $( ".eab-add_attendance .button" ).click(function(e){
+                alert(123);
+        });
 
 	$("body").on("click", ".eab-add_attendance .button", function () {
 		var $root = $(".eab-add_attendance"),

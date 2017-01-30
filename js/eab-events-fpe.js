@@ -152,7 +152,7 @@ function send_save_request () {
 		data["fee"] = $("#eab-events-fpe-event_fee").val();
 	}
 	$(document).trigger('eab-events-fpe-save_request', [data]);
-
+        
 	// Start sending!!
 	$.post(_eab_events_fpe_data.ajax_url, {
 		"action": "eab_events_fpe-save_event",
@@ -179,6 +179,7 @@ function send_save_request () {
 		}
 		
 		$("#eab-events-fpe-event_id").val(post_id);
+                $(".eab-attendance-event_id").val(post_id);
 		return show_message((message ? message : l10nFpe.all_good), false);
 	});
 	return false;
@@ -208,6 +209,24 @@ $(function () {
 		toggle_fee();
 	}
 	
+        $("body").on("click", ".eab-add_attendance .button", function () {
+		var $root = $(".eab-add_attendance"),
+			event_id = $root.find(".eab-attendance-event_id").val()
+			email = $root.find(".eab-attendance-email").val(),
+			status = $root.find(".eab-attendance-status").val()
+		;
+		if (!event_id || !email || !status) return false;
+		$.post(ajaxurl, {
+			action: "eab_add_attendance",
+			user: email,
+			post_id: event_id,
+			status: status
+		}, function (data) {
+			$("#eab-bookings-response").html(data);
+		});
+		return false;
+	});
+        
 	// Init save request processing
 	$("#eab-events-fpe-ok").click(send_save_request);
 
