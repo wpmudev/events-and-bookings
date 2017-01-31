@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Immediately expire past events
-Description: By default, your past events will be archived. Activating this add-on will immediately expire all your archived events.
+Description: By default, your past events will be archived. Activating this add-on will expire all your archived events. This action depends on cron job, so you need to wait till next cron-job run. Cron job will be run by your system automatically in certain interval. For now, this addon will run hourly.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 1.0
 Author: WPMU DEV
