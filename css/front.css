@@ -551,6 +551,8 @@ a.wpmudevevents-login_link-wordpress {
 #eab-wordpress_login-wrapper .eab-wordpress_login-element input {
 	width: 175px;
 	float: right;
+        border: 1px solid #ccc;
+        padding: 3px 0;
 }
 
 .wpmudevevents-date var,
@@ -618,4 +620,21 @@ a.export_to_ical:after, a.export_to_gcal:after {
 
 .wpmudevevents-additional_details{
     margin-bottom: 20px;
+}
+
+#eab-wordpress_login-mode_toggle a{
+        font-style: italic;
+        font-size: 80%;
+        color: #000;
+}
+
+#eab-wordpress_login-command_wrapper{
+        margin-top: 10px;
+}
+
+#eab-wordpress_login-command_wrapper input{
+        background: #000;
+        color: #fff;
+        padding: 5px 10px;
+        margin-left: 10px;
 }
