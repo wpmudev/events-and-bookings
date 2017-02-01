@@ -220,13 +220,16 @@ class Eab_Calendars_GoogleImporter {
 			</ol>
 		</p>
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
-			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+                        <div>
+			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client ID', Eab_EventsHub::TEXT_DOMAIN); ?></label><br />
 			<input type="text" size="90" id="incsub_event-gcal_importer-app_id" name="gcal_importer[client_id]" value="<?php print $api_key; ?>" />
 			<span><?php echo $tips->add_tip(__('Enter your Client ID number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
-			<br />
-			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client secret', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+                        </div>
+                        <div>
+			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client secret', Eab_EventsHub::TEXT_DOMAIN); ?></label><br />
 			<input type="text" size="85" id="incsub_event-gcal_importer-app_id" name="gcal_importer[client_secret]" value="<?php print $api_secret; ?>" />
 			<span><?php echo $tips->add_tip(__('Enter your Client secret number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+                        </div>
 			<div class="gcal_importer-auth_actions">
 		<?php if ($is_authenticated && $api_key && $api_secret) { ?>
 				<a href="#reset" class="button" id="gcal_import-reset"><?php _e('Reset', Eab_EventsHub::TEXT_DOMAIN); ?></a>

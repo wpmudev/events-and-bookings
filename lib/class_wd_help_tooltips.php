@@ -206,16 +206,6 @@ class WpmuDev_HelpTooltips {
 		
 		?>
 <style type="text/css">
-.wpmudev-help {
-	display: block;
-	background-color: #ffffe0;
-	border: 1px solid #e6db55;
-	padding: 1em 1em;
-	-moz-border-radius:3px;
-	-khtml-border-radius:3px;
-	-webkit-border-radius:3px;
-	border-radius:3px;
-}
 <?php 	
 		if ($this->_icon_url) { 
 ?>
@@ -228,10 +218,14 @@ class WpmuDev_HelpTooltips {
 	left: -12000000px;
 }
 
+.wpmudev-help-trigger:focus{
+        box-shadow: none;
+}
 
 .wpmudev-help,
 .wpmudev-help-trigger {
 	display: inline-block;
+        outline: none;
 	width: 18px;
 	height: 18px;
 	font-size: 18px;
@@ -250,7 +244,22 @@ class WpmuDev_HelpTooltips {
 	vertical-align: middle;
 }
 
-.wpmudev-help:before,
+.wpmudev-help {
+	width: 300px;
+        font-size: 13px;
+        padding: 10px;
+        height: auto;
+        line-height: 125%;
+        text-align: left;
+        background: #fff;
+        border: 1px solid #ccc;
+        font-family: arial;
+	-moz-border-radius:3px;
+	-khtml-border-radius:3px;
+	-webkit-border-radius:3px;
+	border-radius:3px;
+}
+
 .wpmudev-help-trigger:before {
 	content: "\f348";
 }

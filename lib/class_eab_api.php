@@ -608,7 +608,7 @@ class Eab_Api {
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-facebook-app_id" id="incsub_event_label-facebook-app_id"><?php _e('Facebook App ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 					<input type="text" id="incsub_event-facebook-app_id" name="event_default[facebook-app_id]" value="<?php echo esc_attr($this->_data->get_option('facebook-app_id')); ?>" />
-					<span><?php echo $tips->add_tip(sprintf(__('Enter your App ID number here. If you don\'t have a Facebook App yet, you will need to create one <a href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://developers.facebook.com/apps')); ?></span>
+					<span><?php echo $tips->add_tip(sprintf(__('Enter your App ID number here. If you don\'t have a Facebook App yet, you will need to create one <a target="_blank" href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://developers.facebook.com/apps')); ?></span>
 				</div>
 
 				<div class="eab-settings-settings_item">
@@ -621,7 +621,7 @@ class Eab_Api {
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-twitter-app_id" id="incsub_event_label-twitter-app_id"><?php _e('Twitter Consumer Key', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 					<input type="text" id="incsub_event-twitter-app_id" name="event_default[twitter-app_id]" value="<?php echo esc_attr($this->_data->get_option('twitter-app_id')); ?>" />
-					<span><?php echo $tips->add_tip(sprintf(__('Enter your Twitter App ID number here. If you don\'t have a Twitter App yet, you will need to create one <a href="%s">here</a>.<br />When setting up your app, please remember to also set the <b>Callback URL</b> to appropriate value (<code>%s</code>)', Eab_EventsHub::TEXT_DOMAIN), 'https://dev.twitter.com/apps/new', home_url())); ?></span>
+					<span><?php echo $tips->add_tip(sprintf(__('Enter your Twitter App ID number here. If you don\'t have a Twitter App yet, you will need to create one <a target="_blank" href="%s">here</a>.<br />When setting up your app, please remember to also set the <b>Callback URL</b> to appropriate value (<code>%s</code>)', Eab_EventsHub::TEXT_DOMAIN), 'https://dev.twitter.com/apps/new', home_url())); ?></span>
 				</div>
 
 				<div class="eab-settings-settings_item">
@@ -633,7 +633,7 @@ class Eab_Api {
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-google-client_id" id="incsub_event_label-google-client_id"><?php _e('Google Client ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 					<input type="text" id="incsub_event-google-client_id" name="event_default[google-client_id]" value="<?php echo esc_attr($this->_data->get_option('google-client_id')); ?>" />
-					<span><?php echo $tips->add_tip(sprintf(__('Enter your Google App Client ID here. If you don\'t have a Google App yet, you will need to create one <a href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://console.developers.google.com/')); ?></span>
+					<span><?php echo $tips->add_tip(sprintf(__('Enter your Google App Client ID here. If you don\'t have a Google App yet, you will need to create one <a target="_blank" href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://console.developers.google.com/')); ?></span>
 					<span>
 						<small><?php _e('If you leave this field empty, Google Auth will revert to legacy OpenID.', Eab_EventsHub::TEXT_DOMAIN); ?></small>
 					</span>
