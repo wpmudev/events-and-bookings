@@ -359,6 +359,7 @@ class Eab_Events_FrontPageEditing {
 		$this->_enqueue_dependencies();
 
 		$style = $event->get_id() ? '' : 'style="display:none"';
+                $ret = '';
 		$ret .= '<div id="eab-events-fpe">';
 		$ret .= '<a id="eab-events-fpe-back_to_event" href="' . get_permalink($event->get_id()) . '" ' . $style . '>' . __('Back to Event', Eab_EventsHub::TEXT_DOMAIN) . '</a>';
 		$ret .= '<input type="hidden" id="eab-events-fpe-event_id" value="' . (int)$event->get_id() . '" />';
