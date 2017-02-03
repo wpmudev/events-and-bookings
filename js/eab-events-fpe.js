@@ -222,7 +222,7 @@ $(function () {
 			post_id: event_id,
 			status: status
 		}, function (data) {
-			$("#eab-bookings-response").html(data);
+			$(".eab-add_attendance-container").html(data);
 		});
 		return false;
 	});

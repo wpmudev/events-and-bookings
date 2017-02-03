@@ -238,7 +238,9 @@ class Eab_Template {
 
 		$content = '<div class="eab-add_attendance-container">';
 
-		$content .= '<fieldset class="eab-add_attendance">';
+		//$content .= '<div id="eab-bookings-response"></div>';
+                
+                $content .= '<fieldset class="eab-add_attendance">';
 		$content .= '<legend>' . __('Add user', Eab_EventsHub::TEXT_DOMAIN) . '</legend>';
 		
 		$content .= '<label>' . __('User email', Eab_EventsHub::TEXT_DOMAIN) . '</label>&nbsp;';
