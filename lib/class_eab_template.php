@@ -270,6 +270,7 @@ class Eab_Template {
 
 		//$content = Eab_Template::get_admin_attendance_addition_form($event, $statuses); // Moved to actual bookings areas
 
+                $content = '';
 		$content .= '<h4>'. __($status_name, Eab_EventsHub::TEXT_DOMAIN). '</h4>';
 		$content .= '<ul class="eab-guest-list">';
 

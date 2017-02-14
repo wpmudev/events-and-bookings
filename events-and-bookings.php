@@ -332,14 +332,14 @@ class Eab_EventsHub {
                 foreach( $translations as $key => $val )
                 {
                         $wpdb->query(
-                                $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $val->element_id, $user_id)
+                                $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), '$status') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $val->element_id, $user_id)
                         );
                 }
         }
         else
         {
                 $wpdb->query(
-                        $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), 'yes') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $event_id, $user_id)
+                        $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), '$status') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $event_id, $user_id)
                 );
         }
     }
