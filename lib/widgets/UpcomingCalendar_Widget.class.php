@@ -5,7 +5,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	function __construct () {
 		$widget_ops = array(
 			'classname' => __CLASS__, 
-			'description' => __('Displays List of Upcoming Events from your entire network', $this->translation_domain),
+			'description' => __('Displays List of Upcoming Events from your site', $this->translation_domain),
 		);
 		
 		add_action('wp_enqueue_scripts', array($this, 'css_load_styles'));
