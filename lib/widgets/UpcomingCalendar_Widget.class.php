@@ -5,7 +5,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	function __construct () {
 		$widget_ops = array(
 			'classname' => __CLASS__, 
-			'description' => __('Displays List of Upcoming Events from your entire network', $this->translation_domain),
+			'description' => __('Displays List of Upcoming Events from your site', $this->translation_domain),
 		);
 		
 		add_action('wp_enqueue_scripts', array($this, 'css_load_styles'));
@@ -135,17 +135,24 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 				$category_class = !empty($term->slug) ? $term->slug : false;
 			}
 		}
-
+        
+        if( defined( 'EAB_UPCOMING_EVENT_FROM_TODAY' ) && EAB_UPCOMING_EVENT_FROM_TODAY ) add_filter( 'eab-collection-upcoming-start_timestamp', array( $this, 'eab_widget_start_date' ) );
 		$events = $network
 			? Eab_Network::get_upcoming_events(10)
 			: Eab_CollectionFactory::get_upcoming_events($date, $args)
 		;
+        if( defined( 'EAB_UPCOMING_EVENT_FROM_TODAY' ) && EAB_UPCOMING_EVENT_FROM_TODAY ) remove_filter( 'eab-collection-upcoming-start_timestamp', array( $this, 'eab_widget_start_date' ) );
 
 		if (!class_exists('Eab_CalendarTable_UpcomingCalendarWidget')) require_once EAB_PLUGIN_DIR . 'lib/class_eab_calendar_helper.php';
 		$renderer = new Eab_CalendarTable_UpcomingCalendarWidget($events);
 		$renderer->set_class($category_class);
 		return $renderer->get_month_calendar($date);
 	}
+    
+    function eab_widget_start_date( $date )
+    {
+        return date( 'Y' ) . '-' . date( 'm' ) . '-' . date( 'd' ) . ' 00:00';
+    }
 	
 	function handle_calendar_request () {
 		$now = !empty($_POST['now']) ? (int)$_POST['now'] : false;
