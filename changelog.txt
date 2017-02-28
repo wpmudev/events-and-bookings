@@ -6,6 +6,7 @@ Changelog:
 1.9.5 - 2017-03-01
 ----------------------------------------------------------------------
 - Added: Define "EAB_UPCOMING_EVENT_FROM_TODAY" to show *only* upcoming events in upcoming events calendar widget
+- Fixed: Paypal Sandbox is not working
 - Fixed: Cancel and Delete attendence link is not working from front end
 - Fixed: RSVP is not working, sometimes user is attending even when user clicked on Maybe or Not Attending
 - Fixed: API Instruction tooltip for Facebook, Twitter and Google+
