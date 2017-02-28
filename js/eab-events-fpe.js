@@ -209,7 +209,7 @@ $(function () {
 		toggle_fee();
 	}
 	
-        $("body").on("click", ".eab-add_attendance .button", function () {
+    $("body").on("click", ".eab-add_attendance .button", function () {
 		var $root = $(".eab-add_attendance"),
 			event_id = $root.find(".eab-attendance-event_id").val()
 			email = $root.find(".eab-attendance-email").val(),
@@ -223,6 +223,37 @@ $(function () {
 			status: status
 		}, function (data) {
 			$(".eab-add_attendance-container").html(data);
+		});
+		return false;
+	});
+    
+    // Attendance deleting
+	$("body").on("click", ".eab-guest-delete_attendance", function () {
+		var $me = $(this);
+		var user_id = $me.attr("data-eab-user_id");
+		var post_id = $me.attr("data-eab-event_id");
+		$.post(ajaxurl, {
+			"action": "eab_delete_attendance",
+			"user_id": user_id,
+			"post_id": post_id
+		}, function (data) {
+			$(".eab-add_attendance-container").html(data);
+            window.location.reload();
+		});
+		return false;
+	});
+    
+    $("body").on("click", ".eab-guest-cancel_attendance", function () {
+		var $me = $(this);
+		var user_id = $me.attr("data-eab-user_id");
+		var post_id = $me.attr("data-eab-event_id");
+		$.post(ajaxurl, {
+			"action": "eab_cancel_attendance",
+			"user_id": user_id,
+			"post_id": post_id
+		}, function (data) {
+			$(".eab-add_attendance-container").html(data);
+            window.location.reload();
 		});
 		return false;
 	});
