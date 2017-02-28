@@ -37,19 +37,32 @@ module.exports = function( grunt ) {
         plugin_branches: {
 			include_files: [
 				'**',
+				'!**/css/src/**',
+				'!**/css/sass/**',
+				'!**/js/src/**',
+				'!**/js/vendor/**',
+				'!**/img/src/**',
 				'!**/node_modules/**',
+				'!**/tests/**',
 				'!**/releases/*.zip',
 				'!releases/*.zip',
-				'!**/releases/**',
+				'!**/release/**',
 				'!**/Gruntfile.js',
 				'!**/package.json',
 				'!**/build/**',
+                '!**/bin/**',
+                '!**/src/**',
+				'!app/assets/css/src/**',
+				'!app/assets/js/src/**',
+				'!app/assets/js/vendor/**',
+				'!app/assets/img/src/**',
 				'!node_modules/**',
 				'!.sass-cache/**',
 				'!releases/**',
 				'!Gruntfile.js',
 				'!package.json',
 				'!build/**',
+				'!tests/**',
 				'!.git/**',
 				'!.git',
 				'!**/.svn/**',
@@ -147,19 +160,23 @@ module.exports = function( grunt ) {
         },
         
         copy: {
-			src: conf.plugin_branches.include_files,
-			dest: 'releases/<%= pkg.name %>-<%= pkg.version %>/'
+            files: {
+                src: conf.plugin_branches.include_files,
+                dest: 'releases/<%= pkg.name %>-<%= pkg.version %>/'
+            }
 		},
         
         compress: {
-			options: {
-                mode: 'zip',
-                archive: './releases/<%= pkg.name %>-<%= pkg.version %>.zip'
-            },
-            expand: true,
-            cwd: 'releases/<%= pkg.version %>-<%= pkg.version %>/',
-            src: [ '**/*' ],
-            dest: conf.plugin_dir
+            files: {
+                options: {
+                    mode: 'zip',
+                    archive: './releases/<%= pkg.name %>-<%= pkg.version %>.zip'
+                },
+                expand: true,
+                cwd: 'releases/<%= pkg.name %>-<%= pkg.version %>/',
+                src: [ '**/*' ],
+                dest: conf.plugin_dir
+            }
 		},
         
         makepot: {
