@@ -39,22 +39,13 @@ ul.eab-guest-list li {
 	cursor: pointer;
 	border-width: 1px;
 	border-style: solid;
-	-moz-border-radius: 11px;
 	-khtml-border-radius: 11px;
-	-webkit-border-radius: 11px;
 	border-radius: 11px;
 	font-weight: bold;
 	margin-top: 10px;
-	-moz-box-sizing: content-box;
-	-webkit-box-sizing: content-box;
 	-khtml-box-sizing: content-box;
 	box-sizing: content-box;
 	background-color: #f6f6f6;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(246, 246, 246)), to(rgb(240, 239, 239)));
-	background-image: -webkit-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
-	background-image: -moz-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
-	background-image: -o-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
-	background-image: -ms-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
 	background-image: linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#f6f6f6', EndColorStr='#f0efef');
 }

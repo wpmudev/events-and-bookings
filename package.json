@@ -1,0 +1,44 @@
+{
+  "name": "events-and-bookings",
+  "title": "Events and Bookings",
+  "description": "Events gives you a flexible WordPress-based system for organizing parties, dinners, fundraisers - you name it.",
+  "version": "1.9.5",
+  "homepage": "http://premium.wpmudev.org/project/events-and-booking",
+  "author": [
+    {
+      "name": "S H Mohanjith"
+    },
+    {
+      "name": "Ve Bailovity"
+    },
+    {
+      "name": "Ignacio"
+    },
+    {
+      "name": "Ashok Kumar Nath"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Hoang Ngo"
+    },
+    {
+      "name": "Hakan Evin"
+    }
+  ],
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-autoprefixer": "^3.0.4",
+    "grunt-clear": "^0.2.1",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-compass": "^1.1.1",
+    "grunt-contrib-compress": "^1.4.1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "^2.0.0",
+    "grunt-contrib-rename": "0.0.3",
+    "grunt-contrib-uglify": "^2.1.0",
+    "grunt-wp-i18n": "^1.0.0",
+    "load-grunt-tasks": "^3.5.2",
+    "time-grunt": "^1.4.0"
+  }
+}

@@ -375,7 +375,7 @@ class Eab_Template {
 		if( trim( $data->get_option('paypal_email') ) != '' ) {
 		
 			$content .= $data->get_option('paypal_sandbox') 
-				? '<form action="https://sandbox.paypal.com/cgi-bin/webscr" method="post">'
+				? '<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">'
 				: '<form action="https://www.paypal.com/cgi-bin/webscr" method="post">'
 			;
 			$content .= '<input type="hidden" name="business" value="' . $data->get_option('paypal_email') . '" />';

@@ -1,7 +1,31 @@
 Plugin Name: Events
 Author: WPMU DEV
 
-Change Log:
+Changelog:
+----------------------------------------------------------------------
+1.9.5 - 2017-03-01
+----------------------------------------------------------------------
+- Added: Define "EAB_UPCOMING_EVENT_FROM_TODAY" to show *only* upcoming events in upcoming events calendar widget
+- Fixed: Paypal Sandbox is not working
+- Fixed: Cancel and Delete attendence link is not working from front end
+- Fixed: RSVP is not working, sometimes user is attending even when user clicked on Maybe or Not Attending
+- Fixed: API Instruction tooltip for Facebook, Twitter and Google+
+- Fixed: Users can't be added as attendee from front end
+- Fixed: Local timezone addon is not working for German locale
+- Fixed: No excerpt is showing in calendar shortcode
+- Fixed: Wrong URL when events slug is changed from dashboard
+- Fixed: Additional fiels can't be added in event settings
+- Fixed: Using manual payment, admin can approve once only
+- Fixed: Datepicker was not working in mobile device, chrome browser
+- Fixed: Social login style issue for UF themes
+- Fixed: Some notice generated in conflict with Google Maps plugin
+- Fixed: Some issues with calendar background colors
+
+----------------------------------------------------------------------
+1.9.4 - 2016-12-27
+----------------------------------------------------------------------
+- Version number fix
+
 ----------------------------------------------------------------------
 1.9.3 - 2016-12-27
 ----------------------------------------------------------------------
