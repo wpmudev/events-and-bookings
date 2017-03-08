@@ -258,6 +258,11 @@ class Eab_EventsHub {
 		    $user_id = apply_filters('eab-rsvp-user_id', $current_user->ID, $_POST['user_id']);
 
 		    do_action( 'incsub_event_booking', $event_id, $user_id, $booking_action );
+            
+            echo "<pre>";
+print_r($_POST);
+echo "</pre>";exit;
+            
 		    if (isset($_POST['action_yes'])) {
                                 $this->update_rsvp_per_event( $event_id, $user_id, 'yes' );
 				// --todo: Add to BP activity stream

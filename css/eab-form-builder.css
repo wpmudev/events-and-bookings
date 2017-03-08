@@ -1,0 +1,63 @@
+.eab_form_canvas{
+    width: 75%;
+    float: left;
+    padding: 15px;
+    box-sizing: border-box;
+}
+.eab_form_elements{
+    width: 25%;
+    float: left;
+    padding: 15px;
+    box-sizing: border-box;
+}
+.eab_clr{
+    clear: both;
+}
+
+.eab_element{
+    margin-bottom: 10px;
+    border: 1px dashed #999;
+    padding: 10px;
+    background: #ddd;
+    cursor: pointer;
+}
+
+.eab_form_stage{
+    min-height: 300px;
+    border: 1px dashed #999;
+    padding: 20px;
+}
+
+.eab_element_rendered{
+    background: #ddd;
+    border: 1px dashed #999;
+    padding: 0 10px 10px;
+    margin-bottom: 15px;
+}
+
+.eab_element_rendered h4{
+    background: #ccc;
+    padding: 10px;
+    border-bottom: 1px dashed #999;
+    cursor: pointer;
+}
+
+.eab_element_rendered h4 span{
+    font-size: 12px;
+    float: right;
+    cursor: pointer;
+}
+
+.eab_element_rendered_box{
+    padding: 0 10px;
+    display: none;
+}
+
+.eab_visible{
+    display: block !important;
+}
+
+.eab_rsvp_custom_form{
+    clear: both;
+    display: block;
+}

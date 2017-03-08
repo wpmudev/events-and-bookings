@@ -514,6 +514,7 @@ class Eab_Template {
 					'" />',
 					$event->get_id()
 				);
+                $content .= apply_filters( 'eab_rsvps_form_end_before', '' );
 				$content .= '</form>';
 			} else {
 				$login_url_y = apply_filters('eab-rsvps-rsvp_login_page-yes', wp_login_url(get_permalink($event->get_id())) . '&eab=y');
