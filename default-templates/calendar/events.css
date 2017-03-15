@@ -63,6 +63,10 @@ a.wpmudevevents-calendar-event:hover {
 	border-radius: 5px;
 }
 
+.wpmudevevents-calendar-event-info img{
+	display: block
+}
+
 /* ----- Shortcode ----- */
 
 .eab-shortcode_calendar .eab-shortcode_calendar-title-top, 
