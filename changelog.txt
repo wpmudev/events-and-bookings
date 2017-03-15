@@ -8,6 +8,7 @@ Changelog:
 
 - Added: Option to show event thumb in archive page
 - Added: Option to show event thumb in calendar template - filter added: eab_show_thumb_in_calendar_template
+- Updated: Shortcode documentation for network attribute
 
 ----------------------------------------------------------------------
 1.9.5 - 2017-03-01
