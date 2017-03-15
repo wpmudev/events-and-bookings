@@ -3,6 +3,7 @@
 class Eab_Template {
 	
 	public static function get_archive_content ($post, $content=false) {
+		
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
 		if ('incsub_event' != $event->get_type()) return $content;
 		
@@ -17,6 +18,14 @@ class Eab_Template {
 		$new_content  = '';
 		
 		$new_content .= '<div class="event ' . self::get_status_class($event) . '" itemscope itemtype="http://schema.org/Event">';
+
+		if( $content['with_thumbnail'] == 'yes' )
+		{
+			$new_content .= '<div class="event_sc_thumb">';
+			$new_content .= get_the_post_thumbnail( $event->get_id() );
+			$new_content .= '</div>';
+		}
+
 		$new_content .= '<meta itemprop="name" content="' . esc_attr($event->get_title()) . '" />';
 		$new_content .= '<a href="' . $link . '" class="wpmudevevents-viewevent">' .
 			__('View event', Eab_EventsHub::TEXT_DOMAIN) . 
@@ -709,7 +718,7 @@ class Eab_Template {
 			$out .= '<article class="eab-event ' . eab_call_template('get_status_class', $event) . '" id="eab-event-' . $event->get_id() . '">' .
 				'<h4>' . $event->get_title() . '</h4>' .
 				'<div class="eab-event-body">' .
-					eab_call_template('get_archive_content', $event) .
+					eab_call_template('get_archive_content', $event, $args) .
 				'</div>' .
 			'</article>';
 		}

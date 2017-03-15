@@ -277,6 +277,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'template' => 'get_shortcode_archive_output', // Subtemplate file, or template class call
 			'override_styles' => false,
 			'override_scripts' => false,
+			'with_thumbnail' => false
 		));
 
 		$shortcode = new Eab_Archive_Shortcode( $args );
