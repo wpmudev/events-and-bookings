@@ -227,7 +227,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'title' => __('Calendar shortcode', Eab_EventsHub::TEXT_DOMAIN),
 			'tag' => 'eab_calendar',
 			'arguments' => array(
-				'network' => array('help' => __('Query type', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'network' => array('help' => __('Query type (Required <a href="https://premium.wpmudev.org/project/post-indexer/" target="_blank">Post Indexer</a> plugin', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
 				'relative_date' => array('help' => __('A date relative to now or to date argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_strtotime'),
 				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
@@ -289,7 +289,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'title' => __('Archive shortcode', Eab_EventsHub::TEXT_DOMAIN),
 			'tag' => 'eab_archive',
 			'arguments' => array(
-				'network' => array('help' => __('Query type', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'network' => array('help' => __('Query type (Required <a href="https://premium.wpmudev.org/project/post-indexer/" target="_blank">Post Indexer</a> plugin)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
 				'relative_date' => array('help' => __('A date relative to now or to date argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_strtotime'),
 				'lookahead' => array('help' => __('Don\'t use default monthly page - use weeks count instead', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
