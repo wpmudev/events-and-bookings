@@ -3,6 +3,13 @@ Author: WPMU DEV
 
 Changelog:
 ----------------------------------------------------------------------
+1.9.6 - 2017-03-01
+----------------------------------------------------------------------
+
+- Added: Option to show event thumb in archive page
+- Added: Option to show event thumb in calendar template - filter added: eab_show_thumb_in_calendar_template
+
+----------------------------------------------------------------------
 1.9.5 - 2017-03-01
 ----------------------------------------------------------------------
 - Added: Define "EAB_UPCOMING_EVENT_FROM_TODAY" to show *only* upcoming events in upcoming events calendar widget
