@@ -68,11 +68,6 @@ class Eab_Events_RsvpEmail {
 			$codec->expand($body, Eab_Macro_Codec::FILTER_BODY),
 			$headers
 		);
-		ob_start();
-		print_r($headers);
-		$r = ob_get_clean();
-		error_log($user->user_email);
-		error_log($r);
 		remove_filter('wp_mail_content_type', array($this, 'email_charset'));
 	}
 
