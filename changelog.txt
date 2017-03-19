@@ -10,6 +10,7 @@ Changelog:
 - Added: Option to show event thumb in calendar template - filter added: eab_show_thumb_in_calendar_template
 - Added: Widget added for monthly archive navigation
 - Updated: Shortcode documentation for network attribute
+- Fixed: RSVP Email settings from name and email were not working
 
 ----------------------------------------------------------------------
 1.9.5 - 2017-03-01
