@@ -11,6 +11,8 @@ Changelog:
 - Added: Widget added for monthly archive navigation
 - Updated: Shortcode documentation for network attribute
 - Fixed: RSVP Email settings from name and email were not working
+- Fixed: RSVP Notification Email settings from name and email were not working
+- Fixed: Pagination was not working in eab_shortcode
 
 ----------------------------------------------------------------------
 1.9.5 - 2017-03-01

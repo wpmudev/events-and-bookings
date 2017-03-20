@@ -7,13 +7,13 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 
 	public function __construct( $args ) {
 		$this->args  = $args;
-		$this->query = $this->_to_query_args( $args );
 
 		if ( $this->args['paged'] ) {
 			$requested_page     = get_query_var( 'page' );
 			$requested_page     = $requested_page ? $requested_page : get_query_var( 'paged' );
 			$this->args['page'] = $requested_page ? $requested_page : $this->args['page'];
 		}
+		$this->query = $this->_to_query_args( $this->args );
 	}
 
 	public function output( $content = false ) {
