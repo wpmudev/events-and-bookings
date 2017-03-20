@@ -236,7 +236,7 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
                 <div class="eab_element_rendered" id="<%= data.uniqueID %>">
                     <input type="hidden" name="eab_rsvp_element[eab_element_id][]" value="<%= data.uniqueID %>">
                     <input type="hidden" name="eab_rsvp_element[<%= data.uniqueID %>][type]" value="dropdown">
-                    <h4>Dropdown <span>Remove</span></h4>
+                    <h4><?php _e( 'Dropdown', Eab_EventsHub::TEXT_DOMAIN ); ?> <span><?php _e( 'Remove', Eab_EventsHub::TEXT_DOMAIN ); ?></span></h4>
                     <div class="eab_element_rendered_box">
                         <table cellpadding="5" cellspacing="5" width="100%">
                             <tr>
@@ -276,17 +276,18 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
             <div class="eab_rsvp_custom_form">
                 <table cellpadding="5" cellspacing="5">
                 <?php foreach( $data['eab_element_id'] as $id ) : ?>
-                    <tr>
-                        <td><?php echo $data[$id]['label']; ?></td>
+					<?php $required = isset( $data[$id]['required'] ) ? $data[$id]['required'] : 0; ?>
+                    <tr class="eab_field_<?php echo $required == 1 ? 'required' : '' ?>">
+                        <td valign="top"><?php echo $data[$id]['label']; ?></td>
                         <?php if( $data[$id]['type'] != 'text' && $data[$id]['type'] != 'textarea' ) : ?>
-                        <td><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'], $data[$id]['values'] ) ?></td>
+                        <td class="eab_field_col"><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'], $data[$id]['values'] ) ?></td>
                         <?php else : ?>
-                        <td><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'] ) ?></td>
+                        <td class="eab_field_col"><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'] ) ?></td>
                         <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
                 </table>
-				<input class="button" type="submit" name="action_yes" value="<?php _e( 'Join', Eab_EventsHub::TEXT_DOMAIN ); ?>">
+				<input class="button eab_rsvp_form_submit" type="submit" name="action_yes" value="<?php _e( 'Join', Eab_EventsHub::TEXT_DOMAIN ); ?>">
             </div>
             <?php endif; ?>
             <?php
