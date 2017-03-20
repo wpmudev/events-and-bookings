@@ -68,7 +68,7 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
                 <h3 class="eab-hndle"><?php _e( 'RSVP Builder', Eab_EventsHub::TEXT_DOMAIN ); ?></h3>
                 <div class="eab_form_wrap">
                     <div class="eab_form_canvas">
-                        <h4><?php _e( 'Select element from left side', Eab_EventsHub::TEXT_DOMAIN ); ?></h4>
+                        <h4><?php _e( 'Select element from right side', Eab_EventsHub::TEXT_DOMAIN ); ?></h4>
                         <div class="eab_form_stage">
                             
                             <?php if( isset( $data['eab_element_id'] ) && count( $data['eab_element_id'] ) > 0 ) : ?>
