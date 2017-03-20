@@ -1,7 +1,7 @@
 <?php
 /*
-Plugin Name: Event RSVP Form
-Description: A form builder to create your own RSVP form
+Plugin Name: Event RSVP Form (Beta)
+Description: A form builder to create your own RSVP form. Please make sure, "Additional registration fields", "RSVP with email address" and "Allow Facebook and Twitter Login?" are disabled.
 Plugin URI: http://premium.wpmudev.org/project/events-and-booking
 Version: 0.1 - Beta
 Author: WPMU DEV
@@ -33,31 +33,36 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
             add_action( 'eab-settings-after_appearance_settings', array( $this, 'show_settings' ) );
             add_filter( 'eab-settings-before_save', array( $this, 'save_settings' ) );
             add_filter( 'eab_rsvps_form_end_before', array( $this, 'insert_custom_rsvp_form' ) );
+			add_action( 'incsub_event_booking_yes_meta', array( $this, 'save_custom_form_values' ), 99, 3 );
+			add_filter( 'eab_guest_list_username_after', array( $this, 'display_rsvp_extra_information' ), 99, 4 );
         }
         
         public function register_scripts()
         {
-            wp_enqueue_script(
-                'eab-form-builder-script',
-                plugins_url( 'events-and-bookings/js/' ) . 'eab-form-builder.js',
-                array( 'jquery', 'underscore' ),
-                Eab_EventsHub::CURRENT_VERSION,
-                true
-            );
-            
             wp_enqueue_style(
                 'eab-form-builder-style',
                 plugins_url( 'events-and-bookings/css/' ) . 'eab-form-builder.css',
                 '',
                 Eab_EventsHub::CURRENT_VERSION
             );
+			
+			wp_enqueue_script(
+                'eab-form-builder-script',
+                plugins_url( 'events-and-bookings/js/' ) . 'eab-form-builder.js',
+                array( 'jquery', 'underscore' ),
+                //Eab_EventsHub::CURRENT_VERSION,
+				filemtime( EAB_PLUGIN_DIR . 'js/eab-form-builder.js' ),
+                true
+            );
+			wp_localize_script( 'eab-form-builder-script', 'eabRSVP', array(
+																		   'logged_in' => is_user_logged_in()
+																	) );
+
         }
         
         public function show_settings()
         {
-            $data = $this->_data->get_option( 'eab_rsvp_element' );echo "<pre>";
-print_r($data);
-echo "</pre>";
+            $data = $this->_data->get_option( 'eab_rsvp_element' );
             ?>
             <div id="eab-settings-rsvp-custom-form" class="eab-metabox postbox">
                 <h3 class="eab-hndle"><?php _e( 'RSVP Builder', Eab_EventsHub::TEXT_DOMAIN ); ?></h3>
@@ -281,6 +286,7 @@ echo "</pre>";
                     </tr>
                 <?php endforeach; ?>
                 </table>
+				<input class="button" type="submit" name="action_yes" value="<?php _e( 'Join', Eab_EventsHub::TEXT_DOMAIN ); ?>">
             </div>
             <?php endif; ?>
             <?php
@@ -307,7 +313,7 @@ echo "</pre>";
                     $values_trimmed = array_map( 'trim', $values );
                     foreach( $values_trimmed as $key => $value )
                     {
-                        $html .= '<label><input type="radio" name="eab_rsvp_custom_form[' . $this->_label_to_name( $label ) . ']" value="' . $value . '"> ' . $values[$key] . ' ';
+                        $html .= '<label><input type="radio" name="eab_rsvp_custom_form[' . $this->_label_to_name( $label ) . ']" value="' . $value . '"> ' . $values[$key] . ' </label>';
                     }
                     break;
                 
@@ -317,7 +323,7 @@ echo "</pre>";
                     $values_trimmed = array_map( 'trim', $values );
                     foreach( $values_trimmed as $key => $value )
                     {
-                        $html .= '<label><input type="checkbox" name="eab_rsvp_custom_form[' . $this->_label_to_name( $label ) . '][]" value="' . $value . '"> ' . $values[$key] . ' ';
+                        $html .= '<label><input type="checkbox" name="eab_rsvp_custom_form[' . $this->_label_to_name( $label ) . '][]" value="' . $value . '"> ' . $values[$key] . ' </label>';
                     }
                     break;
                 
@@ -340,6 +346,37 @@ echo "</pre>";
         {
             return strtolower( str_replace( ' ', '_', $label ) );
         }
+		
+		public function save_custom_form_values( $event_id, $user_id, $post )
+		{
+			update_user_meta( $user_id, $this->_create_user_meta_name( $event_id, $user_id ), $post['eab_rsvp_custom_form'] );
+		}
+		
+		protected function _create_user_meta_name( $event_id, $user_id )
+		{
+			return 'eab_event_form_' . $event_id . '_user_' . $user_id;
+		}
+		
+		public function display_rsvp_extra_information( $content, $event, $user_id, $user_data )
+		{
+			$user_meta = get_user_meta( $user_id, $this->_create_user_meta_name( $event->get_id(), $user_id ) );
+			$data = $this->_data->get_option( 'eab_rsvp_element' );
+			
+			$html = '';
+			$html .= '<div class="rsvp_extra_info">';
+				foreach( $data['eab_element_id'] as $id ) :
+				$html .= '<div class="rsvp_extra_info_fields">';
+					$value = $user_meta[0][ $this->_label_to_name( $data[$id]['label'] ) ];
+					
+					if( is_array( $value ) ) $value = implode( ', ', $value );
+					
+					$html .= $data[$id]['label'] . ': ' . $value;
+				$html .= '</div>';
+				endforeach;
+			$html .= '</div>';
+			
+			return $content . $html;
+		}
         
     }
     

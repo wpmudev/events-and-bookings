@@ -293,6 +293,9 @@ class Eab_Template {
 				'<br />' .
 				apply_filters('eab-guest_list-admin-guest_name', $user_data->display_name, $booking->user_id, $user_data) .
 			'</a>';
+			
+			$content .= apply_filters( 'eab_guest_list_username_after', '', $event, $booking->user_id, $user_data );
+			
 			if ($event->is_premium()) {
 				if ($event->user_paid($booking->user_id)) {
 					$ticket_count = $event->get_booking_meta($booking->id, 'booking_ticket_count');

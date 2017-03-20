@@ -59,7 +59,18 @@
     var RSVP = {
         
         init: function() {
+            if( eabRSVP.logged_in == 1 )
+            {
+                $( document ).on( 'click', '.wpmudevevents-yes-submit', this.appear_custom_fields );
+            }
+        },
+        
+        appear_custom_fields: function( e ) {
+            e.preventDefault();
             
+            $( this ).next( '.eab_rsvp_custom_form' ).slideDown();
+            
+            return false;
         }
         
     };

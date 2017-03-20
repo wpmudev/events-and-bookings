@@ -61,3 +61,11 @@
     clear: both;
     display: block;
 }
+
+.eab_rsvp_custom_form{
+    display: none;
+}
+
+.rsvp_extra_info{
+    margin: 20px 0;
+}

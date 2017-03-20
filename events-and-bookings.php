@@ -259,14 +259,11 @@ class Eab_EventsHub {
 
 		    do_action( 'incsub_event_booking', $event_id, $user_id, $booking_action );
             
-            echo "<pre>";
-print_r($_POST);
-echo "</pre>";exit;
-            
 		    if (isset($_POST['action_yes'])) {
                                 $this->update_rsvp_per_event( $event_id, $user_id, 'yes' );
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_yes', $event_id, $user_id );
+				do_action( 'incsub_event_booking_yes_meta', $event_id, $user_id, $_POST );
 				$this->recount_bookings($event_id);
 				//wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES));
                                 wp_redirect(
