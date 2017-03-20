@@ -55,7 +55,8 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
                 true
             );
 			wp_localize_script( 'eab-form-builder-script', 'eabRSVP', array(
-																		   'logged_in' => is_user_logged_in()
+																		   'logged_in' => is_user_logged_in(),
+																		   'error_msg' => __( 'You have missed one or more required fields', Eab_EventsHub::TEXT_DOMAIN )
 																	) );
 
         }
@@ -278,7 +279,7 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
                 <?php foreach( $data['eab_element_id'] as $id ) : ?>
 					<?php $required = isset( $data[$id]['required'] ) ? $data[$id]['required'] : 0; ?>
                     <tr class="eab_field_<?php echo $required == 1 ? 'required' : '' ?>">
-                        <td valign="top"><?php echo $data[$id]['label']; ?></td>
+                        <td valign="top"><?php echo $data[$id]['label']; ?> <?php echo $required == 1 ? '*' : '' ?></td>
                         <?php if( $data[$id]['type'] != 'text' && $data[$id]['type'] != 'textarea' ) : ?>
                         <td class="eab_field_col"><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'], $data[$id]['values'] ) ?></td>
                         <?php else : ?>
@@ -287,6 +288,7 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
                     </tr>
                 <?php endforeach; ?>
                 </table>
+				<div class="eab_rsvp_form_error_msg"></div>
 				<input class="button eab_rsvp_form_submit" type="submit" name="action_yes" value="<?php _e( 'Join', Eab_EventsHub::TEXT_DOMAIN ); ?>">
             </div>
             <?php endif; ?>

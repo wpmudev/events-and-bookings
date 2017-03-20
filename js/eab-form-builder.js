@@ -54,8 +54,6 @@
     
     Builder.init();
     
-    
-    
     var RSVP = {
         
         init: function() {
@@ -74,8 +72,9 @@
             return false;
         },
         
-        vefiry_form: function( e ) {
-            e.preventDefault();
+        vefiry_form: function() {
+            
+            $( '.eab_rsvp_form_error_msg' ).html( '' );
             
             var parentClass = '.eab_field_required',
                 fieldCol = '.eab_field_col',
@@ -94,17 +93,17 @@
                             hasError = true;
                         }
                     }
-                    else if( type == 'checkbox' )
+                    else if( type == 'checkbox' && ! hasError )
                     {
                         hasError = true;
                         elem.closest( fieldCol ).find( 'input[type="checkbox"]' ).each(function() {
-                            if( $(this).is( ':checked' ) ){alert(123);
+                            if( $(this).is( ':checked' ) ){
                                 hasError = false;
                                 return;
                             }
                         });
                     }
-                    else if( type == 'radio' )
+                    else if( type == 'radio' && ! hasError )
                     {
                         hasError = true;
                         elem.closest( fieldCol ).find( 'input[type="radio"]' ).each(function() {
@@ -115,71 +114,28 @@
                         });
                     }
                 }
-                
-                /*if( objCol.find( 'input[type="text"]' ).length )
+                else if( objCol.find( 'select' ).length > 0 )
                 {
-                    field = 'text';
-                }
-                else if( objCol.find( 'input[type="checkbox"]' ) )
-                {
-                    field = 'checkbox';
-                }
-                else if( objCol.find( 'input[type="radio"]' ).length )
-                {
-                    field = 'radio';
-                }
-                else if( objCol.find( 'select' ).length )
-                {
-                    field = 'dropdown';
-                }
-                else if( objCol.find( 'textarea' ).length )
-                {
-                    field = 'textarea';
-                }
-                
-                switch( field ) {
-                    case 'text':
-                        if( objCol.find( 'input[type="text"]' ).val() == '' )
-                        {alert(123);
-                            hasError = true;
-                        }
-                        break;
-                    
-                    case 'checkbox':
+                    if( objCol.find( 'select' ).val() === '' ) {
                         hasError = true;
-                        objCol.find( 'input[type="checkbox"]' ).each(function() {
-                            if( $( this ).is( ':checked' ) )
-                            {alert(1234);
-                                hasError = false;
-                                
-                            }
-                        });
-                        break;
-                    
-                    case 'radio':
-                        if( objCol.find( 'input[type="radio"]:checked' ).val() == '' )
-                        {alert(1237);
-                            hasError = true;
-                        }
-                        break;
-                    
-                    case 'dropdown':
-                        if( objCol.find( 'select' ).val() == '' )
-                        {alert(129);
-                            hasError = true;
-                        }
-                        break;
-                    
-                    case 'textarea':
-                        if( objCol.find( 'textarea' ).val() == '' )
-                        {alert(12322);
-                            hasError = true;
-                        }
-                        break;
-                }*/
+                    }
+                }
+                else if( objCol.find( 'textarea' ).length > 0 )
+                {
+                    if( objCol.find( 'textarea' ).val() === '' ) {
+                        hasError = true;
+                    }
+                }
             });
             
-            console.log(hasError);
+            if( hasError )
+            {
+                $( '.eab_rsvp_form_error_msg' ).html( eabRSVP.error_msg );
+            }
+            else
+            {
+                return true;
+            }
             
             return false;
         }
