@@ -36,6 +36,7 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
 			add_action( 'incsub_event_booking_yes_meta', array( $this, 'save_custom_form_values' ), 99, 3 );
 			add_filter( 'eab_guest_list_username_after', array( $this, 'display_rsvp_extra_information' ), 99, 4 );
 			add_action( 'template_redirect', array( $this, 'save_visitors_rsvp_info' ) );
+			add_filter( 'eab-exporter-csv-row', array( $this, 'add_additional_data_in_csv_header' ), 99, 5 );
         }
         
         public function register_scripts()
@@ -444,6 +445,22 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
 			wp_set_current_user( $user->ID, $user->user_login );
 			wp_set_auth_cookie( $user->ID ); // Logged in with email, yay
 			do_action( 'wp_login', $user->user_login );
+		}
+		
+		public function add_additional_data_in_csv_header( $headers, $event, $booking, $user_data )
+		{
+			$user_meta = get_user_meta( $user_data->id, $this->_create_user_meta_name( $event->get_id(), $user_data->id ) );
+			$data = $this->_data->get_option( 'eab_rsvp_element' );
+			
+			foreach( $data['eab_element_id'] as $id )
+			{
+				$value = $user_meta[0][ $this->_label_to_name( $data[$id]['label'] ) ];
+				if( is_array( $value ) ) $value = implode( ', ', $value );
+				
+				$headers[ $data[$id]['label'] ] = $value;
+			}
+			
+			return $headers;
 		}
         
     }

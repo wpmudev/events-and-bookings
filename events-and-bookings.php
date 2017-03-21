@@ -251,8 +251,8 @@ class Eab_EventsHub {
 	function process_rsvps ( $event_id = null, $user_id = null ) {
 		global $wpdb, $current_user;
 		
-		if( null == $event_id ) $event_id = $_POST['event_id'];
-		if( null == $user_id ) $user_id = $_POST['user_id'];
+		if( null == $event_id ) $event_id = isset( $_POST['event_id'] ) ? $_POST['event_id'] : null;
+		if( null == $user_id ) $user_id = isset( $_POST['user_id'] ) ? $_POST['user_id'] : null;
 		
 		if (isset($event_id) && isset($user_id)) {
 		    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
