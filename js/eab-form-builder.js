@@ -57,11 +57,11 @@
     var RSVP = {
         
         init: function() {
-            if( eabRSVP.logged_in == 1 )
-            {
+            //if( eabRSVP.logged_in == 1 )
+            //{
                 $( document ).on( 'click', '.wpmudevevents-yes-submit', this.appear_custom_fields );
                 $( document ).on( 'click', '.eab_rsvp_form_submit', this.vefiry_form );
-            }
+            //}
         },
         
         appear_custom_fields: function( e ) {

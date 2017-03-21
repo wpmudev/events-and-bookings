@@ -75,7 +75,7 @@ class Eab_Events_RsvpWithEmail {
 
 		if (empty($user_id) || is_wp_error($user_id)) return false;
 
-// Notification email??
+		// Notification email??
 		wp_new_user_notification($user_id, $password);
 
 		return get_userdata($user_id);

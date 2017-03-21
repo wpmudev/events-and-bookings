@@ -542,6 +542,7 @@ class Eab_Template {
 					'" >'.__('I\'m Attending', Eab_EventsHub::TEXT_DOMAIN).'</a>',
 					$event->get_id()
 				);
+				$content .= apply_filters( 'eab_rsvps_form_end_before', '' );
 			}
 		}
 		

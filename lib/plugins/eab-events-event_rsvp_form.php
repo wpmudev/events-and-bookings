@@ -35,6 +35,7 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
             add_filter( 'eab_rsvps_form_end_before', array( $this, 'insert_custom_rsvp_form' ) );
 			add_action( 'incsub_event_booking_yes_meta', array( $this, 'save_custom_form_values' ), 99, 3 );
 			add_filter( 'eab_guest_list_username_after', array( $this, 'display_rsvp_extra_information' ), 99, 4 );
+			add_action( 'template_redirect', array( $this, 'save_visitors_rsvp_info' ) );
         }
         
         public function register_scripts()
@@ -274,23 +275,37 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
             $data = $this->_data->get_option( 'eab_rsvp_element' );
             ?>
             <?php if( isset( $data['eab_element_id'] ) && count( $data['eab_element_id'] ) > 0 ) : ?>
-            <div class="eab_rsvp_custom_form">
-                <table cellpadding="5" cellspacing="5">
-                <?php foreach( $data['eab_element_id'] as $id ) : ?>
-					<?php $required = isset( $data[$id]['required'] ) ? $data[$id]['required'] : 0; ?>
-                    <tr class="eab_field_<?php echo $required == 1 ? 'required' : '' ?>">
-                        <td valign="top"><?php echo $data[$id]['label']; ?> <?php echo $required == 1 ? '*' : '' ?></td>
-                        <?php if( $data[$id]['type'] != 'text' && $data[$id]['type'] != 'textarea' ) : ?>
-                        <td class="eab_field_col"><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'], $data[$id]['values'] ) ?></td>
-                        <?php else : ?>
-                        <td class="eab_field_col"><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'] ) ?></td>
-                        <?php endif; ?>
-                    </tr>
-                <?php endforeach; ?>
-                </table>
-				<div class="eab_rsvp_form_error_msg"></div>
-				<input class="button eab_rsvp_form_submit" type="submit" name="action_yes" value="<?php _e( 'Join', Eab_EventsHub::TEXT_DOMAIN ); ?>">
-            </div>
+			<div class="eab_rsvp_custom_form">
+				<?php if( ! is_user_logged_in() ) : global $post; ?>
+				<form action="#" method="post">
+				<input type="hidden" name="eab_rsvp_custom_form_with_email" value="1">
+				<input type="hidden" name="eab_rsvp_custom_form[eab_event_id]" value="<?php echo $post->ID ?>">
+				<?php endif; ?>
+					<table cellpadding="5" cellspacing="5">
+					<?php foreach( $data['eab_element_id'] as $id ) : ?>
+						<?php $required = isset( $data[$id]['required'] ) ? $data[$id]['required'] : 0; ?>
+						<tr class="eab_field_<?php echo $required == 1 ? 'required' : '' ?>">
+							<td valign="top"><?php echo $data[$id]['label']; ?> <?php echo $required == 1 ? '*' : '' ?></td>
+							<?php if( $data[$id]['type'] != 'text' && $data[$id]['type'] != 'textarea' ) : ?>
+							<td class="eab_field_col"><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'], $data[$id]['values'] ) ?></td>
+							<?php else : ?>
+							<td class="eab_field_col"><?php echo $this->_render_element( $data[$id]['type'], $data[$id]['label'] ) ?></td>
+							<?php endif; ?>
+						</tr>
+					<?php endforeach; ?>
+					<?php if( ! is_user_logged_in() ) : ?>
+						<tr class="eab_field_required">
+							<td valign="top"><?php _e( 'Email', Eab_EventsHub::TEXT_DOMAIN ); ?> *</td>
+							<td class="eab_field_col"><?php echo $this->_render_element( 'text', 'eab_email' ) ?></td>
+						</tr>
+					<?php endif; ?>
+					</table>
+					<div class="eab_rsvp_form_error_msg"></div>
+					<input class="button eab_rsvp_form_submit" type="submit" name="action_yes" value="<?php _e( 'Join', Eab_EventsHub::TEXT_DOMAIN ); ?>">
+				<?php if( ! is_user_logged_in() ) : ?>
+				</form>
+				<?php endif; ?>
+			</div>
             <?php endif; ?>
             <?php
             $html = $html . ob_get_clean();
@@ -379,6 +394,56 @@ if( ! class_exists( 'Eab_Events_CustomRSVPForm' ) )
 			$html .= '</div>';
 			
 			return $content . $html;
+		}
+		
+		public function save_visitors_rsvp_info()
+		{
+			
+			
+			if( isset( $_POST['eab_rsvp_custom_form_with_email'] ) && $_POST['eab_rsvp_custom_form_with_email'] == 1 )
+			{
+				$eab_rsvp_custom_form = $_POST['eab_rsvp_custom_form'];
+				$user = $this->_create_user( $eab_rsvp_custom_form['eab_email'] );
+				
+				if ( is_object( $user ) && ! empty( $user->ID ) )
+				{
+					$this->_login_user( $user );
+					$eab = events_and_bookings();
+					$eab->process_rsvps( $eab_rsvp_custom_form['eab_event_id'], $user->ID );
+				}
+			}
+			
+		}
+		
+		private function _create_user ( $email )
+		{
+			list( $username, $domain ) = explode( '@', $email, 2 );
+			$username = sanitize_user( trim( $username ) );
+			while ( username_exists( $username ) ) {
+				$username .= rand( 0, 9 );
+			}
+	
+			$password = wp_generate_password( 12, false );
+			$user_id = wp_create_user( $username, $password, $email );
+	
+			if ( empty( $user_id ) || is_wp_error( $user_id ) ) return false;
+	
+			// Notification email??
+			if( apply_filters( 'eab_custom_rsvp_user_notification_mail', true ) )
+			{
+				wp_new_user_notification( $user_id, $password );
+			}
+	
+			return get_userdata( $user_id );
+			
+		}
+		
+		private function _login_user ( $user )
+		{
+			if ( empty( $user->ID ) || empty( $user->user_login ) ) return false;
+			wp_set_current_user( $user->ID, $user->user_login );
+			wp_set_auth_cookie( $user->ID ); // Logged in with email, yay
+			do_action( 'wp_login', $user->user_login );
 		}
         
     }
