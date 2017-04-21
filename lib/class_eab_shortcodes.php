@@ -330,6 +330,13 @@ class Eab_Shortcodes extends Eab_Codec {
 		));
 
 		$query = $this->_to_query_args($args);
+
+		$order_method = $args['order']
+			? create_function('', 'return "' . $args['order'] . '";')
+			: false
+		;
+		if ($order_method) add_filter('eab-collection-date_ordering_direction', $order_method);
+
 		$events = Eab_CollectionFactory::get_expired_events($query);
 
 		$output = Eab_Template::util_apply_shortcode_template($events, $args);//eab_call_template('util_apply_shortcode_template', $events, $args);

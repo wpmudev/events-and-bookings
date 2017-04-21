@@ -318,6 +318,16 @@ class Eab_ArchivedCollection extends Eab_Collection {
  * All expired events
  */
 class Eab_ExpiredCollection extends Eab_Collection {
+	public function __construct ($args=array()) {
+		Eab_Filter::start_date_ordering_set_up();
+		add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));
+		parent::__construct($args);
+		Eab_Filter::start_date_ordering_tear_down();
+	}
+
+	public function propagate_direction_filter ($direction) {
+		return apply_filters('eab-collection-date_ordering_direction', $direction);
+	}
 
 	public function build_query_args ($original) {
 
