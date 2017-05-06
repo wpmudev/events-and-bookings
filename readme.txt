@@ -3,7 +3,7 @@ Contributors: mohanjith
 Tags: events, booking
 Requires at least: 3.3
 Stable tag: trunk
-Tested up to: 3.3.1
+Tested up to: 4.7.4
 
 Allow your readers to register for events you organize
 
@@ -14,6 +14,10 @@ Allow your readers to register for events you organize
 * Please note we will be automatically changing WPMU DEV Google Maps Plugin Settings if installed *
 
 == ChangeLog ==
+
+= 1.0.2 =
+
+* Allow "No Start Time" and "No End Time" in front end event editor
 
 = 1.0.1 =
 
