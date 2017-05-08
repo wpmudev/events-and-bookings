@@ -128,6 +128,22 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 }
 // End Category sorting in default WP requests
 
+// Archive sorting and pagination in default WP requests
+function _eab_dispatch_event_archives($query) {
+    global $wp_query;
+
+    if ( is_admin() || !$wp_query->is_main_query() || !is_post_type_archive('incsub_event') ) return;
+    $data = Eab_Options::get_instance();
+    if ( $pagination = $data->get_option('pagination') ) {
+        $query->set( 'posts_per_page', $pagination );
+    }
+    if ( $data->get_option('ordering_direction') ) {
+        add_filter( 'eab-ordering-date_ordering_direction', function() {return 'DESC';} );
+    }
+}
+add_action('pre_get_posts', '_eab_dispatch_event_archives');
+// End Archive sorting and pagination in default WP requests
+
 // Admin side - ensure Maps availability for subscribers
 function eab_to_agm__ensure_subscribers_maps () {
 	global $post;
