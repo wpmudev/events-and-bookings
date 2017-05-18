@@ -534,7 +534,8 @@ abstract class Eab_FB_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 		$raw_token = $this->_verify_authentication_code();
 		if (!$raw_token) die;
 
-		parse_str($raw_token, $token_data);
+		//parse_str($raw_token, $token_data);
+		$token_data = json_decode($raw_token, true);
 		if (empty($token_data['access_token'])) die;
 
 		$short_token = $token_data['access_token'];
@@ -542,7 +543,8 @@ abstract class Eab_FB_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 		$this->set_parameter('fb_exchange_token', $short_token, self::SCOPE_REFRESH);
 		$raw_token = $this->_refresh_authentication_code();
 		if (!$raw_token) die;
-		parse_str($raw_token, $token_data);
+		//parse_str($raw_token, $token_data);
+		$token_data = json_decode($raw_token, true);
 
 		$token_data['time'] = time();
 
