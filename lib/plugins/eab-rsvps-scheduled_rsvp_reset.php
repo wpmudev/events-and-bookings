@@ -82,6 +82,7 @@ class Eab_Rsvps_RsvpAutoReset {
 			'43200' => __('Twelve hours', Eab_EventsHub::TEXT_DOMAIN),
 			'86400' => __('Day', Eab_EventsHub::TEXT_DOMAIN),
 		);
+		$runs = apply_filters( 'eab_rsvp_scheduled_rsvp_reset_cron_times', $runs );
 		$run_each = $this->_data->get_option('rsvp_auto_reset-run_each');
 		$run_each = $run_each ? $run_each : 3600;
 
