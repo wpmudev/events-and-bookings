@@ -303,7 +303,9 @@ function authenticate () {
 $(function () {
 	$("#fbe_import-authenticate").on("click", authenticate);
 	$("#fbe_import-reset").on("click", function () {
-		$.post(ajaxurl, {"action": "eab_fbe_import_reset"}, window.location.reload);
+		$.post(ajaxurl, {"action": "eab_fbe_import_reset"}, function() {
+			window.location.reload();
+		});
 		return false;
 	});
 	$("#fbe_import-resync").on("click", function () {
