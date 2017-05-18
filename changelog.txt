@@ -9,6 +9,7 @@ Changelog:
 - Added: Option to show event thumb in archive page
 - Added: Option to show event thumb in calendar template - filter added: eab_show_thumb_in_calendar_template
 - Added: Widget added for monthly archive navigation
+- Added: Filter - eab_rsvp_scheduled_rsvp_reset_cron_times to modify the reset settings cron job times
 - Updated: Shortcode documentation for network attribute
 - Fixed: RSVP Email settings from name and email were not working
 - Fixed: RSVP Notification Email settings from name and email were not working
