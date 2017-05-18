@@ -376,7 +376,9 @@ class Eab_MP_Bridge {
 
 	}
         
-        function process_event_payment_forms ($form, $event_id) {
+    function process_event_payment_forms ($form, $event_id) {
+		$product_id = get_post_meta($event_id, 'eab_product_id', true);
+		if( !isset( $product_id ) || empty( $product_id ) ) return $form;
 		if (!$this->_is_mp_present()) return $form;
 		return '<p><a href="' . esc_url(mp_cart_link(false, true)) . '">' . __('Click here to purchase your ticket', Eab_EventsHub::TEXT_DOMAIN) . '</a></p>';
 	}
