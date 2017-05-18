@@ -15,6 +15,7 @@ Changelog:
 - Fixed: Pagination was not working in eab_shortcode
 - Fixed: FB Integration in Events+ doesn't work after authorization
 - Fixed: FB authenticate reset was not working
+- Fixed: Events+ MarketPress Add-on Breaks Regular Paid Events
 
 ----------------------------------------------------------------------
 1.9.5 - 2017-03-01
