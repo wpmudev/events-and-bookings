@@ -17,6 +17,7 @@ Changelog:
 - Fixed: FB Integration in Events+ doesn't work after authorization
 - Fixed: FB authenticate reset was not working
 - Fixed: Events+ MarketPress Add-on Breaks Regular Paid Events
+- Fixed: Notice on undefined variable post_type when M2 and E+ are active together
 
 ----------------------------------------------------------------------
 1.9.5 - 2017-03-01
