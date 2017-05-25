@@ -150,7 +150,9 @@ class Eab_EventsHub {
 
     public function reverse_m2_modified_event_cpt( $wp_query, $obj )
     {
-        if( is_array( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'][0] == Eab_EventModel::POST_TYPE )
+        if( ! isset( $wp_query->query_vars['post_type'] ) ) return;
+		
+		if( is_array( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'][0] == Eab_EventModel::POST_TYPE )
         {
                 $wp_query->query_vars['post_type'] = Eab_EventModel::POST_TYPE;
         }
