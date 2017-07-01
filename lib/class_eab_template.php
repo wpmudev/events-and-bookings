@@ -554,7 +554,11 @@ class Eab_Template {
 
 		if ($event->has_venue()) {
 			$venue = $event->get_venue_location(Eab_EventModel::VENUE_AS_ADDRESS);
-			$content .= "<div class='wpmudevevents-location' itemprop='location'>{$venue}</div>";
+			$content .= "<div class='wpmudevevents-location' itemprop='location' itemscope itemtype='http://schema.org/Place'>
+                            <span itemprop='name'>{$venue}</span>
+                            <span itemprop='address' itemscope itemtype='http://schema.org/PostalAddress'></span>
+                        </div>';
+                            
 		}
 		if ($event->is_premium()) {
 			$price = $event->get_price();
