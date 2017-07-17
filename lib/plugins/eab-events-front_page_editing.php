@@ -269,6 +269,10 @@ class Eab_Events_FrontPageEditing {
 		update_post_meta($post_id, 'incsub_event_start', $start);
 		update_post_meta($post_id, 'incsub_event_end', $end);
 		update_post_meta($post_id, 'incsub_event_status', strip_tags($data['status']));
+		
+		//specify if the event has start and end time or not.
+		if ( $data['has_start'] == 0 ) update_post_meta($post_id, 'incsub_event_no_start',1);			
+		if ( $data['has_end'] == 0 ) update_post_meta($post_id, 'incsub_event_no_end',1);
 
 		$venue_map = get_post_meta($post_id, 'agm_map_created', true);
 		if (!$venue_map && $data['venue'] && class_exists('AgmMapModel')) {
@@ -388,6 +392,7 @@ class Eab_Events_FrontPageEditing {
 		$ret .= '<label>' . __('Starts on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
 		$ret .= ' <input type="text" name="" id="eab-events-fpe-start_date" value="' . date('Y-m-d', $start) . '" size="10" />';
 		$ret .= ' <input type="text" name="" id="eab-events-fpe-start_time" value="' . date('H:i', $start) . '" size="3" />';
+		$ret .= ' <input id="incsub_event_no_start_time_0" class="incsub_event incsub_event_time incsub_event_no_start_time" name="incsub_event_no_start_time[0]" value="1" type="checkbox"> No Start Time';
 		$ret .= '</div>';
 
 		// End date/time
@@ -397,8 +402,9 @@ class Eab_Events_FrontPageEditing {
 		$ret .= '<label>' . __('Ends on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
 		$ret .= ' <input type="text" name="" id="eab-events-fpe-end_date" value="' . date('Y-m-d', $end) . '" size="10" />';
 		$ret .= ' <input type="text" name="" id="eab-events-fpe-end_time" value="' . date('H:i', $end) . '" size="3" />';
+		$ret .= ' <input id="incsub_event_no_end_time_0" class="incsub_event incsub_event_time incsub_event_no_end_time" name="incsub_event_no_end_time[0]" value="1" type="checkbox"> No End Time';
 		$ret .= '</div>';
-
+		
 		// End date, time, venue
 		$ret .= '</div>';
 
