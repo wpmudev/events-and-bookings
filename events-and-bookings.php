@@ -341,6 +341,9 @@ class Eab_EventsHub {
 						    return false;
 						}
 				    }
+				}else{
+					//If map does not exists in the events venu meta field then we have to remove its attachment with even too. 
+					delete_post_meta($post->ID, 'agm_map_created' );
 				}
 		    }
 
