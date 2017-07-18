@@ -19,7 +19,7 @@ class Eab_Template {
 		
 		$new_content .= '<div class="event ' . self::get_status_class($event) . '" itemscope itemtype="http://schema.org/Event">';
 
-		if( $content['with_thumbnail'] == 'yes' )
+		if( !empty( $content['with_thumbnail'] ) && $content['with_thumbnail'] == 'yes' )
 		{
 			$new_content .= '<div class="event_sc_thumb">';
 			$new_content .= get_the_post_thumbnail( $event->get_id() );
@@ -566,7 +566,11 @@ class Eab_Template {
 
 		if ($event->has_venue()) {
 			$venue = $event->get_venue_location(Eab_EventModel::VENUE_AS_ADDRESS);
-			$content .= "<div class='wpmudevevents-location' itemprop='location'>{$venue}</div>";
+			$content .= "<div class='wpmudevevents-location' itemprop='location' itemscope itemtype='http://schema.org/Place'>
+                            <span itemprop='name'>{$venue}</span>
+                            <span itemprop='address' itemscope itemtype='http://schema.org/PostalAddress'></span>
+                        </div>';
+                            
 		}
 		if ($event->is_premium()) {
 			$price = $event->get_price();

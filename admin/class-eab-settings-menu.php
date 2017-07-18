@@ -94,6 +94,8 @@ class Eab_Admin_Settings_Menu {
 
 		$options = array();
 		$options['slug'] 						= trim(trim($event_default['slug'], '/'));
+		$options['pagination']                          = empty( $event_default['pagination'] ) ? 0 : (int)$event_default['pagination'];
+		$options['ordering_direction'] 			= !empty( $event_default['ordering_direction'] );
 		$options['accept_payments'] 			= empty( $event_default['accept_payments'] ) ? 0 : $event_default['accept_payments'];
 		$options['accept_api_logins'] 			= empty( $event_default['accept_api_logins'] ) ? 0 : $event_default['accept_api_logins'];
 		$options['display_attendees'] 			= empty( $event_default['display_attendees'] ) ? 0 : $event_default['display_attendees'];
