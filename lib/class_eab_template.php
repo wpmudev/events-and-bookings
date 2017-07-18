@@ -569,7 +569,7 @@ class Eab_Template {
 			$content .= "<div class='wpmudevevents-location' itemprop='location' itemscope itemtype='http://schema.org/Place'>
                             <span itemprop='name'>{$venue}</span>
                             <span itemprop='address' itemscope itemtype='http://schema.org/PostalAddress'></span>
-                        </div>';
+                        </div>";
                             
 		}
 		if ($event->is_premium()) {
