@@ -84,7 +84,10 @@ class Eab_Maps_EventMapsOptions {
 			<tr valign="top">
 				<th scope="row"><?php _e('Map appearance', Eab_EventsHub::TEXT_DOMAIN)?></th>
 				<td>
-					<table celpadding="5" cellspacing="5">
+					<style>
+						.eab_inner_table td{padding: 0 !important}
+					</style>
+					<table celpadding="5" cellspacing="5" class="eab_inner_table">
 						<tr>
 							<td valign="top">
 								<label for="eab-google_maps-zoom">
