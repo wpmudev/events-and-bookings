@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.9.6';
+    const CURRENT_VERSION = '1.9.7';
 
     /**
      * Translation domain
