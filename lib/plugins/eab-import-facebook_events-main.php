@@ -217,18 +217,18 @@ class Eab_Calendars_FacebookEventsImporter {
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
                         <table cellpadding="5" cellspacing="5" width="100%">
                                 <tr>
-                                        <td>
+                                        <td valign="top" width="400">
                                                 <label style="width: 100%" for="incsub_event-fbe_importer-client_id" id="incsub_event_label-fbe_importer-client_id"><?php _e('App ID', Eab_EventsHub::TEXT_DOMAIN); ?> <?php echo $tips->add_tip(__('Enter your App ID number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></label>
                                         </td>
-                                        <td>
+                                        <td valign="top">
                                                 <input type="text" size="85" id="incsub_event-fbe_importer-client_id" name="fbe_importer[client_id]" value="<?php print $api_key; ?>" />
                                         </td>
                                 </tr>
                                 <tr>
-                                        <td>
+                                        <td valign="top">
                                                 <label style="width: 100%" for="incsub_event-fbe_importer-client_id" id="incsub_event_label-fbe_importer-client_id"><?php _e('App secret', Eab_EventsHub::TEXT_DOMAIN); ?> <?php echo $tips->add_tip(__('Enter your App secret number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></label>
                                         </td>
-                                        <td>
+                                        <td valign="top">
                                                 <input type="text" size="85" id="incsub_event-fbe_importer-client_id" name="fbe_importer[client_secret]" value="<?php print $api_secret; ?>" />
                                         </td>
                                 </tr>
