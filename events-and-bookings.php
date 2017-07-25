@@ -642,6 +642,11 @@ class Eab_EventsHub {
     function meta_box_part_where () {
 		global $post;
 		$event = new Eab_EventModel($post);
+        $address_data = $event->get_address();
+        $street_address = isset( $address_data[ 'streetAddress' ] ) ? $address_data[ 'streetAddress' ] : '';
+        $address_locality = isset( $address_data[ 'addressLocality' ] ) ? $address_data[ 'addressLocality' ] : '';
+        $address_region = isset( $address_data[ 'addressRegion' ] ) ? $address_data[ 'addressRegion' ] : '';
+        $postal_code = isset( $address_data[ 'postalCode' ] ) ? $address_data[ 'postalCode' ] : '';
 
 		$content  = '';
 		$content .= '<div class="eab_meta_box">';
@@ -649,6 +654,37 @@ class Eab_EventsHub {
 		$content .= '<div class="misc-eab-section" >';
 		$content .= '<div class="eab_meta_column_box top"><label for="incsub_event_venue" id="incsub_event_venue_label">'.__('Event location', self::TEXT_DOMAIN).'</label> <span id="eab_insert_map"></span></div>';
 		$content .= '<textarea class="widefat" type="text" name="incsub_event_venue" id="incsub_event_venue" size="20" >' . $event->get_venue() . '</textarea>';
+		$content .= '</div>';
+		$content .= '</div>';
+                $content .= '<div class="eab_meta_box">';
+		$content .= '<input type="hidden" name="incsub_event_address_meta" value="1" />';
+		$content .= '<div class="misc-eab-section" >';
+		$content .= '<div class="eab_meta_column_box top"><label for="incsub_event_address" id="incsub_event_address_label">'.__('Event address', self::TEXT_DOMAIN).'</label></div>';
+        
+        $content .= '<div class="misc-eab-section eab-address-section">';
+            
+            $content .= '<div class="misc-eab-subsection eab-address-subsection">';
+            $content .= '<label>' . __('Street address', self::TEXT_DOMAIN) . '</label> ';
+            $content .= '<input type="text" name="incsub_event_address[streetAddress]" value="' . $street_address . '" />';
+            $content .= '</div>';
+        
+            $content .= '<div class="misc-eab-subsection eab-address-subsection"> ';
+            $content .= '<label>' . __('Locality', self::TEXT_DOMAIN) . '</label>';
+            $content .= '<input type="text" name="incsub_event_address[addressLocality]" value="' . $address_locality . '" />';
+            $content .= '</div>';
+        
+            $content .= '<div class="misc-eab-subsection eab-address-subsection"> ';
+            $content .= '<label>' . __('Region', self::TEXT_DOMAIN) . '</label>';
+            $content .= '<input type="text" name="incsub_event_address[addressRegion]" value="' . $address_region . '" />';
+            $content .= '</div>';
+
+            $content .= '<div class="misc-eab-subsection eab-address-subsection"> ';
+            $content .= '<label>' . __('ZIP Code', self::TEXT_DOMAIN) . '</label>';
+            $content .= '<input type="text" name="incsub_event_address[postalCode]" value="' . $postal_code . '" />';
+            $content .= '</div>';
+        
+        $content .= '</div>';
+        
 		$content .= '</div>';
 		$content .= '</div>';
 
@@ -1075,6 +1111,15 @@ class Eab_EventsHub {
 
 		    //for any other plugin to hook into
 		    do_action( 'incsub_event_save_where_meta', $post_id, $meta );
+		}
+        
+        if ( $post->post_type == "incsub_event" && isset( $_POST['incsub_event_address_meta'] ) ) {
+			$meta = get_post_custom($post_id);
+
+			update_post_meta($post_id, 'incsub_event_address', array_map('strip_tags', $_POST['incsub_event_address']) );
+
+			//for any other plugin to hook into
+		    do_action( 'incsub_event_save_address_meta', $post_id, $meta );
 		}
 
 		// Setting up event status

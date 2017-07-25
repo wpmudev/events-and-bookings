@@ -566,10 +566,37 @@ class Eab_Template {
 
 		if ($event->has_venue()) {
 			$venue = $event->get_venue_location(Eab_EventModel::VENUE_AS_ADDRESS);
+            $address = '';
+            
 			$content .= "<div class='wpmudevevents-location' itemprop='location' itemscope itemtype='http://schema.org/Place'>
-                            <span itemprop='name'>{$venue}</span>
-                            <span itemprop='address' itemscope itemtype='http://schema.org/PostalAddress'></span>
-                        </div>";
+                            <span itemprop='name'>{$venue}</span>";
+            
+            if( $event->has_address() ){
+                $address_data = $event->get_address();
+                
+                if( isset( $address_data['streetAddress'] ) && $address_data['streetAddress'] != '' ){
+                    $address .= "<span itemprop='streetAddress'>{$address_data['streetAddress']}</span><br />";
+                }
+                
+                if( isset( $address_data['addressLocality'] ) && $address_data['addressLocality'] != '' ){
+                    $address .= "<span itemprop='addressLocality'>{$address_data['addressLocality']}</span><br />";
+                }
+                
+                if( isset( $address_data['addressRegion'] ) && $address_data['addressRegion'] != '' ){
+                    $address .= "<span itemprop='addressRegion'>{$address_data['addressRegion']}</span>, ";
+                }
+                
+                if( isset( $address_data['postalCode'] ) && $address_data['postalCode'] != '' ){
+                    $address .= "<span itemprop='postalCode'>{$address_data['postalCode']}</span>";
+                }
+
+            }
+            
+            
+            
+            $content .= "<div itemprop='address' itemscope itemtype='http://schema.org/PostalAddress'>{$address}</div>";
+                            
+            $content .= "</div>";
                             
 		}
 		if ($event->is_premium()) {

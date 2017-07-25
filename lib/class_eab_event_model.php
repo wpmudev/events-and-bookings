@@ -129,6 +129,21 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 	 * @return string Venue
 	 */
 	abstract public function get_venue ();
+    
+    /**
+	 * Return event location address. Usefull for schema markup
+	 * @return string Address
+	 */
+    
+	abstract public function get_address ();
+    
+    /**
+	 * Does the event has address info set?
+	 * @return bool
+	 */
+	public function has_address () {
+		return $this->get_address() ? true : false;
+	}
 
 	/**
 	 * Does the event has venue info set?
@@ -315,6 +330,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	private $_no_end_dates;
 
 	private $_venue;
+    private $_address;
 	private $_price;
 	private $_status;
 
@@ -841,7 +857,16 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		return $this->_venue;
 	}
 
-
+    /**
+	 * Return event location address. Usefull for schema markup
+	 * @return string Address
+	 */
+	public function get_address () {
+		if ($this->_address) return $this->_address;
+		$this->_address = get_post_meta($this->get_id(), 'incsub_event_address', true);
+		return $this->_address;
+	}
+    
 /* ----- Price methods ----- */
 
 	/**
@@ -1141,6 +1166,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$this->get_end_dates();
 		$this->has_no_end_time();
 		$this->get_venue();
+        $this->get_address();
 		$this->get_price();
 		$this->get_status();
 	}
