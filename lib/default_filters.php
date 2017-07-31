@@ -117,9 +117,8 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 	}
 
 	function _eab_dispatch_event_categories_for_ordering ($query) {
-		global $wp_query;
 		if (is_admin()) return false;
-		if (!$wp_query->is_main_query()) return false;
+		if (!$query->is_main_query()) return false;
 		if (empty($query->query_vars['eab_events_category'])) return false;
 		Eab_Filter::start_date_ordering_set_up();
 		add_filter('found_posts', '_eab_tear_down_event_categories_for_ordering');
@@ -130,9 +129,7 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 
 // Archive sorting and pagination in default WP requests
 function _eab_dispatch_event_archives($query) {
-    global $wp_query;
-
-    if ( is_admin() || !$wp_query->is_main_query() || !is_post_type_archive('incsub_event') ) return;
+    if ( is_admin() || !$query->is_main_query() || !is_post_type_archive('incsub_event') ) return;
     $data = Eab_Options::get_instance();
     if ( $pagination = $data->get_option('pagination') ) {
         $query->set( 'posts_per_page', $pagination );
