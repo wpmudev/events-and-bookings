@@ -24,7 +24,10 @@
 					</div>
 					<div class="eab-settings-settings_item">
 						<label for="incsub_event-ordering_direction" id="incsub_event_label-ordering_direction"><?php _e('Set descending ordering direction by start date:', eab_domain() ); ?></label>
-                                                <input type="checkbox" size="20" id="incsub_event-ordering_direction" name="event_default[ordering_direction]" value="1" <?php checked( !empty($this->_data->get_option('ordering_direction') ) ); ?>>
+						<?php
+							$ordering_direction = $this->_data->get_option('ordering_direction');
+						?>
+                        <input type="checkbox" size="20" id="incsub_event-ordering_direction" name="event_default[ordering_direction]" value="1" <?php checked( !empty( $ordering_direction ) ); ?>>
 						<span><?php echo $tips->add_tip(__('This is the ordering direction how your events archive can be ordering. By default, the direction is ascending.', eab_domain() )); ?></span>
 					</div>
 					<div class="eab-settings-settings_item">
