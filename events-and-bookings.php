@@ -256,7 +256,17 @@ class Eab_EventsHub {
 		    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
 
 		    $event_id = intval($_POST['event_id']);
-		    $booking_action = $booking_actions[$_POST['action_yes']];
+			foreach( $booking_actions as $val )
+			{
+				if( isset( $_POST['action_' . $val] ) )
+				{
+					$booking_action = $val;
+					break;
+				}
+			}
+			
+			$booking_action = isset( $booking_action ) ? $booking_action : '';
+			
 		    $user_id = apply_filters('eab-rsvp-user_id', $current_user->ID, $_POST['user_id']);
 
 		    do_action( 'incsub_event_booking', $event_id, $user_id, $booking_action );
