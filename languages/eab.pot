@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Events + 1.9.6-Beta\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/events-and-bookings\n"
-"POT-Creation-Date: 2017-07-18 09:43:40+00:00\n"
+"POT-Creation-Date: 2017-08-01 15:00:34+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -716,7 +716,7 @@ msgstr ""
 #: events-and-bookings.php:1001 lib/class_eab_exporter.php:120
 #: lib/class_eab_exporter.php:166 lib/class_eab_template.php:157
 #: lib/class_eab_template.php:199 lib/class_eab_template.php:510
-#: lib/class_eab_template.php:535
+#: lib/class_eab_template.php:535 lib/class_eab_template.php:662
 #: lib/plugins/eab-email-enewsletter_integration.php:269
 #: lib/plugins/eab-events-front_page_editing.php:428
 #: lib/plugins/eab-rsvps-additional_registration_fields.php:154
@@ -1111,66 +1111,66 @@ msgid ""
 "Facebook and Twitter Login?\" in plugin settings."
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:154
+#: lib/class_eab_calendar_helper.php:161
 #: lib/plugins/eab-events_weekly_calendar.php:339
 msgid "Sunday"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:155
+#: lib/class_eab_calendar_helper.php:162
 #: lib/plugins/eab-events_weekly_calendar.php:340
 msgid "Monday"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:156
+#: lib/class_eab_calendar_helper.php:163
 #: lib/plugins/eab-events_weekly_calendar.php:341
 msgid "Tuesday"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:157
+#: lib/class_eab_calendar_helper.php:164
 #: lib/plugins/eab-events_weekly_calendar.php:342
 msgid "Wednesday"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:158
+#: lib/class_eab_calendar_helper.php:165
 #: lib/plugins/eab-events_weekly_calendar.php:343
 msgid "Thursday"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:159
+#: lib/class_eab_calendar_helper.php:166
 #: lib/plugins/eab-events_weekly_calendar.php:344
 msgid "Friday"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:160
+#: lib/class_eab_calendar_helper.php:167
 #: lib/plugins/eab-events_weekly_calendar.php:345
 msgid "Saturday"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:256
+#: lib/class_eab_calendar_helper.php:263
 msgid "Su"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:257
+#: lib/class_eab_calendar_helper.php:264
 msgid "Mo"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:258
+#: lib/class_eab_calendar_helper.php:265
 msgid "Tu"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:259
+#: lib/class_eab_calendar_helper.php:266
 msgid "We"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:260
+#: lib/class_eab_calendar_helper.php:267
 msgid "Th"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:261
+#: lib/class_eab_calendar_helper.php:268
 msgid "Fr"
 msgstr ""
 
-#: lib/class_eab_calendar_helper.php:262
+#: lib/class_eab_calendar_helper.php:269
 msgid "Sa"
 msgstr ""
 
@@ -1242,13 +1242,14 @@ msgstr ""
 
 #: lib/class_eab_exporter.php:118 lib/class_eab_exporter.php:173
 #: lib/class_eab_template.php:155 lib/class_eab_template.php:197
-#: lib/plugins/eab-buddypres-my_events.php:68
+#: lib/class_eab_template.php:660 lib/plugins/eab-buddypres-my_events.php:68
 msgid "Attending"
 msgstr ""
 
 #: lib/class_eab_exporter.php:119 lib/class_eab_template.php:156
 #: lib/class_eab_template.php:198 lib/class_eab_template.php:516
-#: lib/class_eab_template.php:541 lib/plugins/eab-buddypres-my_events.php:75
+#: lib/class_eab_template.php:541 lib/class_eab_template.php:661
+#: lib/plugins/eab-buddypres-my_events.php:75
 #: lib/plugins/eab-email-enewsletter_integration.php:268
 msgid "Maybe"
 msgstr ""
@@ -1537,6 +1538,126 @@ msgstr ""
 
 #: lib/class_eab_template.php:547
 msgid "I'm Attending"
+msgstr ""
+
+#: lib/class_eab_template.php:603
+msgid " and "
+msgstr ""
+
+#: lib/class_eab_template.php:609
+msgid ""
+"On <span class=\"wpmudevevents-date_format-start\"><var "
+"class=\"eab-date_format-date\">%s</var></span>"
+msgstr ""
+
+#: lib/class_eab_template.php:610
+msgid ""
+"On <var class=\"eab-date_format-date\">%s</var> <span "
+"class=\"wpmudevevents-date_format-start\">from <var "
+"class=\"eab-date_format-time\">%s</var></span>"
+msgstr ""
+
+#: lib/class_eab_template.php:613 lib/class_eab_template.php:614
+#: lib/class_eab_template.php:633
+msgid "<span class=\"wpmudevevents-date_format-end\">to %s</span><br />"
+msgstr ""
+
+#: lib/class_eab_template.php:621
+msgid ""
+"Took place on <span class=\"wpmudevevents-date_format-start\"><var "
+"class=\"eab-date_format-date\">%s</var></span>"
+msgstr ""
+
+#: lib/class_eab_template.php:622
+msgid ""
+"Took place on <var class=\"eab-date_format-date\">%s</var> <span "
+"class=\"wpmudevevents-date_format-start\">from <var "
+"class=\"eab-date_format-time\">%s</var></span>"
+msgstr ""
+
+#: lib/class_eab_template.php:627
+msgid ""
+"Takes place on <span class=\"wpmudevevents-date_format-start\"><var "
+"class=\"eab-date_format-date\">%s</var></span>"
+msgstr ""
+
+#: lib/class_eab_template.php:628
+msgid ""
+"Takes place on <var class=\"eab-date_format-date\">%s</var> <span "
+"class=\"wpmudevevents-date_format-start\">from <var "
+"class=\"eab-date_format-time\">%s</var></span>"
+msgstr ""
+
+#: lib/class_eab_template.php:691
+msgid "Excellent! We've got you marked as coming and we'll see you there!"
+msgstr ""
+
+#: lib/class_eab_template.php:692
+msgid "Thanks for letting us know. Hopefully you'll be able to make it!"
+msgstr ""
+
+#: lib/class_eab_template.php:693
+msgid "That's too bad you won't be able to make it"
+msgstr ""
+
+#: lib/class_eab_template.php:863
+msgid "boolean"
+msgstr ""
+
+#: lib/class_eab_template.php:864
+msgid "\"yes\" or \"no\""
+msgstr ""
+
+#: lib/class_eab_template.php:865
+msgid "%s=\"yes\""
+msgstr ""
+
+#: lib/class_eab_template.php:868
+msgid "integer"
+msgstr ""
+
+#: lib/class_eab_template.php:870
+msgid "%s=\"326\""
+msgstr ""
+
+#: lib/class_eab_template.php:873
+msgid "string"
+msgstr ""
+
+#: lib/class_eab_template.php:874
+msgid "\"mystring\""
+msgstr ""
+
+#: lib/class_eab_template.php:875
+msgid "%s=\"mystring\""
+msgstr ""
+
+#: lib/class_eab_template.php:878
+msgid "date"
+msgstr ""
+
+#: lib/class_eab_template.php:879
+msgid "date format string"
+msgstr ""
+
+#: lib/class_eab_template.php:880
+msgid "%s=\"2011-11-18\""
+msgstr ""
+
+#: lib/class_eab_template.php:883
+msgid "date format"
+msgstr ""
+
+#: lib/class_eab_template.php:884
+msgid "format string for dates"
+msgstr ""
+
+#: lib/class_eab_template.php:885
+msgid "%s=\"Y-m-d\""
+msgstr ""
+
+#: lib/class_eab_template.php:888
+msgid "<a href=\"%s\" target=\"_blank\">strtotime</a>-compatible string"
 msgstr ""
 
 #: lib/class_eab_template.php:889
@@ -3174,23 +3295,23 @@ msgstr ""
 msgid "Map appearance"
 msgstr ""
 
-#: lib/plugins/eab-maps-event_maps_options.php:88
+#: lib/plugins/eab-maps-event_maps_options.php:94
 msgid "Zoom:"
 msgstr ""
 
-#: lib/plugins/eab-maps-event_maps_options.php:90
+#: lib/plugins/eab-maps-event_maps_options.php:99
 msgid "Numeric value"
 msgstr ""
 
-#: lib/plugins/eab-maps-event_maps_options.php:94
+#: lib/plugins/eab-maps-event_maps_options.php:105
 msgid "Type:"
 msgstr ""
 
-#: lib/plugins/eab-maps-event_maps_options.php:106
+#: lib/plugins/eab-maps-event_maps_options.php:120
 msgid "Units:"
 msgstr ""
 
-#: lib/plugins/eab-maps-event_maps_options.php:120
+#: lib/plugins/eab-maps-event_maps_options.php:137
 msgid "Show images"
 msgstr ""
 
