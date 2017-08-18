@@ -217,7 +217,12 @@ class Eab_Admin {
 
 				if (current_user_can($post_type_object->cap->delete_post, $event->get_id())) {
 					if ('trash' == $post->post_status) {
-						$actions['untrash'] = "<a title='" . esc_attr(__('Restore this Event from the Trash', Eab_EventsHub::TEXT_DOMAIN)) . "' href='" . wp_nonce_url(admin_url(sprintf($post_type_object->_edit_link . '&amp;action=untrash', $event->get_id())), 'untrash-' . $post->post_type . '_' . $event->get_id()) . "'>" . __('Restore') . "</a>";
+						$actions['untrash'] = sprintf(	'<a href="%s" title="%s" aria-label="%s">%s</a>',
+							wp_nonce_url( admin_url( sprintf( $post_type_object->_edit_link . '&amp;action=untrash', $post->ID ) ), 'untrash-post_' . $post->ID ),
+							'Restore this Event from the Trash',
+							esc_attr( sprintf( __( 'Restore &#8220;%s&#8221; from the Trash' ), $title ) ),
+							__( 'Restore' )
+						);	
 					} else if (EMPTY_TRASH_DAYS) {
 						$actions['trash'] = '<a class="submitdelete" title="' . esc_attr(__('Move this Event to the Trash', Eab_EventsHub::TEXT_DOMAIN)) . '" href="' . get_delete_post_link($event->get_id()) . '">' . __('Trash') . '</a>';
 					}
