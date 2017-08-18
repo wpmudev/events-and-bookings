@@ -127,7 +127,7 @@ class Eab_Payments_PaymentViaProducts {
 	}
 
 	function save_settings ($options) {
-		$options['payment-ppvp-category'] = $_POST['eab_event-payment-ppvp-category'];
+		$options['payment-ppvp-category'] = isset( $_POST['eab_event-payment-ppvp-category'] ) ? $_POST['eab_event-payment-ppvp-category'] : '';
 		return $options;
 	}
 }
