@@ -85,19 +85,26 @@ abstract class WpmuDev_CalendarTable {
 			if ($this->start_of_week == $dow) $ret .= '</tr><tr>';
 			
 			$this->reset_event_info_storage();
-			foreach ($post_info as $ipost) {
-				for ($k = 0; $k < count($ipost['event_starts']); $k++) {
-					$start = strtotime($ipost['event_starts'][$k]);
-					$end = strtotime($ipost['event_ends'][$k]);
-					if ($start < $current_day_end && $end > $current_day_start) {
-						$this->set_event_info(
-							array('start' => $start, 'end'=> $end), 
-							array('start' => $current_day_start, 'end'=> $current_day_end),
-							$ipost
-						);
+			if( apply_filters( 'eab_event_calendar_display_list_customize', true ) )
+			{
+				foreach ($post_info as $ipost) {
+					for ($k = 0; $k < count($ipost['event_starts']); $k++) {
+						$start = strtotime($ipost['event_starts'][$k]);
+						$end = strtotime($ipost['event_ends'][$k]);
+						if ($start < $current_day_end && $end > $current_day_start) {
+							$this->set_event_info(
+								array('start' => $start, 'end'=> $end), 
+								array('start' => $current_day_start, 'end'=> $current_day_end),
+								$ipost
+							);
+						}
 					}
-				}
-			} 
+				} 
+			}
+			else
+			{
+				do_action( 'eab_event_calendar_display_list_reorder', $post_info, $this, $current_day_start, $current_day_end );
+			}
 			
 			$activity = $this->get_event_info_as_string($i);
 			$class_names = array();

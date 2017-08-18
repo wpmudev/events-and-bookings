@@ -245,7 +245,7 @@ class WpmuDev_HelpTooltips {
 }
 
 .wpmudev-help {
-	width: 300px;
+	width: 200px;
         font-size: 13px;
         padding: 10px;
         height: auto;

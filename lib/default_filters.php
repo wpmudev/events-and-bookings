@@ -138,11 +138,15 @@ function _eab_dispatch_event_archives($query) {
         $query->set( 'posts_per_page', $pagination );
     }
     if ( $data->get_option('ordering_direction') ) {
-        add_filter( 'eab-ordering-date_ordering_direction', function() {return 'DESC';} );
+        add_filter( 'eab-ordering-date_ordering_direction', 'eab_ordering_date_ordering_direction_cb' );
     }
 }
 add_action('pre_get_posts', '_eab_dispatch_event_archives');
 // End Archive sorting and pagination in default WP requests
+
+function eab_ordering_date_ordering_direction_cb() {
+	return 'DESC';
+}
 
 // Admin side - ensure Maps availability for subscribers
 function eab_to_agm__ensure_subscribers_maps () {

@@ -432,7 +432,7 @@ function boot () {
 		return;
 	}
 	
-	box_root.append('<div id="eab-root-settings_nav"></div>');
+	box_root.prepend('<div id="eab-root-settings_nav"></div>');
 	root = $("#eab-root-settings_nav");
 
 	root.empty();
