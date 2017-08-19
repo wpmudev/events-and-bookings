@@ -96,7 +96,8 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 		$time = $this->get_timestamp();
 		$year = (int)date('Y', $time);
 		$month = date('m', $time);
-		$time = strtotime("{$year}-{$month}-01");
+		$day = date('d', $time);
+		$time = strtotime("{$year}-{$month}-{$day}");
 
 		$forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
 		if (!isset($args['incsub_event'])) { // If not single
@@ -104,6 +105,7 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 		}
 		$forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
 
+		$start_day = $day ? sprintf('%02d', $day) : $day;
 		$start_month = $month ? sprintf("%02d", $month) : date('m');
 		if ($start_month < 12) {
 			$end_month = sprintf("%02d", (int)$month+1);
@@ -130,7 +132,7 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 					),
 					array(
 		    			'key' => 'incsub_event_end',
-		    			'value' => apply_filters('eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-01 00:00"),
+		    			'value' => apply_filters('eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-{$start_day} 00:00"),
 		    			'compare' => '>=',
 		    			'type' => 'DATETIME'
 					),
