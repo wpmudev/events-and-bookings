@@ -111,11 +111,11 @@ class Eab_Template {
 			$content .= '<a href="' . 
 				admin_url('admin-ajax.php?action=eab_list_rsvps&pid=' . $event->get_id()) . 
 				'" id="wpmudevevents-load-rsvps" class="hide-if-no-js wpmudevevents-viewrsvps wpmudevevents-loadrsvps">' .
-					__('See who has RSVPed', Eab_EventsHub::TEXT_DOMAIN) .
+					apply_filters( 'eab_show_rsvp_text', __('See who has RSVPed', Eab_EventsHub::TEXT_DOMAIN) ) .
 			'</a>';
 			$content .= '&nbsp;';
 			$content .= '<a href="#" id="wpmudevevents-hide-rsvps" class="hide-if-no-js wpmudevevents-viewrsvps wpmudevevents-hidersvps">' .
-				__('Hide who has RSVPed', Eab_EventsHub::TEXT_DOMAIN) .
+				apply_filters( 'eab_hide_rsvp_text', __('Hide who has RSVPed', Eab_EventsHub::TEXT_DOMAIN) ) .
 			'</a>';
 			$content .= '</div>';
 			$content .= '<div id="wpmudevevents-rsvps-response"></div>';
