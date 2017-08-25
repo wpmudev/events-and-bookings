@@ -57,15 +57,26 @@ class Eab_Template {
 		
 		// Added by Hakan
 		$show_pay_note = $event->is_premium() && $event->user_is_coming() && !$event->user_paid();
-		$show_pay_note = apply_filters('eab-event-show_pay_note', $show_pay_note, $event->get_id () ); 
+		$show_pay_note = apply_filters('eab-event-show_pay_note', $show_pay_note, $event->get_id () );
 
-		if ( $show_pay_note	) {
+		$paypal_processing = false;
+		if ( isset( $_GET['paypal_processing'] ) ) {
+			if ( $_GET['paypal_processing'] == 1 ) {
+				// Will show message if user has just returned from a paypal payment as it takes around 10 seconds for the payment to register in the database.
+				$paypal_processing = true;
+			}
+		}
+		if ( $show_pay_note && ! $paypal_processing ) {
 			$new_content .= '<div id="wpmudevevents-payment">';
-			$new_content .= __('You haven\'t paid for this event', Eab_EventsHub::TEXT_DOMAIN).' ';
+			$new_content .= __( 'You haven\'t paid for this event', Eab_EventsHub::TEXT_DOMAIN ) . ' ';
 			$new_content .= self::get_payment_forms($event);
 			$new_content .= '</div>';
-		} else if ($event->is_premium() && $event->user_paid()) {
-			$new_content .= __('You already paid for this event', Eab_EventsHub::TEXT_DOMAIN);
+		} elseif ( $event->is_premium() && $event->user_paid() ) {
+			$new_content .= __( 'You already paid for this event', Eab_EventsHub::TEXT_DOMAIN );
+		} elseif ( $paypal_processing ) {
+			$new_content .= '<div id="wpmudevevents-payment">';
+			$new_content .= __( 'Your payment is being processed. This may take a few minutes to show here.', Eab_EventsHub::TEXT_DOMAIN ) . ' ';
+			$new_content .= '</div>';
 		}
 		
 		// Added by Hakan
@@ -372,7 +383,7 @@ class Eab_Template {
 		return $content;
 	}
 	
-	public static function get_payment_forms ($post) {
+	public static function get_payment_forms ($post ) {
 		global $blog_id, $current_user;
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
 
@@ -394,7 +405,7 @@ class Eab_Template {
 				admin_url('admin-ajax.php?action=eab_paypal_ipn&blog_id=' . $blog_id . '&booking_id=' . $booking_id) .
 			'" />';
 			$content .= '<input type="hidden" name="amount" value="' . $event->get_price()  .'" />';
-			$content .= '<input type="hidden" name="return" value="' . get_permalink($event->get_id()) . '" />';
+			$content .= '<input type="hidden" name="return" value="' . get_permalink($event->get_id()) . '?paypal_processing=1" />';
 			$content .= '<input type="hidden" name="currency_code" value="' . $data->get_option('currency') . '">';
 			$content .= '<input type="hidden" name="cmd" value="_xclick" />';
 			
