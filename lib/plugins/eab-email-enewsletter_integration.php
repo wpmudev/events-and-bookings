@@ -169,11 +169,13 @@ class Eab_Emi_Model {
 	 * Update cached groups with newly created RSVPs.
 	 */
 	public function update_rsvp_group ($event_id, $user_id, $rsvp) {
-		$event = new Eab_EventModel(get_post($event_id));
-		$parent = $event->is_recurring_child();
-		$group_pack = get_post_meta($event_id, self::GROUP_POST_META_KEY, true);
-		if (empty($group_pack) && !empty($parent)) return $this->update_rsvp_group($parent, $user_id, $rsvp);
-		if (empty($group_pack)) return false;
+		$event 		= new Eab_EventModel( get_post( $event_id ) );
+		$parent 	= $event->is_recurring_child();
+		$group_pack = get_post_meta( $event_id, self::GROUP_POST_META_KEY, true );
+		if ( empty( $group_pack ) && !empty( $parent ) ) 
+			return $this->update_rsvp_group( $parent, $user_id, $rsvp );
+		if ( empty( $group_pack ) ) 
+			return false;
 
 		$group_ids = array();
 		$other_groups = array();
