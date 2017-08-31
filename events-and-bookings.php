@@ -6,7 +6,7 @@ Description: Events gives you a flexible WordPress-based system for organizing p
 Author: WPMU DEV
 Text Domain: eab
 WDP ID: 249
-Version: 1.9.6-Beta
+Version: 1.9.6-Beta4
 Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION = '1.9.7';
+    const CURRENT_VERSION = '1.9.6';
 
     /**
      * Translation domain
@@ -224,7 +224,7 @@ class Eab_EventsHub {
 		$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
 		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
 	    //add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
-            add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/(.+)?/comment-page-([0-9]{1,})/?$', 'index.php?incsub_event=$matches[1]&cpage=$matches[2]', 'top' );
+        add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/(.+)?/comment-page-([0-9]{1,})/?$', 'index.php?incsub_event=$matches[1]&cpage=$matches[2]', 'top' );
 
 		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
 
@@ -254,34 +254,31 @@ class Eab_EventsHub {
 		global $wpdb, $current_user;
 		if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
 		    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
-
+			$booking_action = '';
 		    $event_id = intval($_POST['event_id']);
-			foreach( $booking_actions as $val )
-			{
-				if( isset( $_POST['action_' . $val] ) )
-				{
+			foreach( $booking_actions as $val ) {
+				if( isset( $_POST['action_' . $val] ) ) {
 					$booking_action = $val;
 					break;
 				}
 			}
 			
-			$booking_action = isset( $booking_action ) ? $booking_action : '';
 			
 		    $user_id = apply_filters('eab-rsvp-user_id', $current_user->ID, $_POST['user_id']);
 
 		    do_action( 'incsub_event_booking', $event_id, $user_id, $booking_action );
 		    if (isset($_POST['action_yes'])) {
-                                $this->update_rsvp_per_event( $event_id, $user_id, 'yes' );
+                $this->update_rsvp_per_event( $event_id, $user_id, 'yes' );
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_yes', $event_id, $user_id );
 				$this->recount_bookings($event_id);
 				//wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES));
-                                wp_redirect(
-                                        add_query_arg(
-                                                'eab_success_msg',
-                                                Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES)
-                                        )
-                                );
+				wp_redirect(
+						add_query_arg(
+								'eab_success_msg',
+								Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES)
+						)
+				);
 				exit();
 		    }
 		    if (isset($_POST['action_maybe'])) {
