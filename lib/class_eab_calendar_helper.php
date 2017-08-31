@@ -628,6 +628,9 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
                                 $id_attr,
                                 $title_link
                             );
+				
+		$prev_time = date( 'd' );
+		$next_time = date('t') - date( 'd' ) + 1;
                 
 		return "<tr class='{$row_class}'>" .
 			'<td>' .
@@ -638,7 +641,7 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 			'</td>' .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-month" href="' . 
-					esc_url(add_query_arg('date', date('Y-m', $time - (28*86400)))) . $id_href . '">' .
+					esc_url(add_query_arg('date', date('Y-m', $time - ($prev_time*86400)))) . $id_href . '">' .
 					'&nbsp;&lsaquo;' .
 				'</a>' .
 			'</td>' .
@@ -648,7 +651,7 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
 			'</td>' .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-next eab-time_unit-month" href="' . 
-					esc_url(add_query_arg('date', date('Y-m', $time + (32*86400)))) . $id_href . '">' . 
+					esc_url(add_query_arg('date', date('Y-m', $time + ($next_time*86400)))) . $id_href . '">' . 
 					'&rsaquo;&nbsp;' . 
 				'</a>' .
 			'</td>' .
