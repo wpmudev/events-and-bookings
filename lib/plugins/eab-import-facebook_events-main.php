@@ -318,13 +318,13 @@ $(function () {
 <?php
 	}
 
-	function save_settings ($options) {
-		$options['fbe_importer-client_id'] = $_POST['fbe_importer']['client_id'];
-		$options['fbe_importer-client_secret'] = $_POST['fbe_importer']['client_secret'];
-		$options['fbe_importer-fb_user'] = $_POST['fbe_importer']['fb_user'];
-		$options['fbe_importer-run_each'] = $_POST['fbe_importer']['run_each'];
-		$options['fbe_importer-sync_calendars'] = $_POST['fbe_importer']['sync_calendars'];
-		$options['fbe_importer-calendar_author'] = $_POST['fbe_importer']['calendar_author'];
+	function save_settings ( $options ) {
+		$options['fbe_importer-client_id'] 			= $_POST['fbe_importer']['client_id'];
+		$options['fbe_importer-client_secret'] 		= $_POST['fbe_importer']['client_secret'];
+		$options['fbe_importer-fb_user'] 			= isset( $_POST['fbe_importer']['fb_user'] ) ? $_POST['fbe_importer']['fb_user'] : '';
+		$options['fbe_importer-run_each'] 			= isset( $_POST['fbe_importer']['run_each'] ) ? $_POST['fbe_importer']['run_each'] : '';
+		$options['fbe_importer-sync_calendars'] 	= isset( $_POST['fbe_importer']['sync_calendars'] ) ? $_POST['fbe_importer']['sync_calendars'] : '';
+		$options['fbe_importer-calendar_author'] 	= isset( $_POST['fbe_importer']['calendar_author'] ) ? $_POST['fbe_importer']['calendar_author'] : '';
 		return $options;
 	}
 
