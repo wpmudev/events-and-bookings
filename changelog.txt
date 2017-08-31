@@ -23,6 +23,7 @@ Changelog:
 - Fixed: Notice on undefined variable post_type when M2 and E+ are active together
 - Fixed: Remove meta field of the map from event when map is deleted from venue meta field
 - Fixed: eab_expired shortcode doesn't sort by event date but by the time the event was created.
+- Fixed: RSVP Payment status export for manually approved transactions
 
 ----------------------------------------------------------------------
 1.9.5 - 2017-03-01
