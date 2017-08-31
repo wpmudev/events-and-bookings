@@ -628,9 +628,13 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
                                 $id_attr,
                                 $title_link
                             );
-				
+		
+		$offset = get_option( 'gmt_offset' ) * HOUR_IN_SECONDS;
+		$t = date_i18n( 'd', date( 'd' ) + $offset );
+		
 		$prev_time = date( 'd' );
-		$next_time = date('t') - date( 'd' ) + 1;
+		$next_time = date('t') - $t + 1;
+		
                 
 		return "<tr class='{$row_class}'>" .
 			'<td>' .
