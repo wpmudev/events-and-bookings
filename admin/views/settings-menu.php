@@ -27,12 +27,12 @@
 						<?php
 							$ordering_direction = $this->_data->get_option('ordering_direction');
 						?>
-                        <input type="checkbox" size="20" id="incsub_event-ordering_direction" name="event_default[ordering_direction]" value="1" <?php checked( !empty( $ordering_direction ) ); ?>>
+						<input type="checkbox" size="20" id="incsub_event-ordering_direction" name="event_default[ordering_direction]" value="1" <?php $ordering_direction = $this->_data->get_option('ordering_direction'); checked( !empty( $ordering_direction ) ); ?>>
 						<span><?php echo $tips->add_tip(__('This is the ordering direction how your events archive can be ordering. By default, the direction is ascending.', eab_domain() )); ?></span>
 					</div>
 					<div class="eab-settings-settings_item">
 						<label for="incsub_event-pagination" id="incsub_event_label-pagination"><?php _e('Set pagination (events):', eab_domain() ); ?></label>
-                                                <input type="number" size="20" id="incsub_event-pagination" name="event_default[pagination]" value="<?php echo (int)$this->_data->get_option('pagination'); ?>" />
+                        <input type="number" size="20" id="incsub_event-pagination" name="event_default[pagination]" value="<?php echo (int)$this->_data->get_option('pagination'); ?>" />
 						<span><?php echo $tips->add_tip(__('This is the pagination for events archive. By default - 0, without pagination.', eab_domain() )); ?></span>
 					</div>
 

@@ -138,7 +138,7 @@ function _eab_dispatch_event_archives($query) {
         add_filter( 'eab-ordering-date_ordering_direction', 'eab_ordering_date_ordering_direction_cb' );
     }
 }
-add_action('pre_get_posts', '_eab_dispatch_event_archives');
+add_action('pre_get_posts', '_eab_dispatch_event_archives', 1);
 // End Archive sorting and pagination in default WP requests
 
 function eab_ordering_date_ordering_direction_cb() {
