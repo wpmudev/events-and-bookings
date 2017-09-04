@@ -7,6 +7,10 @@ ul.eab-guest-list li {
 .misc-eab-section label {
     vertical-align: text-top;
 }
+.misc-eab-section label.eab-inline-label {
+    width: 45px;
+    display: inline-block;
+}
 
 .misc-eab-section label textarea {
     width: 255px;
