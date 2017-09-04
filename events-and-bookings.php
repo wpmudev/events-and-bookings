@@ -687,7 +687,7 @@ class Eab_EventsHub {
 					$content .= '<div class="eab-section-block">';
 					$content .= '<div class="eab-section-heading">' . sprintf(__('Part %d', self::TEXT_DOMAIN), $key+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 					$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$key.'">';
-					$content .= __('<strong>Start</strong><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+					$content .= __('<span>Start</span><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
 					$content .= '<input type="text" name="incsub_event_start['.$key.']" id="incsub_event_start_'.$key.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" /> ';
 					$content .= '<input type="text" name="incsub_event_start_time['.$key.']" id="incsub_event_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_start_time" value="'.date('H:i', $start).'" size="3" />';
 					$content .= ' <input type="checkbox" name="incsub_event_no_start_time['.$key.']" id="incsub_event_no_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_no_start_time" value="1" ' . $no_start . ' />';
@@ -695,7 +695,7 @@ class Eab_EventsHub {
 					$content .= '</div>';
 
 					$content .= '<div class="misc-eab-section"><label for="incsub_event_end_'.$key.'">';
-					$content .= __('<strong>End</strong><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+					$content .= __('<span>End</span><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
 					$content .= '<input type="text" name="incsub_event_end['.$key.']" id="incsub_event_end_'.$key.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="'.date('Y-m-d', $end).'" size="10" /> ';
 					$content .= '<input type="text" name="incsub_event_end_time['.$key.']" id="incsub_event_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_end_time" value="'.date('H:i', $end).'" size="3" />';
 					$content .= ' <input type="checkbox" name="incsub_event_no_end_time['.$key.']" id="incsub_event_no_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_no_end_time" value="1" ' . $no_end . ' />';
@@ -708,7 +708,7 @@ class Eab_EventsHub {
 			    $content .= '<div class="eab-section-block">';
 			    $content .= '<div class="eab-section-heading">' . sprintf(__('Part %d', self::TEXT_DOMAIN), $i+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 			    $content .= '<div class="misc-eab-section eab-start-section"><label class="eab-inline-label" for="incsub_event_start_'.$i.'">';
-			    $content .= __('<strong>Start</strong><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+			    $content .= __('<span>Start</span><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
 			    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="" size="10" /> ';
 			    $content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_start_time" value="" size="3" />';
 				$content .= ' <input type="checkbox" name="incsub_event_no_start_time['.$i.']" id="incsub_event_no_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_no_start_time" value="1" />';
@@ -716,7 +716,7 @@ class Eab_EventsHub {
 			    $content .= '</div>';
 
 			    $content .= '<div class="misc-eab-section"><label class="eab-inline-label" for="incsub_event_end_'.$i.'">';
-			    $content .= __('<strong>End</strong><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+			    $content .= __('<span>End</span><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
 			    $content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="" size="10" /> ';
 			    $content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_end_time" value="" size="3" />';
 				$content .= ' <input type="checkbox" name="incsub_event_no_end_time['.$i.']" id="incsub_event_no_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_no_end_time" value="1" />';
@@ -733,7 +733,7 @@ class Eab_EventsHub {
 			$content .= '<div class="eab-section-block">';
 			$content .= '<div class="eab-section-heading">' . sprintf(__('Part bank', self::TEXT_DOMAIN), $i+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 			$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_bank" >';
-			$content .= __('<strong>Start</strong><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+			$content .= __('<span>Start</span><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
 			$content .= '<input type="text" name="incsub_event_start_b[bank]" id="incsub_event_start_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_start_b" value="" size="10" /> ';
 			$content .= '<input type="text" name="incsub_event_start_time_b[bank]" id="incsub_event_start_time_bank" class="incsub_event incsub_event_time incsub_event_start_time_b" value="" size="3" />';
 			$content .= ' <input type="checkbox" name="incsub_event_no_start_time[bank]" id="incsub_event_no_start_time_bank" class="incsub_event incsub_event_time incsub_event_no_start_time" value="1" />';
@@ -741,7 +741,7 @@ class Eab_EventsHub {
 			$content .= '</div>';
 
 			$content .= '<div class="misc-eab-section eab-end-section"><label for="incsub_event_end_bank">';
-			$content .= __('<strong>End</strong><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+			$content .= __('<span>End</span><br>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
 			$content .= '<input type="text" name="incsub_event_end_b[bank]" id="incsub_event_end_bank" class="incsub_event_picker_b incsub_event incsub_event_date incsub_event_end_b" value="" size="10" /> ';
 			$content .= '<input type="text" name="incsub_event_end_time_b[bank]" id="incsub_event_end_time_bank" class="incsub_event incsub_event_time incsub_event_end_time_b" value="" size="3" />';
 			$content .= ' <input type="checkbox" name="incsub_event_no_end_time[bank]" id="incsub_event_no_end_time_bank" class="incsub_event incsub_event_time incsub_event_no_end_time" value="1" />';
