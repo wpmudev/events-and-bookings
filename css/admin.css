@@ -381,6 +381,7 @@ label[for^="incsub_event_start_"], label[for^="incsub_event_end_"] {
 }
 label[for^="incsub_event_start_"] span, label[for^="incsub_event_end_"] span {
     font-weight: bold;
+    display: block;
 }
 .eab-section-block {
     border-top: 1px solid #d7d7d7;
