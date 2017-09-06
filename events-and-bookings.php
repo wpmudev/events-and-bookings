@@ -251,7 +251,7 @@ class Eab_EventsHub {
     }
 
 	function process_rsvps () {
-		global $wpdb, $current_user;
+		global $wpdb;
 		if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
 		    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
 			$booking_action = '';
@@ -262,9 +262,8 @@ class Eab_EventsHub {
 					break;
 				}
 			}
-			
-			
-		    $user_id = apply_filters('eab-rsvp-user_id', $_POST['user_id'], $current_user->ID );
+
+			$user_id = apply_filters('eab-rsvp-user_id', get_current_user_id(), $_POST['user_id']);
 
 		    do_action( 'incsub_event_booking', $event_id, $user_id, $booking_action );
 		    if (isset($_POST['action_yes'])) {
