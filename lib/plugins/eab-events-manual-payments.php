@@ -226,14 +226,17 @@ class Eab_Events_ManualPayments {
 		if ( !is_array( $payments ) )
 			die(json_encode(array("error"=>"Record could not be found"))); 
 		else {
+			$post  		= get_post( $event_id );
+			$event 		= ( $post instanceof Eab_EventModel ) ? $post : new Eab_EventModel( $post );
+			$booking_id = $event->get_user_booking_id( $user_id );
 			foreach ( $payments as $key=>$payment ) { 
 				if ( $payment["id"] == $user_id ) {
 					$payments[$key]["stat"] = "paid";
 					//$payments = array_filter( array_unique( $payments ) );
                     $payments = array_map( "unserialize", array_unique( array_map( "serialize", $payments ) ) );
 					Eab_EventModel::update_booking_meta( $event_id, "manual_payment", serialize( $payments ) );
-					Eab_EventModel::update_booking_meta( $event_id, 'booking_transaction_key', true);
-					Eab_EventModel::update_booking_meta( $event_id, 'booking_ticket_count', true);
+					Eab_EventModel::update_booking_meta( $booking_id, 'booking_transaction_key', true);
+					Eab_EventModel::update_booking_meta( $booking_id, 'booking_ticket_count', true);
 					die();
 				}
 			}
