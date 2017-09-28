@@ -140,6 +140,8 @@ function send_save_request () {
 		"content": content,
 		"start": $start_date.val() + ' ' + modified_start_time,
 		"end": $end_date.val() + ' ' + modified_end_time,
+		"no_start_time": $( '#eab-events-fpe-toggle_time__start' ).is( ':checked' ),
+		"no_end_time": $( '#eab-events-fpe-toggle_time__end' ).is( ':checked' ),
 		"venue": $("#eab-events-fpe-venue").val(),
 		"status": $("#eab-events-fpe-status").val(),
 		"is_premium": ($("#eab-events-fpe-is_premium").length ? $("#eab-events-fpe-is_premium").val() : 0),
@@ -285,6 +287,27 @@ $(function () {
         return false;
     });
 	/* End of adding by Ashok */
+
+	/* Toggle time options */
+	$( document ).on( 'click', '#eab-events-fpe-date_time .eab_time_toggle', function(){
+		
+		var affect = $( this ).data( 'time-affect' ),
+			source = ( $( this ).attr( 'type' ) == 'checkbox' ) ? 'checkbox' : 'other_trigger',
+			target = $( '.eab-events-fpe_wrap_time_' + affect ),
+			checkbox = $( '#eab-events-fpe-toggle_time__' + affect );
+		
+		if( source == 'other_trigger' ){
+			checkbox.prop("checked", !checkbox.prop("checked"));
+		}
+		
+		if( checkbox.is( ':checked' ) ){
+			target.fadeOut( 300 );
+		}
+		else{
+			target.show( 300 );	
+		}
+
+	});
 });
 
 	

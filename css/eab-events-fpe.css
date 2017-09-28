@@ -37,6 +37,14 @@
 	margin-right: 1.5em;
 }
 
+.hide_time_option{
+	display: none;
+}
+
+.eab_action_button{
+	cursor: pointer;
+}
+
 /* ----- Form elements setup ----- */
 #eab-events-fpe-event_title {
 	width: 99%;

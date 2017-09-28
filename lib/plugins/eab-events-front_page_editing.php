@@ -385,20 +385,57 @@ class Eab_Events_FrontPageEditing {
 		// Start date/time
 		$start = $event->get_start_timestamp();
 		$start = $start ? $start : eab_current_time();
-		$ret .= '<div>';
-		$ret .= '<label>' . __('Starts on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-start_date" value="' . date('Y-m-d', $start) . '" size="10" />';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-start_time" value="' . date('H:i', $start) . '" size="3" />';
-		$ret .= '</div>';
 
 		// End date/time
 		$end = $event->get_end_timestamp();
 		$end = $end ? $end : eab_current_time() + 3600;
-		$ret .= '<div>';
-		$ret .= '<label>' . __('Ends on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-end_date" value="' . date('Y-m-d', $end) . '" size="10" />';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-end_time" value="' . date('H:i', $end) . '" size="3" />';
-		$ret .= '</div>';
+
+		// Has not start or end time
+		$has_no_start_time = $event->has_no_start_time();
+		$has_no_end_time = $event->has_no_end_time();
+
+		ob_start();
+		?>
+		<div class="eab-events-fpe-meta_box_item eab_event_date eab_start_date">
+			<fieldset>
+				<legend><?php _e('Starts on', Eab_EventsHub::TEXT_DOMAIN) ?></legend>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<label class="date-title"><?php _e('Day', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+					<input type="text" name="" id="eab-events-fpe-start_date" value="<?php echo date('Y-m-d', $start); ?>" size="10" />
+				</div>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<div class="eab-events-fpe_wrap_time_start <?php echo $has_no_start_time ? 'hide_time_option' : '' ?>"  >
+						<label class="date-title"><?php _e('Time', Eab_EventsHub::TEXT_DOMAIN); ?></label>					
+						<input type="text" name="" id="eab-events-fpe-start_time" value="<?php echo date('H:i', $start); ?>" size="3" />					
+					</div>
+					<div id="eab-events-fpe-time__start">
+						<input type="checkbox" id="eab-events-fpe-toggle_time__start" class="eab_action_cb eab_time_toggle" data-time-affect="start" <?php checked( $has_no_start_time ); ?> /> 
+						<a class="eab_action_button eab_time_toggle" data-time-affect="start"><?php _e('No start time', Eab_EventsHub::TEXT_DOMAIN); ?></a>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+
+		<div class="eab-events-fpe-meta_box_item eab_event_date eab_end_date">
+			<fieldset>
+				<legend><?php _e('Ends on', Eab_EventsHub::TEXT_DOMAIN) ?></legend>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<label class="date-title"><?php _e('Day', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+					<input type="text" name="" id="eab-events-fpe-end_date" value="<?php echo date('Y-m-d', $end); ?>" size="10" />
+				</div>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<div class="eab-events-fpe_wrap_time_end <?php echo $has_no_end_time ? 'hide_time_option' : '' ?>">
+						<label class="date-title"><?php _e('Time', Eab_EventsHub::TEXT_DOMAIN); ?></label>					
+						<input type="text" name="" id="eab-events-fpe-end_time" value="<?php echo date('H:i', $end); ?>" size="3" />
+					</div>
+					<div id="eab-events-fpe-time__end">
+						<input type="checkbox" id="eab-events-fpe-toggle_time__end" class="eab_action_cb eab_time_toggle" data-time-affect="end" <?php checked( $has_no_end_time ); ?> /> 
+						<a class="eab_action_button eab_time_toggle" data-time-affect="end"><?php _e('No end time', Eab_EventsHub::TEXT_DOMAIN); ?></a></div>
+				</div>
+			</fieldset>
+		</div>
+		<?php
+		$ret .= ob_get_clean();
 
 		// End date, time, venue
 		$ret .= '</div>';
