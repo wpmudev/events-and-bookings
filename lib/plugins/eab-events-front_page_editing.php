@@ -237,6 +237,9 @@ class Eab_Events_FrontPageEditing {
 		$start = date('Y-m-d H:i', strtotime($data['start']));
 		$end = date('Y-m-d H:i', strtotime($data['end']));
 
+		$has_no_start_time = ( isset( $data['no_start_time'] ) && $data['no_start_time'] == 'true' ) ? true : false;
+		$has_no_end_time = ( isset( $data['no_end_time'] ) && $data['no_end_time'] == 'true' ) ? true : false;
+
 		$post_type = get_post_type_object(Eab_EventModel::POST_TYPE);
 		$post['post_title'] = strip_tags($data['title']);
 		$post['post_content'] = current_user_can('unfiltered_html') ? $data['content'] : wp_filter_post_kses($data['content']);
@@ -267,7 +270,9 @@ class Eab_Events_FrontPageEditing {
 		)));
 
 		update_post_meta($post_id, 'incsub_event_start', $start);
+		update_post_meta( $post_id, 'incsub_event_no_start', $has_no_start_time );
 		update_post_meta($post_id, 'incsub_event_end', $end);
+		update_post_meta( $post_id, 'incsub_event_no_end', $has_no_end_time );
 		update_post_meta($post_id, 'incsub_event_status', strip_tags($data['status']));
 
 		$venue_map = get_post_meta($post_id, 'agm_map_created', true);
