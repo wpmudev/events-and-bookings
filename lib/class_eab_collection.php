@@ -96,7 +96,10 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 		$time = $this->get_timestamp();
 		$year = (int)date('Y', $time);
 		$month = date('m', $time);
-		$day = date('d', $time);
+		$day = date('d');
+		if( $month != date( 'm' ) ){
+			$day = '01';
+		}
 		$time = strtotime("{$year}-{$month}-{$day}");
 
 		$forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
@@ -115,6 +118,10 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 			$end_year = $year+1;
 		}
 
+		$start_range = "{$year}-{$start_month}-{$start_day} 00:00";
+		$last_day_range = strtotime('last day of',strtotime("{$year}-{$start_month}-01"));
+		$end_range = date( 'Y-m-d 00:00', $last_day_range );
+
 		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);
 
 		$args = array_merge(
@@ -125,17 +132,11 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 				'suppress_filters' => false,
 				'meta_query' => array(
 					array(
-		    			'key' => 'incsub_event_start',
-		    			'value' => apply_filters('eab-collection-upcoming-end_timestamp', "{$end_year}-{$end_month}-01 00:00"),
-		    			'compare' => '<',
-		    			'type' => 'DATETIME'
-					),
-					array(
-		    			'key' => 'incsub_event_end',
-		    			'value' => apply_filters('eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-{$start_day} 00:00"),
-		    			'compare' => '>=',
-		    			'type' => 'DATETIME'
-					),
+			            'key' => 'incsub_event_start',
+			            'value' => array($start_range, $end_range),
+			            'compare' => 'BETWEEN',
+			            'type' => 'DATE'
+			        ),
 					array(
 						'key' => 'incsub_event_status',
 						'value' => $forbidden_statuses,
