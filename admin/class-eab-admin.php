@@ -42,7 +42,9 @@ class Eab_Admin {
 		}
 
 		// Register scripts/styles
+		wp_register_script('eab_jquery_timepicker', plugins_url('events-and-bookings/js/jquery.ui.timepicker.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_register_script('eab_admin_js', plugins_url('events-and-bookings/js/eab-admin.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+		wp_register_style('eab_jquery_timepicker', plugins_url('events-and-bookings/css/jquery.ui.timepicker.css'), null, Eab_EventsHub::CURRENT_VERSION);
 		wp_register_style('eab_admin', plugins_url('events-and-bookings/css/admin.css'), null, Eab_EventsHub::CURRENT_VERSION);
 
 		if (defined('AGM_PLUGIN_URL')) {
@@ -81,6 +83,7 @@ class Eab_Admin {
 			return;
 		wp_enqueue_script('eab_jquery_ui');
 		wp_enqueue_script('jquery-ui-datepicker');
+		wp_enqueue_script('eab_jquery_timepicker');
 		wp_enqueue_script('eab_admin_js');
 	}
 
@@ -88,6 +91,7 @@ class Eab_Admin {
 		if (!$this->_check_admin_page_id())
 			return;
 		wp_enqueue_style('eab_jquery_ui');
+		wp_enqueue_style('eab_jquery_timepicker');
 		wp_enqueue_style('eab_admin');
 	}
 

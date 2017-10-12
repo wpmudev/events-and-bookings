@@ -245,8 +245,9 @@ class Eab_EventsHub {
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
 
 		wp_register_script('eab_event_js', plugins_url('events-and-bookings/js/eab-event.js'), array('jquery'), self::CURRENT_VERSION);
-
+		
 		wp_register_style('eab_jquery_ui', plugins_url('events-and-bookings/css/smoothness/jquery-ui-1.8.16.custom.css'), null, self::CURRENT_VERSION);
+		
 
 		wp_register_style('eab_front', plugins_url('events-and-bookings/css/front.css'), null, self::CURRENT_VERSION);
 
@@ -286,7 +287,7 @@ class Eab_EventsHub {
                 $this->update_rsvp_per_event( $event_id, $user_id, 'yes' );
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_yes', $event_id, $user_id );
-				$this->recount_bookings($event_id);
+				$this->recount_bookings( $event_id );
 				//wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES));
 				wp_redirect(
 					add_query_arg(
@@ -717,17 +718,17 @@ class Eab_EventsHub {
 					$content .= '<div class="eab-section-block">';
 					$content .= '<div class="eab-section-heading">' . sprintf(__('Part %d', self::TEXT_DOMAIN), $key+1) . '&nbsp' . '<a href="#remove" class="eab-event-remove_time">' . __('Remove', self::TEXT_DOMAIN) . '</a></div>';
 					$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$key.'">';
-					$content .= __('<span>Start</span>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+					$content .= sprintf( __('%sStart%s Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN ), '<span>', '</span>' ).'</label>';
 					$content .= '<input type="text" name="incsub_event_start['.$key.']" id="incsub_event_start_'.$key.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" /> ';
-					$content .= '<input type="text" name="incsub_event_start_time['.$key.']" id="incsub_event_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_start_time" value="'.date('H:i', $start).'" size="3" />';
+					$content .= '<input type="text" name="incsub_event_start_time['.$key.']" id="incsub_event_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_start_time" value="'.date('H:i', $start).'" size="3" />';
 					$content .= ' <input type="checkbox" name="incsub_event_no_start_time['.$key.']" id="incsub_event_no_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_no_start_time" value="1" ' . $no_start . ' />';
 					$content .= ' <label for="incsub_event_no_start_time_'.$key.'">' . __('No start time', self::TEXT_DOMAIN) . '</label>';
 					$content .= '</div>';
 
 					$content .= '<div class="misc-eab-section"><label for="incsub_event_end_'.$key.'">';
-					$content .= __('<span>End</span>Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN).'</label>';
+					$content .= sprintf( __('%sEnd%s Enter Time in 24 Hour Format. e.g. 20:00', self::TEXT_DOMAIN ), '<span>', '</span>' ).'</label>';
 					$content .= '<input type="text" name="incsub_event_end['.$key.']" id="incsub_event_end_'.$key.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="'.date('Y-m-d', $end).'" size="10" /> ';
-					$content .= '<input type="text" name="incsub_event_end_time['.$key.']" id="incsub_event_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_end_time" value="'.date('H:i', $end).'" size="3" />';
+					$content .= '<input type="text" name="incsub_event_end_time['.$key.']" id="incsub_event_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_end_time" value="'.date('H:i', $end).'" size="3" />';
 					$content .= ' <input type="checkbox" name="incsub_event_no_end_time['.$key.']" id="incsub_event_no_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_no_end_time" value="1" ' . $no_end . ' />';
 					$content .= ' <label for="incsub_event_no_end_time_'.$key.'">' . __('No end time', self::TEXT_DOMAIN) . '</label>';
 					$content .= '</div>';

@@ -4,13 +4,19 @@ jQuery(function() {
          * Commenting the following if as datepicker doesn't work in mobile
          */
 	//if (!("ontouchstart" in window)) {
-		jQuery(".incsub_event_picker").datepicker({
-			"dateFormat": "yy-mm-dd",
-			"changeMonth": true,
-			"changeYear": true,
-			"defaultDate": new Date(),
-			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
-		});
+	jQuery(".incsub_event_picker").datepicker({
+		"dateFormat": "yy-mm-dd",
+		"changeMonth": true,
+		"changeYear": true,
+		"defaultDate": new Date(),
+		"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
+	});
+	jQuery( ".incsub_event_time_picker" ).timepicker({
+		showNowButton: true,
+		showDeselectButton: true,
+		defaultTime: '',  // removes the highlighted time for when the input is empty.
+		showCloseButton: true
+	});
 	//}
 
     jQuery('[href*="preview=true"]').hide(); // Preview won't work
@@ -24,6 +30,13 @@ jQuery(function() {
 			"changeMonth": true,
 			"changeYear": true,
 			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
+		});
+
+		jQuery( "#incsub_event_start_time_"+row_id+" , #incsub_event_end_time_"+row_id ).timepicker({
+			showNowButton: true,
+			showDeselectButton: true,
+			defaultTime: '',  // removes the highlighted time for when the input is empty.
+			showCloseButton: true
 		});
 
 		if (jQuery('.eab-section-block').length > 2) {
