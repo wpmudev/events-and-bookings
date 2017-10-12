@@ -151,10 +151,10 @@ class Eab_Events_ManualPayments {
 	 *
 	 */	
 	function show_settings() {
-		if (!class_exists('WpmuDev_HelpTooltips')) 
+		if ( !class_exists( 'WpmuDev_HelpTooltips' ) ) 
 			require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url( plugins_url( 'events-and-bookings/img/information.png' ) );
 		?>
 		<div id="eab-settings-manual_payments" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Manual Payment settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -168,12 +168,12 @@ class Eab_Events_ManualPayments {
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-manual_payment_pay" ><?php _e('Pay button text', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 						<input type="text" size="40" name="event_default[manual_payment_pay]" value="<?php print $this->_data->get_option('manual_payment_pay'); ?>" />
-						<span><?php echo $tips->add_tip(__('This is the text that will appear on Pay button. User needs to click this button after he made the payment.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+						<span><?php echo $tips->add_tip( __('This is the text that will appear on Pay button. User needs to click this button after he made the payment.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 					</div>
 					
 					<div class="eab-settings-settings_item">
 					    <label for="incsub_event-manual_payment_instructions" ><?php _e('Instructions', Eab_EventsHub::TEXT_DOMAIN); ?>&nbsp;:</label>
-						<span><?php echo $tips->add_tip(__('Write the procedure that the user needs to do for a manual payment here. Use MANUALPAYMENTBUTTON to insert the Pay Button to the desired location.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+						<span><?php echo $tips->add_tip( __('Write the procedure that the user needs to do for a manual payment here. Use MANUALPAYMENTBUTTON to insert the Pay Button to the desired location.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
 						<?php wp_editor( $this->_data->get_option('manual_payment_instructions'), 'manualpaymentsinstructions', array('textarea_name'=>'event_default[manual_payment_instructions]', 'textarea_rows' => 5) ); ?>
 					</div>
 					    
@@ -221,11 +221,9 @@ class Eab_Events_ManualPayments {
 		$user_id = $_POST["user_id"];
 		$event_id = $_POST["event_id"];
 		if ( !$user_id OR !$event_id )
-			die(json_encode(array("error"=>"User ID or Event ID is missing")));
+			die( json_encode( array( "error" => __( "User ID or Event ID is missing", Eab_EventsHub::TEXT_DOMAIN ) ) ) );
 		$payments = maybe_unserialize( stripslashes( Eab_EventModel::get_booking_meta( $event_id, "manual_payment" ) ) );
-		if ( !is_array( $payments ) )
-			die(json_encode(array("error"=>"Record could not be found"))); 
-		else {
+		if ( is_array( $payments ) ) {
 			$post  		= get_post( $event_id );
 			$event 		= ( $post instanceof Eab_EventModel ) ? $post : new Eab_EventModel( $post );
 			$booking_id = $event->get_user_booking_id( $user_id );
@@ -235,13 +233,13 @@ class Eab_Events_ManualPayments {
 					//$payments = array_filter( array_unique( $payments ) );
                     $payments = array_map( "unserialize", array_unique( array_map( "serialize", $payments ) ) );
 					Eab_EventModel::update_booking_meta( $event_id, "manual_payment", serialize( $payments ) );
-					Eab_EventModel::update_booking_meta( $booking_id, 'booking_transaction_key', true);
-					Eab_EventModel::update_booking_meta( $booking_id, 'booking_ticket_count', true);
+					Eab_EventModel::update_booking_meta( $booking_id, 'booking_transaction_key', true );
+					Eab_EventModel::update_booking_meta( $booking_id, 'booking_ticket_count', true );
 					die();
 				}
 			}
 		}
-		die(json_encode(array("error"=>"Record could not be found")));
+		die( json_encode( array( "error" => __( "Record could not be found", Eab_EventsHub::TEXT_DOMAIN ) ) ) );
 	}
 	
 	/**
@@ -260,7 +258,7 @@ class Eab_Events_ManualPayments {
 					$content .= '<script type="text/javascript">';
 					$content .= 'jQuery(document).ready(function($){
 									$("#approve_payment_'.$user_id.'").click(function() {
-										if (confirm("Are you sure to approve this payment?")){
+										if (confirm("'. __( "Are you sure to approve this payment?", Eab_EventsHub::TEXT_DOMAIN ) .'")){
 											$.post(ajaxurl, {
 												"action": "eab_approve_manual_payment",
 												"user_id":'.$user_id.',
@@ -268,7 +266,7 @@ class Eab_Events_ManualPayments {
 											}, function (data) {
 												if (data && data.error) {alert(data.error);}
 												else {
-													$("#div_approve_payment_'.$user_id.'").parent(".eab-guest").find(".eab-guest-payment_info").html("paid");
+													$("#div_approve_payment_'.$user_id.'").parent(".eab-guest").find(".eab-guest-payment_info").html("'.__( 'paid', Eab_EventsHub::TEXT_DOMAIN ).'");
 													$("#div_approve_payment_'.$user_id.'").remove();
 												}
 											},
