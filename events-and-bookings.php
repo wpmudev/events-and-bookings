@@ -289,10 +289,10 @@ class Eab_EventsHub {
 				$this->recount_bookings($event_id);
 				//wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES));
 				wp_redirect(
-						add_query_arg(
-								'eab_success_msg',
-								Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES)
-						)
+					add_query_arg(
+						'eab_success_msg',
+						Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_YES)
+					)
 				);
 				exit();
 		    }
@@ -301,13 +301,12 @@ class Eab_EventsHub {
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_maybe', $event_id, $user_id );
 				$this->recount_bookings($event_id);
-				//wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_MAYBE));
-                                wp_redirect(
-                                        add_query_arg(
-                                                'eab_success_msg',
-                                                Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_MAYBE)
-                                        )
-                                );
+				wp_redirect(
+					add_query_arg(
+						'eab_success_msg',
+						Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_MAYBE)
+					)
+				);
 				exit();
 		    }
 		    if (isset($_POST['action_no'])) {
@@ -315,13 +314,12 @@ class Eab_EventsHub {
 				// --todo: Remove from BP activity stream
 				do_action( 'incsub_event_booking_no', $event_id, $user_id );
 				$this->recount_bookings($event_id);
-				//wp_redirect('?eab_success_msg=' . Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_NO));
-                                wp_redirect(
-                                        add_query_arg(
-                                                'eab_success_msg',
-                                                Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_NO)
-                                        )
-                                );
+				wp_redirect(
+					add_query_arg(
+						'eab_success_msg',
+						Eab_Template::get_success_message_code(Eab_EventModel::BOOKING_NO)
+					)
+				);
 				exit();
 		    }
 		}
@@ -344,59 +342,76 @@ class Eab_EventsHub {
 		return $message;
     }
 
-    function update_rsvp_per_event( $event_id, $user_id, $status )
-    {
+    function update_rsvp_per_event( $event_id, $user_id, $status ) {
         global $wpdb;
-
+		$table_name = self::tablename( self::BOOKING_TABLE );
         if ( class_exists( 'SitePress' ) ) {
-                global $sitepress;
-                $trid = $sitepress->get_element_trid( $event_id );
-                $translations = $sitepress->get_element_translations( $trid );
+			global $sitepress;
+			$trid = $sitepress->get_element_trid( $event_id );
+			$translations = $sitepress->get_element_translations( $trid );
 
-                foreach( $translations as $key => $val )
-                {
-                        $wpdb->query(
-                                $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), '$status') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $val->element_id, $user_id)
-                        );
-                }
+			foreach( $translations as $key => $val ) {
+				$wpdb->query(
+					$wpdb->prepare( "INSERT INTO $table_name VALUES(null, %d, %d, NOW(), '$status') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $val->element_id, $user_id )
+				);
+			}
+        } else {
+			$wpdb->query(
+				$wpdb->prepare("INSERT INTO $table_name VALUES(null, %d, %d, NOW(), '$status') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $event_id, $user_id )
+			);
         }
-        else
-        {
-                $wpdb->query(
-                        $wpdb->prepare("INSERT INTO ".self::tablename(self::BOOKING_TABLE)." VALUES(null, %d, %d, NOW(), '$status') ON DUPLICATE KEY UPDATE `status` = '" . $status . "';", $event_id, $user_id)
-                );
-        }
-    }
+	}
+
+	/**
+	 * Check RSVP
+	 * 
+	 * @return book
+	 */
+	function check_rsvp_per_event( $event_id, $user_id, $status ) {
+		global $wpdb;
+		$record 	= false;
+		$table_name = self::tablename( self::BOOKING_TABLE );
+		if ( class_exists( 'SitePress' ) ) {
+			global $sitepress;
+			$trid 			= $sitepress->get_element_trid( $event_id );
+			$translations 	= $sitepress->get_element_translations( $trid );
+
+			foreach( $translations as $key => $val ) {
+				$record = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $table_name WHERE `user_id` =  %d AND `event_id` = %d AND `status` = %s", $user_id, $val->element_id, $status ) );
+			}
+		} else {
+			$record = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $table_name WHERE `user_id` =  %d AND `event_id` = %d AND `status` = %s", $user_id, $event_id, $status ) );
+		}
+		return $record;
+	}
 
     function recount_bookings( $event_id ) {
 		global $wpdb;
 
-                // If WPML Enabled
-                if ( class_exists( 'SitePress' ) ) {
-                        global $sitepress;
-                        $trid = $sitepress->get_element_trid( $event_id );
-                        $translations = $sitepress->get_element_translations( $trid );
+		// If WPML Enabled
+		if ( class_exists( 'SitePress' ) ) {
+			global $sitepress;
+			$trid = $sitepress->get_element_trid( $event_id );
+			$translations = $sitepress->get_element_translations( $trid );
 
-                        foreach( $translations as $key => $val )
-                        {
-                                $this->update_count_rsvp_meta( $val->element_id );
-                        }
-                }
+			foreach( $translations as $key => $val ) {
+				$this->update_count_rsvp_meta( $val->element_id );
+			}
+		}
 
 		$this->update_count_rsvp_meta( $event_id );
     }
 
-    public function update_count_rsvp_meta( $event_id )
-    {
+    public function update_count_rsvp_meta( $event_id ) {
         global $wpdb;
 
         // Yes
         $yes_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".self::tablename(self::BOOKING_TABLE)." WHERE `status` = 'yes' AND event_id = %d;", $event_id));
-    update_post_meta($event_id, 'incsub_event_yes_count', $yes_count);
+    	update_post_meta($event_id, 'incsub_event_yes_count', $yes_count);
 
         // Maybe
         $maybe_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".self::tablename(self::BOOKING_TABLE)." WHERE `status` = 'maybe' AND event_id = %d;", $event_id));
-    update_post_meta($event_id, 'incsub_event_maybe_count', $maybe_count);
+   	 	update_post_meta($event_id, 'incsub_event_maybe_count', $maybe_count);
         update_post_meta($event_id, 'incsub_event_attending_count', $maybe_count+$yes_count);
 
         // No

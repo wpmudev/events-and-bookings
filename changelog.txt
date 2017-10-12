@@ -6,9 +6,9 @@ Changelog:
 1.9.7 - 
 ----------------------------------------------------------------------
 - Added: New attribute show_old on the shortcode eab_calendar to allow viewing of past events
-- Fixed: E-newsletter activation error. Tables of enewletter would not be created
-- Fixed: Session warning
-
+- Fixed: E-newsletter activation error. Tables of eneswletter would not be created
+- Fixed: Session warning when enewsletter is activated
+- Fixed: Prevent multiple clicking of event RSVP buttons after confirmation
 
 ----------------------------------------------------------------------
 1.9.6 - 2017-09-08

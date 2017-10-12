@@ -519,19 +519,19 @@ class Eab_Template {
 					'<input class="' .
 						(($booking_id && $booking_status == 'no') ? 'current wpmudevevents-no-submit' : 'wpmudevevents-no-submit ' . $default_class) .
 						'" type="submit" name="action_no" value="' . __('No', Eab_EventsHub::TEXT_DOMAIN) .
-					'" />',
+					'" '.(($booking_id && $booking_status == 'no') ? 'disabled="disabled"' : '').' />',
 					$event->get_id()
 				);
 				$content .= apply_filters('eab-rsvps-button-maybe',
 					'<input class="' . (($booking_id && $booking_status == 'maybe') ? 'current wpmudevevents-maybe-submit' : 'wpmudevevents-maybe-submit ' . $default_class) .
 						'" type="submit" name="action_maybe" value="' . __('Maybe', Eab_EventsHub::TEXT_DOMAIN) . 
-					'" />',
+					'" '.(($booking_id && $booking_status == 'maybe') ? 'disabled="disabled"' : '').' />',
 					$event->get_id()
 				);
 				$content .= apply_filters('eab-rsvps-button-yes',
 					'<input class="' . (($booking_id && $booking_status == 'yes') ? 'current wpmudevevents-yes-submit' : 'wpmudevevents-yes-submit ' . $default_class) .
 						'" type="submit" name="action_yes" value="' . __('I\'m attending', Eab_EventsHub::TEXT_DOMAIN) .
-					'" />',
+					'" '.(($booking_id && $booking_status == 'yes') ? 'disabled="disabled"' : '').'/>',
 					$event->get_id()
 				);
 				$content .= '</form>';
