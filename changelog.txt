@@ -5,8 +5,10 @@ Changelog:
 ----------------------------------------------------------------------
 1.9.7 - 
 ----------------------------------------------------------------------
+- Added: New attribute show_old on the shortcode eab_calendar to allow viewing of past events
 - Fixed: E-newsletter activation error. Tables of enewletter would not be created
 - Fixed: Session warning
+
 
 ----------------------------------------------------------------------
 1.9.6 - 2017-09-08

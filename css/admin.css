@@ -8,7 +8,7 @@ ul.eab-guest-list li {
     vertical-align: text-top;
 }
 .misc-eab-section label.eab-inline-label {
-    width: 45px;
+    width: auto;
     display: inline-block;
 }
 

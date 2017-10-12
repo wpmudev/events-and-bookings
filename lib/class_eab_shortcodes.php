@@ -22,78 +22,89 @@ class Eab_Shortcodes extends Eab_Codec {
 	 * @param  boolean $content Fallback content
 	 * @return string           Map string or fallback content
 	 */
-	function process_events_map_shortcode ($args=array(), $content=false) {
-		if (!class_exists('AgmMapModel') || !class_exists('AgmMarkerReplacer')) return $content;
+	function process_events_map_shortcode ( $args = array(), $content=false) {
+		if (!class_exists('AgmMapModel') || !class_exists('AgmMarkerReplacer')) {
+			return $content;
+		}
 
-		$map_args = $args;
-		$args = $this->_preparse_arguments($args, array(
-		// Date arguments
-			'relative_date' => false, // A date relative to _now_ or to date argument - using a strtotime string
-			'date' => false, // Starting date - default to now
-			'lookahead' => false, // Don't use default monthly page - use weeks count instead
-			'weeks' => false, // Look ahead this many weeks
-		// Query arguments
-			'category' => false, // ID or slug
-			'categories' => false, // Comma-separated list of IDs
-			'limit' => false, // Show at most this many events
-			'order' => false,
-		// Appearance arguments
-			'allow_multiple_markers' => false,
-			'open_only' => true,
-			'show_date' => true,
-			'show_excerpt' => false,
-			'excerpt_length' => 55,
-			'legacy' => false, // Force the legacy maps fetching method
-			'featured_image' => false,
-			'class' => false,
-			'template' => 'get_shortcode_events_map_marker_body_output', // Always a template class call
+		$map_args 	= $args;
+		$args 		= $this->_preparse_arguments( $args, array(
+			// Date arguments
+			'relative_date' 			=> false, // A date relative to _now_ or to date argument - using a strtotime string
+			'date' 						=> false, // Starting date - default to now
+			'lookahead' 				=> false, // Don't use default monthly page - use weeks count instead
+			'weeks' 					=> false, // Look ahead this many weeks
+			// Query arguments
+			'category' 					=> false, // ID or slug
+			'categories' 				=> false, // Comma-separated list of IDs
+			'limit' 					=> false, // Show at most this many events
+			'order' 					=> false,
+			// Appearance arguments
+			'allow_multiple_markers' 	=> false,
+			'open_only' 				=> true,
+			'show_date' 				=> true,
+			'show_excerpt' 				=> false,
+			'excerpt_length' 			=> 55,
+			'legacy' 					=> false, // Force the legacy maps fetching method
+			'featured_image' 			=> false,
+			'class' 					=> false,
+			'template' 					=> 'get_shortcode_events_map_marker_body_output', // Always a template class call
 		));
-		$args['featured_image'] = $this->_arg_to_bool($args['featured_image']);
-		$args['show_date'] = $this->_arg_to_bool($args['show_date']);
-		$args['show_excerpt'] = $this->_arg_to_bool($args['show_excerpt']);
+		$args['featured_image'] 		= $this->_arg_to_bool($args['featured_image']);
+		$args['show_date'] 				= $this->_arg_to_bool($args['show_date']);
+		$args['show_excerpt'] 			= $this->_arg_to_bool($args['show_excerpt']);
 		$args['allow_multiple_markers'] = $this->_arg_to_bool($args['allow_multiple_markers']);
-		$class = $args['class'] ? 'class="' . $args['class'] . '"' : '';
+		$class 							= $args['class'] ? 'class="' . $args['class'] . '"' : '';
 
-		$query = $this->_to_query_args($args);
+		$query 							= $this->_to_query_args($args);
 
-		$order_method = $args['order']
-			? create_function('', 'return "' . $args['order'] . '";')
-			: false
-		;
-		if ($order_method) add_filter('eab-collection-date_ordering_direction', $order_method);
+		$order_method 					= $args['order']
+					? create_function('', 'return "' . $args['order'] . '";')
+					: false ;
+		if ( $order_method ) { 
+			add_filter( 'eab-collection-date_ordering_direction', $order_method );
+		}
 
 		$maps = array();
-		if ($this->_arg_to_bool($args['legacy'])) {
+		if ( $this->_arg_to_bool( $args['legacy'] ) ) {
 			// Lookahead - depending on presence, use regular upcoming query, or poll week count
-			if ($args['lookahead']) {
+			if ( $args['lookahead'] ) {
 				$method = $args['weeks']
 					? create_function('', 'return ' . $args['weeks'] . ';')
 					: false;
 				;
-				if ($method) add_filter('eab-collection-upcoming_weeks-week_number', $method);
-				$events = Eab_CollectionFactory::get_upcoming_weeks($args['date'], $query);
-				if ($method) remove_filter('eab-collection-upcoming_weeks-week_number', $method);
+				if ( $method ) {
+					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+				}
+				$events = Eab_CollectionFactory::get_upcoming_weeks( $args['date'], $query );
+				if ( $method ) {
+					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+				}
 			} else {
 				// No lookahead, get the full month only
-				$events = Eab_CollectionFactory::get_upcoming($args['date'], $query);
+				$events = Eab_CollectionFactory::get_upcoming( $args['date'], $query );
 			}
-			if ($order_method) remove_filter('eab-collection-date_ordering_direction', $order_method);
+			if ( $order_method ) {
+				remove_filter( 'eab-collection-date_ordering_direction', $order_method );
+			}
 
-			$model = new AgmMapModel;
-			$raw_maps = $model->get_custom_maps($events->query);
-			if (empty($raw_maps)) return $content;
+			$model 		= new AgmMapModel;
+			$raw_maps 	= $model->get_custom_maps($events->query);
+			if ( empty( $raw_maps ) ) {
+				return $content;
+			}
 
-			foreach ($raw_maps as $key => $map) {
-				if (empty($map['markers']) || count($map['markers']) > 1) continue;
+			foreach ( $raw_maps as $key => $map ) {
+				if ( empty( $map['markers'] ) || count( $map['markers'] ) > 1 ) continue;
 				$event = !empty($map['post_ids']) && !empty($map['post_ids'][0])
 					? new Eab_EventModel(get_post($map['post_ids'][0]))
 					: false
 				;
-				if (!$event) continue;
+				if ( !$event ) continue;
 
 				$map['markers'][0]['title'] = $event->get_title();
 				$map['markers'][0]['body'] = Eab_Template::util_apply_shortcode_template($event, $args);
-				if ($args['featured_image']) {
+				if ( $args['featured_image'] ) {
 					$icon = $event->get_featured_image_url();
 					if ($icon) $map['markers'][0]['icon'] = $icon;
 				}
@@ -101,7 +112,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				$maps[] = $map;
 			}
 		} else {
-			if ($args['lookahead']) {
+			if ( $args['lookahead'] ) {
 				$method = $args['weeks']
 					? create_function('', 'return ' . $args['weeks'] . ';')
 					: false;
@@ -181,7 +192,7 @@ class Eab_Shortcodes extends Eab_Codec {
 	function process_calendar_shortcode ($args=array(), $content=false) {
 		$args = $this->_preparse_arguments($args, array(
 			'network' => false,
-			'date' => false,
+			'date' => strtotime(date( 'Y-m' )),
 			'relative_date' => false,
 		// Query arguments
 			'category' => false, // ID or slug
@@ -200,6 +211,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'with_thumbnail' => false,
 			'default_thumbnail' => false,
 			'show_excerpt' => false,
+			'show_old' => false,
 			'excerpt_length' => 55,
 		));
 
@@ -209,11 +221,19 @@ class Eab_Shortcodes extends Eab_Codec {
 		}
 
 		$query = $this->_to_query_args($args);
-
 		$events = ($args['network'] && is_multisite())
 			? Eab_Network::get_upcoming_events(30)
 			: Eab_CollectionFactory::get_upcoming_events($args['date'], $query)
 		;
+		
+		if ( $args['show_old'] ) {
+			$old_events = ($args['network'] && is_multisite())
+				? Eab_Network::get_old_events(30)
+				: Eab_CollectionFactory::get_old_events($args['date'], $query)
+			;
+			
+			$events = array_merge( $events, $old_events );
+		}
 
 		$output = Eab_Template::util_apply_shortcode_template($events, $args);
 		$output = $output ? $output : $content;
@@ -224,28 +244,29 @@ class Eab_Shortcodes extends Eab_Codec {
 
 	function add_calendar_shortcode_help ($help) {
 		$help[] = array(
-			'title' => __('Calendar shortcode', Eab_EventsHub::TEXT_DOMAIN),
-			'tag' => 'eab_calendar',
+			'title' 	=> __('Calendar shortcode', Eab_EventsHub::TEXT_DOMAIN),
+			'tag' 		=> 'eab_calendar',
 			'arguments' => array(
-				'network' => array('help' => __('Query type (Required <a href="https://premium.wpmudev.org/project/post-indexer/" target="_blank">Post Indexer</a> plugin', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
-				'date' => array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
-				'relative_date' => array('help' => __('A date relative to now or to date argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_strtotime'),
-				'category' => array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
-				'categories' => array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
-				'navigation' => array('help' => __('Show navigation', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
-				'track' => array('help' => __('Maintain scroll position when navigating', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
-				'title_format' => array('help' => __('Date format used in the navigation title, defaults to "M Y"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
-				'short_title_format' => array('help' => __('Date format used for shorter date representation in the navigation title, defaults to "m-Y"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
-				'long_date_format' => array('help' => __('Date format used for displaying long date representation, defaults to your date settings', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
-				'footer' => array('help' => __('Show calendar table footer', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
-				'class' => array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
-				'with_thumbnail' => array('help' => __('Show event thumbnail', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'network' 			=> array('help' => __('Query type (Required <a href="https://premium.wpmudev.org/project/post-indexer/" target="_blank">Post Indexer</a> plugin', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'date' 				=> array('help' => __('Starting date - default to now', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'relative_date' 	=> array('help' => __('A date relative to now or to date argument', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_strtotime'),
+				'category' 			=> array('help' => __('Show events from this category (ID or slug)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:or_integer'),
+				'categories' 		=> array('help' => __('Show events from these categories - accepts comma-separated list of IDs', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:id_list'),
+				'navigation' 		=> array('help' => __('Show navigation', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'track' 			=> array('help' => __('Maintain scroll position when navigating', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'title_format' 		=> array('help' => __('Date format used in the navigation title, defaults to "M Y"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
+				'short_title_format'=> array('help' => __('Date format used for shorter date representation in the navigation title, defaults to "m-Y"', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
+				'long_date_format' 	=> array('help' => __('Date format used for displaying long date representation, defaults to your date settings', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date_format'),
+				'footer' 			=> array('help' => __('Show calendar table footer', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'class' 			=> array('help' => __('Apply this CSS class', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'with_thumbnail' 	=> array('help' => __('Show event thumbnail', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'default_thumbnail' => array('help' => __('Use this image URL as thumnail if event does not have an appropriate featured image set', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:url'),
-				'show_excerpt' => array('help' => __('Show event excerpt in the quick overview.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
-				'excerpt_length' => array('help' => __('Determine the excerpt length (characters count) to be shown.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
-				'template' => array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
-				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
-				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'show_excerpt' 		=> array('help' => __('Show event excerpt in the quick overview.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'excerpt_length' 	=> array('help' => __('Determine the excerpt length (characters count) to be shown.', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'integer'),
+				'template' 			=> array('help' => __('Subtemplate file, or template class call', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
+				'override_styles' 	=> array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'override_scripts' 	=> array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'show_old'			=> array('help' => __('Show past events on the calendar', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 			),
 			'advanced_arguments' => array('template', 'override_scripts', 'override_styles', 'default_thumbnail'),
 		);
@@ -258,26 +279,26 @@ class Eab_Shortcodes extends Eab_Codec {
 	function process_archive_shortcode ($args=array(), $content=false) {
 		include_once( 'shortcodes/class-eab-archive-shortcode.php' );
 		$args = $this->_preparse_arguments($args, array(
-			'network' => false, // Query type
-		// Date arguments
-			'date' => false, // Starting date - default to now
-			'relative_date' => false,
-			'lookahead' => false, // Don't use default monthly page - use weeks count instead
-			'weeks' => false, // Look ahead this many weeks
-		// Query arguments
-			'category' => false, // ID or slug
-			'categories' => false, // Comma-separated list of category IDs
-			'limit' => false, // Show at most this many events
-			'order' => false,
-		// Paging arguments
-			'paged' => false,
-			'page' => 1,
-		// Appearance arguments
-			'class' => false,
-			'template' => 'get_shortcode_archive_output', // Subtemplate file, or template class call
-			'override_styles' => false,
-			'override_scripts' => false,
-			'with_thumbnail' => false
+			'network' 			=> false, // Query type
+			// Date arguments
+			'date' 				=> false, // Starting date - default to now
+			'relative_date' 	=> false,
+			'lookahead' 		=> false, // Don't use default monthly page - use weeks count instead
+			'weeks' 			=> false, // Look ahead this many weeks
+			// Query arguments
+			'category' 			=> false, // ID or slug
+			'categories' 		=> false, // Comma-separated list of category IDs
+			'limit' 			=> false, // Show at most this many events
+			'order' 			=> false,
+			// Paging arguments
+			'paged' 			=> false,
+			'page' 				=> 1,
+			// Appearance arguments
+			'class' 			=> false,
+			'template' 			=> 'get_shortcode_archive_output', // Subtemplate file, or template class call
+			'override_styles' 	=> false,
+			'override_scripts' 	=> false,
+			'with_thumbnail' 	=> false
 		));
 
 		$shortcode = new Eab_Archive_Shortcode( $args );

@@ -14,9 +14,9 @@ class Eab_Admin_Settings_Menu {
 
 		add_action( 'load-' . $id, array( $this, 'load' ) );
 
-		$eab = events_and_bookings();
-		$this->_data = $eab->_data;
-		$this->_api = $eab->_api;
+		$eab 			= events_and_bookings();
+		$this->_data 	= $eab->_data;
+		$this->_api 	= $eab->_api;
 	}
 
 	public function load() {
@@ -109,11 +109,10 @@ class Eab_Admin_Settings_Menu {
 
 		$options = apply_filters('eab-settings-before_save', $options);
 		$this->_data->set_options($options);
-                // Added by Ashok
-                // Removed old redirect
-                // Added new redirect, based on selected tab in Events Settings
-                wp_redirect( add_query_arg( 'incsub_event_settings_saved', 1, $event_default['event_settings_url'] ) );
-		//wp_redirect('edit.php?post_type=incsub_event&page=eab_settings&incsub_event_settings_saved=1');
+		// Added by Ashok
+		// Removed old redirect
+		// Added new redirect, based on selected tab in Events Settings
+		wp_redirect( add_query_arg( 'incsub_event_settings_saved', 1, $event_default['event_settings_url'] ) );
 		exit();
 	}
 }
