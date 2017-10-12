@@ -12,7 +12,7 @@ class Eab_Api {
 	public function initialize () {
 		add_action('wp_ajax_nopriv_eab_get_form', array($this, 'handle_get_form'));
 		add_action('wp_ajax_eab_get_form', array($this, 'handle_get_form'));
-		if ($this->_data->get_option('accept_api_logins')) {
+		if ( $this->_data->get_option('accept_api_logins') ) {
 			add_action('wp_ajax_nopriv_eab_facebook_login', array($this, 'handle_facebook_login'));
 
 			add_action('wp_ajax_nopriv_eab_get_twitter_auth_url', array($this, 'handle_get_twitter_auth_url'));
@@ -29,9 +29,10 @@ class Eab_Api {
 			add_filter('get_avatar', array($this, 'get_social_api_avatar'), 10, 3);
 
 			// Google
-			if (!session_id()) session_start();
-			if (!class_exists('LightOpenID')) include_once  EAB_PLUGIN_DIR . 'lib/lightopenid/openid.php';
-			$this->openid = new LightOpenID;
+			if ( !class_exists( 'LightOpenID' ) ) {
+				include_once  EAB_PLUGIN_DIR . 'lib/lightopenid/openid.php';
+			} 
+			$this->openid 			= new LightOpenID;
 
 			$this->openid->identity = 'https://www.google.com/accounts/o8/id';
 			$this->openid->required = array('namePerson/first', 'namePerson/last', 'namePerson/friendly', 'contact/email');

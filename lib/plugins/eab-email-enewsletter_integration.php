@@ -138,17 +138,21 @@ class Eab_Emi_Model {
 
 	const GROUP_POST_META_KEY = "eab_event_rsvp_group";
 
-	private $_newsletter;
+	private $_newsletter = null;
 	private $_db;
 
 	public function __construct () {
 		global $email_newsletter, $wpdb;
-		$this->_newsletter = $email_newsletter;
 		$this->_db = $wpdb;
+		if ( isset( $email_newsletter ) && is_object( $email_newsletter ) ) {
+			if ( $this->newsletter_tables_exist() ) {
+				$this->_newsletter = $email_newsletter;
+			}
+		}
 	}
 
 	public function has_newsletter () {
-		return !empty($this->_newsletter);
+		return !empty( $this->_newsletter);
 	}
 
 	public function get_newsletters () {
@@ -157,6 +161,32 @@ class Eab_Emi_Model {
 
 	public function get_meta ($newsletter_id, $meta_key) {
 		return $this->_newsletter->get_newsletter_meta($newsletter_id, $meta_key);
+	}
+
+	/**
+	 * Enewsletter plugin has some issues where the plugin does not create tables. 
+	 * So we need to check
+	 */
+	public function newsletter_tables_exist() {
+		global $email_newsletter;
+		$email_newsletter->install( get_current_blog_id() );
+		$exists 	= false;
+		$prefix 	= $this->_get_table_prefix();
+		$table_name = $prefix . "enewsletter_meta";
+		if ( $this->_db->get_var( $this->_db->prepare( "show tables like %s", $table_name ) ) == $table_name ) {
+			$exists = true;
+		} else {
+			$email_newsletter->upgrade( get_current_blog_id(), 2.704 );
+			$exists = false;
+		}
+		$table_name = $prefix . "enewsletter_newsletters";
+		if ( $this->_db->get_var( $this->_db->prepare( "show tables like %s", $table_name ) ) == $table_name ) {
+			$exists = true;
+		} else {
+			$email_newsletter->upgrade( get_current_blog_id(), 2.704 );
+			$exists = false;
+		}
+		return $exists;
 	}
 
 	public function get_expanded_newsletter_ids () {
@@ -374,7 +404,7 @@ class Eab_Emi_Model {
 	}
 
 	private function _get_table_prefix () {
-		return $this->_newsletter->tb_prefix;
+		return $this->_db->prefix;
 	}
 
 	/**

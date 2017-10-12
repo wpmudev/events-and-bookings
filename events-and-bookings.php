@@ -84,15 +84,19 @@ class Eab_EventsHub {
     function __construct () {
 		global $wpdb, $wp_version;
 
+		if ( !session_id() ) {
+			session_start();
+		}
+
 		// Actions
-		add_action('init', array($this, 'init'), 0);
-		add_action('init', array($this, 'process_rsvps'), 99); // Bind this a bit later, so BP can load up
+		add_action( 'init', array( $this, 'init' ), 0 );
+		add_action( 'init', array( $this, 'process_rsvps' ), 99 ); // Bind this a bit later, so BP can load up
 
 
-		add_action('option_rewrite_rules', array($this, 'check_rewrite_rules'));
+		add_action( 'option_rewrite_rules', array( $this, 'check_rewrite_rules' ) );
 
-		add_action('wp_print_styles', array($this, 'wp_print_styles'));
-		add_action('wp_enqueue_scripts', array($this, 'wp_enqueue_scripts'));
+		add_action( 'wp_print_styles', array( $this, 'wp_print_styles' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 
 		/**
 		 * Wipe out the default post actions, because we're using our own
@@ -137,7 +141,7 @@ class Eab_EventsHub {
 
 	    add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
-                add_action( 'ms_rule_cptgroup_model_protect_posts', array( $this, 'reverse_m2_modified_event_cpt' ), 99, 2 );
+        add_action( 'ms_rule_cptgroup_model_protect_posts', array( $this, 'reverse_m2_modified_event_cpt' ), 99, 2 );
 
 	    if ( is_admin() ) {
 		    require_once( 'admin/class-eab-admin.php' );
@@ -148,13 +152,13 @@ class Eab_EventsHub {
 
     }
 
-    public function reverse_m2_modified_event_cpt( $wp_query, $obj )
-    {
-        if( ! isset( $wp_query->query_vars['post_type'] ) ) return;
+    public function reverse_m2_modified_event_cpt( $wp_query, $obj ) {
+        if( ! isset( $wp_query->query_vars['post_type'] ) ) {
+			return;
+		} 
 		
-		if( is_array( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'][0] == Eab_EventModel::POST_TYPE )
-        {
-                $wp_query->query_vars['post_type'] = Eab_EventModel::POST_TYPE;
+		if( is_array( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'][0] == Eab_EventModel::POST_TYPE ) {
+            $wp_query->query_vars['post_type'] = Eab_EventModel::POST_TYPE;
         }
     }
 
@@ -168,33 +172,43 @@ class Eab_EventsHub {
 		}
 	}
 
-	function process_recurrent_trashing ($post_id) {
-		$event = new Eab_EventModel(get_post($post_id));
-		if (!$event->is_recurring()) return false;
+	function process_recurrent_trashing ( $post_id ) {
+		$event = new Eab_EventModel( get_post( $post_id ) );
+		if ( !$event->is_recurring() )  { 
+			return false;
+		}
 		$event->trash_recurring_instances();
 	}
 
-	function process_recurrent_untrashing ($post_id) {
-		$event = new Eab_EventModel(get_post($post_id));
-		if (!$event->is_recurring()) return false;
+	function process_recurrent_untrashing ( $post_id ) {
+		$event = new Eab_EventModel( get_post( $post_id ) );
+		if ( !$event->is_recurring() )  { 
+			return false;
+		}
 		$event->untrash_recurring_instances();
 	}
 
-	function process_recurrent_deletion ($post_id) {
-		$event = new Eab_EventModel(get_post($post_id));
-		if (!$event->is_recurring()) return false;
+	function process_recurrent_deletion ( $post_id ) {
+		$event = new Eab_EventModel( get_post( $post_id ) );
+		if ( !$event->is_recurring() )  { 
+			return false;
+		}
 		$event->delete_recurring_instances();
 	}
 
 	function respawn_recurring_instances ($post) {
-		if (empty($post->post_type) || Eab_EventModel::POST_TYPE !== $post->post_type) return false;
-		$event = new Eab_EventModel($post);
-		if (!$event->is_recurring()) return false;
+		if ( empty( $post->post_type ) || Eab_EventModel::POST_TYPE !== $post->post_type )  { 
+			return false;
+		}
+		$event = new Eab_EventModel( $post );
+		if ( !$event->is_recurring() )  { 
+			return false;
+		}
 
-		$interval = $event->get_recurrence();
+		$interval 	= $event->get_recurrence();
 		$time_parts = $event->get_recurrence_parts();
-		$start = $event->get_recurrence_starts();
-		$end = $event->get_recurrence_ends();
+		$start 		= $event->get_recurrence_starts();
+		$end 		= $event->get_recurrence_ends();
 
 		$event->spawn_recurring_instances($start, $end, $interval, $time_parts);
 	}
@@ -209,10 +223,10 @@ class Eab_EventsHub {
 		global $wpdb, $wp_rewrite, $current_user, $blog_id, $wp_version;
 		$version = preg_replace('/-.*$/', '', $wp_version);
 
-		if (preg_match('/mu\-plugin/', PLUGINDIR) > 0) {
-		    load_muplugin_textdomain(self::TEXT_DOMAIN, dirname(plugin_basename(__FILE__)).'/languages');
+		if ( preg_match('/mu\-plugin/', PLUGINDIR ) > 0 ) {
+		    load_muplugin_textdomain( self::TEXT_DOMAIN, dirname( plugin_basename( __FILE__) ).'/languages' );
 		} else {
-		    load_plugin_textdomain(self::TEXT_DOMAIN, false, dirname(plugin_basename(__FILE__)).'/languages');
+		    load_plugin_textdomain( self::TEXT_DOMAIN, false, dirname( plugin_basename( __FILE__) ).'/languages' );
 		}
 
 	    $taxonomies = new Eab_Taxonomies();
@@ -220,13 +234,13 @@ class Eab_EventsHub {
 
 		$event_structure = '/'.$this->_data->get_option('slug').'/%event_year%/%event_monthnum%/%incsub_event%';
 
-		$wp_rewrite->add_rewrite_tag("%incsub_event%", '(.+?)', "incsub_event=");
-		$wp_rewrite->add_rewrite_tag("%event_year%", '([0-9]{4})', "event_year=");
-		$wp_rewrite->add_rewrite_tag("%event_monthnum%", '([0-9]{2})', "event_monthnum=");
+		$wp_rewrite->add_rewrite_tag( "%incsub_event%", '(.+?)', "incsub_event=" );
+		$wp_rewrite->add_rewrite_tag( "%event_year%", '([0-9]{4})', "event_year=" );
+		$wp_rewrite->add_rewrite_tag( "%event_monthnum%", '([0-9]{2})', "event_monthnum=" );
 	    //add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/.+?/comment-page-([0-9]{1,})/?$', 'index.php?post_type=incsub_event&cpage=$matches[1]', 'top' );
         add_rewrite_rule( $this->_data->get_option('slug') . '/[0-9]{4}/[0-9]{2}/(.+)?/comment-page-([0-9]{1,})/?$', 'index.php?incsub_event=$matches[1]&cpage=$matches[2]', 'top' );
 
-		$wp_rewrite->add_permastruct('incsub_event', $event_structure, false);
+		$wp_rewrite->add_permastruct( 'incsub_event', $event_structure, false );
 
 		//wp_register_script('eab_jquery_ui', plugins_url('events-and-bookings/js/jquery-ui.custom.min.js'), array('jquery'), self::CURRENT_VERSION);
 
@@ -238,24 +252,26 @@ class Eab_EventsHub {
 
 
 
-		if (isset($_REQUEST['eab_step'])) {
+		if ( isset($_REQUEST['eab_step'] ) ) {
 		    setcookie('eab_step', $_REQUEST['eab_step'], eab_current_time()+(3600*24));
-		} else if (isset($_COOKIE['eab_step'])) {
+		} else if ( isset($_COOKIE['eab_step'] ) ) {
 		    $_REQUEST['eab_step'] = $_COOKIE['eab_step'];
 		}
 
-		if (isset($_REQUEST['eab_export'])) {
-			if (!class_exists('Eab_ExporterFactory')) require_once EAB_PLUGIN_DIR . 'lib/class_eab_exporter.php';
-			Eab_ExporterFactory::serve($_REQUEST);
+		if ( isset( $_REQUEST['eab_export'] ) ) {
+			if ( !class_exists('Eab_ExporterFactory') )  { 
+				require_once EAB_PLUGIN_DIR . 'lib/class_eab_exporter.php';
+			}
+			Eab_ExporterFactory::serve( $_REQUEST );
 		}
     }
 
 	function process_rsvps () {
 		global $wpdb;
-		if (isset($_POST['event_id']) && isset($_POST['user_id'])) {
-		    $booking_actions = array('yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no');
-			$booking_action = '';
-		    $event_id = intval($_POST['event_id']);
+		if ( isset( $_POST['event_id'] ) && isset( $_POST['user_id'] ) ) {
+		    $booking_actions 	= array( 'yes' => 'yes', 'maybe' => 'maybe', 'no' => 'no' );
+			$booking_action 	= '';
+		    $event_id 			= intval( $_POST['event_id'] );
 			foreach( $booking_actions as $val ) {
 				if( isset( $_POST['action_' . $val] ) ) {
 					$booking_action = $val;
