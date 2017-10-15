@@ -637,13 +637,16 @@ class Eab_EventsHub {
     function wp_enqueue_scripts() {
 		global $wp_query;
 
-		echo '<script type="text/javascript">var _eab_data=' . json_encode(apply_filters('eab-javascript-public_data', array(
+		$script = 'var _eab_data=' . json_encode(apply_filters('eab-javascript-public_data', array(
 				'ajax_url' => admin_url('admin-ajax.php'),
 				'root_url' => plugins_url('events-and-bookings/img/'),
 				'fb_scope' => 'email',))
 			) . ';' .
-			'if (!("ontouchstart" in document.documentElement)) document.documentElement.className += " no-touch";' .
-		'</script>';
+			'if (!("ontouchstart" in document.documentElement)) document.documentElement.className += " no-touch";';
+		if ( ! wp_script_is( 'jquery', 'done' ) ) {
+			wp_enqueue_script( 'jquery' );
+		}
+		wp_add_inline_script( 'jquery-migrate', $script );
 
 		if (isset($wp_query->query_vars['post_type']) && $wp_query->query_vars['post_type'] == 'incsub_event') {
 		    wp_enqueue_script('eab_event_js');
