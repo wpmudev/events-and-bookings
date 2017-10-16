@@ -6,12 +6,12 @@ class Eab_Upcoming_Widget extends Eab_Widget {
     
     function __construct () {
     	$this->_defaults = apply_filters('eab-widgets-upcoming-default_fields', array( 
-			'title' => __('Upcoming', $this->translation_domain),
-			'excerpt' => false,
-			'excerpt_words_limit' => false,
-			'thumbnail' => false,
-			'limit' => 5,
-			'dates' => false,
+			'title' 				=> __('Upcoming', $this->translation_domain),
+			'excerpt' 				=> false,
+			'excerpt_words_limit' 	=> false,
+			'thumbnail' 			=> false,
+			'limit' 				=> 5,
+			'dates' 				=> false,
 		));
 		$widget_ops = array(
 			'description' => __('Display List of Upcoming Events', $this->translation_domain),
@@ -28,9 +28,12 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		extract($args);
 		
 		$instance = apply_filters('eab-widgets-upcoming-instance_read', $instance, $this);
-		$options = wp_parse_args((array)$instance, $this->_defaults);
+		$options = wp_parse_args( (array ) $instance, $this->_defaults );
+		if ( isset( $instance['title'] ) && !empty( $instance['title'] ) ) {
+			$options['title'] = strip_tags( $instance['title'] );
+		}
 		
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Upcoming', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
+		$title = apply_filters('widget_title', ( empty($options['title']) ) ? __('Upcoming', $this->translation_domain) : $options['title'], $options, $this->id_base);
 		$query_args = array(
 			'posts_per_page' => $options['limit'],
 		);
@@ -89,19 +92,19 @@ class Eab_Upcoming_Widget extends Eab_Widget {
     }
     
     function update ($new_instance, $old_instance) {
-		$instance = $old_instance;
-        $new_instance = wp_parse_args((array)$new_instance, $this->_defaults);
+		$instance 		= $old_instance;
+        $new_instance 	= wp_parse_args((array)$new_instance, $this->_defaults);
         
-        $instance['title'] = strip_tags($new_instance['title']);
-        $instance['excerpt'] = (int)$new_instance['excerpt'];
-        $instance['excerpt_words_limit'] = (int)$new_instance['excerpt_words_limit'];
-        $instance['thumbnail'] = (int)$new_instance['thumbnail'];
-        $instance['limit'] = (int)$new_instance['limit'];
-        $instance['lookahead'] = (int)$new_instance['lookahead'];
-        $instance['dates'] = (int)$new_instance['dates'];
-        $instance['category'] = (int)$new_instance['category'];
+        $instance['title'] 					= strip_tags($new_instance['title']);
+        $instance['excerpt'] 				= (int)$new_instance['excerpt'];
+        $instance['excerpt_words_limit'] 	= (int)$new_instance['excerpt_words_limit'];
+        $instance['thumbnail'] 				= (int)$new_instance['thumbnail'];
+        $instance['limit'] 					= (int)$new_instance['limit'];
+        $instance['lookahead'] 				= (int)$new_instance['lookahead'];
+        $instance['dates'] 					= (int)$new_instance['dates'];
+        $instance['category'] 				= (int)$new_instance['category'];
 
-        $instance = apply_filters('eab-widgets-upcoming-instance_update', $instance, $new_instance, $this);
+        $instance 		= apply_filters('eab-widgets-upcoming-instance_update', $instance, $new_instance, $this);
 	
         return $instance;
     }
@@ -109,7 +112,10 @@ class Eab_Upcoming_Widget extends Eab_Widget {
     function form ($instance) {
     	$instance = apply_filters('eab-widgets-upcoming-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
-        $options['title'] = strip_tags($instance['title']);	
+		if ( isset( $instance['title'] ) && !empty( $instance['title'] ) ) {
+			$options['title'] = strip_tags( $instance['title'] );
+		}
+        	
 		
 		$categories = get_terms('eab_events_category');
 	?>

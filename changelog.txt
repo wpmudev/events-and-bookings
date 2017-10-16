@@ -11,6 +11,8 @@ Changelog:
 - Fixed: E-newsletter activation error. Tables of eneswletter would not be created
 - Fixed: Session warning when enewsletter is activated
 - Fixed: Prevent multiple clicking of event RSVP buttons after confirmation
+- Fixed: Archived Events shortcode
+- Fixed: Php notices
 
 ----------------------------------------------------------------------
 1.9.6 - 2017-09-08
