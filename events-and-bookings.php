@@ -463,8 +463,10 @@ class Eab_EventsHub {
     function handle_archive_template( $path ) {
 		global $wp_query, $post;
 
-		if ( ! is_post_type_archive ( 'incsub_event' ) )
-		    return $path;
+		if ( ! is_post_type_archive ( 'incsub_event' ) ) {
+			return $path;
+		}
+		    
 
 		$current_filter = explode( '_', current_filter() );
 		$type 			= reset( $current_filter );
@@ -480,9 +482,9 @@ class Eab_EventsHub {
 		;
 		$eab_type = $is_theme_tpl = false;
 		if ($this->_data->get_option('override_appearance_defaults')) {
-			$eab_type = $this->_data->get_option('archive_template');
-			$eab_type = $eab_type ? $eab_type : '';
-			$is_theme_tpl = preg_match('/\.php$/', $eab_type);
+			$eab_type 		= $this->_data->get_option('archive_template');
+			$eab_type 		= $eab_type ? $eab_type : '';
+			$is_theme_tpl 	= preg_match('/\.php$/', $eab_type);
 		}
 		if ( !$style && !$is_theme_tpl && @$this->_data->get_option('override_appearance_defaults' ) ) {
 			$style_path = file_exists( EAB_PLUGIN_DIR . "default-templates/{$eab_type}/events.css" );

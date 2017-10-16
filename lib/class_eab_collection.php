@@ -190,26 +190,26 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 		$args = array_merge(
 			$args,
 			array(
-			 	'post_type' => 'incsub_event',
-			 	'post_status' => array('publish', Eab_EventModel::RECURRENCE_STATUS),
-				'suppress_filters' => false,
-				'meta_query' => array(
+			 	'post_type' 		=> 'incsub_event',
+			 	'post_status' 		=> array('publish', Eab_EventModel::RECURRENCE_STATUS),
+				'suppress_filters' 	=> false,
+				'meta_query' 		=> array(
 					array(
-		    			'key' => 'incsub_event_start',
-						'value' => date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are $weeks weeks from now
-		    			'compare' => '<',
-		    			'type' => 'DATETIME'
+		    			'key' 		=> 'incsub_event_start',
+						'value' 	=> date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are $weeks weeks from now
+		    			'compare' 	=> '<',
+		    			'type' 		=> 'DATETIME'
 					),
 					array(
-		    			'key' => 'incsub_event_end',
-						'value' => date( "Y-m-d H:i", $time ), // Events those already started now
-		    			'compare' => '>=',
-		    			'type' => 'DATETIME'
+		    			'key' 		=> 'incsub_event_end',
+						'value' 	=> date( "Y-m-d H:i", $time ), // Events those already started now
+		    			'compare' 	=> '>=',
+		    			'type' 		=> 'DATETIME'
 					),
 					array(
-						'key' => 'incsub_event_status',
-						'value' => $forbidden_statuses,
-						'compare' => 'NOT IN',
+						'key' 		=> 'incsub_event_status',
+						'value' 	=> $forbidden_statuses,
+						'compare' 	=> 'NOT IN',
 					),
 				)
 			)
@@ -217,6 +217,63 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 		return $args;
 	}
 }
+
+class Eab_UpcomingWeeksArchiveCollection extends Eab_TimedCollection {
+	
+		const WEEK_COUNT = 5;
+	
+		public function __construct ($timestamp=false, $args=array()) {
+			if (!defined('EAB_COLLECTION_UPCOMING_WEEKS_COUNT')) define('EAB_COLLECTION_UPCOMING_WEEKS_COUNT', self::WEEK_COUNT, true);
+	
+			Eab_Filter::start_date_ordering_set_up();
+			add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));
+			parent::__construct($timestamp, $args);
+			Eab_Filter::start_date_ordering_tear_down();
+		}
+	
+		public function propagate_direction_filter ($direction) {
+			return apply_filters('eab-collection-date_ordering_direction', $direction);
+		}
+	
+		public function build_query_args ($args) {
+			// Changes by Hakan
+			// Commented lines were not removed intentionally.
+			$time = $this->get_timestamp();
+	
+			if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;
+	
+			$weeks = apply_filters( 'eab-collection-upcoming_weeks-archive-week_number', EAB_COLLECTION_UPCOMING_WEEKS_COUNT );
+			$weeks = is_numeric($weeks) ? $weeks : self::WEEK_COUNT;
+	
+			$args = array_merge(
+				$args,
+				array(
+					 'post_type' 		=> 'incsub_event',
+					 'post_status' 		=> array('publish', Eab_EventModel::RECURRENCE_STATUS),
+					'suppress_filters' 	=> false,
+					'meta_query' 		=> array(
+						array(
+							'key' 		=> 'incsub_event_start',
+							'value' 	=> date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are $weeks weeks from now
+							'compare' 	=> '<',
+							'type' 		=> 'DATETIME'
+						),
+						array(
+							'key' 		=> 'incsub_event_end',
+							'value' 	=> date( "Y-m-d H:i", $time ), // Events those already started now
+							'compare' 	=> '>=',
+							'type' 		=> 'DATETIME'
+						),
+						array(
+							'key' 	=> 'incsub_event_status',
+							'value' => Eab_EventModel::STATUS_ARCHIVED,
+						),
+					)
+				)
+			);
+			return $args;
+		}
+	}
 
 
 /**
@@ -297,22 +354,29 @@ class Eab_OldCollection extends Eab_TimedCollection {
  */
 class Eab_ArchivedCollection extends Eab_Collection {
 
-	public function build_query_args ($args) {
-
+	public function build_query_args ($args, $timestamp = false) {
 		$args = array_merge(
 			$args,
 			array(
-			 	'post_type' => 'incsub_event',
-				'post_status' => 'any',
-				'posts_per_page' => -1,
-				'meta_query' => array(
+			 	'post_type' 		=> 'incsub_event',
+				'post_status' 		=> 'any',
+				'posts_per_page' 	=> -1,
+				'meta_query' 		=> array(
 					array(
-		    			'key' => 'incsub_event_status',
+		    			'key' 	=> 'incsub_event_status',
 		    			'value' => Eab_EventModel::STATUS_ARCHIVED,
 					),
-				)
+				),
 			)
 		);
+		if ( $timestamp ) {
+			$args['meta_query'][0] = array(
+				'key' 		=> 'incsub_event_start',
+				'value' 	=> date( "Y-m-d H:i", $timestamp ),
+				'compare' 	=> '>=',
+				'type' 		=> 'DATETIME'
+			);
+		}
 		return $args;
 	}
 }
@@ -478,6 +542,16 @@ class Eab_CollectionFactory {
 
 	public static function get_expired_events ($args=array()) {
 		$me = new Eab_ExpiredCollection($args);
+		return $me->to_collection();
+	}
+
+	public static function get_archive_events ( $args=array(), $timestamp=false ) {
+		$me = new Eab_ArchivedCollection($args,$timestamp);
+		return $me->to_collection();
+	}
+
+	public static function get_upcoming_weeks_archive_events ($timestamp=false, $args=array()) {
+		$me = new Eab_UpcomingWeeksArchiveCollection($timestamp, $args);
 		return $me->to_collection();
 	}
 }
