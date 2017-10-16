@@ -197,7 +197,7 @@ class Eab_EventsHub {
 		$event->delete_recurring_instances();
 	}
 
-	function respawn_recurring_instances ($post) {
+	function respawn_recurring_instances ( $post ) {
 		if ( empty( $post->post_type ) || Eab_EventModel::POST_TYPE !== $post->post_type )  { 
 			return false;
 		}
@@ -211,7 +211,7 @@ class Eab_EventsHub {
 		$start 		= $event->get_recurrence_starts();
 		$end 		= $event->get_recurrence_ends();
 
-		$event->spawn_recurring_instances($start, $end, $interval, $time_parts);
+		$event->spawn_recurring_instances( $start, $end, $interval, $time_parts );
 	}
 
     /**
@@ -222,9 +222,9 @@ class Eab_EventsHub {
      */
     function init() {
 		global $wpdb, $wp_rewrite, $current_user, $blog_id, $wp_version;
-		$version = preg_replace('/-.*$/', '', $wp_version);
+		$version = preg_replace( '/-.*$/', '', $wp_version );
 
-		if ( preg_match('/mu\-plugin/', PLUGINDIR ) > 0 ) {
+		if ( preg_match( '/mu\-plugin/', PLUGINDIR ) > 0 ) {
 		    load_muplugin_textdomain( self::TEXT_DOMAIN, dirname( plugin_basename( __FILE__) ).'/languages' );
 		} else {
 		    load_plugin_textdomain( self::TEXT_DOMAIN, false, dirname( plugin_basename( __FILE__) ).'/languages' );
@@ -233,7 +233,7 @@ class Eab_EventsHub {
 	    $taxonomies = new Eab_Taxonomies();
 	    $taxonomies->register();
 
-		$event_structure = '/' . $this->_data->get_option('slug'). '/%event_year%/%event_monthnum%/%incsub_event%';
+		$event_structure = '/' . $this->_data->get_option( 'slug' ). '/%event_year%/%event_monthnum%/%incsub_event%';
 
 		$wp_rewrite->add_rewrite_tag( "%incsub_event%", '(.+?)', "incsub_event=" );
 		$wp_rewrite->add_rewrite_tag( "%event_year%", '([0-9]{4})', "event_year=" );
@@ -281,10 +281,10 @@ class Eab_EventsHub {
 				}
 			}
 
-			$user_id = apply_filters( 'eab-rsvp-user_id', get_current_user_id(), $_POST['user_id']);
+			$user_id = apply_filters( 'eab-rsvp-user_id', get_current_user_id(), $_POST['user_id'] );
 
 		    do_action( 'incsub_event_booking', $event_id, $user_id, $booking_action );
-		    if (isset($_POST['action_yes'])) {
+		    if ( isset( $_POST['action_yes'] ) ) {
                 $this->update_rsvp_per_event( $event_id, $user_id, 'yes' );
 				// --todo: Add to BP activity stream
 				do_action( 'incsub_event_booking_yes', $event_id, $user_id );
@@ -481,14 +481,14 @@ class Eab_EventsHub {
 			)
 		;
 		$eab_type = $is_theme_tpl = false;
-		if ($this->_data->get_option('override_appearance_defaults')) {
-			$eab_type 		= $this->_data->get_option('archive_template');
+		if ( $this->_data->get_option( 'override_appearance_defaults' ) ) {
+			$eab_type 		= $this->_data->get_option( 'archive_template' );
 			$eab_type 		= $eab_type ? $eab_type : '';
-			$is_theme_tpl 	= preg_match('/\.php$/', $eab_type);
+			$is_theme_tpl 	= preg_match( '/\.php$/', $eab_type );
 		}
-		if ( !$style && !$is_theme_tpl && @$this->_data->get_option('override_appearance_defaults' ) ) {
+		if ( !$style && !$is_theme_tpl && @$this->_data->get_option( 'override_appearance_defaults' ) ) {
 			$style_path = file_exists( EAB_PLUGIN_DIR . "default-templates/{$eab_type}/events.css" );
-			$style 		= $style_path ? plugins_url( basename( dirname(__FILE__) ) . "/default-templates/{$eab_type}/events.css" ) : $style;
+			$style 		= $style_path ? EAB_PLUGIN_DIR . "/default-templates/{$eab_type}/events.css" : $style;
 		}
 		if ( $style ) { 
 			add_action( 'wp_head', create_function('', "wp_enqueue_style('eab-events', '$style');" ) );
