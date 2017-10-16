@@ -52,9 +52,9 @@ class Eab_Api {
 		$domain = get_bloginfo('name');
 		$domain = $domain ? $domain : __('WordPress', Eab_EventsHub::TEXT_DOMAIN);
 
-		$show_facebook = !$this->_data->get_option('api_login-hide-facebook');
-		$show_twitter = !$this->_data->get_option('api_login-hide-twitter');
-		$show_google = !$this->_data->get_option('api_login-hide-google');
+		$show_facebook	= !$this->_data->get_option('api_login-hide-facebook');
+		$show_twitter 	= !$this->_data->get_option('api_login-hide-twitter');
+		$show_google 	= !$this->_data->get_option('api_login-hide-google');
 
 		$registration_msg = '';
 		$registration_services = array();
@@ -80,39 +80,39 @@ class Eab_Api {
 
 		wp_enqueue_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
-			'facebook' => __('Login with Facebook', Eab_EventsHub::TEXT_DOMAIN),
-			'twitter' => __('Login with Twitter', Eab_EventsHub::TEXT_DOMAIN),
-			'google' => __('Login with Google', Eab_EventsHub::TEXT_DOMAIN),
-			'wordpress' => sprintf(__('Login with %s', Eab_EventsHub::TEXT_DOMAIN), $domain),
-			'cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
-			'please_wait' => __('Please, wait...', Eab_EventsHub::TEXT_DOMAIN),
+			'facebook' 				=> __('Login with Facebook', Eab_EventsHub::TEXT_DOMAIN),
+			'twitter' 				=> __('Login with Twitter', Eab_EventsHub::TEXT_DOMAIN),
+			'google' 				=> __('Login with Google', Eab_EventsHub::TEXT_DOMAIN),
+			'wordpress' 			=> sprintf(__('Login with %s', Eab_EventsHub::TEXT_DOMAIN), $domain),
+			'cancel' 				=> __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
+			'please_wait' 			=> __('Please, wait...', Eab_EventsHub::TEXT_DOMAIN),
 
-			'wp_register' => __('Register', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_registration_msg' => sprintf(_x('Create a username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
-			'wp_login' => __('Log in', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_login_msg' => sprintf(_x('Login with your existing username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
-			'wp_username' => __('Username', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_password' => __('Password', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_email' => __('Email', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_toggle_on' => __('Already a member? Log in here', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_toggle_off' => __('Click here to register', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_lost_pw_text' => __('Forgot your password', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_lost_pw_url' => wp_lostpassword_url(),
-			'wp_submit' => __('Submit', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_register' 			=> __('Register', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_registration_msg' 	=> sprintf(_x('Create a username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
+			'wp_login' 				=> __('Log in', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_login_msg' 			=> sprintf(_x('Login with your existing username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
+			'wp_username' 			=> __('Username', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_password' 			=> __('Password', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_email' 				=> __('Email', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_toggle_on' 			=> __('Already a member? Log in here', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_toggle_off' 		=> __('Click here to register', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_lost_pw_text' 		=> __('Forgot your password', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_lost_pw_url' 		=> wp_lostpassword_url(),
+			'wp_submit' 			=> __('Submit', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_cancel' 			=> __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
 			// Vars
-			'data' => array(
-				'show_facebook' => $show_facebook,
-				'show_twitter' => $show_twitter,
-				'show_google' => $show_google,
-				'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
-				'gg_client_id' => $this->_data->get_option('google-client_id'),
+			'data' 					=> array(
+				'show_facebook' 		=> $show_facebook,
+				'show_twitter' 			=> $show_twitter,
+				'show_google' 			=> $show_google,
+				'show_wordpress' 		=> !$this->_data->get_option('api_login-hide-wordpress'),
+				'gg_client_id' 			=> $this->_data->get_option('google-client_id'),
 			),
 			//validation error for worpress popup
-			'wp_missing_username_password' => __( 'Username and password are required!', Eab_EventsHub::TEXT_DOMAIN ),
-			'wp_username_pass_invalid' => __( 'Invalid username or password!', Eab_EventsHub::TEXT_DOMAIN ),
-			'wp_missing_user_email' => __( 'Username and email are required!', Eab_EventsHub::TEXT_DOMAIN ),
-			'wp_signup_error' => __( 'Your email/username is already taken or email is invalid!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_missing_username_password' 	=> __( 'Username and password are required!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_username_pass_invalid' 		=> __( 'Invalid username or password!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_missing_user_email' 		=> __( 'Username and email are required!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_signup_error' 				=> __( 'Your email/username is already taken or email is invalid!', Eab_EventsHub::TEXT_DOMAIN ),
 		)));
 		if (!$this->_data->get_option('facebook-no_init')) {
 			if (defined('EAB_INTERNAL_FLAG__FB_INIT_ADDED')) return false;
@@ -145,7 +145,7 @@ class Eab_Api {
 
 	function get_social_api_avatar ($avatar, $id_or_email, $size = '96') {
 		$wp_uid = false;
-		if (is_object($id_or_email)) {
+		if ( is_object( $id_or_email ) ) {
 			if (isset($id_or_email->comment_author_email)) $id_or_email = $id_or_email->comment_author_email;
 			else return $avatar;
 		}
