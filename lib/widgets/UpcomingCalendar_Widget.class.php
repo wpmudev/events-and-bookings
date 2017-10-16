@@ -30,13 +30,12 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	}
 	
 	function form ($instance) {
-		$title = esc_attr($instance['title']);
-		$date = esc_attr($instance['date']);
-		$network = esc_attr($instance['network']) ? 'checked="checked"' : '';
-		$category = !empty($instance['category']) ? 
+		$title 		= isset( $instance['title'] ) ? esc_attr($instance['title']) : '';
+		$date 		= isset( $instance['date'] ) ? esc_attr($instance['date']) : '';
+		$network 	= esc_attr($instance['network']) ? 'checked="checked"' : '';
+		$category 	= ( isset( $instance['category'] ) && !empty($instance['category']) ) ? 
 			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
-			: array()
-		;
+			: array() ;
 
 		$html .= '<p>';
 		$html .= '<label for="' . $this->get_field_id('title') . '">' . __('Title:', $this->translation_domain) . '</label>';
@@ -73,22 +72,22 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	}
 	
 	function update ($new_instance, $old_instance) {
-		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['date'] = strip_tags($new_instance['date']);
-		$instance['network'] = strip_tags($new_instance['network']);
-		$instance['category'] = !empty($new_instance['category']) ? array_map('strip_tags', $new_instance['category']) : false;
+		$instance 				= $old_instance;
+		$instance['title']	 	= strip_tags($new_instance['title']);
+		$instance['date'] 		= strip_tags($new_instance['date']);
+		$instance['network'] 	= strip_tags($new_instance['network']);
+		$instance['category'] 	= !empty($new_instance['category']) ? array_map('strip_tags', $new_instance['category']) : false;
 
-		delete_transient($this->get_field_id('cache'));
+		delete_transient( $this->get_field_id('cache') );
 
 		return $instance;
 	}
 	
 	function widget ($args, $instance) {
 		extract($args);
-		$title = apply_filters('widget_title', $instance['title']);
-		$network = is_multisite() ? (int)$instance['network'] : false;
-		$category = !empty($instance['category']) ? 
+		$title 		= isset( $instance['title'] ) ? apply_filters('widget_title', $instance['title']) : '';
+		$network 	= is_multisite() ? (int)$instance['network'] : false;
+		$category 	= ( isset( $instance['category'] ) && !empty($instance['category']) ) ? 
 			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
 			: array()
 		;

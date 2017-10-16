@@ -1,9 +1,7 @@
 <?php
 
-class Eab_Month_Navigation_Widget extends Eab_Widget
-{
-	public function __construct ()
-	{
+class Eab_Month_Navigation_Widget extends Eab_Widget {
+	public function __construct () {
 		$widget_ops = array(
 			'classname' => __CLASS__, 
 			'description' => __( 'Displays a form to navigation to other month archive.', $this->translation_domain ),
@@ -12,12 +10,11 @@ class Eab_Month_Navigation_Widget extends Eab_Widget
 		parent::__construct( __CLASS__, __( 'Monthly Event Archive Navigation', $this->translation_domain ), $widget_ops );
 	}
 	
-	public function form ($instance)
-	{
-		$title		= esc_attr( $instance['title'] );
-		$text		= esc_attr( $instance['text'] );
-		$year_from 	= esc_attr( $instance['year_from'] );
-		$year_to 	= esc_attr( $instance['year_to'] );
+	public function form ($instance) {
+		$title		= isset( $instance['title'] ) ? esc_attr( $instance['title'] ) : '';
+		$text		= isset( $instance['text'] ) ? esc_attr( $instance['text'] ) : '';
+		$year_from 	= isset( $instance['year_from'] ) ? esc_attr( $instance['year_from'] ) : '';
+		$year_to 	= isset( $instance['year_to'] ) ? esc_attr( $instance['year_to'] ) : '';
 		
 		$text 		= empty( $text ) ? __( 'Browse', $this->translation_domain ) : $text;
 		$year_to 	= empty( $year_to ) ? date( 'Y' ) : $year_to;
@@ -40,12 +37,9 @@ class Eab_Month_Navigation_Widget extends Eab_Widget
 			<input type="text" name="<?php echo $this->get_field_name( 'text' ) ?>" id="<?php echo $this->get_field_id( 'text' ) ?>" class="widefat" value="<?php echo $text ?>">
 		</p>
 		<?php
-	
-		echo $html;
 	}
 	
-	public function update ( $new_instance, $old_instance )
-	{
+	public function update ( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 		$instance['title'] 		= strip_tags( $new_instance['title'] );
 		$instance['text'] 		= strip_tags( $new_instance['text'] );
@@ -57,8 +51,7 @@ class Eab_Month_Navigation_Widget extends Eab_Widget
 		return $instance;
 	}
 	
-	public function widget ( $args, $instance )
-	{
+	public function widget ( $args, $instance ) {
 		extract($args);
 		$title = apply_filters( 'widget_title', $instance['title'] );
 
@@ -104,8 +97,7 @@ class Eab_Month_Navigation_Widget extends Eab_Widget
 			</form>
 			<?php $eab = events_and_bookings(); ?>
 			<script type="text/javascript">
-			function show_monthly_archive()
-			{
+			function show_monthly_archive() {
 				var year 	= document.getElementById( 'eab_widget_year' ).value,
 					month 	= document.getElementById( 'eab_widget_month' ).value,
 					url		= '<?php echo home_url($eab->_data->get_option('slug')) . '/'; ?>' + year + '/' + month;

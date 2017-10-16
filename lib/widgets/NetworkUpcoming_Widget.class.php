@@ -11,8 +11,8 @@ class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 	}
 	
 	function form ($instance) {
-		$title = esc_attr($instance['title']);
-		$limit = esc_attr($instance['limit']);
+		$title = isset( $instance['title'] ) ? esc_attr($instance['title'])  : '';
+		$limit = isset( $instance['limit'] ) ? esc_attr($instance['limit']) : '';
 		
 		$html .= '<p>';
 		$html .= '<label for="' . $this->get_field_id('title') . '">' . __('Title:', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
@@ -42,7 +42,7 @@ class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 	function widget ($args, $instance) {
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
-		$limit = (int)$instance['limit'];
+		$limit = isset( $instance['limit'] ) ? (int)$instance['limit'] : 0;
 		
 		$events = Eab_Network::get_upcoming_events($limit);
 	

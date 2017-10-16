@@ -28,8 +28,12 @@ class Eab_Popular_Widget extends Eab_Widget {
 		
 		$instance = apply_filters('eab-widgets-popular-instance_read', $instance, $this);
 		$options = wp_parse_args((array)$instance, $this->_defaults);
+
+		if ( isset( $instance['title'] ) && !empty( $instance['title'] ) ) {
+			$options['title'] = strip_tags( $instance['title'] );
+		}
 		
-		$title = apply_filters('widget_title', empty($instance['title']) ? __('Most Popular', $this->translation_domain) : $instance['title'], $instance, $this->id_base);
+		$title = apply_filters('widget_title', empty( $options['title'] ) ? __('Most Popular', $this->translation_domain) : $options['title'], $instance, $this->id_base);
 		
 		$_events = Eab_CollectionFactory::get_popular_events(array(
 			'posts_per_page' => $options['limit'],
@@ -85,11 +89,11 @@ class Eab_Popular_Widget extends Eab_Widget {
 		$instance = $old_instance;
         $new_instance = wp_parse_args((array)$new_instance, $this->_defaults);
         
-        $instance['title'] = strip_tags($new_instance['title']);
-        $instance['excerpt'] = (int)$new_instance['excerpt'];
-        $instance['excerpt_words_limit'] = (int)$new_instance['excerpt_words_limit'];
-        $instance['thumbnail'] = (int)$new_instance['thumbnail'];
-        $instance['limit'] = (int)$new_instance['limit'];
+        $instance['title'] 					= strip_tags($new_instance['title']);
+        $instance['excerpt'] 				= (int)$new_instance['excerpt'];
+        $instance['excerpt_words_limit'] 	= (int)$new_instance['excerpt_words_limit'];
+        $instance['thumbnail'] 				= (int)$new_instance['thumbnail'];
+        $instance['limit'] 					= (int)$new_instance['limit'];
 
         $instance = apply_filters('eab-widgets-popular-instance_update', $instance, $new_instance, $this);
 	
@@ -97,13 +101,15 @@ class Eab_Popular_Widget extends Eab_Widget {
     }
     
     function form ($instance) {
-    	$instance = apply_filters('eab-widgets-popular-instance_read', $instance, $this);
-		$options = wp_parse_args((array)$instance, $this->_defaults);
-        $options['title'] = strip_tags($instance['title']);	
+    	$instance 			= apply_filters('eab-widgets-popular-instance_read', $instance, $this);
+		$options 			= wp_parse_args((array)$instance, $this->_defaults);
+		if ( isset( $instance['title'] ) && !empty( $instance['title'] ) ) {
+			$options['title'] = strip_tags( $instance['title'] );
+		}
 	
 	?>
 	<div style="text-align:left">
-            <label for="<?php echo $this->get_field_id('title'); ?>" style="line-height:35px;display:block;"><?php _e('Title', $this->translation_domain); ?>:<br />
+        <label for="<?php echo $this->get_field_id('title'); ?>" style="line-height:35px;display:block;"><?php _e('Title', $this->translation_domain); ?>:<br />
 		<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo $options['title']; ?>" type="text" style="width:95%;" />
             </label>
             <label for="<?php echo $this->get_field_id('excerpt'); ?>" style="display:block;">
