@@ -107,7 +107,7 @@
             minutes: {
                 starts: 0,                  // first displayed minute
                 ends: 55,                   // last displayed minute
-                interval: 5,                // interval of displayed minutes
+                interval: 1,                // interval of displayed minutes
                 manual: []                  // optional extra manual entries for minutes
             },
             rows: 4,                        // number of rows for the input tables, minimum 2, makes more sense if you use multiple of 2

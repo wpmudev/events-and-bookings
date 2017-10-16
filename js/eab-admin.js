@@ -14,8 +14,7 @@ jQuery(function() {
 	jQuery( ".incsub_event_time_picker" ).timepicker({
 		showNowButton: true,
 		showDeselectButton: true,
-		defaultTime: '',  // removes the highlighted time for when the input is empty.
-		showCloseButton: true
+		showCloseButton: true,
 	});
 	//}
 
@@ -35,7 +34,6 @@ jQuery(function() {
 		jQuery( "#incsub_event_start_time_"+row_id+" , #incsub_event_end_time_"+row_id ).timepicker({
 			showNowButton: true,
 			showDeselectButton: true,
-			defaultTime: '',  // removes the highlighted time for when the input is empty.
 			showCloseButton: true
 		});
 
