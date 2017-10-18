@@ -42,23 +42,25 @@ class Eab_Maps_EventMapsOptions {
 	}
 
 	function save_settings ($options) {
-		if (empty($_POST['google_maps'])) return $options;
+		if ( !isset( $_POST['google_maps'] ) ) {
+			return $options;
+		}
 
-		$data = stripslashes_deep($_POST['google_maps']);
-		$options['google_maps-overrides'] = !empty($data['overrides']) ? array_filter($data['overrides']) : array();
+		$data = stripslashes_deep( $_POST['google_maps'] );
+		$options['google_maps-overrides'] = !empty( $data['overrides'] ) ? array_filter($data['overrides']) : array();
 		return $options;
 	}
 
 	function show_settings () {
 		$map_types = array(
-			'ROADMAP' => __('ROADMAP', 'agm_google_maps'),
+			'ROADMAP' 	=> __('ROADMAP', 'agm_google_maps'),
 			'SATELLITE' => __('SATELLITE', 'agm_google_maps'),
-			'HYBRID' => __('HYBRID', 'agm_google_maps'),
-			'TERRAIN' => __('TERRAIN', 'agm_google_maps'),
+			'HYBRID' 	=> __('HYBRID', 'agm_google_maps'),
+			'TERRAIN' 	=> __('TERRAIN', 'agm_google_maps'),
 		);
 		$map_units = array(
-			'METRIC' => __('Metric', 'agm_google_maps'),
-			'IMPERIAL' => __('Imperial', 'agm_google_maps'),
+			'METRIC' 	=> __('Metric', 'agm_google_maps'),
+			'IMPERIAL' 	=> __('Imperial', 'agm_google_maps'),
 		);
 		$options = $this->_data->get_option('google_maps-overrides');
 ?>

@@ -42,7 +42,7 @@ class Eab_Payments_PaymentViaProducts {
 	 */
 	public function dispatch_ordering_actions () {
 		if ($this->_is_old_mp()) {
-			if (!class_exists('Eab_MP_Bridge_Legacy')) require_once('lib/class_eab_mp_bridge_legacy.php');
+			if (!class_exists('Eab_MP_Bridge_Legacy')) require_once( 'lib/class_eab_mp_bridge_legacy.php');
 			Eab_MP_Bridge_Legacy::serve();
 		} else {
 			if (!class_exists('Eab_MP_Bridge')) require_once('lib/class_eab_mp_bridge.php');
