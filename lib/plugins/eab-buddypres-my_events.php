@@ -116,7 +116,7 @@ class Eab_BuddyPress_MyEvents {
 	function enqueue_dependencies () {
 		global $bp;
 		if ('my-events' != $bp->current_component) return false;
-		wp_enqueue_style('eab-bp-my_events', plugins_url('events-and-bookings/css/eab-buddypress-my_events.css'));
+		wp_enqueue_style('eab-bp-my_events', EAB_PLUGIN_URL . 'css/eab-buddypress-my_events.css');
 	}
 	
 	function show_organized_title () {
@@ -195,7 +195,7 @@ class Eab_BuddyPress_MyEvents {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url( EAB_PLUGIN_URL . 'img/information.png' );
 		$premium = $this->_data->get_option('bp-my_events-premium_events');
 		$options = array(
 			'' => __('Do nothing special', Eab_EventsHub::TEXT_DOMAIN),

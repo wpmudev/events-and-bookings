@@ -73,7 +73,7 @@ class Eab_Rsvps_RsvpAutoReset {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 		$runs = array(
 			'3600' => __('Hour', Eab_EventsHub::TEXT_DOMAIN),
 			'7200' => __('Two hours', Eab_EventsHub::TEXT_DOMAIN),

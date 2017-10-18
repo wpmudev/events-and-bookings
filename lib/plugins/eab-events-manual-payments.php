@@ -154,7 +154,7 @@ class Eab_Events_ManualPayments {
 		if ( !class_exists( 'WpmuDev_HelpTooltips' ) ) 
 			require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url( plugins_url( 'events-and-bookings/img/information.png' ) );
+		$tips->set_icon_url( EAB_PLUGIN_URL . 'img/information.png' );
 		?>
 		<div id="eab-settings-manual_payments" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Manual Payment settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>

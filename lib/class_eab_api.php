@@ -78,7 +78,7 @@ class Eab_Api {
 			$registration_msg = sprintf(_x(' - or just click cancel to register using your %s ID', 'Registration supplemental message part', Eab_EventsHub::TEXT_DOMAIN), $supported_ids);
 		}
 
-		wp_enqueue_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+		wp_enqueue_script('eab_api_js', EAB_PLUGIN_URL . 'js/eab-api.js', array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
 			'facebook' 				=> __('Login with Facebook', Eab_EventsHub::TEXT_DOMAIN),
 			'twitter' 				=> __('Login with Twitter', Eab_EventsHub::TEXT_DOMAIN),

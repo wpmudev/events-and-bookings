@@ -154,7 +154,7 @@ class Eab_Events_RsvpEmailMe {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 		
 		$positive_rsvp = $this->_data->get_option('eab_rsvps-email_me-positive_rsvp') ? 'checked="checked"' : '';
 		$paid_rsvp = $this->_data->get_option('eab_rsvps-email_me-paid_rsvp') ? 'checked="checked"' : '';

@@ -329,7 +329,7 @@ class Eab_Calendars_MeetupImporter {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 
 		$api_key = $this->_data->get_option('meetup_importer-api_key');
 		$member_id = $this->_data->get_option('meetup_importer-user_id');

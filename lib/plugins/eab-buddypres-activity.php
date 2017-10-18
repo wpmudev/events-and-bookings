@@ -202,7 +202,7 @@ class Eab_BuddyPress_AutoUpdateActivity {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url( EAB_PLUGIN_URL . 'img/information.png' );
 
 		$_created = $this->_data->get_option('bp-activity_autoupdate-event_created');
 		$event_created = 'any' == $_created ? 'checked="checked"' : false;

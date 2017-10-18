@@ -21,7 +21,7 @@ class Eab_Admin_Shortcodes_Menu {
 			require_once eab_plugin_dir(). 'lib/class_wd_help_tooltips.php';
 
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url( EAB_PLUGIN_URL . 'img/information.png' );
 
 		$out = '';
 		$count = 0;

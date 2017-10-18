@@ -176,7 +176,7 @@ class Eab_Calendars_FacebookEventsImporter {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 
 		$api_key = $this->_data->get_option('fbe_importer-client_id');
 		$api_secret = $this->_data->get_option('fbe_importer-client_secret');

@@ -96,7 +96,7 @@ class Eab_Events_RsvpEmail {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 		
 		$from = $this->_data->get_option('eab_rsvps-email-from');
 		$from = $from ? $from : get_option('admin_email');

@@ -139,7 +139,7 @@ class Eab_BuddyPress_GroupEvents {
 	
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png');
 		$checked = $this->_data->get_option('bp-group_event-auto_join_groups') ? 'checked="checked"' : '';
 		$private = $this->_data->get_option('bp-group_event-private_events') ? 'checked="checked"' : '';
 		$user_groups_only = $this->_data->get_option('bp-group_event-user_groups_only') ? 'checked="checked"' : '';

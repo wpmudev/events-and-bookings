@@ -67,7 +67,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		}
  
 		if ($shortcode_found) 
-			wp_enqueue_style('eab-events-weekly-calendar', plugins_url("/events-and-bookings/css/weekly-event-calendar.css") );
+			wp_enqueue_style('eab-events-weekly-calendar', EAB_PLUGIN_URL . "css/weekly-event-calendar.css" );
  
 		return $posts;
 	}	
@@ -388,7 +388,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 	 */	
 	function log( $message='' ) {
 		// Don't give warning if folder is not writable
-		@file_put_contents( WP_PLUGIN_DIR . "/events-and-bookings/log.txt", $message . chr(10). chr(13), FILE_APPEND ); 
+		@file_put_contents( EAB_PLUGIN_DIR . "log.txt", $message . chr(10). chr(13), FILE_APPEND ); 
 	}
 
 	/**
@@ -410,7 +410,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		if (!class_exists('WpmuDev_HelpTooltips')) 
 			require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 		?>
 		<div id="eab-settings-weekly_calendar" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Weekly Event Calendar settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>

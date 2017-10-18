@@ -61,7 +61,7 @@ class Eab_Events_FrontPageEditing {
 		$pages = get_pages();
 		$integrate_with_my_events = $this->_options['integrate_with_my_events'] ? 'checked="checked"' : '';
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png');
 ?>
 <div id="eab-settings-fpe" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Front-page editing', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -594,7 +594,7 @@ class Eab_Events_FrontPageEditing {
 	public function enqueue_dependency_data () {
 		printf(
 			'<script type="text/javascript">var _eab_events_fpe_data={"ajax_url": "%s", "root_url": "%s"};</script>',
-			admin_url('admin-ajax.php'), plugins_url('events-and-bookings/img/')
+			admin_url('admin-ajax.php'), EAB_PLUGIN_URL . 'img/'
 		);
 
 		$event_id = (int)@$_GET['event_id'];

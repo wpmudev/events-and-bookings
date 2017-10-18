@@ -657,7 +657,7 @@ class Eab_EventsHub {
 		$script = 'var _eab_data=' . json_encode( apply_filters( 'eab-javascript-public_data', 
 				array(
 					'ajax_url' => admin_url('admin-ajax.php'),
-					'root_url' => plugins_url('events-and-bookings/img/'),
+					'root_url' => EAB_PLUGIN_URL . 'img/',
 					'fb_scope' => 'email'
 				))
 			) . ';' .
@@ -1091,7 +1091,7 @@ class Eab_EventsHub {
 	}
 
 	function meta_box_part_bookings ( $post ) {
-		$event = new Eab_EventModel( $post );
+		$event 	= new Eab_EventModel( $post );
 
 		$content  = '';
 		$content .= '<div id="eab-bookings-response">';
@@ -1209,7 +1209,7 @@ class Eab_EventsHub {
 					if ( empty( $_POST['incsub_event_start'][$i] ) || empty( $_POST['incsub_event_end'][$i] ) ) {
 						continue;
 					}
-					if ( !empty ($_POST['incsub_event_start'][$i] ) ) {
+					if ( !empty ( $_POST['incsub_event_start'][$i] ) ) {
 
 						if ( $_POST['incsub_event_start_time'][$i] != '' && strpos( ':', $_POST['incsub_event_start_time'][$i] ) === false ){
 							$_POST['incsub_event_start_time'][$i] = $_POST['incsub_event_start_time'][$i] . ':00';
@@ -1330,10 +1330,10 @@ class Eab_EventsHub {
 
     private function _get_rewrite_rules () {
     	$slug = $this->_data->get_option('slug');
-    	return self::get_rewrite_rules($slug);
+    	return self::get_rewrite_rules( $slug );
     }
 
-    public static function get_rewrite_rules ($slug) {
+    public static function get_rewrite_rules ( $slug ) {
     	return array(
 			"{$slug}/([0-9]{4})/?$" 							=> 'index.php?event_year=$matches[1]&post_type=incsub_event',
 			"{$slug}/([0-9]{4})/([0-9]{1,2})/?$" 				=> 'index.php?event_year=$matches[1]&event_monthnum=$matches[2]&post_type=incsub_event',
@@ -1381,9 +1381,6 @@ class Eab_EventsHub {
 		global $wp_rewrite;
 		$wp_rewrite->flush_rules();
 	}
-
-
-
 
 
     /**
@@ -1465,7 +1462,7 @@ class Eab_EventsHub {
 		$avail_post_stati 	= wp_edit_posts_query();
 		$num_posts 			= wp_count_posts( Eab_EventModel::POST_TYPE, 'readable' );
 
-		$argvs = array( 'post_type' => Eab_EventModel::POST_TYPE );
+		$argvs 				= array( 'post_type' => Eab_EventModel::POST_TYPE );
 
 		foreach ( get_post_stati( $argvs, 'objects' ) as $status ) {
 		    $class 			= '';
@@ -1493,18 +1490,18 @@ class Eab_EventsHub {
 
 
     function widgets_init() {
-		require_once EAB_PLUGIN_DIR. 'lib/widgets/Widget.class.php';
+		require_once EAB_PLUGIN_DIR . 'lib/widgets/Widget.class.php';
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/Attendees_Widget.class.php';
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/Popular_Widget.class.php';
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/Upcoming_Widget.class.php';
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/UpcomingCalendar_Widget.class.php';
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/EAB_Month_Navigation.php';
 
-		register_widget('Eab_Attendees_Widget');
-		register_widget('Eab_Popular_Widget');
-		register_widget('Eab_Upcoming_Widget');
-		register_widget('Eab_CalendarUpcoming_Widget');
-		register_widget('Eab_Month_Navigation_Widget');
+		register_widget( 'Eab_Attendees_Widget' );
+		register_widget( 'Eab_Popular_Widget' );
+		register_widget( 'Eab_Upcoming_Widget' );
+		register_widget( 'Eab_CalendarUpcoming_Widget' );
+		register_widget( 'Eab_Month_Navigation_Widget' );
     }
 
 	/**
@@ -1522,7 +1519,9 @@ class Eab_EventsHub {
 	 * HAVE to calculate in the year as well.
 	 */
 	function load_events_from_query () {
-		if (is_admin()) return false;
+		if ( is_admin() ) {
+			return false;
+		}
 		global $wp_query;
 
 		if ( Eab_EventModel::POST_TYPE == $wp_query->query_vars['post_type'] ) {
@@ -1532,18 +1531,18 @@ class Eab_EventsHub {
 			$month 			= $original_month ? $original_month : date( 'm' );
 
 			do_action( 'eab-query_rewrite-before_query_replacement', $original_year, $original_month );
-			$wp_query = Eab_CollectionFactory::get_upcoming( strtotime( "{$year}-{$month}-01 00:00" ), $wp_query->query );
-			$wp_query->is_404 = false;
+			$wp_query 			= Eab_CollectionFactory::get_upcoming( strtotime( "{$year}-{$month}-01 00:00" ), $wp_query->query );
+			$wp_query->is_404 	= false;
 			do_action( 'eab-query_rewrite-after_query_replacement' );
 		} else if ( !empty( $wp_query->query_vars['eab_events_category'] ) && empty( $wp_query->query_vars['paged'] ) && !empty( $_GET['date'] ) ) {
 			$date = strtotime( $_GET['date'] );
-			if (!$date) {
+			if ( !$date ) {
 				return false;
 			}
 
 			do_action( 'eab-query_rewrite-before_query_replacement', false, false );
-			$wp_query = Eab_CollectionFactory::get_upcoming( $date, $wp_query->query );
-			$wp_query->is_404 = false;
+			$wp_query 			= Eab_CollectionFactory::get_upcoming( $date, $wp_query->query );
+			$wp_query->is_404 	= false;
 			do_action( 'eab-query_rewrite-after_query_replacement' );
 		}
 	}
@@ -1565,8 +1564,12 @@ if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
 	include_once( 'lib/class-eab-ajax.php' );
 
 
-if (!defined('EAB_OLD_EVENTS_EXPIRY_LIMIT')) define('EAB_OLD_EVENTS_EXPIRY_LIMIT', 100, true);
-if (!defined('EAB_MAX_UPCOMING_EVENTS')) define('EAB_MAX_UPCOMING_EVENTS', 500, true);
+if ( !defined( 'EAB_OLD_EVENTS_EXPIRY_LIMIT' ) ) {
+	define( 'EAB_OLD_EVENTS_EXPIRY_LIMIT', 100, true );
+}
+if ( !defined( 'EAB_MAX_UPCOMING_EVENTS' ) ) {
+	define( 'EAB_MAX_UPCOMING_EVENTS', 500, true );
+}
 
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_error_reporter.php';
 Eab_ErrorReporter::serve();
@@ -1597,30 +1600,32 @@ if ( is_admin() ) {
 	require_once EAB_PLUGIN_DIR . 'lib/class_eab_admin_tutorial.php';
 	Eab_AdminTutorial::serve();
 
-	require_once dirname(__FILE__) . '/lib/contextual_help/class_eab_admin_help.php';
+	require_once EAB_PLUGIN_DIR . 'lib/contextual_help/class_eab_admin_help.php';
 	Eab_AdminHelp::serve();
 
 	// Dashboard notification
 	global $wpmudev_notices;
-	if (!is_array($wpmudev_notices)) $wpmudev_notices = array();
+	if ( !is_array( $wpmudev_notices ) ) {
+		$wpmudev_notices = array();
+	}
 	$wpmudev_notices[] = array(
-		'id' => 249,
-		'name' => 'Events +',
-		'screens' => array(
+		'id' 		=> 249,
+		'name' 		=> 'Events +',
+		'screens' 	=> array(
 			'incsub_event_page_eab_welcome',
 			'incsub_event_page_eab_settings',
 			'incsub_event_page_eab_shortcodes',
 		),
 	);
-	require_once EAB_PLUGIN_DIR . '/lib/wpmudev-dash-notification.php';
+	require_once EAB_PLUGIN_DIR . 'lib/wpmudev-dash-notification.php';
 }
 
 
 function eab_activate() {
-	include_once( 'lib/class-eab-activator.php' );
+	include_once( EAB_PLUGIN_DIR . 'lib/class-eab-activator.php' );
 	Eab_Activator::run();
 }
-register_activation_hook(__FILE__, 'eab_activate' );
+register_activation_hook( __FILE__, 'eab_activate' );
 
 
 function eab_domain() {
