@@ -9,7 +9,6 @@ ul.eab-guest-list li {
 }
 .misc-eab-section label.eab-inline-label {
     width: auto;
-    display: inline-block;
 }
 
 .misc-eab-section label textarea {
