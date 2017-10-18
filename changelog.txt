@@ -6,13 +6,14 @@ Changelog:
 1.9.7 - 
 ----------------------------------------------------------------------
 - Added: New attribute show_old on the shortcode eab_calendar to allow viewing of past events
-- Added: Text on event creation and edit page to inform of the tim format
 - Added: 24 hour clock timepicker
+- Added: Disabled text input in event edit date and time fields. Date and time picker are used instead
 - Fixed: E-newsletter activation error. Tables of eneswletter would not be created
 - Fixed: Session warning when enewsletter is activated
 - Fixed: Prevent multiple clicking of event RSVP buttons after confirmation
 - Fixed: Archived Events shortcode
 - Fixed: Php notices
+- Fixed: Admin CSS alignments
 
 ----------------------------------------------------------------------
 1.9.6 - 2017-09-08
