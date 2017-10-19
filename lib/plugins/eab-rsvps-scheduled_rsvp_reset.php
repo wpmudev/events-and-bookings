@@ -126,9 +126,9 @@ class Eab_Rsvps_RsvpAutoReset {
 	}
 
 	function save_settings ($options) {
-		$options['rsvp_auto_reset-run_each'] = $_POST['eab_rsvps']['rsvp_auto_reset-run_each'];
-		$options['rsvp_auto_reset-cutoff'] = $_POST['eab_rsvps']['rsvp_auto_reset-cutoff'];
-		$options['rsvp_auto_reset-remove_attendance'] = $_POST['eab_rsvps']['rsvp_auto_reset-remove_attendance'];
+		$options['rsvp_auto_reset-run_each'] 			= isset( $_POST['eab_rsvps']['rsvp_auto_reset-run_each'] ) ? $_POST['eab_rsvps']['rsvp_auto_reset-run_each'] : false;
+		$options['rsvp_auto_reset-cutoff'] 				= isset( $_POST['eab_rsvps']['rsvp_auto_reset-cutoff'] ) ? $_POST['eab_rsvps']['rsvp_auto_reset-cutoff'] : '';
+		$options['rsvp_auto_reset-remove_attendance'] 	= isset( $_POST['eab_rsvps']['rsvp_auto_reset-remove_attendance'] ) ? $_POST['eab_rsvps']['rsvp_auto_reset-remove_attendance'] : '';
 		return $options;
 	}
 

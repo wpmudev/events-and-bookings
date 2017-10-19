@@ -39,7 +39,7 @@ class Eab_Export_iCal {
 		if ($this->_data->get_option('eab_export-ical-auto_show_links')) {
 			add_filter('eab-template-archive_after_view_link', array($this, 'append_export_link'), 10, 2);
 			add_filter('eab-events-after_single_event', array($this, 'append_export_link'), 10, 2);
-                        add_filter('eab-events-after_event_details', array($this, 'append_export_link'), 10, 2);
+            add_filter('eab-events-after_event_details', array($this, 'append_export_link'), 10, 2);
 		}
 
 		add_action('eab-events-rsvp_email-codec-macros', array($this, 'rsvp_email_macro_addition'));
