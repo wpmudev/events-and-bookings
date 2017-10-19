@@ -2,16 +2,16 @@
 
 *Similar structure as: Membership 2, Popup, Custom Sidebars, CoursePress*
 
-The **only** development branch for Events+ is `development`. This branch ultimately is responsible for creating the production branches that are finally published.
+The **only** development branch for Events+ is `master`. This branch ultimately is responsible for creating the production branches that are finally published.
 
 
-**Remember:** `development` is the ONLY branch that should be edited and forked!
+**Remember:** `master` is the ONLY branch that should be edited and forked!
 
 -----
 
 # DEVELOPMENT
 
-As mentioned above: Only directly edit the branch `development`. Other branches should be only updated via grunt tasks (see section "Automation" below).
+As mentioned above: Only directly edit the branch `master`. Other branches should be only updated via grunt tasks (see section "Automation" below).
 
 Important: Do not let your IDE change the **source order** of the code. Fixing up formatting is fine, but moving code blocks around is not! It will confuse grunt and produce problems.
 
