@@ -93,6 +93,34 @@ function _time_string_to_array (time_string) {
 }
 
 /**
+* Manage no start and end time checkboxes
+*/
+jQuery(document).ready(function(e) {
+   	jQuery(document).on('change', '#incsub_event_no_start_time_0',function(){
+		if ( document.getElementById("incsub_event_no_start_time_0").checked == true ){
+	   		jQuery('#eab-events-fpe-start_time').hide();
+		}else{
+			jQuery('#eab-events-fpe-start_time').show();
+		}
+    });
+	jQuery(document).on('change', '#incsub_event_no_end_time_0',function(){
+		if ( document.getElementById("incsub_event_no_end_time_0").checked == true ){
+	   		jQuery('#eab-events-fpe-end_time').hide();
+		}else{
+			jQuery('#eab-events-fpe-end_time').show();
+		}
+    });
+	
+	if ( jQuery('#eab-events-fpe-start_time').val() == "00:00"){
+		jQuery('#eab-events-fpe-start_time').hide();
+		jQuery('#incsub_event_no_start_time_0').attr('checked',true);
+	}
+	if ( jQuery('#eab-events-fpe-end_time').val() == "00:00"){
+		jQuery('#eab-events-fpe-end_time').hide();
+		jQuery('#incsub_event_no_end_time_0').attr('checked',true);
+	}
+});
+/**
  * Sends save request and shows general message
  */
 function send_save_request () {
@@ -100,26 +128,31 @@ function send_save_request () {
 
 	var $start_date = $("#eab-events-fpe-start_date");
 	if (!$start_date.val()) return missing_datetime_error($start_date);
-	
-	var $start_time = $("#eab-events-fpe-start_time");
-	if (!$start_time.val()) return missing_datetime_error($start_time);
-	
 	var start = new Date($start_date.val());
-	var start_time_parts = _time_string_to_array($start_time.val());
+	
+	if ( document.getElementById("incsub_event_no_start_time_0").checked == true ){
+		var $start_time = $("#eab-events-fpe-start_time");
+		if (!$start_time.val()) return missing_datetime_error($start_time);
+	
+		var start_time_parts = _time_string_to_array($start_time.val());
 
-	start.setHours(start_time_parts[0]);
-	start.setMinutes(start_time_parts[1]);
+		start.setHours(start_time_parts[0]);
+		start.setMinutes(start_time_parts[1]);
+	}
 	
 	var $end_date = $("#eab-events-fpe-end_date");
 	if (!$end_date.val()) return missing_datetime_error($end_date);
-	
-	var $end_time = $("#eab-events-fpe-end_time");
-	if (!$end_time.val()) return missing_datetime_error($end_time);
-	
 	var end = new Date($end_date.val());
-	var end_time_parts = _time_string_to_array($end_time.val());
-	end.setHours(end_time_parts[0]);
-	end.setMinutes(end_time_parts[1]);
+	
+	
+	if ( document.getElementById("incsub_event_no_end_time_0").checked == true ){
+		var $end_time = $("#eab-events-fpe-end_time");
+		if (!$end_time.val()) return missing_datetime_error($end_time);
+		
+		var end_time_parts = _time_string_to_array($end_time.val());
+		end.setHours(end_time_parts[0]);
+		end.setMinutes(end_time_parts[1]);
+	}
 	
 	if (start >= end) return invalid_datetime_error();
 	
@@ -147,8 +180,12 @@ function send_save_request () {
 		"is_premium": ($("#eab-events-fpe-is_premium").length ? $("#eab-events-fpe-is_premium").val() : 0),
 		"category": $("#eab-events-fpe-categories").val(),
 		/* Added by Ashok */
-		"featured" : $('#eab-fpe-attach_id').val()
+		"featured" : $('#eab-fpe-attach_id').val(),
 		/* End of adding by Ashok */
+		/* Added by Lindeni */
+		"has_start" : has_start,
+		"has_end" : has_end
+		/* End of adding by Lindeni */
 	};
 	if ($("#eab-events-fpe-event_fee").length) {
 		data["fee"] = $("#eab-events-fpe-event_fee").val();

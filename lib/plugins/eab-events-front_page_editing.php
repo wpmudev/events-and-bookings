@@ -274,6 +274,10 @@ class Eab_Events_FrontPageEditing {
 		update_post_meta($post_id, 'incsub_event_end', $end);
 		update_post_meta( $post_id, 'incsub_event_no_end', $has_no_end_time );
 		update_post_meta($post_id, 'incsub_event_status', strip_tags($data['status']));
+		
+		//specify if the event has start and end time or not.
+		if ( $data['has_start'] == 0 ) update_post_meta($post_id, 'incsub_event_no_start',1);			
+		if ( $data['has_end'] == 0 ) update_post_meta($post_id, 'incsub_event_no_end',1);
 
 		$venue_map = get_post_meta($post_id, 'agm_map_created', true);
 		if (!$venue_map && $data['venue'] && class_exists('AgmMapModel')) {
