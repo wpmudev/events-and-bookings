@@ -232,7 +232,9 @@ abstract class WpmuDev_DatedVenueItem extends WpmuDev_RecurringDatedItem {
 			$map_id = get_post_meta($this->get_id(), 'agm_map_created', true);
 			if (!$map_id) return false;
 		} else if (!isset($matches[1]) || !isset($matches[1][0])) return false;
-		return $map_id ? $map_id : $matches[1][0];
+		$map = $map_id ? $map_id : $matches[1][0];
+		
+		return apply_filters( 'eab_event_location_map', $map );
 	}
 
 	/**

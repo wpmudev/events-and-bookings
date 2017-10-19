@@ -7,6 +7,9 @@ ul.eab-guest-list li {
 .misc-eab-section label {
     vertical-align: text-top;
 }
+.misc-eab-section label.eab-inline-label {
+    width: auto;
+}
 
 .misc-eab-section label textarea {
     width: 255px;
@@ -39,22 +42,13 @@ ul.eab-guest-list li {
 	cursor: pointer;
 	border-width: 1px;
 	border-style: solid;
-	-moz-border-radius: 11px;
 	-khtml-border-radius: 11px;
-	-webkit-border-radius: 11px;
 	border-radius: 11px;
 	font-weight: bold;
 	margin-top: 10px;
-	-moz-box-sizing: content-box;
-	-webkit-box-sizing: content-box;
 	-khtml-box-sizing: content-box;
 	box-sizing: content-box;
 	background-color: #f6f6f6;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(246, 246, 246)), to(rgb(240, 239, 239)));
-	background-image: -webkit-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
-	background-image: -moz-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
-	background-image: -o-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
-	background-image: -ms-linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
 	background-image: linear-gradient(top, rgb(246, 246, 246), rgb(240, 239, 239));
 	filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#f6f6f6', EndColorStr='#f0efef');
 }
@@ -365,4 +359,30 @@ border: 1px solid #E6DB55;padding:0 10px;margin-bottom:10px;}
 .eab_tutorial-pointer .wp-pointer-buttons a {
     float: none;
     line-height: 2em;
+}
+
+input.incsub_event_date, input.incsub_event_time{
+	font-size: 10px;
+	padding: 3px;
+}
+
+.eab-start-section{
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+/**
+* Event Editor Sidebar Date and Time Design Fix
+**/
+label[for^="incsub_event_start_"], label[for^="incsub_event_end_"] {
+    display: block;
+    margin-top: 10px;
+}
+label[for^="incsub_event_start_"] span, label[for^="incsub_event_end_"] span {
+    font-weight: bold;
+    display: block;
+}
+.eab-section-block {
+    border-top: 1px solid #d7d7d7;
+    margin: 10px 0;
 }

@@ -12,7 +12,7 @@ class Eab_Api {
 	public function initialize () {
 		add_action('wp_ajax_nopriv_eab_get_form', array($this, 'handle_get_form'));
 		add_action('wp_ajax_eab_get_form', array($this, 'handle_get_form'));
-		if ($this->_data->get_option('accept_api_logins')) {
+		if ( $this->_data->get_option('accept_api_logins') ) {
 			add_action('wp_ajax_nopriv_eab_facebook_login', array($this, 'handle_facebook_login'));
 
 			add_action('wp_ajax_nopriv_eab_get_twitter_auth_url', array($this, 'handle_get_twitter_auth_url'));
@@ -29,9 +29,10 @@ class Eab_Api {
 			add_filter('get_avatar', array($this, 'get_social_api_avatar'), 10, 3);
 
 			// Google
-			if (!session_id()) session_start();
-			if (!class_exists('LightOpenID')) include_once  EAB_PLUGIN_DIR . 'lib/lightopenid/openid.php';
-			$this->openid = new LightOpenID;
+			if ( !class_exists( 'LightOpenID' ) ) {
+				include_once  EAB_PLUGIN_DIR . 'lib/lightopenid/openid.php';
+			} 
+			$this->openid 			= new LightOpenID;
 
 			$this->openid->identity = 'https://www.google.com/accounts/o8/id';
 			$this->openid->required = array('namePerson/first', 'namePerson/last', 'namePerson/friendly', 'contact/email');
@@ -51,9 +52,9 @@ class Eab_Api {
 		$domain = get_bloginfo('name');
 		$domain = $domain ? $domain : __('WordPress', Eab_EventsHub::TEXT_DOMAIN);
 
-		$show_facebook = !$this->_data->get_option('api_login-hide-facebook');
-		$show_twitter = !$this->_data->get_option('api_login-hide-twitter');
-		$show_google = !$this->_data->get_option('api_login-hide-google');
+		$show_facebook	= !$this->_data->get_option('api_login-hide-facebook');
+		$show_twitter 	= !$this->_data->get_option('api_login-hide-twitter');
+		$show_google 	= !$this->_data->get_option('api_login-hide-google');
 
 		$registration_msg = '';
 		$registration_services = array();
@@ -77,41 +78,41 @@ class Eab_Api {
 			$registration_msg = sprintf(_x(' - or just click cancel to register using your %s ID', 'Registration supplemental message part', Eab_EventsHub::TEXT_DOMAIN), $supported_ids);
 		}
 
-		wp_enqueue_script('eab_api_js', plugins_url('events-and-bookings/js/eab-api.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+		wp_enqueue_script('eab_api_js', EAB_PLUGIN_URL . 'js/eab-api.js', array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_localize_script('eab_api_js', 'l10nEabApi', apply_filters('eab-javascript-api_vars', array(
-			'facebook' => __('Login with Facebook', Eab_EventsHub::TEXT_DOMAIN),
-			'twitter' => __('Login with Twitter', Eab_EventsHub::TEXT_DOMAIN),
-			'google' => __('Login with Google', Eab_EventsHub::TEXT_DOMAIN),
-			'wordpress' => sprintf(__('Login with %s', Eab_EventsHub::TEXT_DOMAIN), $domain),
-			'cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
-			'please_wait' => __('Please, wait...', Eab_EventsHub::TEXT_DOMAIN),
+			'facebook' 				=> __('Login with Facebook', Eab_EventsHub::TEXT_DOMAIN),
+			'twitter' 				=> __('Login with Twitter', Eab_EventsHub::TEXT_DOMAIN),
+			'google' 				=> __('Login with Google', Eab_EventsHub::TEXT_DOMAIN),
+			'wordpress' 			=> sprintf(__('Login with %s', Eab_EventsHub::TEXT_DOMAIN), $domain),
+			'cancel' 				=> __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
+			'please_wait' 			=> __('Please, wait...', Eab_EventsHub::TEXT_DOMAIN),
 
-			'wp_register' => __('Register', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_registration_msg' => sprintf(_x('Create a username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
-			'wp_login' => __('Log in', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_login_msg' => sprintf(_x('Login with your existing username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
-			'wp_username' => __('Username', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_password' => __('Password', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_email' => __('Email', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_toggle_on' => __('Already a member? Log in here', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_toggle_off' => __('Click here to register', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_lost_pw_text' => __('Forgot your password', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_lost_pw_url' => wp_lostpassword_url(),
-			'wp_submit' => __('Submit', Eab_EventsHub::TEXT_DOMAIN),
-			'wp_cancel' => __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_register' 			=> __('Register', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_registration_msg' 	=> sprintf(_x('Create a username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
+			'wp_login' 				=> __('Log in', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_login_msg' 			=> sprintf(_x('Login with your existing username in order to register for this event %s', 'The variable is registration supplemental part', Eab_EventsHub::TEXT_DOMAIN), $registration_msg),
+			'wp_username' 			=> __('Username', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_password' 			=> __('Password', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_email' 				=> __('Email', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_toggle_on' 			=> __('Already a member? Log in here', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_toggle_off' 		=> __('Click here to register', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_lost_pw_text' 		=> __('Forgot your password', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_lost_pw_url' 		=> wp_lostpassword_url(),
+			'wp_submit' 			=> __('Submit', Eab_EventsHub::TEXT_DOMAIN),
+			'wp_cancel' 			=> __('Cancel', Eab_EventsHub::TEXT_DOMAIN),
 			// Vars
-			'data' => array(
-				'show_facebook' => $show_facebook,
-				'show_twitter' => $show_twitter,
-				'show_google' => $show_google,
-				'show_wordpress' => !$this->_data->get_option('api_login-hide-wordpress'),
-				'gg_client_id' => $this->_data->get_option('google-client_id'),
+			'data' 					=> array(
+				'show_facebook' 		=> $show_facebook,
+				'show_twitter' 			=> $show_twitter,
+				'show_google' 			=> $show_google,
+				'show_wordpress' 		=> !$this->_data->get_option('api_login-hide-wordpress'),
+				'gg_client_id' 			=> $this->_data->get_option('google-client_id'),
 			),
 			//validation error for worpress popup
-			'wp_missing_username_password' => __( 'Username and password are required!', Eab_EventsHub::TEXT_DOMAIN ),
-			'wp_username_pass_invalid' => __( 'Invalid username or password!', Eab_EventsHub::TEXT_DOMAIN ),
-			'wp_missing_user_email' => __( 'Username and email are required!', Eab_EventsHub::TEXT_DOMAIN ),
-			'wp_signup_error' => __( 'Your email/username is already taken or email is invalid!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_missing_username_password' 	=> __( 'Username and password are required!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_username_pass_invalid' 		=> __( 'Invalid username or password!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_missing_user_email' 		=> __( 'Username and email are required!', Eab_EventsHub::TEXT_DOMAIN ),
+			'wp_signup_error' 				=> __( 'Your email/username is already taken or email is invalid!', Eab_EventsHub::TEXT_DOMAIN ),
 		)));
 		if (!$this->_data->get_option('facebook-no_init')) {
 			if (defined('EAB_INTERNAL_FLAG__FB_INIT_ADDED')) return false;
@@ -144,7 +145,7 @@ class Eab_Api {
 
 	function get_social_api_avatar ($avatar, $id_or_email, $size = '96') {
 		$wp_uid = false;
-		if (is_object($id_or_email)) {
+		if ( is_object( $id_or_email ) ) {
 			if (isset($id_or_email->comment_author_email)) $id_or_email = $id_or_email->comment_author_email;
 			else return $avatar;
 		}
@@ -608,7 +609,7 @@ class Eab_Api {
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-facebook-app_id" id="incsub_event_label-facebook-app_id"><?php _e('Facebook App ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 					<input type="text" id="incsub_event-facebook-app_id" name="event_default[facebook-app_id]" value="<?php echo esc_attr($this->_data->get_option('facebook-app_id')); ?>" />
-					<span><?php echo $tips->add_tip(sprintf(__('Enter your App ID number here. If you don\'t have a Facebook App yet, you will need to create one <a href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://developers.facebook.com/apps')); ?></span>
+					<span><?php echo $tips->add_tip(sprintf(__('Enter your App ID number here. If you don\'t have a Facebook App yet, you will need to create one <a target="_blank" href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://developers.facebook.com/apps')); ?></span>
 				</div>
 
 				<div class="eab-settings-settings_item">
@@ -621,7 +622,7 @@ class Eab_Api {
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-twitter-app_id" id="incsub_event_label-twitter-app_id"><?php _e('Twitter Consumer Key', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 					<input type="text" id="incsub_event-twitter-app_id" name="event_default[twitter-app_id]" value="<?php echo esc_attr($this->_data->get_option('twitter-app_id')); ?>" />
-					<span><?php echo $tips->add_tip(sprintf(__('Enter your Twitter App ID number here. If you don\'t have a Twitter App yet, you will need to create one <a href="%s">here</a>.<br />When setting up your app, please remember to also set the <b>Callback URL</b> to appropriate value (<code>%s</code>)', Eab_EventsHub::TEXT_DOMAIN), 'https://dev.twitter.com/apps/new', home_url())); ?></span>
+					<span><?php echo $tips->add_tip(sprintf(__('Enter your Twitter App ID number here. If you don\'t have a Twitter App yet, you will need to create one <a target="_blank" href="%s">here</a>.<br />When setting up your app, please remember to also set the <b>Callback URL</b> to appropriate value (<code>%s</code>)', Eab_EventsHub::TEXT_DOMAIN), 'https://dev.twitter.com/apps/new', home_url())); ?></span>
 				</div>
 
 				<div class="eab-settings-settings_item">
@@ -633,7 +634,7 @@ class Eab_Api {
 				<div class="eab-settings-settings_item">
 				    <label for="incsub_event-google-client_id" id="incsub_event_label-google-client_id"><?php _e('Google Client ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 					<input type="text" id="incsub_event-google-client_id" name="event_default[google-client_id]" value="<?php echo esc_attr($this->_data->get_option('google-client_id')); ?>" />
-					<span><?php echo $tips->add_tip(sprintf(__('Enter your Google App Client ID here. If you don\'t have a Google App yet, you will need to create one <a href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://console.developers.google.com/')); ?></span>
+					<span><?php echo $tips->add_tip(sprintf(__('Enter your Google App Client ID here. If you don\'t have a Google App yet, you will need to create one <a target="_blank" href="%s">here</a>', Eab_EventsHub::TEXT_DOMAIN), 'https://console.developers.google.com/')); ?></span>
 					<span>
 						<small><?php _e('If you leave this field empty, Google Auth will revert to legacy OpenID.', Eab_EventsHub::TEXT_DOMAIN); ?></small>
 					</span>

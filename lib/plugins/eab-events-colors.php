@@ -142,7 +142,7 @@ class Eab_Events_Colors {
 		$use_widget = $this->_data->get_option('eab-colors-use_widget') ? 'checked="checked"' : '';
 		$use_expanded_widget = $this->_data->get_option('eab-colors-use_expanded_widget') ? 'checked="checked"' : '';
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png');
 ?>
 <div id="eab-settings-colors" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Event Colors', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -150,18 +150,31 @@ class Eab_Events_Colors {
 	<?php foreach ($categories as $category) { ?>
 		<div class="eab-settings-settings_item">
 		<?php
-			if (is_object($category)) {
+			if ( is_object( $category )  ) {
 				$label = sprintf(__('Event category: &quot;%s&quot;', Eab_EventsHub::TEXT_DOMAIN), esc_html($category->name));
 				$cat = sanitize_html_class($category->slug);
 				$for = esc_attr("eab-colors-{$category->slug}");
-				$value_bg = !empty($colors[$cat]['bg']) || '#' == $colors[$cat]['bg'] ? esc_attr($colors[$cat]['bg']) : $default_bg;
-				$value_fg = !empty($colors[$cat]['fg']) || '#' == $colors[$cat]['fg'] ? esc_attr($colors[$cat]['fg']) : $default_fg;
+				$value_bg = $default_bg;
+				$value_fg = $default_bg;
+				if ( isset ( $colors[$cat] ) && isset( $colors[$cat]['bg'] ) ) {
+					$value_bg = !empty($colors[$cat]['bg']) || '#' == $colors[$cat]['bg'] ? esc_attr($colors[$cat]['bg']) : $default_bg;
+				}
+				if ( isset ( $colors[$cat] ) && isset( $colors[$cat]['fg'] ) ) {
+					$value_fg = !empty($colors[$cat]['fg']) || '#' == $colors[$cat]['fg'] ? esc_attr($colors[$cat]['fg']) : $default_fg;
+				}
+
 			} else {
 				$label = __('Default', Eab_EventsHub::TEXT_DOMAIN);
 				$cat = '__default__';
 				$for = esc_attr("eab-colors-{$cat}");
-				$value_bg = !empty($colors[$cat]['bg']) || '#' == $colors[$cat]['bg'] ? esc_attr($colors[$cat]['bg']) : $default_bg;
-				$value_fg = !empty($colors[$cat]['fg']) || '#' == $colors[$cat]['fg'] ? esc_attr($colors[$cat]['fg']) : $default_fg;
+				$value_bg = $default_bg;
+				$value_fg = $default_bg;
+				if ( isset ( $colors[$cat] ) && isset( $colors[$cat]['bg'] ) ) {
+					$value_bg = !empty($colors[$cat]['bg']) || '#' == $colors[$cat]['bg'] ? esc_attr($colors[$cat]['bg']) : $default_bg;
+				}
+				if ( isset ( $colors[$cat] ) && isset( $colors[$cat]['fg'] ) ) {
+					$value_fg = !empty($colors[$cat]['fg']) || '#' == $colors[$cat]['fg'] ? esc_attr($colors[$cat]['fg']) : $default_fg;
+				}
 
 				$default_bg = $value_bg;
 				$default_fg = $value_fg;
@@ -169,11 +182,11 @@ class Eab_Events_Colors {
 		?>
 			<b><?php echo $label; ?></b><br />
 			<label for="<?php echo $for; ?>-bg">
-				<?php _e('Background', Eab_EventsHub::TEXT_DOMAIN); ?>
+				<span class="eab-color-text"><?php _e('Background', Eab_EventsHub::TEXT_DOMAIN); ?></span><br/>
 				<input type="color" name="eab-colors[<?php echo $cat; ?>][bg]" value="<?php echo $value_bg; ?>" />
 			</label>
 			<label for="<?php echo $for; ?>-fg">
-				<?php _e('Text', Eab_EventsHub::TEXT_DOMAIN); ?>
+				<span class="eab-color-text"><?php _e('Text', Eab_EventsHub::TEXT_DOMAIN); ?></span><br/>
 				<input type="color" name="eab-colors[<?php echo $cat; ?>][fg]" value="<?php echo $value_fg; ?>" />
 			</label>
 			<label for="<?php echo $for; ?>-skip">
@@ -206,16 +219,13 @@ $(function () {
 	if ($fields.length && $fields.wpColorPicker) $fields.wpColorPicker();
 	$("#eab-colors-reset_to_defaults").click(function (e) {
             e.preventDefault();
-            for( var i = 0; i < $fields.length; i++ )
-            {
+            for( var i = 0; i < $fields.length; i++ ) {
                 var labelAttr = $( $fields[i] ).closest( 'label' ).attr( 'for' );
-                if( labelAttr == 'eab-colors-__default__-bg' )
-                {
+                if( labelAttr == 'eab-colors-__default__-bg' ) {
                     // For some reason .val( '#'75AB24 ) is not working here!
                     $( $fields[i] ).attr( 'value', '#75AB24' );
                 }
-                else if( labelAttr == 'eab-colors-__default__-fg' )
-                {
+                else if( labelAttr == 'eab-colors-__default__-fg' ) {
                     $( $fields[i] ).attr( 'value', '#FFFFFF' );
                 }
             }

@@ -91,7 +91,7 @@ class Eab_Events_RsvpWithEmail {
 
 	public function enqueue_api_scripts () {
 		if (is_user_logged_in()) return false;
-		wp_enqueue_script('eab-rsvp_with_email', plugins_url(basename(EAB_PLUGIN_DIR) . "/js/eab-rsvp_with_email.js"), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+		wp_enqueue_script('eab-rsvp_with_email', EAB_PLUGIN_URL . "js/eab-rsvp_with_email.js", array('jquery'), Eab_EventsHub::CURRENT_VERSION);
 		wp_localize_script('eab-rsvp_with_email', 'l10nRsvpWithEmail', array(
 			'email' => __('Email', Eab_EventsHub::TEXT_DOMAIN),
 		));

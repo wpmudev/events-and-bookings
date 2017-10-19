@@ -22,6 +22,10 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 	
 	function __construct() {
 		$this->_data = Eab_Options::get_instance();
+		if ( !is_object( $this->_data ) ) {
+			$this->_data = new Eab_Options;
+		}
+			
 		// To follow WP Start of week setting
 		if ( !$this->start_of_week = get_option('start_of_week') )
 			$this->start_of_week = 0;
@@ -67,7 +71,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		}
  
 		if ($shortcode_found) 
-			wp_enqueue_style('eab-events-weekly-calendar', plugins_url("/events-and-bookings/css/weekly-event-calendar.css") );
+			wp_enqueue_style('eab-events-weekly-calendar', EAB_PLUGIN_URL . "css/weekly-event-calendar.css" );
  
 		return $posts;
 	}	
@@ -213,15 +217,15 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		
 		$sunday = $this->sunday( $date ); // Timestamp of first Sunday of any date
 
-		if ( !$start = $this->_data->get_option('weekly_calendar_start') OR $start > 23 )
+		if ( !$start = $options->get_option('weekly_calendar_start') OR $start > 23 )
 			$start = 10; // Set a default working time start
 		$first = $start *3600 + $sunday; // Timestamp of the first cell of first Sunday
 		
-		if ( !$end = $this->_data->get_option('weekly_calendar_end') OR $end < 1 )
+		if ( !$end = $options->get_option('weekly_calendar_end') OR $end < 1 )
 			$end = 24; // Set a default working time end
 		$last = $end *3600 + $sunday; // Timestamp of the last cell of first Sunday
 		
-		if ( !$interval = $this->_data->get_option('weekly_calendar_interval') OR $interval < 10 OR $interval > 60 * 12 )
+		if ( !$interval = $options->get_option('weekly_calendar_interval') OR $interval < 10 OR $interval > 60 * 12 )
 			$interval = 120; // Set a default interval in minutes
 		$step = $interval * 60; // Timestamp increase interval to one cell below
 		
@@ -388,7 +392,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 	 */	
 	function log( $message='' ) {
 		// Don't give warning if folder is not writable
-		@file_put_contents( WP_PLUGIN_DIR . "/events-and-bookings/log.txt", $message . chr(10). chr(13), FILE_APPEND ); 
+		@file_put_contents( EAB_PLUGIN_DIR . "log.txt", $message . chr(10). chr(13), FILE_APPEND ); 
 	}
 
 	/**
@@ -410,7 +414,7 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		if (!class_exists('WpmuDev_HelpTooltips')) 
 			require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 		?>
 		<div id="eab-settings-weekly_calendar" class="eab-metabox postbox">
 				<h3 class="eab-hndle"><?php _e('Weekly Event Calendar settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>

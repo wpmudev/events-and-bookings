@@ -245,7 +245,7 @@ class Eab_Calendars_MeetupImporter {
 		foreach ($imported as $event_id) {
 			if (empty($event_id)) continue;
 			$event = new Eab_EventModel(get_post($event_id));
-			$result[] = '<a href="' . admin_url('post.php?action=edit&post=' . $event->get_id()) . '">' . $event->get_title() . '</a>';
+			$result[] = '<a target="_blank" href="' . admin_url('post.php?action=edit&post=' . $event->get_id()) . '">' . $event->get_title() . '</a>';
 		}
 		$result[] = sprintf(__('%s events successfully imported', Eab_EventsHub::TEXT_DOMAIN), count($result));
 		wp_send_json(array(
@@ -270,13 +270,16 @@ class Eab_Calendars_MeetupImporter {
 			: false
 		;
 		if (!$time) return false;
+                $offset = apply_filters( 'eab_meetup_offset_adjust', get_option( 'gmt_offset' ) );
+                $time = $time + ( $offset * 60 * 60 );
+                
 		if (empty($event['status']) || 'upcoming' != $event['status']) return false;
 
 		// Is the event already imported?
 		global $wpdb;
 		$id = esc_sql($event['id']);
 		$is_imported = $wpdb->get_var("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='_eab_meetup_id' AND meta_value='{$id}'");
-		if (!empty($is_imported)) return false;
+		//if (!empty($is_imported)) return false;
 
 		$post = array(
 			'post_type' => Eab_EventModel::POST_TYPE,
@@ -326,7 +329,7 @@ class Eab_Calendars_MeetupImporter {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 
 		$api_key = $this->_data->get_option('meetup_importer-api_key');
 		$member_id = $this->_data->get_option('meetup_importer-user_id');
@@ -353,6 +356,11 @@ class Eab_Calendars_MeetupImporter {
 	    	<button type="button" class="button" id="eab-meetup_importer-import_user_events"><?php echo esc_html(__('Import my events', Eab_EventsHub::TEXT_DOMAIN)); ?></button>
 	    	<button type="button" class="button" id="eab-meetup_importer-import_location_events"><?php echo esc_html(__('Import events close to my current location', Eab_EventsHub::TEXT_DOMAIN)); ?></button>
 	    	<button type="button" class="button" id="eab-meetup_importer-import_user_topics"><?php echo esc_html(__('Import my topics as event categories', Eab_EventsHub::TEXT_DOMAIN)); ?></button>
+                <?php if( ! is_ssl() ) : ?>
+                <br>
+                <em><?php _e( 'Important: To import events close to your current location, you must need SSL', Eab_EventsHub::TEXT_DOMAIN ); ?></em>
+                <br>
+                <?php endif; ?>
 	    	<div id="eab-meetup_importer-status" style="display:none"></div>
 	    <?php } else { ?>
 			<p class="note"><?php _e('To start, fill up the API information above and save your settings', Eab_EventsHub::TEXT_DOMAIN); ?></p>
@@ -387,6 +395,7 @@ $(function () {
 	$("#eab-meetup_importer-import_location_events").on("click", function (e) {
 		e.preventDefault();
 		write_status("<?php echo esc_js(__('Please, hold on...', Eab_EventsHub::TEXT_DOMAIN)); ?>");
+                
 		navigator.geolocation.getCurrentPosition(function (resp) {
 			$.post(ajaxurl, {
 				action: 'eab_meetup-import_nearby_events',

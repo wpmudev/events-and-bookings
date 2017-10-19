@@ -160,23 +160,12 @@ function send_save_request () {
 		'<img src="' + _eab_events_fpe_data.root_url + '/waiting.gif" id="eab-events-fpe-waiting_indicator" />'
 	);
 	var content = $("#eab-events-fpe-content").is(":visible") ? $("#eab-events-fpe-content").val() : tinyMCE.activeEditor.getContent();
-        var has_start = 1, has_end = 1;
-		if ( document.getElementById("incsub_event_no_start_time_0").checked == false ){
-        	var modified_start_time = start_time_parts.join(':');
-			modified_start_time = modified_start_time.replace(/ /g, '');
-			
-		}else{
-			var modified_start_time = "";
-			has_start=0;	
-		}
-		
-		if ( document.getElementById("incsub_event_no_end_time_0").checked == false ){
-        	var modified_end_time = end_time_parts.join(':');
-        	modified_end_time = modified_end_time.replace(/ /g, '');
-		}else{
-			var modified_end_time = "";
-			has_end=0;
-		}
+        
+        var modified_start_time = start_time_parts.join(':');
+        var modified_end_time = end_time_parts.join(':');
+        
+        modified_start_time = modified_start_time.replace(/ /g, '');
+        modified_end_time = modified_end_time.replace(/ /g, '');
         
 	var data = {
 		"id": $("#eab-events-fpe-event_id").val(),
@@ -184,6 +173,8 @@ function send_save_request () {
 		"content": content,
 		"start": $start_date.val() + ' ' + modified_start_time,
 		"end": $end_date.val() + ' ' + modified_end_time,
+		"no_start_time": $( '#eab-events-fpe-toggle_time__start' ).is( ':checked' ),
+		"no_end_time": $( '#eab-events-fpe-toggle_time__end' ).is( ':checked' ),
 		"venue": $("#eab-events-fpe-venue").val(),
 		"status": $("#eab-events-fpe-status").val(),
 		"is_premium": ($("#eab-events-fpe-is_premium").length ? $("#eab-events-fpe-is_premium").val() : 0),
@@ -200,6 +191,7 @@ function send_save_request () {
 		data["fee"] = $("#eab-events-fpe-event_fee").val();
 	}
 	$(document).trigger('eab-events-fpe-save_request', [data]);
+        
 	// Start sending!!
 	$.post(_eab_events_fpe_data.ajax_url, {
 		"action": "eab_events_fpe-save_event",
@@ -256,6 +248,55 @@ $(function () {
 		toggle_fee();
 	}
 	
+    $("body").on("click", ".eab-add_attendance .button", function () {
+		var $root = $(".eab-add_attendance"),
+			event_id = $root.find(".eab-attendance-event_id").val()
+			email = $root.find(".eab-attendance-email").val(),
+			status = $root.find(".eab-attendance-status").val()
+		;
+		if (!event_id || !email || !status) return false;
+		$.post(ajaxurl, {
+			action: "eab_add_attendance",
+			user: email,
+			post_id: event_id,
+			status: status
+		}, function (data) {
+			$(".eab-add_attendance-container").html(data);
+		});
+		return false;
+	});
+    
+    // Attendance deleting
+	$("body").on("click", ".eab-guest-delete_attendance", function () {
+		var $me = $(this);
+		var user_id = $me.attr("data-eab-user_id");
+		var post_id = $me.attr("data-eab-event_id");
+		$.post(ajaxurl, {
+			"action": "eab_delete_attendance",
+			"user_id": user_id,
+			"post_id": post_id
+		}, function (data) {
+			$(".eab-add_attendance-container").html(data);
+            window.location.reload();
+		});
+		return false;
+	});
+    
+    $("body").on("click", ".eab-guest-cancel_attendance", function () {
+		var $me = $(this);
+		var user_id = $me.attr("data-eab-user_id");
+		var post_id = $me.attr("data-eab-event_id");
+		$.post(ajaxurl, {
+			"action": "eab_cancel_attendance",
+			"user_id": user_id,
+			"post_id": post_id
+		}, function (data) {
+			$(".eab-add_attendance-container").html(data);
+            window.location.reload();
+		});
+		return false;
+	});
+        
 	// Init save request processing
 	$("#eab-events-fpe-ok").click(send_save_request);
 
@@ -283,6 +324,27 @@ $(function () {
         return false;
     });
 	/* End of adding by Ashok */
+
+	/* Toggle time options */
+	$( document ).on( 'click', '#eab-events-fpe-date_time .eab_time_toggle', function(){
+		
+		var affect = $( this ).data( 'time-affect' ),
+			source = ( $( this ).attr( 'type' ) == 'checkbox' ) ? 'checkbox' : 'other_trigger',
+			target = $( '.eab-events-fpe_wrap_time_' + affect ),
+			checkbox = $( '#eab-events-fpe-toggle_time__' + affect );
+		
+		if( source == 'other_trigger' ){
+			checkbox.prop("checked", !checkbox.prop("checked"));
+		}
+		
+		if( checkbox.is( ':checked' ) ){
+			target.fadeOut( 300 );
+		}
+		else{
+			target.show( 300 );	
+		}
+
+	});
 });
 
 	

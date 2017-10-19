@@ -80,7 +80,7 @@ class Eab_Events_EventCountdown {
 	 * Register jQuery countdown
 	 */		
 	function register_scripts() {
-		wp_register_script('jquery-countdown',plugins_url('events-and-bookings/js/').'jquery.countdown.min.js',array('jquery','jquery-ui-widget'));
+		wp_register_script('jquery-countdown',EAB_PLUGIN_URL.'js/jquery.countdown.min.js',array('jquery','jquery-ui-widget'));
 	}
 
 	/**
@@ -100,8 +100,11 @@ class Eab_Events_EventCountdown {
 		}
  
 		if ($shortcode_found) {
-			wp_enqueue_style('jquery-countdown',plugins_url('events-and-bookings/css/').'jquery.countdown.css');
-			define('EAB_COUNTDOWN_FLAG_STYLES_INJECTED', true); // Don't double-enqueue
+			wp_enqueue_style('jquery-countdown',EAB_PLUGIN_URL.'css/jquery.countdown.css');
+
+			if ( ! defined('EAB_COUNTDOWN_FLAG_STYLES_INJECTED') ) {
+				define( 'EAB_COUNTDOWN_FLAG_STYLES_INJECTED', true ); // Don't double-enqueue
+			}
 		}
  
 		return $posts;
@@ -114,10 +117,10 @@ class Eab_Events_EventCountdown {
 		if ( $this->add_countdown ) {
 			wp_enqueue_script('jquery-countdown');
 			if ( $locale = $this->locale() ) {
-				wp_enqueue_script('jquery-countdown-'.$locale,plugins_url('events-and-bookings/js/').'jquery.countdown-'.$locale.'.js',array('jquery-countdown'));
+				wp_enqueue_script('jquery-countdown-'.$locale,EAB_PLUGIN_URL.'js/jquery.countdown-'.$locale.'.js',array('jquery-countdown'));
 			}
 			if (!(defined('EAB_COUNTDOWN_FLAG_STYLES_INJECTED') && EAB_COUNTDOWN_FLAG_STYLES_INJECTED)) {
-				wp_enqueue_style('jquery-countdown',plugins_url('events-and-bookings/css/').'jquery.countdown.css'); // E.g. in a widget
+				wp_enqueue_style('jquery-countdown',EAB_PLUGIN_URL.'css/jquery.countdown.css'); // E.g. in a widget
 			}
 		}
 	}
@@ -130,12 +133,12 @@ class Eab_Events_EventCountdown {
 			return false;
 		
 		// First check with full match, e.g. zh-CN	
-		if ( file_exists( WP_PLUGIN_DIR . "/events-and-bookings/js/jquery.countdown-".$locale.".js" ) )
+		if ( file_exists( EAB_PLUGIN_DIR . "js/jquery.countdown-".$locale.".js" ) )
 			return $locale;
 			
 		// Then check the first abbr. e.g. zh
 		list( $locale1, $locale2 ) = explode( "-", $locale );
-		if ( file_exists( WP_PLUGIN_DIR . "/events-and-bookings/js/jquery.countdown-".$locale1.".js" ) )
+		if ( file_exists( EAB_PLUGIN_DIR . "js/jquery.countdown-".$locale1.".js" ) )
 			return $locale1;
 			
 		// No localized js file exists, use English
@@ -192,7 +195,7 @@ class Eab_Events_EventCountdown {
 			default:	$size = 70; $height = 72; break;
 		}
 		
-		$sprite_file = esc_js(plugins_url('/events-and-bookings/img/sprite_'.$size.'x'.$height.'.png'));
+		$sprite_file = esc_js( EAB_PLUGIN_URL . 'img/sprite_'.$size.'x'.$height.'.png' );
 		
 		$result = $wpdb->get_row(
 			"SELECT estart.* 

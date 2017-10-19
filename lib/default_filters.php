@@ -117,9 +117,8 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 	}
 
 	function _eab_dispatch_event_categories_for_ordering ($query) {
-		global $wp_query;
 		if (is_admin()) return false;
-		if (!$wp_query->is_main_query()) return false;
+		if (!$query->is_main_query()) return false;
 		if (empty($query->query_vars['eab_events_category'])) return false;
 		Eab_Filter::start_date_ordering_set_up();
 		add_filter('found_posts', '_eab_tear_down_event_categories_for_ordering');
@@ -127,6 +126,24 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 	add_action('pre_get_posts', '_eab_dispatch_event_categories_for_ordering', 1);
 }
 // End Category sorting in default WP requests
+
+// Archive sorting and pagination in default WP requests
+function _eab_dispatch_event_archives($query) {
+    if ( is_admin() || !$query->is_main_query() || !is_post_type_archive('incsub_event') ) return;
+    $data = Eab_Options::get_instance();
+    if ( $pagination = $data->get_option('pagination') ) {
+        $query->set( 'posts_per_page', $pagination );
+    }
+    if ( $data->get_option('ordering_direction') ) {
+        add_filter( 'eab-ordering-date_ordering_direction', 'eab_ordering_date_ordering_direction_cb' );
+    }
+}
+add_action('pre_get_posts', '_eab_dispatch_event_archives', 1);
+// End Archive sorting and pagination in default WP requests
+
+function eab_ordering_date_ordering_direction_cb() {
+	return 'DESC';
+}
 
 // Admin side - ensure Maps availability for subscribers
 function eab_to_agm__ensure_subscribers_maps () {

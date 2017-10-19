@@ -108,8 +108,11 @@ class Eab_Gcal_Importer_GoogleImporter extends Eab_ScheduledImporter {
 		$meta['incsub_event_status'] = Eab_EventModel::STATUS_OPEN; // Open by default
 
 		// Metadata - timestamps
-		$start = isset($gevent['start']['dateTime']) ? $this->_to_local_time($gevent['start']['dateTime']) : false;
-		$end = isset($gevent['end']['dateTime']) ? $this->_to_local_time($gevent['end']['dateTime']) : false;
+                $startDateTime = isset($gevent['start']['dateTime']) ? $gevent['start']['dateTime'] : $gevent['start']['date'];
+                $endDateTime = isset($gevent['end']['dateTime']) ? $gevent['end']['dateTime'] : $gevent['end']['date'];
+                
+		$start = isset($startDateTime) ? $this->_to_local_time($startDateTime) : false;
+		$end = isset($endDateTime) ? $this->_to_local_time($endDateTime) : false;
 		if ($start) $meta['incsub_event_start'] = date('Y-m-d H:i:s', $start);
 		if ($end) $meta['incsub_event_end'] = date('Y-m-d H:i:s', $end);
 
@@ -176,7 +179,7 @@ class Eab_Calendars_GoogleImporter {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 
 		$api_key = $this->_data->get_option('gcal_importer-client_id');
 		$api_secret = $this->_data->get_option('gcal_importer-client_secret');
@@ -217,13 +220,16 @@ class Eab_Calendars_GoogleImporter {
 			</ol>
 		</p>
 		<div class="eab-settings-settings_item" style="line-height:1.8em">
-			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client ID', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+                        <div>
+			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client ID', Eab_EventsHub::TEXT_DOMAIN); ?></label><br />
 			<input type="text" size="90" id="incsub_event-gcal_importer-app_id" name="gcal_importer[client_id]" value="<?php print $api_key; ?>" />
 			<span><?php echo $tips->add_tip(__('Enter your Client ID number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
-			<br />
-			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client secret', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+                        </div>
+                        <div>
+			<label for="incsub_event-gcal_importer-app_id" id="incsub_event_label-gcal_importer-app_id"><?php _e('Client secret', Eab_EventsHub::TEXT_DOMAIN); ?></label><br />
 			<input type="text" size="85" id="incsub_event-gcal_importer-app_id" name="gcal_importer[client_secret]" value="<?php print $api_secret; ?>" />
 			<span><?php echo $tips->add_tip(__('Enter your Client secret number here.', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+                        </div>
 			<div class="gcal_importer-auth_actions">
 		<?php if ($is_authenticated && $api_key && $api_secret) { ?>
 				<a href="#reset" class="button" id="gcal_import-reset"><?php _e('Reset', Eab_EventsHub::TEXT_DOMAIN); ?></a>
@@ -317,12 +323,12 @@ $(function () {
 	}
 
 	function save_settings ($options) {
-		$options['gcal_importer-client_id'] = $_POST['gcal_importer']['client_id'];
-		$options['gcal_importer-client_secret'] = $_POST['gcal_importer']['client_secret'];
-		$options['gcal_importer-sync_calendars'] = $_POST['gcal_importer']['sync_calendars'];
-		$options['gcal_importer-calendar_author'] = $_POST['gcal_importer']['calendar_author'];
-		$options['gcal_importer-run_each'] = $_POST['gcal_importer']['run_each'];
-		$options['gcal_importer-convert_times'] = !empty($_POST['gcal_importer']['convert_times']) ? 1 : 0;
+		$options['gcal_importer-client_id'] 		= isset( $_POST['gcal_importer']['client_id'] ) ? $_POST['gcal_importer']['client_id'] : '';
+		$options['gcal_importer-client_secret'] 	= isset( $_POST['gcal_importer']['client_secret'] ) ? $_POST['gcal_importer']['client_secret'] : '';
+		$options['gcal_importer-sync_calendars'] 	= isset( $_POST['gcal_importer']['sync_calendars'] ) ? $_POST['gcal_importer']['sync_calendars'] : 0;
+		$options['gcal_importer-calendar_author'] 	= isset( $_POST['gcal_importer']['calendar_author'] ) ? $_POST['gcal_importer']['calendar_author'] : '';
+		$options['gcal_importer-run_each'] 			= isset( $_POST['gcal_importer']['run_each'] ) ? $_POST['gcal_importer']['run_each'] : '';
+		$options['gcal_importer-convert_times'] 	= isset( $_POST['gcal_importer']['convert_times'] ) ? 1 : 0;
 		return $options;
 	}
 

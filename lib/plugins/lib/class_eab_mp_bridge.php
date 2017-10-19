@@ -23,6 +23,7 @@ class Eab_MP_Bridge {
 		// Display
 		add_filter('eab-event-payment_forms', array($this, 'process_event_payment_forms'), 10, 2);
                 add_action('incsub_event_booking_yes', array($this, 'add_event_product_to_cart'), 10, 2);
+                add_action('incsub_event_booking_maybe', array($this, 'add_event_product_to_cart'), 10, 2);
 		add_filter('eab-events-event_details-price', array($this, 'show_product_price'), 10, 2);
 
 		// Regular Events+ product selection
@@ -177,7 +178,7 @@ class Eab_MP_Bridge {
 		$out = '';
 		$category_id = $this->_data->get_option('payment-ppvp-category');
 		$query_args = array(
-			'post_type' => 'product',
+			'post_type' => MP_Product::get_post_type(),
 			'posts_per_page' => -1,
 		);
 		if ($category_id) {
@@ -375,7 +376,9 @@ class Eab_MP_Bridge {
 
 	}
         
-        function process_event_payment_forms ($form, $event_id) {
+    function process_event_payment_forms ($form, $event_id) {
+		$product_id = get_post_meta($event_id, 'eab_product_id', true);
+		if( !isset( $product_id ) || empty( $product_id ) ) return $form;
 		if (!$this->_is_mp_present()) return $form;
 		return '<p><a href="' . esc_url(mp_cart_link(false, true)) . '">' . __('Click here to purchase your ticket', Eab_EventsHub::TEXT_DOMAIN) . '</a></p>';
 	}

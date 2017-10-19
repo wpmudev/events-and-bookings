@@ -36,29 +36,29 @@ abstract class WpmuDev_CalendarTable {
 		return $this->_current_timestamp;
 	}
 	
-	public function get_month_calendar ($timestamp=false) {
+	public function get_month_calendar ( $timestamp=false ) {
 		$date = $timestamp ? $timestamp : current_time('timestamp');
 		
 		$this->_current_timestamp = $date;
 		
-		$year = date('Y', $date);
-		$month = date('m', $date);
-		$time = strtotime("{$year}-{$month}-01");
+		$year 	= date('Y', $date);
+		$month 	= date('m', $date);
+		$time 	= strtotime("{$year}-{$month}-01");
 		
-		$days = (int)date('t', $time);
-		$first = (int)date('w', strtotime(date('Y-m-01', $time)));
-		$last = (int)date('w', strtotime(date('Y-m-' . $days, $time)));
+		$days 	= (int)date('t', $time);
+		$first 	= (int)date('w', strtotime(date('Y-m-01', $time)));
+		$last 	= (int)date('w', strtotime(date('Y-m-' . $days, $time)));
 		
 		
 		$post_info = array();
-		if (is_array($this->_events)) foreach ($this->_events as $event) {
+		if ( is_array( $this->_events ) ) foreach ( $this->_events as $event ) {
 			$post_info[] = $this->_get_item_data($event);
 		}
 
-		$tbl_id = $this->get_calendar_id();
-		$tbl_id = $tbl_id ? "id='{$tbl_id}'" : '';
-		$tbl_class = $this->get_calendar_class();
-		$tbl_class = $tbl_class ? "class='{$tbl_class}'" : '';
+		$tbl_id 	= $this->get_calendar_id();
+		$tbl_id 	= $tbl_id ? "id='{$tbl_id}'" : '';
+		$tbl_class 	= $this->get_calendar_class();
+		$tbl_class 	= $tbl_class ? "class='{$tbl_class}'" : '';
 		
 		$ret = '';
 		$ret .= "<table width='100%' {$tbl_id} {$tbl_class}>";
@@ -74,10 +74,10 @@ abstract class WpmuDev_CalendarTable {
 		else
 			$ret .= '<tr>';
 
-		$today_timestamp = date('Y-m-d', eab_current_time());
+		$today_timestamp = date('Y-m-d', eab_current_time() );
 		
 		
-		for ($i=1; $i<=$days; $i++) {
+		for ( $i=1; $i<=$days; $i++ ) {
 			$date = date('Y-m-' . sprintf("%02d", $i), $time);
 			$dow = (int)date('w', strtotime($date));
 			$current_day_start = strtotime("{$date} 00:00"); 
@@ -85,41 +85,57 @@ abstract class WpmuDev_CalendarTable {
 			if ($this->start_of_week == $dow) $ret .= '</tr><tr>';
 			
 			$this->reset_event_info_storage();
-			foreach ($post_info as $ipost) {
-				for ($k = 0; $k < count($ipost['event_starts']); $k++) {
-					$start = strtotime($ipost['event_starts'][$k]);
-					$end = strtotime($ipost['event_ends'][$k]);
-					if ($start < $current_day_end && $end > $current_day_start) {
-						$this->set_event_info(
-							array('start' => $start, 'end'=> $end), 
-							array('start' => $current_day_start, 'end'=> $current_day_end),
-							$ipost
-						);
+			if( apply_filters( 'eab_event_calendar_display_list_customize', true ) ) {
+				foreach ($post_info as $ipost) {
+					for ($k = 0; $k < count($ipost['event_starts']); $k++) {
+						$start = strtotime($ipost['event_starts'][$k]);
+						$end = strtotime($ipost['event_ends'][$k]);
+						if ($start < $current_day_end && $end > $current_day_start) {
+							$this->set_event_info(
+								array('start' => $start, 'end'=> $end), 
+								array('start' => $current_day_start, 'end'=> $current_day_end),
+								$ipost
+							);
+						}
 					}
-				}
-			} 
+				} 
+			} else {
+				do_action( 'eab_event_calendar_display_list_reorder', $post_info, $this, $current_day_start, $current_day_end );
+			}
 			
-			$activity = $this->get_event_info_as_string($i);
+			$activity = $this->get_event_info_as_string( $i );
 			$class_names = array();
-			if ($activity) {
+			if ( $activity ) {
 				$class_names[] = 'eab-has_events';
 			} else {
 				$activity = "<p>{$i}</p>";
 			}
-			if ($date == $today_timestamp) $class_names[] = 'today';
+			if ($date == $today_timestamp) {
+				$class_names[] = 'today';
+			}
 			$class_attribute = !empty($class_names) 
 				? 'class="' . esc_attr(join(' ', $class_names)) . '"'
 				: ''
 			;
 			$ret .= "<td {$class_attribute}>{$activity}</td>";
 		}
+                
+		$final_last = $last + 1;
+		$final_last = $final_last > 6 ? $final_last - 7 : $final_last;
+		if ( $final_last == $this->start_of_week ) {
+			$ret .= '</tr>'; 
+		} else {
+			$cal_diff = 6 - $last + $this->start_of_week;
+			if( $cal_diff > 6 ) $cal_diff -= 7;
+			$ret .= '<td class="no-right-border" colspan="' . $cal_diff . '">&nbsp;</td></tr>';
+		}
 		
-		if ( $last > $this->start_of_week )
+		/*if ( $last > $this->start_of_week )
 			$ret .= '<td class="no-right-border" colspan="' . (6 - $last + $this->start_of_week) . '">&nbsp;</td></tr>'; 
 		else if ( $last + 1 == $this->start_of_week )
 			$ret .= '</tr>'; 
 		else
-			$ret .= '<td class="no-right-border" colspan="' . (6 + $last - $this->start_of_week) . '">&nbsp;</td></tr>';
+			$ret .= '<td class="no-right-border" colspan="' . (6 + $last - $this->start_of_week) . '">&nbsp;</td></tr>';*/
 		
 		$ret .= $this->_get_last_row();
 		
@@ -481,7 +497,8 @@ EabEctEacJs;
 
 	protected function _get_item_data ($post) {
 		$data = parent::_get_item_data($post);
-		if (isset($post->blog_id)) return $data;
+                // Enabling excerpt in calendar
+		// if (isset($post->blog_id)) return $data;
 		$event = ($post instanceof Eab_EventModel) ? $post : new Eab_EventModel($post);
 		
 		if (!empty($this->_thumbnail['with_thumbnail'])) {
@@ -607,7 +624,7 @@ class Eab_CalendarTable_EventShortcodeCalendar extends Eab_CalendarTable_EventAr
                                 $id_attr,
                                 $title_link
                             );
-                
+		        
 		return "<tr class='{$row_class}'>" .
 			'<td>' .
 				'<a class="' . $calendar_class . '-navigation-link eab-navigation-prev eab-time_unit-year" href="' . 

@@ -18,7 +18,7 @@ class Eab_Attendees_Widget extends Eab_Widget {
 	
 		extract($args);
 	
-		if ($post->post_type != 'incsub_event') {
+		if ( $post->post_type != 'incsub_event') {
 		    return;
 		}
 	

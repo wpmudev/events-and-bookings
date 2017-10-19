@@ -4,13 +4,18 @@ jQuery(function() {
          * Commenting the following if as datepicker doesn't work in mobile
          */
 	//if (!("ontouchstart" in window)) {
-		jQuery(".incsub_event_picker").datepicker({
-			"dateFormat": "yy-mm-dd",
-			"changeMonth": true,
-			"changeYear": true,
-			"defaultDate": new Date(),
-			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
-		});
+	jQuery(".incsub_event_picker").datepicker({
+		"dateFormat": "yy-mm-dd",
+		"changeMonth": true,
+		"changeYear": true,
+		"defaultDate": new Date(),
+		"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
+	});
+	jQuery( ".incsub_event_time_picker" ).timepicker({
+		showNowButton: true,
+		showDeselectButton: true,
+		showCloseButton: true,
+	});
 	//}
 
     jQuery('[href*="preview=true"]').hide(); // Preview won't work
@@ -24,6 +29,12 @@ jQuery(function() {
 			"changeMonth": true,
 			"changeYear": true,
 			"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
+		});
+
+		jQuery( "#incsub_event_start_time_"+row_id+" , #incsub_event_end_time_"+row_id ).timepicker({
+			showNowButton: true,
+			showDeselectButton: true,
+			showCloseButton: true
 		});
 
 		if (jQuery('.eab-section-block').length > 2) {
@@ -350,7 +361,7 @@ $(function () {
 		});
 		return false;
 	});
-
+        
 	$("body").on("click", ".eab-add_attendance .button", function () {
 		var $root = $(".eab-add_attendance"),
 			event_id = $root.find(".eab-attendance-event_id").val()
@@ -432,7 +443,7 @@ function boot () {
 		return;
 	}
 	
-	box_root.append('<div id="eab-root-settings_nav"></div>');
+	box_root.prepend('<div id="eab-root-settings_nav"></div>');
 	root = $("#eab-root-settings_nav");
 
 	root.empty();

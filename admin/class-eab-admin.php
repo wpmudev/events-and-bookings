@@ -42,8 +42,10 @@ class Eab_Admin {
 		}
 
 		// Register scripts/styles
-		wp_register_script('eab_admin_js', plugins_url('events-and-bookings/js/eab-admin.js'), array('jquery'), Eab_EventsHub::CURRENT_VERSION);
-		wp_register_style('eab_admin', plugins_url('events-and-bookings/css/admin.css'), null, Eab_EventsHub::CURRENT_VERSION);
+		wp_register_script('eab_jquery_timepicker', EAB_PLUGIN_URL . 'js/jquery.ui.timepicker.js', array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+		wp_register_script('eab_admin_js', EAB_PLUGIN_URL . 'js/eab-admin.js', array('jquery'), Eab_EventsHub::CURRENT_VERSION);
+		wp_register_style('eab_jquery_timepicker', EAB_PLUGIN_URL . 'css/jquery.ui.timepicker.css', null, Eab_EventsHub::CURRENT_VERSION);
+		wp_register_style('eab_admin', EAB_PLUGIN_URL . 'css/admin.css', null, Eab_EventsHub::CURRENT_VERSION);
 
 		if (defined('AGM_PLUGIN_URL')) {
 			add_action('admin_print_scripts-post.php', array($this, 'js_editor_button'));
@@ -51,9 +53,9 @@ class Eab_Admin {
 		}
 
 		$event_localized = array(
-			'view_all_bookings' => __('View all RSVPs', Eab_EventsHub::TEXT_DOMAIN),
-			'back_to_gettting_started' => __('Back to getting started', Eab_EventsHub::TEXT_DOMAIN),
-			'start_of_week' => get_option('start_of_week'),
+			'view_all_bookings' 		=> __('View all RSVPs', Eab_EventsHub::TEXT_DOMAIN),
+			'back_to_gettting_started' 	=> __('Back to getting started', Eab_EventsHub::TEXT_DOMAIN),
+			'start_of_week' 			=> get_option('start_of_week'),
 		);
 
 		wp_localize_script('eab_admin_js', 'eab_event_localized', $event_localized);
@@ -81,6 +83,7 @@ class Eab_Admin {
 			return;
 		wp_enqueue_script('eab_jquery_ui');
 		wp_enqueue_script('jquery-ui-datepicker');
+		wp_enqueue_script('eab_jquery_timepicker');
 		wp_enqueue_script('eab_admin_js');
 	}
 
@@ -88,28 +91,29 @@ class Eab_Admin {
 		if (!$this->_check_admin_page_id())
 			return;
 		wp_enqueue_style('eab_jquery_ui');
+		wp_enqueue_style('eab_jquery_timepicker');
 		wp_enqueue_style('eab_admin');
 	}
 
 	function js_editor_button() {
 		wp_enqueue_script('thickbox');
-		wp_enqueue_script('eab_editor',  plugins_url('events-and-bookings/js/editor.js'), array('jquery'));
+		wp_enqueue_script('eab_editor',  EAB_PLUGIN_URL . 'js/editor.js', array('jquery'));
 		wp_localize_script('eab_editor', 'eab_l10nEditor', array(
-			'loading' => __('Loading maps... please wait', Eab_EventsHub::TEXT_DOMAIN),
-			'use_this_map' => __('Insert this map', Eab_EventsHub::TEXT_DOMAIN),
-			'preview_or_edit' => __('Preview/Edit', Eab_EventsHub::TEXT_DOMAIN),
-			'delete_map' => __('Delete', Eab_EventsHub::TEXT_DOMAIN),
-			'add_map' => __('Add Map', Eab_EventsHub::TEXT_DOMAIN),
-			'existing_map' => __('Existing map', Eab_EventsHub::TEXT_DOMAIN),
-			'no_existing_maps' => __('No existing maps', Eab_EventsHub::TEXT_DOMAIN),
-			'new_map' => __('Create new map', Eab_EventsHub::TEXT_DOMAIN),
-			'advanced' => __('Advanced mode', Eab_EventsHub::TEXT_DOMAIN),
-			'advanced_mode_activate_help' => __('Activate Advanced mode to select individual maps to merge into one new map or to batch delete maps', Eab_EventsHub::TEXT_DOMAIN),
-			'advanced_mode_help' => __('To create a new map from several maps select the maps you want to use and click Merge locations', Eab_EventsHub::TEXT_DOMAIN),
-			'advanced_off' => __('Exit advanced mode', Eab_EventsHub::TEXT_DOMAIN),
-			'merge_locations' => __('Merge locations', Eab_EventsHub::TEXT_DOMAIN),
-			'batch_delete' => __('Batch delete', Eab_EventsHub::TEXT_DOMAIN),
-			'new_map_intro' => __('Create a new map which can be inserted into this post or page. Once you are done you can manage all maps below', Eab_EventsHub::TEXT_DOMAIN),
+			'loading' 						=> __('Loading maps... please wait', Eab_EventsHub::TEXT_DOMAIN),
+			'use_this_map' 					=> __('Insert this map', Eab_EventsHub::TEXT_DOMAIN),
+			'preview_or_edit' 				=> __('Preview/Edit', Eab_EventsHub::TEXT_DOMAIN),
+			'delete_map' 					=> __('Delete', Eab_EventsHub::TEXT_DOMAIN),
+			'add_map' 						=> __('Add Map', Eab_EventsHub::TEXT_DOMAIN),
+			'existing_map' 					=> __('Existing map', Eab_EventsHub::TEXT_DOMAIN),
+			'no_existing_maps' 				=> __('No existing maps', Eab_EventsHub::TEXT_DOMAIN),
+			'new_map' 						=> __('Create new map', Eab_EventsHub::TEXT_DOMAIN),
+			'advanced' 						=> __('Advanced mode', Eab_EventsHub::TEXT_DOMAIN),
+			'advanced_mode_activate_help' 	=> __('Activate Advanced mode to select individual maps to merge into one new map or to batch delete maps', Eab_EventsHub::TEXT_DOMAIN),
+			'advanced_mode_help' 			=> __('To create a new map from several maps select the maps you want to use and click Merge locations', Eab_EventsHub::TEXT_DOMAIN),
+			'advanced_off' 					=> __('Exit advanced mode', Eab_EventsHub::TEXT_DOMAIN),
+			'merge_locations' 				=> __('Merge locations', Eab_EventsHub::TEXT_DOMAIN),
+			'batch_delete' 					=> __('Batch delete', Eab_EventsHub::TEXT_DOMAIN),
+			'new_map_intro' 				=> __('Create a new map which can be inserted into this post or page. Once you are done you can manage all maps below', Eab_EventsHub::TEXT_DOMAIN),
 		));
 	}
 
@@ -217,7 +221,12 @@ class Eab_Admin {
 
 				if (current_user_can($post_type_object->cap->delete_post, $event->get_id())) {
 					if ('trash' == $post->post_status) {
-						$actions['untrash'] = "<a title='" . esc_attr(__('Restore this Event from the Trash', Eab_EventsHub::TEXT_DOMAIN)) . "' href='" . wp_nonce_url(admin_url(sprintf($post_type_object->_edit_link . '&amp;action=untrash', $event->get_id())), 'untrash-' . $post->post_type . '_' . $event->get_id()) . "'>" . __('Restore') . "</a>";
+						$actions['untrash'] = sprintf(	'<a href="%s" title="%s" aria-label="%s">%s</a>',
+							wp_nonce_url( admin_url( sprintf( $post_type_object->_edit_link . '&amp;action=untrash', $post->ID ) ), 'untrash-post_' . $post->ID ),
+							'Restore this Event from the Trash',
+							esc_attr( sprintf( __( 'Restore &#8220;%s&#8221; from the Trash' ), $title ) ),
+							__( 'Restore' )
+						);	
 					} else if (EMPTY_TRASH_DAYS) {
 						$actions['trash'] = '<a class="submitdelete" title="' . esc_attr(__('Move this Event to the Trash', Eab_EventsHub::TEXT_DOMAIN)) . '" href="' . get_delete_post_link($event->get_id()) . '">' . __('Trash') . '</a>';
 					}

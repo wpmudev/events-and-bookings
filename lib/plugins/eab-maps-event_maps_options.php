@@ -42,23 +42,25 @@ class Eab_Maps_EventMapsOptions {
 	}
 
 	function save_settings ($options) {
-		if (empty($_POST['google_maps'])) return $options;
+		if ( !isset( $_POST['google_maps'] ) ) {
+			return $options;
+		}
 
-		$data = stripslashes_deep($_POST['google_maps']);
-		$options['google_maps-overrides'] = !empty($data['overrides']) ? array_filter($data['overrides']) : array();
+		$data = stripslashes_deep( $_POST['google_maps'] );
+		$options['google_maps-overrides'] = !empty( $data['overrides'] ) ? array_filter($data['overrides']) : array();
 		return $options;
 	}
 
 	function show_settings () {
 		$map_types = array(
-			'ROADMAP' => __('ROADMAP', 'agm_google_maps'),
+			'ROADMAP' 	=> __('ROADMAP', 'agm_google_maps'),
 			'SATELLITE' => __('SATELLITE', 'agm_google_maps'),
-			'HYBRID' => __('HYBRID', 'agm_google_maps'),
-			'TERRAIN' => __('TERRAIN', 'agm_google_maps'),
+			'HYBRID' 	=> __('HYBRID', 'agm_google_maps'),
+			'TERRAIN' 	=> __('TERRAIN', 'agm_google_maps'),
 		);
 		$map_units = array(
-			'METRIC' => __('Metric', 'agm_google_maps'),
-			'IMPERIAL' => __('Imperial', 'agm_google_maps'),
+			'METRIC' 	=> __('Metric', 'agm_google_maps'),
+			'IMPERIAL' 	=> __('Imperial', 'agm_google_maps'),
 		);
 		$options = $this->_data->get_option('google_maps-overrides');
 ?>
@@ -84,41 +86,59 @@ class Eab_Maps_EventMapsOptions {
 			<tr valign="top">
 				<th scope="row"><?php _e('Map appearance', Eab_EventsHub::TEXT_DOMAIN)?></th>
 				<td>
-					<label for="eab-google_maps-zoom">
-						<?php _e('Zoom:', Eab_EventsHub::TEXT_DOMAIN); ?>
-						<input type="text" size="4" id="eab-google_maps-zoom" name="google_maps[overrides][zoom]" value="<?php esc_attr_e(@$options['zoom']); ?>" />
-						<em class="eab-inline_help"><?php _e('Numeric value', Eab_EventsHub::TEXT_DOMAIN); ?></em>
-					</label>
-					<br />
-					<label for="eab-google_maps-type">
-						<?php _e('Type:', Eab_EventsHub::TEXT_DOMAIN); ?>
-						<select name="google_maps[overrides][map_type]">
-							<option value=""></option>
-						<?php foreach ($map_types as $type => $label) { ?>
-							<option value="<?php esc_attr_e($type); ?>"
-								<?php selected(@$options['map_type'], $type); ?>
-							><?php echo $label; ?></option>
-						<?php } ?>
-						</select>
-					</label>
-					<br />
-					<label for="eab-google_maps-units">
-						<?php _e('Units:', Eab_EventsHub::TEXT_DOMAIN); ?>
-						<select name="google_maps[overrides][units]">
-							<option value=""></option>
-						<?php foreach ($map_units as $units => $label) { ?>
-							<option value="<?php esc_attr_e($units); ?>"
-								<?php selected(@$options['units'], $units); ?>
-							><?php echo $label; ?></option>
-						<?php } ?>
-						</select>
-					</label>
-					<br />
-					<label for="eab-google_maps-show_images">
-						<input type="hidden" name="google_maps[overrides][show_images]" value="" />
+					<style>
+						.eab_inner_table td{padding: 0 !important}
+					</style>
+					<table celpadding="5" cellspacing="5" class="eab_inner_table">
+						<tr>
+							<td valign="top">
+								<label for="eab-google_maps-zoom">
+									<?php _e('Zoom:', Eab_EventsHub::TEXT_DOMAIN); ?>
+								</label>
+							</td>
+							<td valign="top">
+								<input type="text" size="4" id="eab-google_maps-zoom" name="google_maps[overrides][zoom]" value="<?php esc_attr_e(@$options['zoom']); ?>" />
+								<em class="eab-inline_help"><?php _e('Numeric value', Eab_EventsHub::TEXT_DOMAIN); ?></em>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<label for="eab-google_maps-type">
+									<?php _e('Type:', Eab_EventsHub::TEXT_DOMAIN); ?>
+								</label>
+							</td>
+							<td valign="top">
+								<select name="google_maps[overrides][map_type]">
+									<option value=""></option>
+									<?php foreach ($map_types as $type => $label) { ?>
+										<option value="<?php esc_attr_e($type); ?>"
+											<?php selected(@$options['map_type'], $type); ?>
+										><?php echo $label; ?></option>
+									<?php } ?>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top"><label for="eab-google_maps-units"><?php _e('Units:', Eab_EventsHub::TEXT_DOMAIN); ?></label></td>
+							<td valign="top">
+								<select name="google_maps[overrides][units]">
+									<option value=""></option>
+									<?php foreach ($map_units as $units => $label) { ?>
+										<option value="<?php esc_attr_e($units); ?>"
+											<?php selected(@$options['units'], $units); ?>
+										><?php echo $label; ?></option>
+									<?php } ?>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td valign="top">
+								<input type="hidden" name="google_maps[overrides][show_images]" value="" />
 						<input type="checkbox" id="eab-google_maps-show_images" name="google_maps[overrides][show_images]" value="1" <?php checked(1, @$options['show_images']); ?> />
-						<?php _e('Show images', Eab_EventsHub::TEXT_DOMAIN); ?>
-					</label>
+							</td>
+							<td valign="top"><label for="eab-google_maps-show_images"><?php _e('Show images', Eab_EventsHub::TEXT_DOMAIN); ?></label></td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		</table>

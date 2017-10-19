@@ -73,7 +73,7 @@ class Eab_Rsvps_RsvpAutoReset {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 		$runs = array(
 			'3600' => __('Hour', Eab_EventsHub::TEXT_DOMAIN),
 			'7200' => __('Two hours', Eab_EventsHub::TEXT_DOMAIN),
@@ -82,6 +82,7 @@ class Eab_Rsvps_RsvpAutoReset {
 			'43200' => __('Twelve hours', Eab_EventsHub::TEXT_DOMAIN),
 			'86400' => __('Day', Eab_EventsHub::TEXT_DOMAIN),
 		);
+		$runs = apply_filters( 'eab_rsvp_scheduled_rsvp_reset_cron_times', $runs );
 		$run_each = $this->_data->get_option('rsvp_auto_reset-run_each');
 		$run_each = $run_each ? $run_each : 3600;
 

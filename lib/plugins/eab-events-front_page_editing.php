@@ -61,7 +61,7 @@ class Eab_Events_FrontPageEditing {
 		$pages = get_pages();
 		$integrate_with_my_events = $this->_options['integrate_with_my_events'] ? 'checked="checked"' : '';
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png');
 ?>
 <div id="eab-settings-fpe" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('Front-page editing', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
@@ -237,6 +237,9 @@ class Eab_Events_FrontPageEditing {
 		$start = date('Y-m-d H:i', strtotime($data['start']));
 		$end = date('Y-m-d H:i', strtotime($data['end']));
 
+		$has_no_start_time = ( isset( $data['no_start_time'] ) && $data['no_start_time'] == 'true' ) ? true : false;
+		$has_no_end_time = ( isset( $data['no_end_time'] ) && $data['no_end_time'] == 'true' ) ? true : false;
+
 		$post_type = get_post_type_object(Eab_EventModel::POST_TYPE);
 		$post['post_title'] = strip_tags($data['title']);
 		$post['post_content'] = current_user_can('unfiltered_html') ? $data['content'] : wp_filter_post_kses($data['content']);
@@ -267,7 +270,9 @@ class Eab_Events_FrontPageEditing {
 		)));
 
 		update_post_meta($post_id, 'incsub_event_start', $start);
+		update_post_meta( $post_id, 'incsub_event_no_start', $has_no_start_time );
 		update_post_meta($post_id, 'incsub_event_end', $end);
+		update_post_meta( $post_id, 'incsub_event_no_end', $has_no_end_time );
 		update_post_meta($post_id, 'incsub_event_status', strip_tags($data['status']));
 		
 		//specify if the event has start and end time or not.
@@ -363,6 +368,7 @@ class Eab_Events_FrontPageEditing {
 		$this->_enqueue_dependencies();
 
 		$style = $event->get_id() ? '' : 'style="display:none"';
+                $ret = '';
 		$ret .= '<div id="eab-events-fpe">';
 		$ret .= '<a id="eab-events-fpe-back_to_event" href="' . get_permalink($event->get_id()) . '" ' . $style . '>' . __('Back to Event', Eab_EventsHub::TEXT_DOMAIN) . '</a>';
 		$ret .= '<input type="hidden" id="eab-events-fpe-event_id" value="' . (int)$event->get_id() . '" />';
@@ -388,23 +394,58 @@ class Eab_Events_FrontPageEditing {
 		// Start date/time
 		$start = $event->get_start_timestamp();
 		$start = $start ? $start : eab_current_time();
-		$ret .= '<div>';
-		$ret .= '<label>' . __('Starts on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-start_date" value="' . date('Y-m-d', $start) . '" size="10" />';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-start_time" value="' . date('H:i', $start) . '" size="3" />';
-		$ret .= ' <input id="incsub_event_no_start_time_0" class="incsub_event incsub_event_time incsub_event_no_start_time" name="incsub_event_no_start_time[0]" value="1" type="checkbox"> No Start Time';
-		$ret .= '</div>';
 
 		// End date/time
 		$end = $event->get_end_timestamp();
 		$end = $end ? $end : eab_current_time() + 3600;
-		$ret .= '<div>';
-		$ret .= '<label>' . __('Ends on', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-end_date" value="' . date('Y-m-d', $end) . '" size="10" />';
-		$ret .= ' <input type="text" name="" id="eab-events-fpe-end_time" value="' . date('H:i', $end) . '" size="3" />';
-		$ret .= ' <input id="incsub_event_no_end_time_0" class="incsub_event incsub_event_time incsub_event_no_end_time" name="incsub_event_no_end_time[0]" value="1" type="checkbox"> No End Time';
-		$ret .= '</div>';
-		
+
+		// Has not start or end time
+		$has_no_start_time = $event->has_no_start_time();
+		$has_no_end_time = $event->has_no_end_time();
+
+		ob_start();
+		?>
+		<div class="eab-events-fpe-meta_box_item eab_event_date eab_start_date">
+			<fieldset>
+				<legend><?php _e('Starts on', Eab_EventsHub::TEXT_DOMAIN) ?></legend>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<label class="date-title"><?php _e('Day', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+					<input type="text" name="" id="eab-events-fpe-start_date" value="<?php echo date('Y-m-d', $start); ?>" size="10" />
+				</div>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<div class="eab-events-fpe_wrap_time_start <?php echo $has_no_start_time ? 'hide_time_option' : '' ?>"  >
+						<label class="date-title"><?php _e('Time', Eab_EventsHub::TEXT_DOMAIN); ?></label>					
+						<input type="text" name="" id="eab-events-fpe-start_time" value="<?php echo date('H:i', $start); ?>" size="3" />					
+					</div>
+					<div id="eab-events-fpe-time__start">
+						<input type="checkbox" id="eab-events-fpe-toggle_time__start" class="eab_action_cb eab_time_toggle" data-time-affect="start" <?php checked( $has_no_start_time ); ?> /> 
+						<a class="eab_action_button eab_time_toggle" data-time-affect="start"><?php _e('No start time', Eab_EventsHub::TEXT_DOMAIN); ?></a>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+
+		<div class="eab-events-fpe-meta_box_item eab_event_date eab_end_date">
+			<fieldset>
+				<legend><?php _e('Ends on', Eab_EventsHub::TEXT_DOMAIN) ?></legend>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<label class="date-title"><?php _e('Day', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+					<input type="text" name="" id="eab-events-fpe-end_date" value="<?php echo date('Y-m-d', $end); ?>" size="10" />
+				</div>
+				<div class="eab-events-fpe-meta_box_sub_item">
+					<div class="eab-events-fpe_wrap_time_end <?php echo $has_no_end_time ? 'hide_time_option' : '' ?>">
+						<label class="date-title"><?php _e('Time', Eab_EventsHub::TEXT_DOMAIN); ?></label>					
+						<input type="text" name="" id="eab-events-fpe-end_time" value="<?php echo date('H:i', $end); ?>" size="3" />
+					</div>
+					<div id="eab-events-fpe-time__end">
+						<input type="checkbox" id="eab-events-fpe-toggle_time__end" class="eab_action_cb eab_time_toggle" data-time-affect="end" <?php checked( $has_no_end_time ); ?> /> 
+						<a class="eab_action_button eab_time_toggle" data-time-affect="end"><?php _e('No end time', Eab_EventsHub::TEXT_DOMAIN); ?></a></div>
+				</div>
+			</fieldset>
+		</div>
+		<?php
+		$ret .= ob_get_clean();
+
 		// End date, time, venue
 		$ret .= '</div>';
 
@@ -557,7 +598,7 @@ class Eab_Events_FrontPageEditing {
 	public function enqueue_dependency_data () {
 		printf(
 			'<script type="text/javascript">var _eab_events_fpe_data={"ajax_url": "%s", "root_url": "%s"};</script>',
-			admin_url('admin-ajax.php'), plugins_url('events-and-bookings/img/')
+			admin_url('admin-ajax.php'), EAB_PLUGIN_URL . 'img/'
 		);
 
 		$event_id = (int)@$_GET['event_id'];

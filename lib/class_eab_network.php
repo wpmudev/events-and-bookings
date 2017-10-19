@@ -71,4 +71,33 @@ class Eab_Network {
 		}
 		return apply_filters( 'eab_get_upcoming_events', $result, $limit );
 	}
+        
+        public static function get_archive_events ($limit=5) {
+		if (!eab_has_post_indexer()) return array();
+		$limit = (int)$limit ? (int)$limit : 5;
+		
+		global $wpdb;
+		$result = array();
+		$count = 0;
+		$pi_table = eab_pi_get_table();
+		$pi_published = eab_pi_get_post_date();
+		$pi_blog_id = eab_pi_get_blog_id();
+		$pi_post_id = eab_pi_get_post_id();
+		$raw_network_events = $wpdb->get_results("SELECT * FROM {$wpdb->base_prefix}{$pi_table} WHERE post_type='incsub_event' ORDER BY {$pi_published} DESC");
+		if (!$raw_network_events) return $result;
+		
+		foreach ($raw_network_events as $event) {
+			if ($count == $limit) break;
+			switch_to_blog($event->$pi_blog_id);
+			$post = get_post($event->$pi_post_id);
+			$tmp_event_instance = new Eab_EventModel($post);
+			$tmp_event_instance->cache_data();
+			//if (!$tmp_event_instance->is_archived()) continue;
+			$post->blog_id = $event->$pi_blog_id;
+			$result[] = $post;
+			$count++;
+			restore_current_blog();
+		}
+		return apply_filters( 'eab_get_upcoming_events', $result, $limit );
+	}
 }

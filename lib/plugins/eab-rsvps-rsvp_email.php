@@ -50,10 +50,13 @@ class Eab_Events_RsvpEmail {
 		$from = $from ? $from : get_option('admin_email');
 		$subject = $this->_data->get_option('eab_rsvps-email-subject');
 		$body = $this->_data->get_option('eab_rsvps-email-body');
+		
+		$from_name = $this->_data->get_option('eab_rsvps-email-from-name');
+		$from_name = ! empty( $from_name ) ? $from_name : get_bloginfo( 'name' );
 
 		if (!is_email($user->user_email) || empty($from) || empty($subject) || empty($body)) return false;
 		$headers = array(
-			'From: ' . $from,
+			'From: ' . $from_name . ' <' . $from . '>',
 			'Content-Type: ' . $this->email_charset() . '; charset="' . get_option('blog_charset') . '"'
 		);
 
@@ -85,6 +88,7 @@ class Eab_Events_RsvpEmail {
 	function save_settings ($options) {
 		$data = stripslashes_deep($_POST);
 		$options['eab_rsvps-email-from'] = @$data['eab_rsvps']['email-from'];
+		$options['eab_rsvps-email-from-name'] = @$data['eab_rsvps']['email-from-name'];
 		$options['eab_rsvps-email-subject'] = @$data['eab_rsvps']['email-subject'];
 		$options['eab_rsvps-email-body'] = @$data['eab_rsvps-email-body'];
 		return $options;
@@ -92,10 +96,12 @@ class Eab_Events_RsvpEmail {
 
 	function show_settings () {
 		$tips = new WpmuDev_HelpTooltips();
-		$tips->set_icon_url(plugins_url('events-and-bookings/img/information.png'));
+		$tips->set_icon_url(EAB_PLUGIN_URL . 'img/information.png' );
 		
 		$from = $this->_data->get_option('eab_rsvps-email-from');
 		$from = $from ? $from : get_option('admin_email');
+		$from_name = $this->_data->get_option('eab_rsvps-email-from-name');
+		$from_name = ! empty( $from_name ) ? $from_name : get_bloginfo( 'name' );
 		$subject = $this->_data->get_option('eab_rsvps-email-subject');
 		$body = $this->_data->get_option('eab_rsvps-email-body');
 		
@@ -107,6 +113,11 @@ class Eab_Events_RsvpEmail {
 <div id="eab-settings-eab_rsvps_email" class="eab-metabox postbox">
 	<h3 class="eab-hndle"><?php _e('RSVP Email settings', Eab_EventsHub::TEXT_DOMAIN); ?></h3>
 	<div class="eab-inside">
+		<div class="eab-settings-settings_item">
+	    	<label for="eab_event-eab_rsvps-from-name"><?php _e('From email name', Eab_EventsHub::TEXT_DOMAIN); ?></label>
+			<span><?php echo $tips->add_tip(__('This is the name the RSVP email will be sent from', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
+			<input type="text" id="eab_event-eab_rsvps-from-name" name="eab_rsvps[email-from-name]" value="<?php esc_attr_e($from_name); ?>" />
+	    </div>
 		<div class="eab-settings-settings_item">
 	    	<label for="eab_event-eab_rsvps-from"><?php _e('From email address', Eab_EventsHub::TEXT_DOMAIN); ?></label>
 			<span><?php echo $tips->add_tip(__('This is the address the RSVP email will be sent from', Eab_EventsHub::TEXT_DOMAIN)); ?></span>
