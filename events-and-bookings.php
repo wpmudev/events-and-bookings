@@ -84,11 +84,6 @@ class Eab_EventsHub {
     function __construct () {
 		global $wpdb, $wp_version;
 
-
-		if ( !session_id() ) {
-			session_start();
-		}
-
 		// Actions
 		add_action( 'init', array( $this, 'init' ), 0 );
 		add_action( 'init', array( $this, 'process_rsvps' ), 99 ); // Bind this a bit later, so BP can load up
@@ -541,7 +536,7 @@ class Eab_EventsHub {
     }
 
     function handle_single_template( $path ) {
-		global $wp_query, $post;
+		global $post;
 
 	    if ( ! is_a( $post, 'WP_Post' ) ) {
 		    return $path;
@@ -571,7 +566,7 @@ class Eab_EventsHub {
 		}
 		if ( !$style && !$is_theme_tpl && @$this->_data->get_option( 'override_appearance_defaults' ) ) {
 			$style_path = file_exists(EAB_PLUGIN_DIR . "default-templates/{$eab_type}/events.css" );
-			$style 		= $style_path ? EAB_PLUGIN_URL . "/default-templates/{$eab_type}/events.css" : $style;
+			$style 		= $style_path ? EAB_PLUGIN_URL . "default-templates/{$eab_type}/events.css" : $style;
 		}
 		if ( $style ) { 
 			add_action( 'wp_head', create_function('', "wp_enqueue_style('eab-events', '$style');" ) );
@@ -1547,6 +1542,11 @@ class Eab_EventsHub {
 		}
 	}
 
+}
+
+
+if ( !session_id() ) {
+	session_start();
 }
 
 function eab_autoshow_map_off ( $opts ) {
