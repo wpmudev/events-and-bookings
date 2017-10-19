@@ -483,7 +483,7 @@ class Eab_EventsHub {
 		}
 		if ( !$style && !$is_theme_tpl && @$this->_data->get_option( 'override_appearance_defaults' ) ) {
 			$style_path = file_exists( EAB_PLUGIN_DIR . "default-templates/{$eab_type}/events.css" );
-			$style 		= $style_path ? EAB_PLUGIN_URL . "/default-templates/{$eab_type}/events.css" : $style;
+			$style 		= $style_path ? EAB_PLUGIN_URL . "default-templates/{$eab_type}/events.css" : $style;
 		}
 		if ( $style ) { 
 			add_action( 'wp_head', create_function('', "wp_enqueue_style('eab-events', '$style');" ) );
