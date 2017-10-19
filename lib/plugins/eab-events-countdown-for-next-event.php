@@ -106,7 +106,9 @@ class Eab_Events_CountdownforNextEvent {
  
 		if ($shortcode_found) {
 			wp_enqueue_style('jquery-countdown', EAB_PLUGIN_URL .'css/jquery.countdown.css');
-			define('EAB_COUNTDOWN_FLAG_STYLES_INJECTED', true); // Don't double-enqueue
+			if ( ! defined('EAB_COUNTDOWN_FLAG_STYLES_INJECTED') ) {
+				define( 'EAB_COUNTDOWN_FLAG_STYLES_INJECTED', true ); // Don't double-enqueue
+			}
 		}
  
 		return $posts;

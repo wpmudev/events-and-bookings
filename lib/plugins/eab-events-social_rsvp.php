@@ -105,12 +105,16 @@ class Eab_Events_SocialRsvps {
 		$send = array(
 			'status' => substr(sprintf("I'm going to %s!", $event->get_title()) . ' ' . get_permalink($event_id), 0, 140),
 		);
+		$resp = false;
 		try {
 			$resp = $twitter->post('statuses/update', $send);
 		} catch (Exception $e) {
 			return false;
 		}
-		$event->set_meta('_eab-social_rsvp-twitter-' . $user_id, $resp->id);
+		if ( $resp && isset( $resp->id ) ) {
+			$event->set_meta('_eab-social_rsvp-twitter-' . $user_id, $resp->id );
+		}
+		
 	}
 }
 

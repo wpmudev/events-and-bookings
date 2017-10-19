@@ -323,12 +323,12 @@ $(function () {
 	}
 
 	function save_settings ($options) {
-		$options['gcal_importer-client_id'] = $_POST['gcal_importer']['client_id'];
-		$options['gcal_importer-client_secret'] = $_POST['gcal_importer']['client_secret'];
-		$options['gcal_importer-sync_calendars'] = $_POST['gcal_importer']['sync_calendars'];
-		$options['gcal_importer-calendar_author'] = $_POST['gcal_importer']['calendar_author'];
-		$options['gcal_importer-run_each'] = $_POST['gcal_importer']['run_each'];
-		$options['gcal_importer-convert_times'] = !empty($_POST['gcal_importer']['convert_times']) ? 1 : 0;
+		$options['gcal_importer-client_id'] 		= isset( $_POST['gcal_importer']['client_id'] ) ? $_POST['gcal_importer']['client_id'] : '';
+		$options['gcal_importer-client_secret'] 	= isset( $_POST['gcal_importer']['client_secret'] ) ? $_POST['gcal_importer']['client_secret'] : '';
+		$options['gcal_importer-sync_calendars'] 	= isset( $_POST['gcal_importer']['sync_calendars'] ) ? $_POST['gcal_importer']['sync_calendars'] : 0;
+		$options['gcal_importer-calendar_author'] 	= isset( $_POST['gcal_importer']['calendar_author'] ) ? $_POST['gcal_importer']['calendar_author'] : '';
+		$options['gcal_importer-run_each'] 			= isset( $_POST['gcal_importer']['run_each'] ) ? $_POST['gcal_importer']['run_each'] : '';
+		$options['gcal_importer-convert_times'] 	= isset( $_POST['gcal_importer']['convert_times'] ) ? 1 : 0;
 		return $options;
 	}
 

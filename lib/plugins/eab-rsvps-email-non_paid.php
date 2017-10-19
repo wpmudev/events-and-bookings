@@ -91,9 +91,11 @@ function send_email_non_paid_members_callback() {
 		$bookings = $wpdb->get_results($wpdb->prepare("SELECT id,user_id,event_id FROM ".Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE)." WHERE event_id IN(" . join(',', $all_event_ids) . ") AND status = %s ORDER BY timestamp;", $status));
 		if (!count($bookings)) die(json_encode($response));
 
-		foreach ($bookings as $booking) {
-			if ($event->user_paid($booking->user_id)) continue;
-			$this->_send_notification_email($event->get_id(), $user_id);
+		foreach ( $bookings as $booking ) {
+			if ( $event->user_paid( $booking->user_id ) ) {
+				continue;
+			}
+			$this->_send_notification_email( $event->get_id(), $booking->user_id );
 			$response['sent']+=1;
 		}
 		$response['status'] = 0;
@@ -101,30 +103,34 @@ function send_email_non_paid_members_callback() {
 	}
 
 	private function _send_notification_email ($event_id, $user_id) {
-		$user = get_user_by('id', $user_id);
-		$from = $this->_data->get_option('eab_rsvps-email_non_paid-from');
-		$subject = $this->_data->get_option('eab_rsvps-email_non_paid-subject');
-		$body = $this->_data->get_option('eab_rsvps-email_non_paid-body');
-		$admin_email = get_option('admin_email');
+		$user 			= get_user_by('id', $user_id);
+		if ( $user && !is_wp_error( $user ) ) {
+			$from 			= $this->_data->get_option('eab_rsvps-email_non_paid-from');
+			$subject 		= $this->_data->get_option('eab_rsvps-email_non_paid-subject');
+			$body 			= $this->_data->get_option('eab_rsvps-email_non_paid-body');
+			$admin_email 	= get_option('admin_email');
 
-		$from = $from ? $from : $admin_email;
+			$from 			= $from ? $from : $admin_email;
 
-		if (empty($subject) || empty($body)) return false;
-		$headers = array(
-			'Content-Type: ' . $this->email_charset() . '; charset="' . get_option('blog_charset') . '"',
-			'From: ' . $from,
-		);
+			if ( empty( $subject ) || empty( $body ) ) {
+				return false;
+			}
+			$headers = array(
+				'Content-Type: ' . $this->email_charset() . '; charset="' . get_option('blog_charset') . '"',
+				'From: ' . $from,
+			);
 
-		$codec = new Eab_Macro_Codec($event_id, $user_id);
-		add_filter('wp_mail_content_type', array($this, 'email_charset'));
-		
-		wp_mail(
-			$user->user_email,
-			$codec->expand($subject, Eab_Macro_Codec::FILTER_TITLE),
-			$codec->expand($body, Eab_Macro_Codec::FILTER_BODY),
-			$headers
-		);
-		remove_filter('wp_mail_content_type', array($this, 'email_charset'));
+			$codec = new Eab_Macro_Codec( $event_id, $user_id );
+			add_filter( 'wp_mail_content_type', array( $this, 'email_charset' ) );
+			
+			wp_mail(
+				$user->user_email,
+				$codec->expand( $subject, Eab_Macro_Codec::FILTER_TITLE ),
+				$codec->expand( $body, Eab_Macro_Codec::FILTER_BODY ),
+				$headers
+			);
+			remove_filter( 'wp_mail_content_type', array( $this, 'email_charset' ) );
+		}
 	}
 
 	function email_charset () { return 'text/html'; }

@@ -22,6 +22,10 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 	
 	function __construct() {
 		$this->_data = Eab_Options::get_instance();
+		if ( !is_object( $this->_data ) ) {
+			$this->_data = new Eab_Options;
+		}
+			
 		// To follow WP Start of week setting
 		if ( !$this->start_of_week = get_option('start_of_week') )
 			$this->start_of_week = 0;
@@ -213,15 +217,15 @@ class Eab_CalendarTable_WeeklyEventArchiveCalendar {
 		
 		$sunday = $this->sunday( $date ); // Timestamp of first Sunday of any date
 
-		if ( !$start = $this->_data->get_option('weekly_calendar_start') OR $start > 23 )
+		if ( !$start = $options->get_option('weekly_calendar_start') OR $start > 23 )
 			$start = 10; // Set a default working time start
 		$first = $start *3600 + $sunday; // Timestamp of the first cell of first Sunday
 		
-		if ( !$end = $this->_data->get_option('weekly_calendar_end') OR $end < 1 )
+		if ( !$end = $options->get_option('weekly_calendar_end') OR $end < 1 )
 			$end = 24; // Set a default working time end
 		$last = $end *3600 + $sunday; // Timestamp of the last cell of first Sunday
 		
-		if ( !$interval = $this->_data->get_option('weekly_calendar_interval') OR $interval < 10 OR $interval > 60 * 12 )
+		if ( !$interval = $options->get_option('weekly_calendar_interval') OR $interval < 10 OR $interval > 60 * 12 )
 			$interval = 120; // Set a default interval in minutes
 		$step = $interval * 60; // Timestamp increase interval to one cell below
 		

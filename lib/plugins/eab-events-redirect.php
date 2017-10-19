@@ -49,22 +49,26 @@ class Eab_Events_EventControlledRedirect {
 	function redirect() {
 		global $post, $wpdb;
 		
-		/* Find if this page is selected to be redirected.
-		   For optimization reasons, at this moment we assume that target url is defined
-		   We will check it later
-		*/
-		$results = $wpdb->get_results("SELECT post_id FROM ". $wpdb->postmeta." WHERE meta_key='eab_events_redirect_source' AND meta_value='".$post->ID ."' "); 
-		
-		if ( $results ) {
-			$query = '';
-			foreach ( $results as $result )
-				$query .= $this->generate_query( $result->post_id ). " UNION "; // UNION is faster than OR
+		if ( $post ) {
+			/* Find if this page is selected to be redirected.
+			For optimization reasons, at this moment we assume that target url is defined
+			We will check it later
+			*/
+			$results 		= $wpdb->get_results("SELECT post_id FROM ". $wpdb->postmeta." WHERE meta_key='eab_events_redirect_source' AND meta_value='".$post->ID ."' "); 
+			$global_post_id = $this->_data->get_option('global_redirect_source');
+			if ( $results ) {
+				$query = '';
+				foreach ( $results as $result )
+					$query .= $this->generate_query( $result->post_id ). " UNION "; // UNION is faster than OR
 
-			$this->finalize_redirect( rtrim( $query, "UNION ") ); // get rid of the last UNION
+				$this->finalize_redirect( rtrim( $query, "UNION ") ); // get rid of the last UNION
+			}
+			// Let's check if a global source ID is set, but source is not set for this event
+			else if ( $global_post_id && $global_post_id == $post->ID ) {
+				$this->finalize_redirect( $this->generate_query( ) ); // Check all active events now
+			}
 		}
-		// Let's check if a global source ID is set, but source is not set for this event
-		else if ( $global_post_id = $this->_data->get_option('global_redirect_source') && $global_post_id == $post->ID ) 
-			$this->finalize_redirect( $this->generate_query( ) ); // Check all active events now
+			
 
 		return; // No match, no redirect.
 	}
