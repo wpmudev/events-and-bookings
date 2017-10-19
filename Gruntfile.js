@@ -61,6 +61,7 @@ module.exports = function( grunt ) {
 				'!releases/**',
 				'!Gruntfile.js',
 				'!package.json',
+				'!phpunit.xml.dist',
 				'!build/**',
 				'!tests/**',
 				'!.git/**',
