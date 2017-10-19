@@ -1545,8 +1545,9 @@ class Eab_EventsHub {
 }
 
 
-if ( !session_id() ) {
-	session_start();
+$sess_id = session_id();
+if ( empty( $sess_id ) ) {
+	@session_start();
 }
 
 function eab_autoshow_map_off ( $opts ) {
