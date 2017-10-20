@@ -33,7 +33,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		$html = '';
 		$title 		= isset( $instance['title'] ) ? esc_attr($instance['title']) : '';
 		$date 		= isset( $instance['date'] ) ? esc_attr($instance['date']) : '';
-		$network 	= esc_attr($instance['network']) ? 'checked="checked"' : '';
+		$network 	= ( isset( $instance['network'] ) && esc_attr($instance['network']) ) ? 'checked="checked"' : '';
 		$category 	= ( isset( $instance['category'] ) && !empty($instance['category']) ) ? 
 			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
 			: array() ;
@@ -87,7 +87,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	function widget ($args, $instance) {
 		extract($args);
 		$title 		= isset( $instance['title'] ) ? apply_filters('widget_title', $instance['title']) : '';
-		$network 	= is_multisite() ? (int)$instance['network'] : false;
+		$network 	= is_multisite() ? ( isset( $instance['network'] ) ? (int)$instance['network'] : false) : false;
 		$category 	= ( isset( $instance['category'] ) && !empty($instance['category']) ) ? 
 			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
 			: array()
