@@ -6,7 +6,7 @@
  */
 function eab_get_template_class () {
 	$class = apply_filters('eab-templating-template_class', 'Eab_Template');
-	return class_exists($class)
+	return class_exists( $class )
 		? $class 
 		: 'Eab_Template'
 	;

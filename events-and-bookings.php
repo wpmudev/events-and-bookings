@@ -810,7 +810,7 @@ class Eab_EventsHub {
 		$events 	= Eab_CollectionFactory::get_all_recurring_children_events( $event );
 		$dt_format 	= get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 
-		$selection 	= '<h4><a href="#edit-instances" id="eab_event-edit_recurring_instances">' . __('Edit instances', self::TEXT_DOMAIN) . '</a></h4>';
+		$selection 	= '<h4><a href="#edit-instances" id="eab_event-edit_recurring_instances">' . __( 'Edit instances', self::TEXT_DOMAIN ) . '</a></h4>';
 		$selection .= "<ul id='eab_event-recurring_instances' style='display:none'>";
 		foreach ( $events as $instance ) {
 			$url = admin_url( 'post.php?post=' . $instance->get_id() . '&action=edit' );
@@ -1562,7 +1562,7 @@ define( 'EAB_PLUGIN_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
 include_once EAB_PLUGIN_DIR . 'template-tags.php';
 
 if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
-	include_once( 'lib/class-eab-ajax.php' );
+	include_once( EAB_PLUGIN_DIR . 'lib/class-eab-ajax.php' );
 
 
 if ( !defined( 'EAB_OLD_EVENTS_EXPIRY_LIMIT' ) ) {
@@ -1628,19 +1628,30 @@ function eab_activate() {
 }
 register_activation_hook( __FILE__, 'eab_activate' );
 
-
+/**
+ * Plugin text domain
+ */
 function eab_domain() {
 	return Eab_EventsHub::TEXT_DOMAIN;
 }
 
+/**
+ * Main plugin instance
+ */
 function events_and_bookings() {
 	return Eab_EventsHub::get_instance();
 }
 
+/**
+ * Plugin directory with a trailing slash
+ */
 function eab_plugin_dir() {
 	return EAB_PLUGIN_DIR;
 }
 
+/**
+ * Plugin url with a trailing slash
+ */
 function eab_plugin_url() {
 	return EAB_PLUGIN_URL;
 }
