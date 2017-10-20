@@ -30,6 +30,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	}
 	
 	function form ($instance) {
+		$html = '';
 		$title 		= isset( $instance['title'] ) ? esc_attr($instance['title']) : '';
 		$date 		= isset( $instance['date'] ) ? esc_attr($instance['date']) : '';
 		$network 	= esc_attr($instance['network']) ? 'checked="checked"' : '';
@@ -73,10 +74,10 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	
 	function update ($new_instance, $old_instance) {
 		$instance 				= $old_instance;
-		$instance['title']	 	= strip_tags($new_instance['title']);
-		$instance['date'] 		= strip_tags($new_instance['date']);
-		$instance['network'] 	= strip_tags($new_instance['network']);
-		$instance['category'] 	= !empty($new_instance['category']) ? array_map('strip_tags', $new_instance['category']) : false;
+		$instance['title']	 	= isset( $new_instance['title'] ) ? strip_tags( $new_instance['title'] ) : '';
+		$instance['date'] 		= isset( $new_instance['date'] ) ? strip_tags( $new_instance['date'] ): '';
+		$instance['network'] 	= isset( $new_instance['network'] ) ? strip_tags( $new_instance['network'] ): '';
+		$instance['category'] 	= isset( $new_instance['category'] ) ? array_map( 'strip_tags', $new_instance['category'] ) : false;
 
 		delete_transient( $this->get_field_id('cache') );
 

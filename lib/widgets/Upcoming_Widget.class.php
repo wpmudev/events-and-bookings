@@ -95,14 +95,14 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 		$instance 		= $old_instance;
         $new_instance 	= wp_parse_args((array)$new_instance, $this->_defaults);
         
-        $instance['title'] 					= strip_tags($new_instance['title']);
-        $instance['excerpt'] 				= (int)$new_instance['excerpt'];
-        $instance['excerpt_words_limit'] 	= (int)$new_instance['excerpt_words_limit'];
-        $instance['thumbnail'] 				= (int)$new_instance['thumbnail'];
-        $instance['limit'] 					= (int)$new_instance['limit'];
-        $instance['lookahead'] 				= (int)$new_instance['lookahead'];
-        $instance['dates'] 					= (int)$new_instance['dates'];
-        $instance['category'] 				= (int)$new_instance['category'];
+        $instance['title'] 					= isset( $new_instance['title'] ) ? strip_tags($new_instance['title']) : '';
+        $instance['excerpt'] 				= isset( $new_instance['excerpt'] ) ? (int)$new_instance['excerpt'] : 0;
+        $instance['excerpt_words_limit'] 	= isset( $new_instance['excerpt_words_limit'] ) ? (int)$new_instance['excerpt_words_limit'] : 0;
+        $instance['thumbnail'] 				= isset( $new_instance['thumbnail'] ) ? (int)$new_instance['thumbnail'] : 0;
+        $instance['limit'] 					= isset( $new_instance['limit'] ) ? (int)$new_instance['limit'] : 0;
+        $instance['lookahead'] 				= isset( $new_instance['lookahead'] ) ? (int)$new_instance['lookahead'] : 0;
+        $instance['dates'] 					= isset( $new_instance['dates'] ) ? (int)$new_instance['dates'] : 0;
+        $instance['category'] 				= isset( $new_instance['category'] ) ?  (int)$new_instance['category'] : 0;
 
         $instance 		= apply_filters('eab-widgets-upcoming-instance_update', $instance, $new_instance, $this);
 	
