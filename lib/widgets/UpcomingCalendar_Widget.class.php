@@ -149,8 +149,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		return $renderer->get_month_calendar($date);
 	}
     
-    function eab_widget_start_date( $date )
-    {
+    function eab_widget_start_date( $date ) {
         return date( 'Y' ) . '-' . date( 'm' ) . '-' . date( 'd' ) . ' 00:00';
     }
 	

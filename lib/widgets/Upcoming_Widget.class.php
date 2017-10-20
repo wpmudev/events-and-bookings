@@ -12,6 +12,8 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 			'thumbnail' 			=> false,
 			'limit' 				=> 5,
 			'dates' 				=> false,
+			'category'				=> '',
+			'lookahead'				=> ''
 		));
 		$widget_ops = array(
 			'description' => __('Display List of Upcoming Events', $this->translation_domain),
