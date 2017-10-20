@@ -3,7 +3,7 @@ Author: WPMU DEV
 
 Changelog:
 ----------------------------------------------------------------------
-1.9.7 - 
+1.9.7 - 2017-10-23
 ----------------------------------------------------------------------
 - Added: New attribute show_old on the shortcode eab_calendar to allow viewing of past events
 - Added: 24 hour clock timepicker
