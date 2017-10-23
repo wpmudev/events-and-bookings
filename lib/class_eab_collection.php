@@ -355,12 +355,14 @@ class Eab_OldCollection extends Eab_TimedCollection {
 class Eab_ArchivedCollection extends Eab_Collection {
 
 	public function build_query_args ($args, $timestamp = false) {
+
+		if ( !isset( $args['posts_per_page'] ) ) $args['posts_per_page'] = -1;
+
 		$args = array_merge(
 			$args,
 			array(
 			 	'post_type' 		=> 'incsub_event',
 				'post_status' 		=> 'any',
-				'posts_per_page' 	=> -1,
 				'meta_query' 		=> array(
 					array(
 		    			'key' 	=> 'incsub_event_status',
