@@ -1,9 +1,11 @@
 <?php
-
+/**
+ * Manage addons
+ */
 class Eab_AddonHandler {
 
 	private function __construct () {
-		define('EAB_PLUGIN_ADDONS_DIR', EAB_PLUGIN_DIR . 'lib/plugins', true);
+		define( 'EAB_PLUGIN_ADDONS_DIR', EAB_PLUGIN_DIR . 'lib/plugins', true );
 		$this->_load_active_plugins();
 	}
 
@@ -13,44 +15,44 @@ class Eab_AddonHandler {
 	}
 
 	private function _add_hooks () {
-		add_action('wp_ajax_eab_activate_plugin', array($this, 'json_activate_plugin'));
-		add_action('wp_ajax_eab_deactivate_plugin', array($this, 'json_deactivate_plugin'));
+		add_action( 'wp_ajax_eab_activate_plugin', array( $this, 'json_activate_plugin' ) );
+		add_action( 'wp_ajax_eab_deactivate_plugin', array( $this, 'json_deactivate_plugin' ) );
 
-		add_action('wp_ajax_eab-activate-selected', array($this, 'json_activate_selected'));
-		add_action('wp_ajax_eab-deactivate-selected', array($this, 'json_deactivate_selected'));
+		add_action( 'wp_ajax_eab-activate-selected', array( $this, 'json_activate_selected' ) );
+		add_action( 'wp_ajax_eab-deactivate-selected', array( $this, 'json_deactivate_selected' ) );
 	}
 
 	private function _load_active_plugins () {
 		$active = $this->get_active_plugins();
 
-		foreach ($active as $plugin) {
-			$path = self::plugin_to_path($plugin);
-			if (!file_exists($path)) continue;
-			else @require_once($path);
+		foreach ( $active as $plugin ) {
+			$path = self::plugin_to_path( $plugin );
+			if ( !file_exists( $path ) ) continue;
+			else @require_once( $path );
 		}
 	}
 
 	function json_activate_plugin () {
-		$status = $this->_activate_plugin($_POST['plugin']);
-		echo json_encode(array(
+		$status = $this->_activate_plugin( $_POST['plugin'] );
+		echo json_encode( array(
 			'status' => $status ? 1 : 0,
 		));
 		exit();
 	}
 
 	function json_deactivate_plugin () {
-		$status = $this->_deactivate_plugin($_POST['plugin']);
-		echo json_encode(array(
+		$status = $this->_deactivate_plugin( $_POST['plugin'] );
+		echo json_encode( array(
 			'status' => $status ? 1 : 0,
 		));
 		exit();
 	}
 
 	function json_activate_selected () {
-		$data = stripslashes_deep($_POST);
-		$plugins = $data['plugins'];
-		$error = false;
-		if (!empty($plugins) && is_array($plugins)) foreach($plugins as $plugin) {
+		$data 		= stripslashes_deep( $_POST );
+		$plugins 	= $data['plugins'];
+		$error 		= false;
+		if ( !empty( $plugins ) && is_array( $plugins ) ) foreach( $plugins as $plugin ) {
 			$status = $this->_activate_plugin($plugin);
 			if (!$status) $error = true;
 		} else {
@@ -63,11 +65,11 @@ class Eab_AddonHandler {
 	}
 
 	function json_deactivate_selected () {
-		$data = stripslashes_deep($_POST);
-		$plugins = $data['plugins'];
-		$error = false;
-		if (!empty($plugins) && is_array($plugins)) foreach($plugins as $plugin) {
-			$status = $this->_deactivate_plugin($plugin);
+		$data 		= stripslashes_deep($_POST);
+		$plugins 	= $data['plugins'];
+		$error 		= false;
+		if (!empty( $plugins ) && is_array( $plugins ) ) foreach( $plugins as $plugin ) {
+			$status = $this->_deactivate_plugin( $plugin );
 			if (!$status) $error = true;
 		} else {
 			$error = true;
@@ -85,75 +87,85 @@ class Eab_AddonHandler {
 		return $active;
 	}
 
-	public static function is_plugin_active ($plugin) {
+	public static function is_plugin_active ( $plugin ) {
 		$active = self::get_active_plugins();
-		return in_array($plugin, $active);
+		return in_array( $plugin, $active );
 	}
 
 	public static function get_all_plugins () {
-		$all = glob(EAB_PLUGIN_ADDONS_DIR . '/*.php');
+		$all = glob( EAB_PLUGIN_ADDONS_DIR . '/*.php' );
 		$all = $all ? $all : array();
 		$ret = array();
-		foreach ($all as $path) {
-			$ret[] = pathinfo($path, PATHINFO_FILENAME);
+		foreach ( $all as $path ) {
+			$ret[] = pathinfo( $path, PATHINFO_FILENAME );
 		}
 		return $ret;
 	}
 
-	public static function plugin_to_path ($plugin) {
-		$plugin = str_replace('/', '_', $plugin);
+	public static function plugin_to_path ( $plugin ) {
+		$plugin = str_replace( '/', '_', $plugin);
 		return EAB_PLUGIN_ADDONS_DIR . '/' . "{$plugin}.php";
 	}
 
-	public static function get_plugin_info ($plugin) {
-		$path = self::plugin_to_path($plugin);
-		$default_headers = array(
-			'Name' => 'Plugin Name',
-			'Author' => 'Author',
-			'Description' => 'Description',
-			'Plugin URI' => 'Plugin URI',
-			'Version' => 'Version',
-			'Detail' => 'Detail',
-			'Type' => 'AddonType',
-			'Deprecated' => 'Deprecated',
-			'Required Class' => 'Required Class',
+	public static function get_plugin_info ( $plugin ) {
+		$path 				= self::plugin_to_path( $plugin );
+		$default_headers 	= array(
+			'Name' 				=> 'Plugin Name',
+			'Author' 			=> 'Author',
+			'Description' 		=> 'Description',
+			'Plugin URI' 		=> 'Plugin URI',
+			'Version' 			=> 'Version',
+			'Detail' 			=> 'Detail',
+			'Type' 				=> 'AddonType',
+			'Deprecated' 		=> 'Deprecated',
+			'Required Class' 	=> 'Required Class',
 		);
-		return get_file_data($path, $default_headers, 'eab_addon');
+		return get_file_data( $path, $default_headers, 'eab_addon' );
 	}
 
-	private function _activate_plugin ($plugin) {
-		if (!current_user_can('manage_options')) return false;
+	private function _activate_plugin ( $plugin ) {
+		if ( !current_user_can( 'manage_options' ) ) {
+			return false;
+		}
 
 		$active = self::get_active_plugins();
-		if (in_array($plugin, $active)) return false; // Already active
+		if ( in_array( $plugin, $active ) ) {
+			return false; // Already active
+		}
 
 		$active[] = $plugin;
-		return update_option('eab_activated_plugins', $active);
+		return update_option( 'eab_activated_plugins', $active );
 	}
 
-	private function _deactivate_plugin ($plugin) {
-		if (!current_user_can('manage_options')) return false;
+	private function _deactivate_plugin ( $plugin ) {
+		if ( !current_user_can( 'manage_options' ) ) return false;
 
 		$active = self::get_active_plugins();
-		if (!in_array($plugin, $active)) return false; // Already deactivated
+		if ( !in_array( $plugin, $active ) ) {
+			return false; // Already deactivated
+		}
 
-		$key = array_search($plugin, $active);
-		if ($key === false) return false; // Haven't found it
+		$key = array_search( $plugin, $active );
+		if ( $key === false || $key === null ) {
+			return false; // Haven't found it
+		}
 
-		unset($active[$key]);
-		return update_option('eab_activated_plugins', $active);
+		unset( $active[ $key ] );
+		return update_option( 'eab_activated_plugins', $active );
 	}
 
 	public static function create_addon_settings () {
 
-		if (!class_exists('WpmuDev_HelpTooltips'))
-			require_once dirname(__FILE__) . '/lib/class_wd_help_tooltips.php';
+		if ( !class_exists( 'WpmuDev_HelpTooltips' ) ) {
+			require_once EAB_PLUGIN_DIR . 'lib/class_wd_help_tooltips.php';
+		}
+			
 		$tips = new WpmuDev_HelpTooltips();
 		$tips->set_icon_url( EAB_PLUGIN_URL . 'img/information.png' );
 
-		$all = self::get_all_plugins();
-		$active = self::get_active_plugins();
-		$sections = array();
+		$all 		= self::get_all_plugins();
+		$active 	= self::get_active_plugins();
+		$sections 	= array();
 
 		self::_display_status_message();
 
@@ -162,20 +174,20 @@ class Eab_AddonHandler {
 
 		$tbody = '<thead>';
 		$tbody .= "<tbody>";
-		foreach ($all as $plugin) {
-			$plugin_data = self::get_plugin_info($plugin);
-			if (empty($plugin_data['Name'])) continue; // Require the name
+		foreach ( $all as $plugin ) {
+			$plugin_data = self::get_plugin_info( $plugin );
+			if ( empty( $plugin_data['Name'] ) ) continue; // Require the name
 
 			// Merge in the sections
 			$types = array();
-			if (!empty($plugin_data['Type'])) {
-				$types = array_map('trim', array_values(explode(',', $plugin_data['Type'])));
-				$sections = array_merge($sections, $types);
+			if ( !empty( $plugin_data['Type'] ) ) {
+				$types 		= array_map( 'trim', array_values( explode( ',', $plugin_data['Type'] ) ) );
+				$sections 	= array_merge( $sections, $types );
 			}
 
-			$is_active = in_array($plugin, $active);
+			$is_active = in_array( $plugin, $active );
 
-			if ('yes' == $plugin_data['Deprecated']) {
+			if ( 'yes' == $plugin_data['Deprecated'] ) {
 				if ( empty( $plugin_data['Required Class'] ) ) {
 					// No dependency, so hide the add-on if it is deactivated.
 					if ( ! $is_active ) { continue; }
@@ -185,20 +197,20 @@ class Eab_AddonHandler {
 				}
 			}
 
-			$tbody .= '<tr' . (!empty($types) ? ' data-type="' . esc_attr(join(',', $types)) : '' ) . '" class="' . ($is_active ? 'active' : 'inactive') . '">';
-			if (!(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)) {
+			$tbody .= '<tr' . ( !empty( $types ) ? ' data-type="' . esc_attr( join( ',', $types ) ) : '' ) . '" class="' . ($is_active ? 'active' : 'inactive') . '">';
+			if ( !( defined( 'EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS ) ) {
 				$tbody .= '<td>' .
 					'<input type="checkbox" value="' . esc_attr($plugin) . '" />' .
 				'</td>';
 			}
 			$tbody .= "<td width='30%'>";
-			$tbody .= '<b id="' . esc_attr($plugin) . '">' . $plugin_data['Name'] . '</b>';
+			$tbody .= '<b id="' . esc_attr( $plugin ) . '">' . $plugin_data['Name'] . '</b>';
 			$tbody .= "<br />";
-			$tbody .= ($is_active
+			$tbody .= ( $is_active
 				?
-				'<a href="#deactivate" class="eab_deactivate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Deactivate', Eab_EventsHub::TEXT_DOMAIN) . '</a>'
+				'<a href="#deactivate" class="eab_deactivate_plugin" eab:plugin_id="' . esc_attr( $plugin ) . '">' . __( 'Deactivate', Eab_EventsHub::TEXT_DOMAIN ) . '</a>'
 				:
-				'<a href="#activate" class="eab_activate_plugin" eab:plugin_id="' . esc_attr($plugin) . '">' . __('Activate', Eab_EventsHub::TEXT_DOMAIN) . '</a>'
+				'<a href="#activate" class="eab_activate_plugin" eab:plugin_id="' . esc_attr( $plugin ) . '">' . __( 'Activate', Eab_EventsHub::TEXT_DOMAIN ) . '</a>'
 			);
 			$tbody .= "</td>";
 			$tbody .= '<td>' .
@@ -207,8 +219,8 @@ class Eab_AddonHandler {
 				sprintf(__('Version %s', Eab_EventsHub::TEXT_DOMAIN), $plugin_data['Version']) .
 				'&nbsp;|&nbsp;' .
 				sprintf(__('by %s', Eab_EventsHub::TEXT_DOMAIN), '<a href="' . $plugin_data['Plugin URI'] . '">' . $plugin_data['Author'] . '</a>');
-			if ($plugin_data['Detail']) {
-				$tbody .= '&nbsp;' . $tips->add_tip($plugin_data['Detail']);
+			if ( $plugin_data['Detail'] ) {
+				$tbody .= '&nbsp;' . $tips->add_tip( $plugin_data['Detail'] );
 			}
 			$tbody .= '</td>';
 			$tbody .= "</tr>";
@@ -216,11 +228,11 @@ class Eab_AddonHandler {
 		$tbody .= "</tbody>";
 		$tbody .= "</table>";
 
-		if (!(defined('EAB_PREVENT_SETTINGS_SECTIONS') && EAB_PREVENT_SETTINGS_SECTIONS)) {
-			$sections = array_values(array_unique($sections));
-			array_unshift($sections, '');
+		if ( !( defined( 'EAB_PREVENT_SETTINGS_SECTIONS' ) && EAB_PREVENT_SETTINGS_SECTIONS ) ) {
+			$sections = array_values( array_unique( $sections ) );
+			array_unshift( $sections, '' );
 			$links = array();
-			if (!empty($sections)) foreach ($sections as $sect) {
+			if ( !empty( $sections ) ) foreach ( $sections as $sect ) {
 				$type = !empty($sect) ? "data-type='{$sect}'" : 'class="selected"';
 				$name = !empty($sect) ? $sect : __('All', Eab_EventsHub::TEXT_DOMAIN);
 				$links[] = "<a href='#filter' {$type}>{$name}</a>";
