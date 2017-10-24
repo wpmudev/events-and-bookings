@@ -50,7 +50,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				}
 			} else {
 				// No lookahead, get the full month only
-				$events = Eab_CollectionFactory::get_upcoming_events( $this->query, $this->args['date'] );
+				$events = Eab_CollectionFactory::get_upcoming_events( $this->args['date'], $this->query );
 			}
 			if ( $order_method ) {
 				remove_filter( 'eab-collection-date_ordering_direction', $order_method );
@@ -74,7 +74,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				}
 				$events_query = $this->args['lookahead']
 					? Eab_CollectionFactory::get_upcoming_weeks( $this->args['date'], $this->query )
-					: Eab_CollectionFactory::get_upcoming( $this->query, $this->args['date'] );
+					: Eab_CollectionFactory::get_upcoming( $this->args['date'] , $this->query);
 				if ( $method ) {
 					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
 				}
