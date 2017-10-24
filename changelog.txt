@@ -3,6 +3,12 @@ Author: WPMU DEV
 
 Changelog:
 ----------------------------------------------------------------------
+
+1.9.8 - 
+----------------------------------------------------------------------
+- Fixed: eab_archive shortcode limit
+- Fixed: Event archive page not showing all events
+
 1.9.7 - 2017-10-23
 ----------------------------------------------------------------------
 - Added: New attribute show_old on the shortcode eab_calendar to allow viewing of past events
