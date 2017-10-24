@@ -197,12 +197,6 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 					array(
 		    			'key' 		=> 'incsub_event_start',
 						'value' 	=> date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are $weeks weeks from now
-		    			'compare' 	=> '<',
-		    			'type' 		=> 'DATETIME'
-					),
-					array(
-		    			'key' 		=> 'incsub_event_end',
-						'value' 	=> date( "Y-m-d H:i", $time ), // Events those already started now
 		    			'compare' 	=> '>=',
 		    			'type' 		=> 'DATETIME'
 					),
