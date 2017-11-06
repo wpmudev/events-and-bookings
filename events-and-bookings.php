@@ -1519,7 +1519,7 @@ class Eab_EventsHub {
 		}
 		global $wp_query;
 
-		if ( Eab_EventModel::POST_TYPE == $wp_query->query_vars['post_type'] ) {
+		if ( Eab_EventModel::POST_TYPE == $wp_query->query_vars['post_type'] && !is_single() ) {
 			$original_year 	= isset( $wp_query->query_vars['event_year'] ) ? (int)$wp_query->query_vars['event_year'] : false;
 			$year 			= $original_year ? $original_year : date( 'Y' );
 			$original_month = isset( $wp_query->query_vars['event_monthnum'] ) ? (int)$wp_query->query_vars['event_monthnum'] : false;
