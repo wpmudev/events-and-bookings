@@ -124,7 +124,7 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 
 		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);
 
-		/*$args = array_merge(
+		$args = array_merge(
 			$args,
 			array(
 			 	'post_type' => 'incsub_event',
@@ -143,33 +143,6 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 						'compare' => 'NOT IN',
 					),
 				),
-			)
-		);*/
-		$args = array_merge(
-			$args,
-			array(
-			 	'post_type' 		=> 'incsub_event',
-			 	'post_status' 		=> array('publish', Eab_EventModel::RECURRENCE_STATUS),
-				'suppress_filters' 	=> false,
-				'meta_query' 		=> array(
-					array(
-		    			'key' 		=> 'incsub_event_start',
-						'value' 	=> date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are $weeks weeks from now
-		    			'compare' 	=> '<',
-		    			'type' 		=> 'DATETIME'
-					),
-					array(
-		    			'key' 		=> 'incsub_event_end',
-						'value' 	=> date( "Y-m-d H:i", $time ), // Events those already started now
-		    			'compare' 	=> '>=',
-		    			'type' 		=> 'DATETIME'
-					),
-					array(
-						'key' 		=> 'incsub_event_status',
-						'value' 	=> $forbidden_statuses,
-						'compare' 	=> 'NOT IN',
-					),
-				)
 			)
 		);
 		return $args;
