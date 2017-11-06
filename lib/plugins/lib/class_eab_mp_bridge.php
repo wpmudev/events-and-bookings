@@ -19,6 +19,7 @@ class Eab_MP_Bridge {
 	private function _add_hooks () {
 		add_action('mp_order/new_order', array($this, 'dispatch_mp_product_if_order_paid'), 10, 1);
 		add_action('mp_order_order_paid', array($this, 'mp_product_order_paid'), 10, 1);
+		add_action( 'mp_cart/after_remove_item', array( $this, 'remove_event_rsvp' ), 10, 2 );
 
 		// Display
 		add_filter('eab-event-payment_forms', array($this, 'process_event_payment_forms'), 10, 2);
@@ -560,4 +561,13 @@ class Eab_MP_Bridge {
             }
             return $content;
         }
+		
+		public function remove_event_rsvp( $item_id, $site_id )
+		{
+			$event_id = $this->order_to_event_id( $item_id );
+			$eab = events_and_bookings();
+			$eab->update_rsvp_per_event( $event_id, get_current_user_id(), 'no' );
+			do_action( 'incsub_event_booking_no', $event_id, get_current_user_id() );
+			$eab->recount_bookings( $event_id );
+		}
 }
