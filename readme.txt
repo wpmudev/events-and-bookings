@@ -3,7 +3,7 @@ Contributors: mohanjith
 Tags: events, booking
 Requires at least: 3.3
 Stable tag: trunk
-Tested up to: 4.7.4
+Tested up to: 4.8.3
 
 Allow your readers to register for events you organize
 

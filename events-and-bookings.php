@@ -6,7 +6,7 @@ Description: Events gives you a flexible WordPress-based system for organizing p
 Author: WPMU DEV
 Text Domain: eab
 WDP ID: 249
-Version: 1.9.7
+Version: 1.9.8-beta1
 Author URI: http://premium.wpmudev.org
 */
 
@@ -30,7 +30,7 @@ class Eab_EventsHub {
 	 * @TODO Update version number for new releases
      * @var	string
      */
-    const CURRENT_VERSION 		= '1.9.7';
+    const CURRENT_VERSION 		= '1.9.8';
 
     /**
      * Translation domain
