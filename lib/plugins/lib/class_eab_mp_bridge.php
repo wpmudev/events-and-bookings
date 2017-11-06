@@ -565,9 +565,8 @@ class Eab_MP_Bridge {
 		public function remove_event_rsvp( $item_id, $site_id )
 		{
 			$event_id = $this->order_to_event_id( $item_id );
-			$eab = events_and_bookings();
-			$eab->update_rsvp_per_event( $event_id, get_current_user_id(), 'no' );
-			do_action( 'incsub_event_booking_no', $event_id, get_current_user_id() );
-			$eab->recount_bookings( $event_id );
+			$post = get_post($event_id);
+			$event = new Eab_EventModel($post);
+			$event->delete_attendance(get_current_user_id());
 		}
 }
