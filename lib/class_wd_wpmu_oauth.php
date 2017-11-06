@@ -306,19 +306,21 @@ abstract class Eab_Gcal_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 	}
 
 	public function is_authenticated () {
-		$token_data = $this->get_token_data();
+		$token_data 	= $this->get_token_data();
 
-		$token = $token_data['access_token'];
-		$expires = (int)$token_data['expires_in'];
-		$request_time = (int)$token_data['time'];
-
-		if (time() > $expires + $request_time) {
-			$refresh_token = isset($token_data['refresh_token']) ? $token_data['refresh_token'] : false;
-			if (!$refresh_token) return false;
-			$token_data = $this->_refresh_token($refresh_token);
-			$token = $token_data['access_token'];
+		$token 			= isset( $token_data['access_token'] ) ? $token_data['access_token'] : false;
+		$expires 		= isset( $token_data['expires_in'] ) ? (int)$token_data['expires_in'] : 0;
+		$request_time 	= isset( $token_data['time'] ) ? (int)$token_data['time'] : 0;
+		if ( $request_time > 0 ) {
+			if ( time() > $expires + $request_time ) {
+				$refresh_token = isset( $token_data['refresh_token'] ) ? $token_data['refresh_token'] : false;
+				if ( !$refresh_token ) {
+					return false;
+				}
+				$token_data = $this->_refresh_token( $refresh_token );
+				$token 		= isset( $token_data['access_token'] ) ? $token_data['access_token'] : false;
+			}
 		}
-		
 		return $token;
 	}
 
@@ -348,8 +350,8 @@ abstract class Eab_Gcal_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 	}
 
 	public function process_oauth_login_response () {
-		$state = !empty($_GET['state']) ? $_GET['state'] : false;
-		$code = !empty($_GET['code']) ? $_GET['code'] : false;
+		$state 	= isset( $_GET['state'] ) ? $_GET['state'] : false;
+		$code 	= isset( $_GET['code'] ) ? $_GET['code'] : false;
 
 		if (!$state || !$code) die;
 
@@ -494,7 +496,7 @@ abstract class Eab_FB_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 	public function is_authenticated () {
 		$token_data = $this->get_token_data();
 
-		return isset( $token_data['access_token'] ) ? $token_data['access_token'] : '';
+		return isset( $token_data['access_token'] ) ? $token_data['access_token'] : false;
 	}
 
 	public function get_authentication () {
@@ -512,7 +514,7 @@ abstract class Eab_FB_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 
 	public function get_token () {
 		$token_data = $this->get_token_data();
-		return empty($token_data['access_token'])
+		return isset($token_data['access_token'])
 			? ''
 			: $token_data['access_token']
 		;
@@ -523,7 +525,7 @@ abstract class Eab_FB_Plugin_Oauth extends WpmuDev_Wp_StoredOauth {
 	}
 
 	public function process_oauth_login_response () {
-		$code = !empty($_GET['code']) ? $_GET['code'] : false;
+		$code = isset($_GET['code']) ? $_GET['code'] : false;
 		if (!$code) die;
 		
 		// Verify code...

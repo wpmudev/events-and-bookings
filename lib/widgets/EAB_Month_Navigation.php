@@ -41,10 +41,10 @@ class Eab_Month_Navigation_Widget extends Eab_Widget {
 	
 	public function update ( $new_instance, $old_instance ) {
 		$instance = $old_instance;
-		$instance['title'] 		= strip_tags( $new_instance['title'] );
-		$instance['text'] 		= strip_tags( $new_instance['text'] );
-		$instance['year_from'] 	= strip_tags( $new_instance['year_from'] );
-		$instance['year_to'] 	= strip_tags( $new_instance['year_to'] );
+		$instance['title'] 		= isset( $new_instance['title'] ) ? strip_tags($new_instance['title']) : '';
+		$instance['text'] 		= isset( $new_instance['text'] ) ?strip_tags( $new_instance['text'] ) : '';
+		$instance['year_from'] 	= isset( $new_instance['year_from'] ) ?strip_tags( $new_instance['year_from'] ) : '';
+		$instance['year_to'] 	= isset( $new_instance['year_to'] ) ?strip_tags( $new_instance['year_to'] ) : '';
 		
 		delete_transient( $this->get_field_id( 'cache' ) );
 

@@ -33,8 +33,9 @@ class Eab_NetworkUpcoming_Widget extends Eab_Widget {
 	
 	function update ($new_instance, $old_instance) {
 		$instance = $old_instance;
-		$instance['title'] = strip_tags($new_instance['title']);
-		$instance['limit'] = strip_tags($new_instance['limit']);
+
+		$instance['title'] 	= isset( $new_instance['title'] ) ? strip_tags($new_instance['title']) : '';
+        $instance['limit'] 	= isset( $new_instance['limit'] ) ? (int)$new_instance['limit'] : 0;
 
 		return $instance;
 	}

@@ -30,9 +30,10 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	}
 	
 	function form ($instance) {
+		$html = '';
 		$title 		= isset( $instance['title'] ) ? esc_attr($instance['title']) : '';
 		$date 		= isset( $instance['date'] ) ? esc_attr($instance['date']) : '';
-		$network 	= esc_attr($instance['network']) ? 'checked="checked"' : '';
+		$network 	= ( isset( $instance['network'] ) && esc_attr($instance['network']) ) ? 'checked="checked"' : '';
 		$category 	= ( isset( $instance['category'] ) && !empty($instance['category']) ) ? 
 			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
 			: array() ;
@@ -73,10 +74,10 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	
 	function update ($new_instance, $old_instance) {
 		$instance 				= $old_instance;
-		$instance['title']	 	= strip_tags($new_instance['title']);
-		$instance['date'] 		= strip_tags($new_instance['date']);
-		$instance['network'] 	= strip_tags($new_instance['network']);
-		$instance['category'] 	= !empty($new_instance['category']) ? array_map('strip_tags', $new_instance['category']) : false;
+		$instance['title']	 	= isset( $new_instance['title'] ) ? strip_tags( $new_instance['title'] ) : '';
+		$instance['date'] 		= isset( $new_instance['date'] ) ? strip_tags( $new_instance['date'] ): '';
+		$instance['network'] 	= isset( $new_instance['network'] ) ? strip_tags( $new_instance['network'] ): '';
+		$instance['category'] 	= isset( $new_instance['category'] ) ? array_map( 'strip_tags', $new_instance['category'] ) : false;
 
 		delete_transient( $this->get_field_id('cache') );
 
@@ -86,7 +87,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 	function widget ($args, $instance) {
 		extract($args);
 		$title 		= isset( $instance['title'] ) ? apply_filters('widget_title', $instance['title']) : '';
-		$network 	= is_multisite() ? (int)$instance['network'] : false;
+		$network 	= is_multisite() ? ( isset( $instance['network'] ) ? (int)$instance['network'] : false) : false;
 		$category 	= ( isset( $instance['category'] ) && !empty($instance['category']) ) ? 
 			(is_array($instance['category']) ? array_filter(array_map('esc_attr', $instance['category'])) : array_filter(array(esc_attr($instance['category']))))
 			: array()
@@ -148,8 +149,7 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 		return $renderer->get_month_calendar($date);
 	}
     
-    function eab_widget_start_date( $date )
-    {
+    function eab_widget_start_date( $date ) {
         return date( 'Y' ) . '-' . date( 'm' ) . '-' . date( 'd' ) . ' 00:00';
     }
 	

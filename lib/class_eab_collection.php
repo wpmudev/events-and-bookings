@@ -197,12 +197,6 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 					array(
 		    			'key' 		=> 'incsub_event_start',
 						'value' 	=> date( "Y-m-d H:i", $time + $weeks * 7 * 86400 ), // Events whose starting dates are $weeks weeks from now
-		    			'compare' 	=> '<',
-		    			'type' 		=> 'DATETIME'
-					),
-					array(
-		    			'key' 		=> 'incsub_event_end',
-						'value' 	=> date( "Y-m-d H:i", $time ), // Events those already started now
 		    			'compare' 	=> '>=',
 		    			'type' 		=> 'DATETIME'
 					),
@@ -355,12 +349,14 @@ class Eab_OldCollection extends Eab_TimedCollection {
 class Eab_ArchivedCollection extends Eab_Collection {
 
 	public function build_query_args ($args, $timestamp = false) {
+
+		if ( !isset( $args['posts_per_page'] ) ) $args['posts_per_page'] = -1;
+
 		$args = array_merge(
 			$args,
 			array(
 			 	'post_type' 		=> 'incsub_event',
 				'post_status' 		=> 'any',
-				'posts_per_page' 	=> -1,
 				'meta_query' 		=> array(
 					array(
 		    			'key' 	=> 'incsub_event_status',

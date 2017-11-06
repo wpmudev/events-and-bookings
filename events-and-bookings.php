@@ -6,7 +6,7 @@ Description: Events gives you a flexible WordPress-based system for organizing p
 Author: WPMU DEV
 Text Domain: eab
 WDP ID: 249
-Version: 1.9.7-beta4
+Version: 1.9.7
 Author URI: http://premium.wpmudev.org
 */
 
@@ -83,11 +83,6 @@ class Eab_EventsHub {
      */
     function __construct () {
 		global $wpdb, $wp_version;
-
-
-		if ( !session_id() ) {
-			session_start();
-		}
 
 		// Actions
 		add_action( 'init', array( $this, 'init' ), 0 );
@@ -488,7 +483,7 @@ class Eab_EventsHub {
 		}
 		if ( !$style && !$is_theme_tpl && @$this->_data->get_option( 'override_appearance_defaults' ) ) {
 			$style_path = file_exists( EAB_PLUGIN_DIR . "default-templates/{$eab_type}/events.css" );
-			$style 		= $style_path ? EAB_PLUGIN_URL . "/default-templates/{$eab_type}/events.css" : $style;
+			$style 		= $style_path ? EAB_PLUGIN_URL . "default-templates/{$eab_type}/events.css" : $style;
 		}
 		if ( $style ) { 
 			add_action( 'wp_head', create_function('', "wp_enqueue_style('eab-events', '$style');" ) );
@@ -541,7 +536,7 @@ class Eab_EventsHub {
     }
 
     function handle_single_template( $path ) {
-		global $wp_query, $post;
+		global $post;
 
 	    if ( ! is_a( $post, 'WP_Post' ) ) {
 		    return $path;
@@ -571,7 +566,7 @@ class Eab_EventsHub {
 		}
 		if ( !$style && !$is_theme_tpl && @$this->_data->get_option( 'override_appearance_defaults' ) ) {
 			$style_path = file_exists(EAB_PLUGIN_DIR . "default-templates/{$eab_type}/events.css" );
-			$style 		= $style_path ? EAB_PLUGIN_URL . "/default-templates/{$eab_type}/events.css" : $style;
+			$style 		= $style_path ? EAB_PLUGIN_URL . "default-templates/{$eab_type}/events.css" : $style;
 		}
 		if ( $style ) { 
 			add_action( 'wp_head', create_function('', "wp_enqueue_style('eab-events', '$style');" ) );
@@ -815,7 +810,7 @@ class Eab_EventsHub {
 		$events 	= Eab_CollectionFactory::get_all_recurring_children_events( $event );
 		$dt_format 	= get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 
-		$selection 	= '<h4><a href="#edit-instances" id="eab_event-edit_recurring_instances">' . __('Edit instances', self::TEXT_DOMAIN) . '</a></h4>';
+		$selection 	= '<h4><a href="#edit-instances" id="eab_event-edit_recurring_instances">' . __( 'Edit instances', self::TEXT_DOMAIN ) . '</a></h4>';
 		$selection .= "<ul id='eab_event-recurring_instances' style='display:none'>";
 		foreach ( $events as $instance ) {
 			$url = admin_url( 'post.php?post=' . $instance->get_id() . '&action=edit' );
@@ -1549,6 +1544,12 @@ class Eab_EventsHub {
 
 }
 
+
+$sess_id = session_id();
+if ( empty( $sess_id ) ) {
+	@session_start();
+}
+
 function eab_autoshow_map_off ( $opts ) {
 	@$opts['custom_fields_options']['autoshow_map'] = false;
 	return $opts;
@@ -1561,7 +1562,7 @@ define( 'EAB_PLUGIN_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
 include_once EAB_PLUGIN_DIR . 'template-tags.php';
 
 if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
-	include_once( 'lib/class-eab-ajax.php' );
+	include_once( EAB_PLUGIN_DIR . 'lib/class-eab-ajax.php' );
 
 
 if ( !defined( 'EAB_OLD_EVENTS_EXPIRY_LIMIT' ) ) {
@@ -1627,19 +1628,30 @@ function eab_activate() {
 }
 register_activation_hook( __FILE__, 'eab_activate' );
 
-
+/**
+ * Plugin text domain
+ */
 function eab_domain() {
 	return Eab_EventsHub::TEXT_DOMAIN;
 }
 
+/**
+ * Main plugin instance
+ */
 function events_and_bookings() {
 	return Eab_EventsHub::get_instance();
 }
 
+/**
+ * Plugin directory with a trailing slash
+ */
 function eab_plugin_dir() {
 	return EAB_PLUGIN_DIR;
 }
 
+/**
+ * Plugin url with a trailing slash
+ */
 function eab_plugin_url() {
 	return EAB_PLUGIN_URL;
 }
