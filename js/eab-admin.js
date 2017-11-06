@@ -173,7 +173,7 @@ jQuery(function() {
 		}
 
 		_end = false;
-		if (jQuery('#incsub_event_end_'+_c).val() != '') {
+		if ( jQuery('#incsub_event_end_'+_c).length && jQuery('#incsub_event_end_'+_c).val() != '') {
 			_end = new Date(jQuery('#incsub_event_end_'+_c).val());
 			if (jQuery('#incsub_event_end_time_'+_c).val() != '' || jQuery('#incsub_event_no_end_time_'+_c).is(":checked")) {
 				var _end_time = (jQuery('#incsub_event_no_end_time_'+_c).is(":checked") ? '23:59' : jQuery('#incsub_event_end_time_'+_c).val()),
