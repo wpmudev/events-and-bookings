@@ -192,7 +192,7 @@ class Eab_Shortcodes extends Eab_Codec {
 	function process_calendar_shortcode ($args=array(), $content=false) {
 		$args = $this->_preparse_arguments($args, array(
 			'network' => false,
-			'date' => strtotime(date( 'Y-m' )),
+			'date' => false,
 			'relative_date' => false,
 		// Query arguments
 			'category' => false, // ID or slug
