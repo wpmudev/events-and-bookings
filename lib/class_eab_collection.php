@@ -118,9 +118,9 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 			$end_year = $year+1;
 		}
 
-		$start_range = "{$year}-{$start_month}-{$start_day} 00:00";
+		$start_range = apply_filters( 'eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-{$start_day} 00:00" );
 		$last_day_range = strtotime('last day of',strtotime("{$year}-{$start_month}-01"));
-		$end_range = date( 'Y-m-d 00:00', $last_day_range );
+		$end_range = apply_filters( 'eab-collection-upcoming-end_timestamp', date( 'Y-m-d 00:00', $last_day_range ) );
 
 		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);
 
