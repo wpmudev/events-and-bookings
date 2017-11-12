@@ -125,19 +125,25 @@ jQuery(document).ready(function(e) {
  */
 function send_save_request () {
 	if ($("#eab-events-fpe-date_time-error").length) $("#eab-events-fpe-date_time-error").remove();
+	var has_start = false,
+		has_end = false,
+		$start_date = $("#eab-events-fpe-start_date");
 
-	var $start_date = $("#eab-events-fpe-start_date");
 	if (!$start_date.val()) return missing_datetime_error($start_date);
 	var start = new Date($start_date.val());
+
+	var start_time_parts = [];
+	var end_time_parts = [];
 	
 	if ( $( '#eab-events-fpe-toggle_time__start' ).is( ':checked' ) ){
 		var $start_time = $("#eab-events-fpe-start_time");
 		if (!$start_time.val()) return missing_datetime_error($start_time);
 	
-		var start_time_parts = _time_string_to_array($start_time.val());
+		start_time_parts = _time_string_to_array($start_time.val());
 
 		start.setHours(start_time_parts[0]);
 		start.setMinutes(start_time_parts[1]);
+		has_start = true;
 	}
 	
 	var $end_date = $("#eab-events-fpe-end_date");
@@ -149,9 +155,10 @@ function send_save_request () {
 		var $end_time = $("#eab-events-fpe-end_time");
 		if (!$end_time.val()) return missing_datetime_error($end_time);
 		
-		var end_time_parts = _time_string_to_array($end_time.val());
+		end_time_parts = _time_string_to_array($end_time.val());
 		end.setHours(end_time_parts[0]);
 		end.setMinutes(end_time_parts[1]);
+		has_end = true;
 	}
 	
 	if (start >= end) return invalid_datetime_error();
@@ -161,11 +168,11 @@ function send_save_request () {
 	);
 	var content = $("#eab-events-fpe-content").is(":visible") ? $("#eab-events-fpe-content").val() : tinyMCE.activeEditor.getContent();
         
-        var modified_start_time = start_time_parts.join(':');
-        var modified_end_time = end_time_parts.join(':');
-        
-        modified_start_time = modified_start_time.replace(/ /g, '');
-        modified_end_time = modified_end_time.replace(/ /g, '');
+	var modified_start_time = start_time_parts.join(':');
+	var modified_end_time = end_time_parts.join(':');
+	
+	modified_start_time = modified_start_time.replace(/ /g, '');
+	modified_end_time = modified_end_time.replace(/ /g, '');
         
 	var data = {
 		"id": $("#eab-events-fpe-event_id").val(),
@@ -218,7 +225,7 @@ function send_save_request () {
 		}
 		
 		$("#eab-events-fpe-event_id").val(post_id);
-                $(".eab-attendance-event_id").val(post_id);
+        $(".eab-attendance-event_id").val(post_id);
 		return show_message((message ? message : l10nFpe.all_good), false);
 	});
 	return false;
