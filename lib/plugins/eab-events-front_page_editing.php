@@ -213,10 +213,12 @@ class Eab_Events_FrontPageEditing {
 
 		add_filter('the_content', array($this, 'the_editor_content'), 99);
 		status_header( 200 );
-		$wp_query->is_page = 1;
-		$wp_query->is_singular = 1;
+		$wp_query->is_page = false;
+		$wp_query->is_single = true;
 		$wp_query->post_count = 1;
-		$wp_query->is_404 = null;
+		$wp_query->is_404 = false;
+		$wp_query->posts = array();
+		$wp_query->posts[0] = $qobj;
 	}
 
 	function json_save_event () {
