@@ -130,7 +130,7 @@ function send_save_request () {
 	if (!$start_date.val()) return missing_datetime_error($start_date);
 	var start = new Date($start_date.val());
 	
-	if ( document.getElementById("incsub_event_no_start_time_0").checked == true ){
+	if ( $( '#eab-events-fpe-toggle_time__start' ).is( ':checked' ) ){
 		var $start_time = $("#eab-events-fpe-start_time");
 		if (!$start_time.val()) return missing_datetime_error($start_time);
 	
@@ -145,7 +145,7 @@ function send_save_request () {
 	var end = new Date($end_date.val());
 	
 	
-	if ( document.getElementById("incsub_event_no_end_time_0").checked == true ){
+	if ( $( '#eab-events-fpe-toggle_time__end' ).is( ':checked' ) ){
 		var $end_time = $("#eab-events-fpe-end_time");
 		if (!$end_time.val()) return missing_datetime_error($end_time);
 		
