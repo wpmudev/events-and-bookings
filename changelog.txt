@@ -13,6 +13,7 @@ Changelog:
 - Fixed: When event product is removed from cart, it still says the even is in the cart
 - Fixed: Weeks issue in eab_archive shortcode
 - Fixed: Single event view for future events
+- Fixed: Frontend editor addon
 
 
 1.9.7 - 2017-10-23
