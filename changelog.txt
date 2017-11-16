@@ -7,8 +7,8 @@ Changelog:
 1.9.8 - 
 ----------------------------------------------------------------------
 - Fixed: Event archive page not showing all events
-- Fixed: eab_archive shortcode display
-- Fixed: eab_calendar shortcode display
+- Fixed: eab_archive shortcode
+- Fixed: eab_calendar shortcode
 - Fixed: Default to all events addon bug fix
 - Fixed: When event product is removed from cart, it still says the even is in the cart
 - Fixed: Weeks issue in eab_archive shortcode
