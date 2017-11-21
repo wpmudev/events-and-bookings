@@ -1,9 +1,9 @@
 === Events ===
 Contributors: mohanjith
 Tags: events, booking
-Requires at least: 3.3
+Requires at least: 4.6
 Stable tag: trunk
-Tested up to: 4.8.3
+Tested up to: 4.9
 
 Allow your readers to register for events you organize
 
