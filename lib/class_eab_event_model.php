@@ -590,6 +590,12 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		$instances = $this->_get_recurring_instances_timestamps($start, $end, $interval, $time_parts);
 
 		$duration = (float)@$time_parts['duration'];
+		
+		if( false !== strpos( $time_parts['duration'], ':') ){
+			list( $hours, $minutes ) = explode( ':', $time_parts['duration'] );
+			$duration = ( $minutes * MINUTE_IN_SECONDS ) + ( $hours * HOUR_IN_SECONDS );
+		}
+
 		$duration = $duration ? $duration : 1;
 
 		$venue = $this->get_venue();
@@ -627,7 +633,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				}
 
 				update_post_meta($post_id, 'incsub_event_start', date("Y-m-d H:i:s", $instance));
-				update_post_meta($post_id, 'incsub_event_end', date("Y-m-d H:i:s", $instance + ($duration * 3600)));
+				update_post_meta($post_id, 'incsub_event_end', date("Y-m-d H:i:s", $instance + $duration ));
 				update_post_meta($post_id, 'incsub_event_venue', $venue);
 				update_post_meta($post_id, 'incsub_event_status', self::STATUS_OPEN);
 				if ($this->is_premium()) {
