@@ -93,7 +93,13 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 	}
 
 	public function build_query_args ($args) {
+		
+		$hide_old = apply_filters( 'eab-collection/hide_old', false );
 		$time = $this->get_timestamp();
+		if( $hide_old ){
+			$time = time();
+		}
+
 		$year = (int)date('Y', $time);
 		$month = date('m', $time);
 		$day = date('d', $time);

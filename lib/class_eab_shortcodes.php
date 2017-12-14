@@ -220,20 +220,15 @@ class Eab_Shortcodes extends Eab_Codec {
 			if ($date) $args['date'] = $date;
 		}
 
+		if( ! $args['show_old'] ){
+			add_filter( 'eab-collection/hide_old', '__return_true' );
+		}
+
 		$query = $this->_to_query_args($args);
 		$events = ($args['network'] && is_multisite())
 			? Eab_Network::get_upcoming_events(30)
 			: Eab_CollectionFactory::get_upcoming_events($args['date'], $query)
 		;
-		
-		if ( $args['show_old'] ) {
-			$old_events = ($args['network'] && is_multisite())
-				? Eab_Network::get_old_events(30)
-				: Eab_CollectionFactory::get_old_events($args['date'], $query)
-			;
-			
-			$events = array_merge( $events, $old_events );
-		}
 
 		$output = Eab_Template::util_apply_shortcode_template($events, $args);
 		$output = $output ? $output : $content;

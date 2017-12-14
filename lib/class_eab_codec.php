@@ -89,6 +89,8 @@ abstract class Eab_Codec {
 		if (isset($accepted['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
 		if (isset($accepted['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
 
+		if (isset($accepted['show_old'])) $args['show_old'] = $this->_arg_to_bool($args['show_old']);
+
 		if ($_template && defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES) {
 			$args['template'] = $_template;
 		}
