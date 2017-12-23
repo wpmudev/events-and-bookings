@@ -135,7 +135,7 @@ function send_save_request () {
 	var start_time_parts = [];
 	var end_time_parts = [];
 	
-	if ( $( '#eab-events-fpe-toggle_time__start' ).is( ':checked' ) ){
+	if ( $( '#eab-events-fpe-toggle_time__start' ).not( ':checked' ) ){
 		var $start_time = $("#eab-events-fpe-start_time");
 		if (!$start_time.val()) return missing_datetime_error($start_time);
 	
@@ -151,7 +151,7 @@ function send_save_request () {
 	var end = new Date($end_date.val());
 	
 	
-	if ( $( '#eab-events-fpe-toggle_time__end' ).is( ':checked' ) ){
+	if ( $( '#eab-events-fpe-toggle_time__end' ).not( ':checked' ) ){
 		var $end_time = $("#eab-events-fpe-end_time");
 		if (!$end_time.val()) return missing_datetime_error($end_time);
 		
@@ -161,7 +161,12 @@ function send_save_request () {
 		has_end = true;
 	}
 	
-	if (start >= end) return invalid_datetime_error();
+	if( ( ( 
+		( ! has_start && ! has_end ) || ( has_start && has_end ) ) && start >= end ) || 
+		start > end )
+	{
+		return invalid_datetime_error();
+	}
 	
 	$("#eab-events-fpe-ok").after(
 		'<img src="' + _eab_events_fpe_data.root_url + '/waiting.gif" id="eab-events-fpe-waiting_indicator" />'
