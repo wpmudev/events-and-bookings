@@ -112,12 +112,12 @@ jQuery(document).ready(function(e) {
     });
 	
 	if ( jQuery('#eab-events-fpe-start_time').val() == "00:00"){
-		jQuery('#eab-events-fpe-start_time').hide();
-		jQuery('#incsub_event_no_start_time_0').attr('checked',true);
+		jQuery('.eab-events-fpe_wrap_time_start ').hide();
+		jQuery('#eab-events-fpe-toggle_time__start').attr('checked',true);
 	}
 	if ( jQuery('#eab-events-fpe-end_time').val() == "00:00"){
-		jQuery('#eab-events-fpe-end_time').hide();
-		jQuery('#incsub_event_no_end_time_0').attr('checked',true);
+		jQuery('.eab-events-fpe_wrap_time_end').hide();
+		jQuery('#eab-events-fpe-toggle_time__end').attr('checked',true);
 	}
 });
 /**
