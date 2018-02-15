@@ -1,4 +1,4 @@
-g<?php
+<?php
 
 abstract class WpmuDev_DatedItem {
 
