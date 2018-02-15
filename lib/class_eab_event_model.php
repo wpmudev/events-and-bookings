@@ -1,4 +1,4 @@
-<?php
+g<?php
 
 abstract class WpmuDev_DatedItem {
 
@@ -802,7 +802,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 			$month_days = date('t', $start)*86400;
 			for ($i = $start; $i <= $end; $i+=$month_days) {
 				$month_days = date('t', $i)*86400;
-				$timestamp = date("Y-m-" . $time_parts['day'], $i) . ' ' . $time_parts['time'];
+				$timestamp = date("Y-m-d", $i) . ' ' . $time_parts['time'];
 				$unix_timestamp = strtotime($timestamp);
 				$check = $unix_timestamp >= $start && checkdate((int)date('n', $unix_timestamp), (int)date('j', $unix_timestamp), (int)date('Y', $unix_timestamp));
 				if ( date( 'Y-m-d', $unix_timestamp ) > date( 'Y-m-d', $end ) )
