@@ -9,27 +9,27 @@ AddonType: Events, RSVP
 */
 
 class Eab_Rsvps_AdditionalRegistrationFields {
-	
+
 	private $_data;
-	
+
 	private function __construct () {
 		$this->_data = Eab_Options::get_instance();
 	}
-	
+
 	public static function serve () {
 		$me = new Eab_Rsvps_AdditionalRegistrationFields;
 		$me->_add_hooks();
 	}
-	
+
 	private function _add_hooks () {
 		add_action('eab-settings-after_appearance_settings', array($this, 'show_settings'));
 		add_filter('eab-settings-before_save', array($this, 'save_settings'));
-	
+
 		add_filter('eab-javascript-api_vars', array($this, 'update_api_messages'));
 		add_action('wp_footer', array($this, 'inject_tmp_scripts'));
-		
-		add_filter('eab-user_registration-wordpress-field_validation', array($this, 'validate_additional_fields'), 10, 2);
-		add_action('eab-user_registered-wordpress', array($this, 'save_additional_fields'), 10, 2);
+
+		add_filter('eab-user_registration-wordpress-field_validation', array($this, 'validate_additional_fields'), 10, 3);
+		add_action('eab-user_registered-wordpress', array($this, 'save_additional_fields'), 10, 3);
 
 		if ($this->_data->get_option('additional_fields-export')) {
 			add_filter('eab-exporter-csv-row', array($this, 'inject_export_columns'), 10, 4);
@@ -54,8 +54,12 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 		return $row;
 	}
 
-	function validate_additional_fields ($status, $data) {
-		$fields = Eab_Rsvps_Arf_Model::get_all();
+	function validate_additional_fields ($status, $data, $email_rsvp = false ) {
+		if ( $email_rsvp ) {
+			$fields = Eab_Rsvps_Arf_Model::get_email_rsvp();
+		} else {
+			$fields = Eab_Rsvps_Arf_Model::get_all();
+		}
 		if (empty($fields)) return $status;
 
 		foreach ($fields as $field) {
@@ -68,8 +72,12 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 		return $status;
 	}
 
-	function save_additional_fields ($user_id, $data) {
-		$fields = Eab_Rsvps_Arf_Model::get_all();
+	function save_additional_fields ($user_id, $data, $email_rsvp = false ) {
+		if ( $email_rsvp ) {
+			$fields = Eab_Rsvps_Arf_Model::get_email_rsvp();
+		} else {
+			$fields = Eab_Rsvps_Arf_Model::get_all();
+		}
 		if (empty($fields)) return false;
 
 		foreach ($fields as $field) {
@@ -91,30 +99,58 @@ class Eab_Rsvps_AdditionalRegistrationFields {
 	function inject_tmp_scripts () {
 		$fields = Eab_Rsvps_Arf_Model::get_all();
 		if (empty($fields)) return false;
+		$fields_email_rsvp = Eab_Rsvps_Arf_Model::get_email_rsvp();
 
 		?>
 <script>
 (function ($) {
 
 var eab_rarf_fields = <?php echo json_encode($fields); ?>;
+var eab_rare_fields = <?php echo json_encode($fields_email_rsvp); ?>;
 
-$(document).on("eab-api-registration-form_rendered", function () {
-	var $root = $("#eab-wordpress_login-registration_wrapper"),
-		$last = $root.find(".eab-wordpress_login-element:last"),
-		additive = ''
+function get_fields_html( email_rsvp ) {
+	var additional_class = '',
+		prefix
 	;
-	$.each(eab_rarf_fields, function (idx, field) {
+	if ( "undefined" === typeof email_rsvp ) {
+		array_fields = eab_rarf_fields;
+		prefix = 'eab-rarf-';
+	} else {
+		array_fields = eab_rare_fields;
+		additional_class = ' eab-additional-registration-field';
+		prefix = 'eab-rare-';
+	}
+
+	var additive = '';
+	$.each(array_fields, function (idx, field) {
 		additive += '' +
 			'<p class="eab-wordpress_login-element">' +
 				'<label for="eab-rarf-' + field.id + '">' +
 					field.label +
 				'</label>' +
-				'<input type="' + field.type + '" value="" id="eab-rarf-' + field.id + '" />' +
+				'<input type="' + field.type + '" value="" id="' + prefix + field.id + '" data-key="' + field.id + '" class="' + additional_class + '" />' +
 			'</p>' +
 		'';
+
 	});
+
+	return  additive;
+}
+
+$(document).on("eab-api-registration-form_rendered", function () {
+	var $root = $("#eab-wordpress_login-registration_wrapper"),
+		$last = $root.find(".eab-wordpress_login-element:last"),
+		additive = '';
+
+	additive = get_fields_html();
 	$last.after(additive);
 });
+
+$(document).on("eab-api-email_rsvp-form_rendered", function() {
+	var $root = $("#eab-rsvps-rsvp_with_email");
+	$root.after( get_fields_html( 'email_rsvp' ) );
+});
+
 $(document).on("eab-api-registration-data", function (e, data, deferred) {
 	$.each(eab_rarf_fields, function (idx, field) {
 		var $field = $("#eab-rarf-" + field.id),
@@ -133,9 +169,11 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 </script>
 		<?php
 	}
-	
+
 	function show_settings () {
 		wp_enqueue_script('underscore');
+
+		$rsvp_with_email = Eab_AddonHandler::is_plugin_active('eab-rsvps-rsvp_with_email');
 		$fields = Eab_Rsvps_Arf_Model::get_all();
 		$fields = is_array($fields) ? $fields : array();
 		$_types = array(
@@ -152,6 +190,10 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 				<b><?php echo esc_html($field['label']); ?></b> <em><small>(<?php echo esc_html($field['type']); ?>)</small></em>
 				<br />
 				<?php echo esc_html('Required', Eab_EventsHub::TEXT_DOMAIN); ?>: <b><?php echo esc_html(($field['required'] ? __('Yes', Eab_EventsHub::TEXT_DOMAIN) : __('No', Eab_EventsHub::TEXT_DOMAIN))); ?></b>
+				<?php if ( $rsvp_with_email ) { ?>
+					<br />
+					<?php echo esc_html('Add to RSVP with email', Eab_EventsHub::TEXT_DOMAIN); ?>: <b><?php echo esc_html(($field['email_rsvp'] ? __('Yes', Eab_EventsHub::TEXT_DOMAIN) : __('No', Eab_EventsHub::TEXT_DOMAIN))); ?></b>
+				<?php } ?>
 				<br />
 				<!--<?php _e('E-mail macro:', Eab_EventsHub::TEXT_DOMAIN); ?> <code><?php echo esc_html(Eab_Rsvps_Arf_Model::get_macro($field['label'])); ?></code>
 				<span class="description"><?php _e('This is the placeholder you can use in your emails.', Eab_EventsHub::TEXT_DOMAIN); ?></span> -->
@@ -179,6 +221,12 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 				<input type="checkbox" value="" id="eab-arf-new_additional_field-required" />
 				<?php _e('Required?', Eab_EventsHub::TEXT_DOMAIN); ?>
 			</label>
+			<?php if ( $rsvp_with_email ) { ?>
+				<label for="eab-arf-new_additional_field-email_rsvp">
+					<input type="checkbox" value="" id="eab-arf-new_additional_field-email_rsvp" />
+					<?php _e('Add to RSVP with email?', Eab_EventsHub::TEXT_DOMAIN); ?>
+				</label>
+			<?php } ?>
 			<button type="button" class="button-secondary" id="eab-arf-new_additional_field-add"><?php _e('Add', Eab_EventsHub::TEXT_DOMAIN); ?></button>
 		</div>
 	</div>
@@ -196,6 +244,9 @@ $(document).on("eab-api-registration-data", function (e, data, deferred) {
 		<b>{{= label }}</b> <em><small>({{= type }})</small></em>
 		<br />
 		<?php echo esc_html('Required', Eab_EventsHub::TEXT_DOMAIN); ?>: <b>{{= required ? '<?php echo esc_js(__("Yes", Eab_EventsHub::TEXT_DOMAIN)); ?>' : '<?php echo esc_js(__("No", Eab_EventsHub::TEXT_DOMAIN)); ?>' }}</b>
+		<?php if ( $rsvp_with_email ) { ?>
+			<?php echo esc_html('Add to RSVP with email', Eab_EventsHub::TEXT_DOMAIN); ?>: <b>{{= email_rsvp ? '<?php echo esc_js(__("Yes", Eab_EventsHub::TEXT_DOMAIN)); ?>' : '<?php echo esc_js(__("No", Eab_EventsHub::TEXT_DOMAIN)); ?>' }}</b>
+		<?php } ?>
 		<input type="hidden" name="eab-arf-additional_fields[]" value="{{= escape(_value) }}" />
 		<a href="#remove" class="eab-arf-additional_fields-remove"><?php echo esc_html('Remove', Eab_EventsHub::TEXT_DOMAIN); ?></a>
 	</div>
@@ -303,6 +354,11 @@ class Eab_Rsvps_Arf_Model {
 		return self::$_me->_get_fields();
 	}
 
+	public static function get_email_rsvp () {
+		self::_instantiate();
+		return self::$_me->_get_fields( true );
+	}
+
 	public static function get_clean_name ($label) {
 		self::_instantiate();
 		return self::$_me->_to_clean_name($label);
@@ -329,10 +385,14 @@ class Eab_Rsvps_Arf_Model {
 		return $values;
 	}
 
-	private function _get_fields () {
+	private function _get_fields ( $email_rsvp = false ) {
 		$fields = $this->_data->get_option('additional_fields');
 		if (empty($fields)) return $fields;
 		foreach ($fields as $idx => $field) {
+			if ( $email_rsvp && empty( $field['email_rsvp'] ) ) {
+				unset( $fields[ $idx ] );
+				continue;
+			}
 			if (!empty($field['id'])) continue;
 			$fields[$idx]['id'] = $this->_to_clean_name($field['label']);
 		}

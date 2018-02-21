@@ -52,11 +52,19 @@ class Eab_Events_RsvpWithEmail {
             $error['msg'] = $login_message;
             die(json_encode($error));
         }
-		
+
+		$status = apply_filters( 'eab-user_registration-wordpress-field_validation', true, $data, true );
+		if ( !$status ) {
+		   $error['msg'] =  __('A required field is missing.', Eab_EventsHub::TEXT_DOMAIN);
+		   die(json_encode($error));
+		}
+
 		$wordp_user = $this->_create_user($email);
 
 		if (is_object($wordp_user) && !empty($wordp_user->ID)) $this->_login_user($wordp_user);
 		else die(json_encode($error));
+
+		do_action('eab-user_registered-wordpress', $wordp_user->ID, $data, true);
 
 		die(json_encode(array(
 			"status" => 1,

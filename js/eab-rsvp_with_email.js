@@ -24,6 +24,8 @@ function create_interface (e) {
 		'</label>'
 	);
 
+	$(document).trigger("eab-api-email_rsvp-form_rendered");
+
 	$("#eab-rsvps-rsvp_with_email-trigger").click(function () {
 		do_submit($me.removeClass("active").attr("class"), post_id);
 	});
@@ -31,14 +33,19 @@ function create_interface (e) {
 
 function do_submit (selector, post_id) {
 	var $email = $("#eab-rsvps-rsvp_with_email"),
-		email = $email.val()
+		email = $email.val(),
+		data
 	;
 	if (!email) return false;
-	$.post(_eab_data.ajax_url, {
+	data = {
 		action: "eab-rsvps-rsvp_with_email",
 		email: email,
-        location: location.href
-	}, function (data) {
+		location: location.href
+	};
+	$('.eab-additional-registration-field').each( function() {
+		data[$(this).data('key')] = $(this).val();
+	});
+	$.post(_eab_data.ajax_url, data, function (data) {
 		var status = 0;
 		try { status = parseInt(data.status, 10); } catch (e) { status = 0; }
 		if (status < 1) { // ... handle error
