@@ -44,14 +44,14 @@ abstract class Eab_Codec {
 
 	protected function _preparse_arguments ($raw, $accepted) {
 		$_template = false;
-		if (!empty($accepted['template']) && (defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES)) {
-			$_template = $accepted['template'];
-			unset($accepted['template']);
+		if (!empty($raw['template']) && (defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES)) {
+			$_template = $raw['template'];
+			unset($raw['template']);
 		}
 
 		$args = wp_parse_args($raw, $accepted);
-		if (isset($accepted['network'])) $args['network'] = $this->_arg_to_bool($args['network']);
-		if (isset($accepted['relative_date']) && !empty($args['relative_date'])) {
+		if (isset($raw['network'])) $args['network'] = $this->_arg_to_bool($args['network']);
+		if (isset($raw['relative_date']) && !empty($args['relative_date'])) {
 			$pivot = !empty($args['date'])
 				? strtotime($args['date'])
 				: eab_current_time()
@@ -59,37 +59,43 @@ abstract class Eab_Codec {
 			$relative_date = strtotime($args["relative_date"], $pivot);
 			if ($relative_date) $args['date'] = date("Y-m-d H:i:s", $relative_date);
 		}
-		if (isset($raw['date'])) $args['date'] = $this->_arg_to_time($args['date']);
+		if (isset($raw['date'])) {
+                    $args['date'] = $this->_arg_to_time($args['date']);
+                } else {
+                    if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
+                        $args['date'] = $accepted['date'];
+                    }
+                }
 
-		if (isset($accepted['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
-		if (isset($accepted['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
+		if (isset($raw['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
+		if (isset($raw['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
 
-		if (isset($accepted['limit'])) $args['limit'] = $this->_arg_to_int($args['limit']);
-		if (isset($accepted['order'])) $args['order'] = $args['order'] && in_array(strtoupper($args['order']), array('ASC', 'DESC'))
+		if (isset($raw['limit'])) $args['limit'] = $this->_arg_to_int($args['limit']);
+		if (isset($raw['order'])) $args['order'] = $args['order'] && in_array(strtoupper($args['order']), array('ASC', 'DESC'))
 			? strtoupper($args['order'])
 			: false
 		;
-		if (isset($accepted['category']) && $args['category']) {
+		if (isset($raw['category']) && $args['category']) {
 			$args['category'] = $this->_arg_to_int($args['category'])
 				? array('type' => 'id', 'value' => $this->_arg_to_int($args['category']))
 				: array('type' => 'slug', 'value' => $args['category'])
 			;
 		}
-		if (isset($accepted['categories']) && !empty($args['categories'])) {
+		if (isset($raw['categories']) && !empty($args['categories'])) {
 			$args['categories'] = $this->_arg_to_int_list($args['categories'])
 				? array('type' => 'id', 'value' => $this->_arg_to_int_list($args['categories']))
 				: false
 			;
 		}
-		if (isset($accepted['paged'])) $args['paged'] = $this->_arg_to_bool($args['paged']);
-		if (isset($accepted['page'])) $args['page'] = $this->_arg_to_int($args['page']);
+		if (isset($raw['paged'])) $args['paged'] = $this->_arg_to_bool($args['paged']);
+		if (isset($raw['page'])) $args['page'] = $this->_arg_to_int($args['page']);
 
-		if (isset($accepted['navigation'])) $args['navigation'] = $this->_arg_to_bool($args['navigation']);
+		if (isset($raw['navigation'])) $args['navigation'] = $this->_arg_to_bool($args['navigation']);
 
-		if (isset($accepted['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
-		if (isset($accepted['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
+		if (isset($raw['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
+		if (isset($raw['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
 
-		if (isset($accepted['show_old'])) $args['show_old'] = $this->_arg_to_bool($args['show_old']);
+		if (isset($raw['show_old'])) $args['show_old'] = $this->_arg_to_bool($args['show_old']);
 
 		if ($_template && defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES) {
 			$args['template'] = $_template;
