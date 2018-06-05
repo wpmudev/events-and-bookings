@@ -4,13 +4,13 @@
  * Abstract shortcode codec class.
  */
 abstract class Eab_Codec {
-	
+
 	protected $_shortcodes = array();
-	
+
 	private $_positive_values = array(
 		true, 'true', 'yes', 'on', '1'
 	);
-	
+
 	private $_negative_values = array(
 		false, 'false', 'no', 'off', '0'
 	);
@@ -44,14 +44,14 @@ abstract class Eab_Codec {
 
 	protected function _preparse_arguments ($raw, $accepted) {
 		$_template = false;
-		if (!empty($accepted['template']) && (defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES)) {
-			$_template = $accepted['template'];
-			unset($accepted['template']);
+		if (!empty($raw['template']) && (defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES)) {
+			$_template = $raw['template'];
+			unset($raw['template']);
 		}
 
 		$args = wp_parse_args($raw, $accepted);
-		if (isset($accepted['network'])) $args['network'] = $this->_arg_to_bool($args['network']);
-		if (isset($accepted['relative_date']) && !empty($args['relative_date'])) {
+		if (isset($raw['network'])) $args['network'] = $this->_arg_to_bool($args['network']);
+		if (isset($raw['relative_date']) && !empty($args['relative_date'])) {
 			$pivot = !empty($args['date'])
 				? strtotime($args['date'])
 				: eab_current_time()
@@ -59,37 +59,43 @@ abstract class Eab_Codec {
 			$relative_date = strtotime($args["relative_date"], $pivot);
 			if ($relative_date) $args['date'] = date("Y-m-d H:i:s", $relative_date);
 		}
-		if (isset($accepted['date'])) $args['date'] = $this->_arg_to_time($args['date']);
+		if (isset($raw['date'])) {
+                    $args['date'] = $this->_arg_to_time($args['date']);
+                } else {
+                    if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
+                        $args['date'] = $accepted['date'];
+                    }
+                }
 
-		if (isset($accepted['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
-		if (isset($accepted['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
-		
-		if (isset($accepted['limit'])) $args['limit'] = $this->_arg_to_int($args['limit']);
-		if (isset($accepted['order'])) $args['order'] = $args['order'] && in_array(strtoupper($args['order']), array('ASC', 'DESC'))
+		if (isset($raw['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
+		if (isset($raw['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
+
+		if (isset($raw['limit'])) $args['limit'] = $this->_arg_to_int($args['limit']);
+		if (isset($raw['order'])) $args['order'] = $args['order'] && in_array(strtoupper($args['order']), array('ASC', 'DESC'))
 			? strtoupper($args['order'])
 			: false
 		;
-		if (isset($accepted['category']) && $args['category']) {
+		if (isset($raw['category']) && $args['category']) {
 			$args['category'] = $this->_arg_to_int($args['category'])
 				? array('type' => 'id', 'value' => $this->_arg_to_int($args['category']))
 				: array('type' => 'slug', 'value' => $args['category'])
 			;
 		}
-		if (isset($accepted['categories']) && !empty($args['categories'])) {
+		if (isset($raw['categories']) && !empty($args['categories'])) {
 			$args['categories'] = $this->_arg_to_int_list($args['categories'])
 				? array('type' => 'id', 'value' => $this->_arg_to_int_list($args['categories']))
 				: false
 			;
 		}
-		if (isset($accepted['paged'])) $args['paged'] = $this->_arg_to_bool($args['paged']);
-		if (isset($accepted['page'])) $args['page'] = $this->_arg_to_int($args['page']);
-		
-		if (isset($accepted['navigation'])) $args['navigation'] = $this->_arg_to_bool($args['navigation']);
+		if (isset($raw['paged'])) $args['paged'] = $this->_arg_to_bool($args['paged']);
+		if (isset($raw['page'])) $args['page'] = $this->_arg_to_int($args['page']);
 
-		if (isset($accepted['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
-		if (isset($accepted['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
+		if (isset($raw['navigation'])) $args['navigation'] = $this->_arg_to_bool($args['navigation']);
 
-		if (isset($accepted['show_old'])) $args['show_old'] = $this->_arg_to_bool($args['show_old']);
+		if (isset($raw['override_styles'])) $args['override_styles'] = $this->_arg_to_bool($args['override_styles']);
+		if (isset($raw['override_scripts'])) $args['override_scripts'] = $this->_arg_to_bool($args['override_scripts']);
+
+		if (isset($raw['show_old'])) $args['show_old'] = $this->_arg_to_bool($args['show_old']);
 
 		if ($_template && defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES) {
 			$args['template'] = $_template;
@@ -120,7 +126,7 @@ abstract class Eab_Codec {
 		}
 		return $query;
 	}
-	
+
 	/**
 	 * Registers shortcode handlers.
 	 */
@@ -138,7 +144,7 @@ abstract class Eab_Codec {
  */
 class Eab_Codec_ArgumentsCodec extends Eab_Codec {
 	protected function _register () {} // We won't be registering anything
-	
+
 	public function parse_arguments ($args=array(), $accepted=array()) {
 		return $this->_preparse_arguments($args, $accepted);
 	}
@@ -156,7 +162,7 @@ class Eab_Macro_Codec {
 
 	const FILTER_TITLE = 'title';
 	const FILTER_BODY = 'body';
-	
+
 	protected $_macros = array(
 		'EVENT_NAME',
 		'EVENT_START_DATE',
@@ -196,7 +202,7 @@ class Eab_Macro_Codec {
 			if (is_callable(array($this, $method))) {
 				$callback = array($this, $method);
 				$str = preg_replace_callback(
-					'/(?:^|\b)' . preg_quote($macro, '/') . '(?:\b|$)/', 
+					'/(?:^|\b)' . preg_quote($macro, '/') . '(?:\b|$)/',
 					$callback, $str
 				);
 			}
@@ -239,7 +245,7 @@ class Eab_Macro_Codec {
 	public function replace_event_host () {
 		return wp_strip_all_tags(eab_call_template('get_event_author_link', $this->_event));
 	}
-	
+
 	public function replace_event_venue () {
 		return $this->_event->get_venue_location(Eab_EventModel::VENUE_AS_ADDRESS);
 	}

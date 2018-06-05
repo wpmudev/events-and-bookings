@@ -61,7 +61,7 @@ class Eab_Shortcodes extends Eab_Codec {
 		$order_method 					= $args['order']
 					? create_function('', 'return "' . $args['order'] . '";')
 					: false ;
-		if ( $order_method ) { 
+		if ( $order_method ) {
 			add_filter( 'eab-collection-date_ordering_direction', $order_method );
 		}
 
@@ -192,7 +192,7 @@ class Eab_Shortcodes extends Eab_Codec {
 	function process_calendar_shortcode ($args=array(), $content=false) {
 		$args = $this->_preparse_arguments($args, array(
 			'network' => false,
-			'date' => false,
+			'date' => strtotime(date('Y-m')), // Calendar shortcode uses Y-m date format on paged.
 			'relative_date' => false,
 		// Query arguments
 			'category' => false, // ID or slug
