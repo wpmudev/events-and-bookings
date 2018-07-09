@@ -75,7 +75,8 @@ class Eab_Admin {
 	private function _blog_has_tables () {
 		global $wpdb;
 		$table = Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE); // Check only one
-		return ($wpdb->get_var("show tables like '{$table}'") == $table);
+		if ( ! $stored_table = $wpdb->get_var("show tables like '{$table}'") ) return false;
+		return strtolower($stored_table) == strtolower($table); // we are lowercasing cause uppercase is possible here;
 	}
 
 	function admin_enqueue_scripts() {
