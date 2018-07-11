@@ -102,43 +102,31 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 	}
 
 	private function _get_request_items ($id) {
-		$token = $this->_oauth->get_token();
-                
-        $api_key = $this->_data->get_option('fbe_importer-client_id');
-		$api_secret = $this->_data->get_option('fbe_importer-client_secret');
-		$fb_user = $this->_oauth->get_fb_user();
-		$sync_user = !empty($fb_user['id'])
-				? $fb_user['id']
-				: false
-		;
-		
-		$fb = new Facebook\Facebook(array(
-				'app_id' => $api_key,
-				'app_secret' => $api_secret,
-		));
-		
-		$response = $fb->get('/me/events?fields=id,name,description,start_time,end_time,updated_time', $token);
-		$items = $response->getDecodedBody();
-                
-                /**
-                 * Debug code
-                 */
-                /*ob_start();
-                print_r($items['data']);
-                $x = ob_get_clean();
-                error_log($x);
-                
-		$page = wp_remote_request("https://graph.facebook.com/{$id}/events/?access_token={$token}&fields=id,name,description,start_time,end_time,location,updated_time", $this->_http_headers);
-		if (is_wp_error($page)) return array(); // Request fail
-		if (wp_remote_retrieve_response_code($page) != 200) return array(); // Request fail
-		$raw = wp_remote_retrieve_body($page);
-		$items = json_decode($raw, true);*/
-		
-                
-        return !empty($items['data'])
-			? $items['data']
-			: array()
-		;
+		$token = $this->_oauth->is_authenticated();
+		if ( $token ) {    
+			$api_key = $this->_data->get_option('fbe_importer-client_id');
+			$api_secret = $this->_data->get_option('fbe_importer-client_secret');
+			$fb_user = $this->_oauth->get_fb_user();
+			$sync_user = !empty($fb_user['id'])
+					? $fb_user['id']
+					: false
+			;
+			
+			$fb = new Facebook\Facebook(array(
+					'app_id' => $api_key,
+					'app_secret' => $api_secret,
+			));
+			
+			$response = $fb->get('/me/events?fields=id,name,description,start_time,end_time,updated_time', $token);
+			$items = $response->getDecodedBody();
+			
+					
+			return !empty($items['data'])
+				? $items['data']
+				: array()
+			;
+		}
+		return array();
 	}
 
 	private function get_schedule_key () {
