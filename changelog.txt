@@ -4,6 +4,10 @@ Author: WPMU DEV
 Changelog:
 ----------------------------------------------------------------------
 
+1.9.9
+- Fixed: Facebook import
+
+
 1.9.8 - 2017-11-21
 ----------------------------------------------------------------------
 - Fixed: Event archive page not showing all events
