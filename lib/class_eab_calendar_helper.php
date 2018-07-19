@@ -397,7 +397,7 @@ class Eab_CalendarTable_EventArchiveCalendar extends Eab_CalendarTable {
 			: get_permalink($event_info['id'])
 		;
                 
-                $event_permalink = apply_filters('eab_cal_custom_permalink', $event_permalink, $event_info);
+                $event_permalink = apply_filters('eab-calendar-event_permalink', $event_permalink, $event_info);
                 
                 $gmt_offset = (float)get_option('gmt_offset');
                 $hour_tz = sprintf('%02d', abs((int)$gmt_offset));
