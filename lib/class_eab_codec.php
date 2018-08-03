@@ -59,14 +59,15 @@ abstract class Eab_Codec {
 			$relative_date = strtotime($args["relative_date"], $pivot);
 			if ($relative_date) $args['date'] = date("Y-m-d H:i:s", $relative_date);
 		}
-		if (isset($raw['date'])) {
-                    $args['date'] = $this->_arg_to_time($args['date']);
-                } else {
-                    if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
-                        $args['date'] = $accepted['date'];
-                    }
-                }
 
+		if (isset($args['date'])) {
+                    $args['date'] = $this->_arg_to_time($args['date']);
+                } 
+		
+                if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
+                        $args['date'] = $accepted['date'];
+                }
+		
 		if (isset($raw['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
 		if (isset($raw['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
 
