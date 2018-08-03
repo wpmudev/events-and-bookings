@@ -61,10 +61,10 @@ abstract class Eab_Codec {
 		}
 		if (isset($raw['date'])) {
                     $args['date'] = $this->_arg_to_time($args['date']);
-                } else {
-                    if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
+                }
+		
+		if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
                         $args['date'] = $accepted['date'];
-                    }
                 }
 
 		if (isset($raw['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
@@ -100,6 +100,8 @@ abstract class Eab_Codec {
 		if ($_template && defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES) {
 			$args['template'] = $_template;
 		}
+
+		if (isset($raw['day_only'])) $args['day_only'] = $this->_arg_to_bool($args['day_only']);
 
 		return $args;
 	}
