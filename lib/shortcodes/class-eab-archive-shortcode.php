@@ -42,24 +42,28 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				add_filter( 'eab-collection-date_ordering_direction', $order_method );
 			}
 
-			// Lookahead - depending on presence, use regular upcoming query, or poll week count
-			if ( $this->args['lookahead'] ) {
-				$method = $this->args['weeks']
-					? create_function( '', 'return ' . $this->args['weeks'] . ';' )
-					: false;
-
-				if ( $method ) {
-					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
-				}
-
-				$events = Eab_CollectionFactory::get_upcoming_weeks_events( $this->args['date'], $this->query );
-
-				if ( $method ) {
-					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
-				}
+			if ( $this->args['day_only']) {
+			    $events = Eab_CollectionFactory::get_daily_events( $this->args['date'], $this->query );
 			} else {
-				// No lookahead, get the full month only
-				$events = Eab_CollectionFactory::get_upcoming_events( $this->args['date'], $this->query );
+			    // Lookahead - depending on presence, use regular upcoming query, or poll week count
+			    if ( $this->args['lookahead'] ) {
+				    $method = $this->args['weeks']
+					    ? create_function( '', 'return ' . $this->args['weeks'] . ';' )
+					    : false;
+
+				    if ( $method ) {
+					    add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+				    }
+
+				    $events = Eab_CollectionFactory::get_upcoming_weeks_events( $this->args['date'], $this->query );
+
+				    if ( $method ) {
+					    remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+				    }
+			    } else {
+				    // No lookahead, get the full month only
+				    $events = Eab_CollectionFactory::get_upcoming_events( $this->args['date'], $this->query );
+			    }
 			}
 			if ( $order_method ) {
 				remove_filter( 'eab-collection-date_ordering_direction', $order_method );
@@ -78,6 +82,9 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 
 		if ( $output ) {
 			if ( $this->args['paged'] && ! ( is_multisite() && $this->args['network'] ) ) {
+			    if ($this->args['day_only']) {
+				$events_query = Eab_CollectionFactory::get_daily( $this->args['date'], $this->query );
+			    } else {
 				if ( $method ) {
 					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
 				}
@@ -87,6 +94,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				if ( $method ) {
 					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
 				}
+			    }
 				$output .= eab_call_template( 'get_shortcode_paging', $events_query, $this->args );
 			}
 		}
