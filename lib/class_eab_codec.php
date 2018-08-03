@@ -97,6 +97,8 @@ abstract class Eab_Codec {
 
 		if (isset($raw['show_old'])) $args['show_old'] = $this->_arg_to_bool($args['show_old']);
 
+		if (isset($raw['end_date'])) $args['end_date'] = date("Y-m-d", strtotime($args['end_date']));
+
 		if ($_template && defined('EAB_DISALLOW_SHORTCODE_TEMPLATES') && EAB_DISALLOW_SHORTCODE_TEMPLATES) {
 			$args['template'] = $_template;
 		}

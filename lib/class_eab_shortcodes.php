@@ -293,7 +293,8 @@ class Eab_Shortcodes extends Eab_Codec {
 			'template' 			=> 'get_shortcode_archive_output', // Subtemplate file, or template class call
 			'override_styles' 	=> false,
 			'override_scripts' 	=> false,
-			'with_thumbnail' 	=> false
+			'with_thumbnail' 	=> false,
+			'end_date'		=> false,
 		));
 
 		$shortcode = new Eab_Archive_Shortcode( $args );
@@ -321,6 +322,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'with_thumbnail' => array('help' => __('Show event thumbnail', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'end_date' => array('help' => __('Ending date', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 			),
 			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
 		);
