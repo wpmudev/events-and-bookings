@@ -22,6 +22,15 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 		$method = false;
 
 		$events = array();
+		
+		$day_only = $this->args['day_only']
+			? create_function( '', 'return ' . $this->args['day_only'] . ';' )
+			: false;
+		
+		if($day_only) {
+		    add_filter('eab-collection-upcoming-day_only', $day_only);
+		}
+		
 		if ( is_multisite() && $this->args['network'] ) {
 			$events = Eab_Network::get_archive_events( 30 );
 		} else {

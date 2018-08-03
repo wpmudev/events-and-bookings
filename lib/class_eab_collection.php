@@ -124,6 +124,21 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 			$end_year = $year+1;
 		}
 
+		$end_time = '00:00';
+		$end_day = '01';
+		$start_time = '00:00';
+		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);
+		
+		$day_only = apply_filters('eab-collection-upcoming-day_only', false);
+		if('yes' == $day_only || 1 == $day_only) {
+		    $end_time = '23:59';
+		    $end_day = $day;
+		    $end_month = $month;
+		    $end_year = $year;
+		    $start_month = $month;
+		    $start_day = $day;
+		}
+
 		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = apply_filters('eab-collection-upcoming-max_results', EAB_MAX_UPCOMING_EVENTS);
 
 		$args = array_merge(
@@ -135,13 +150,13 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_start',
-		    			'value' => apply_filters('eab-collection-upcoming-end_timestamp', "{$end_year}-{$end_month}-01 00:00"),
+		    			'value' => apply_filters('eab-collection-upcoming-end_timestamp', "{$end_year}-{$end_month}-{$end_day} {$end_time}"),
 		    			'compare' => '<',
 		    			'type' => 'DATETIME'
 					),
 					array(
 		    			'key' => 'incsub_event_end',
-		    			'value' => apply_filters('eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-{$start_day} 00:00"),
+		    			'value' => apply_filters('eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-{$start_day} {$start_time}"),
 		    			'compare' => '>=',
 		    			'type' => 'DATETIME'
 					),
