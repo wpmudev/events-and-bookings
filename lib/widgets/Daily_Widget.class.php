@@ -34,7 +34,7 @@ class Eab_Daily_Widget extends Eab_Widget {
 			$options['title'] = strip_tags( $instance['title'] );
 		}
 		
-		$title = apply_filters('widget_title', ( empty($options['title']) ) ? __('Upcoming', $this->translation_domain) : $options['title'], $options, $this->id_base);
+		$title = apply_filters('widget_title', ( empty($options['title']) ) ? __('Daily Events', $this->translation_domain) : $options['title'], $options, $this->id_base);
 		$query_args = array(
 			'posts_per_page' => $options['limit'],
 		);
@@ -45,6 +45,9 @@ class Eab_Daily_Widget extends Eab_Widget {
 				'terms' => (int)$options['category'],
 			));
 		}
+			    $ddate = create_function( '', 'return "' . date('Y-m-d',eab_current_time()) .'";');
+			    
+			    add_filter('eab-collection-daily_events_date', $ddate);
 		$_events = Eab_CollectionFactory::get_daily_events(eab_current_time(), $query_args);
 	
 		if (is_array($_events) && count($_events) > 0) {
