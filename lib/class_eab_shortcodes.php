@@ -322,7 +322,7 @@ class Eab_Shortcodes extends Eab_Codec {
 				'with_thumbnail' => array('help' => __('Show event thumbnail', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
-				'end_date' => array('help' => __('Ending date', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'end_date' => array('help' => __('Ending date (YYYY-MM-DD)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
 			),
 			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
 		);

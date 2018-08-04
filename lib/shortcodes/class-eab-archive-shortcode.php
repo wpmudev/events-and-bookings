@@ -34,13 +34,14 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			}
 			
 			if ( $this->args['end_date'] ) {
-			    $start_date = create_function( '', 'return "' . date('Y-m-d', $this->args['date'] ) .' 00:00";');
-			    $end_date = create_function( '', 'return "' . date('Y-m-d', $this->args['end_date'] ) . ' 23:59";');
+			    $start = !empty($this->args['date']) ? $this->args['date'] : eab_current_time();
+			    $start_date = create_function( '', 'return "' . date('Y-m-d', $start) .' 00:00";');
+			    $end_date = create_function( '', 'return "' . date('Y-m-d', $this->args['end_date']) . ' 23:59";');
 			    
 			    add_filter('eab-collection-date_range_start', $start_date);
 			    add_filter('eab-collection-date_range_end', $end_date); 
-			    
-			    $events = Eab_CollectionFactory::get_date_range_events( $this->args['date'], $this->query );
+
+			    $events = Eab_CollectionFactory::get_date_range_events( $start, $this->query );
 			    
 			    remove_filter( 'eab-collection-date_range_start', $start_date );
 			    remove_filter( 'eab-collection-date_range_end', $end_date );
@@ -86,7 +87,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				add_filter('eab-collection-date_range_start', $start_date);
 				add_filter('eab-collection-date_range_end', $end_date);
 				
-				$events_query = Eab_CollectionFactory::get_date_range( $this->args['date'], $this->query );
+				$events_query = Eab_CollectionFactory::get_date_range( $start, $this->query );
 				
 				remove_filter( 'eab-collection-date_range_start', $start_date );
 				remove_filter( 'eab-collection-date_range_end', $end_date );

@@ -177,9 +177,6 @@ class Eab_DateRangeCollection extends Eab_TimedCollection {
 
 	public function build_query_args ($args) {
 		$time = $this->get_timestamp();
-		if( $hide_old ){
-			$time = time();
-		}
 
 		$year = (int)date('Y', $time);
 		$month = date('m', $time);
