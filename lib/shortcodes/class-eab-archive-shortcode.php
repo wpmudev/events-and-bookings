@@ -35,7 +35,13 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			}
 
 			if ( $this->args['day_only']) {
+			    $ddate = create_function( '', 'return "' . date('Y-m-d', $this->args['date'] ) .'";');
+			    
+			    add_filter('eab-collection-daily_events_date', $ddate);
+			    
 			    $events = Eab_CollectionFactory::get_daily_events( $this->args['date'], $this->query );
+			    
+			    remove_filter( 'eab-collection-daily_events_date', $ddate );
 			} else {
 			    // Lookahead - depending on presence, use regular upcoming query, or poll week count
 			    if ( $this->args['lookahead'] ) {
@@ -75,7 +81,11 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 		if ( $output ) {
 			if ( $this->args['paged'] && ! ( is_multisite() && $this->args['network'] ) ) {
 			    if ($this->args['day_only']) {
+				add_filter('eab-collection-daily_events_date', $ddate);
+				
 				$events_query = Eab_CollectionFactory::get_daily( $this->args['date'], $this->query );
+
+				remove_filter( 'eab-collection-daily_events_date', $ddate );
 			    } else {
 				if ( $method ) {
 					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
