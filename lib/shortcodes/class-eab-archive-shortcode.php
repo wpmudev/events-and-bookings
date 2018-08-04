@@ -35,11 +35,12 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			}
 
 			if ( $this->args['day_only']) {
-			    $ddate = create_function( '', 'return "' . date('Y-m-d', $this->args['date'] ) .'";');
+			    $date = !empty($this->args['date']) ? $this->args['date'] : eab_current_time();
+			    $ddate = create_function( '', 'return "' . date('Y-m-d', $date) .'";');
 			    
 			    add_filter('eab-collection-daily_events_date', $ddate);
-			    
-			    $events = Eab_CollectionFactory::get_daily_events( $this->args['date'], $this->query );
+
+			    $events = Eab_CollectionFactory::get_daily_events( $date, $this->query );
 			    
 			    remove_filter( 'eab-collection-daily_events_date', $ddate );
 			} else {
@@ -83,7 +84,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			    if ($this->args['day_only']) {
 				add_filter('eab-collection-daily_events_date', $ddate);
 				
-				$events_query = Eab_CollectionFactory::get_daily( $this->args['date'], $this->query );
+				$events_query = Eab_CollectionFactory::get_daily( $date, $this->query );
 
 				remove_filter( 'eab-collection-daily_events_date', $ddate );
 			    } else {
