@@ -177,6 +177,17 @@ class Eab_DateRangeCollection extends Eab_TimedCollection {
 
 	public function build_query_args ($args) {
 		$time = $this->get_timestamp();
+		if( $hide_old ){
+			$time = time();
+		}
+
+		$year = (int)date('Y', $time);
+		$month = date('m', $time);
+		$day = date('d', $time);
+		if( $month != date( 'm' ) ){
+			$day = '01';
+		}
+		$time = strtotime("{$year}-{$month}-{$day}");
 
 		$forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
 		if (!isset($args['incsub_event'])) { // If not single
@@ -184,13 +195,18 @@ class Eab_DateRangeCollection extends Eab_TimedCollection {
 		}
 		$forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
 
+		$start_day = $day ? sprintf('%02d', $day) : $day;
+		$start_month = $month ? sprintf("%02d", $month) : date('m');
+		if ($start_month < 12) {
+			$end_month = sprintf("%02d", (int)$month+1);
+			$end_year = $year;
+		} else {
+			$end_month = '01';
+			$end_year = $year+1;
+		}
+
 		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;
 		
-		$start_date = $args['date'] ? $args['date'] : date('Y-m-d');
-		$start_date = apply_filters('eab-collection-date_range_start', $start_date);
-		$end_date = $args['end_date'] ? $args['end_date'] : date('Y-m-d');
-		$end_date = apply_filters('eab-collection-date_range_end', $start_date);
-
 		$args = array_merge(
 			$args,
 			array(
@@ -200,13 +216,13 @@ class Eab_DateRangeCollection extends Eab_TimedCollection {
 				'meta_query' => array(
 					array(
 		    			'key' => 'incsub_event_start',
-						'value' => $start_date . ' 23:59', // Show events from this date
+					'value' => apply_filters('eab-collection-date_range_end', "{$end_year}-{$end_month}-01 23:59"),
 		    			'compare' => '<',
 		    			'type' => 'DATETIME'
 					),
 					array(
 		    			'key' => 'incsub_event_end',
-						'value' => $end_date . ' 00:00', // No events after this date.
+					'value' => apply_filters('eab-collection-date_range_start', "{$year}-{$start_month}-{$start_day} 00:00"),
 		    			'compare' => '>=',
 		    			'type' => 'DATETIME'
 					),
@@ -215,7 +231,7 @@ class Eab_DateRangeCollection extends Eab_TimedCollection {
 						'value' => $forbidden_statuses,
 						'compare' => 'NOT IN',
 					),
-				)
+				),
 			)
 		);
 		return $args;
@@ -236,14 +252,36 @@ class Eab_DateRangeArchiveCollection extends Eab_TimedCollection {
 		}
 	
 		public function build_query_args ($args) {
-			$time = $this->get_timestamp();
-	
-			if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;
-	
-			$start_date = $args['date'] ? $args['date'] : date('Y-m-d');
-			$start_date = apply_filters('eab-collection-date_range_start', $start_date);
-			$end_date = $args['end_date'] ? $args['end_date'] : date('Y-m-d');
-			$end_date = apply_filters('eab-collection-date_range_end', $start_date);
+		    $time = $this->get_timestamp();
+		    if( $hide_old ){
+			    $time = time();
+		    }
+
+		    $year = (int)date('Y', $time);
+		    $month = date('m', $time);
+		    $day = date('d', $time);
+		    if( $month != date( 'm' ) ){
+			    $day = '01';
+		    }
+		    $time = strtotime("{$year}-{$month}-{$day}");
+
+		    $forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
+		    if (!isset($args['incsub_event'])) { // If not single
+			    $forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
+		    }
+		    $forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
+
+		    $start_day = $day ? sprintf('%02d', $day) : $day;
+		    $start_month = $month ? sprintf("%02d", $month) : date('m');
+		    if ($start_month < 12) {
+			    $end_month = sprintf("%02d", (int)$month+1);
+			    $end_year = $year;
+		    } else {
+			    $end_month = '01';
+			    $end_year = $year+1;
+		    }
+
+		    if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;
 
 			$args = array_merge(
 				$args,
@@ -254,13 +292,13 @@ class Eab_DateRangeArchiveCollection extends Eab_TimedCollection {
 					'meta_query' 		=> array(
 						array(
 							'key' 		=> 'incsub_event_start',
-							'value' 	=> $start_date . ' 23:59', // Show events from this date
+							'value' 	=> apply_filters('eab-collection-date_range_end', "{$end_year}-{$end_month}-01 23:59"),
 							'compare' 	=> '<',
 							'type' 		=> 'DATETIME'
 						),
 						array(
 							'key' 		=> 'incsub_event_end',
-							'value' 	=> $end_date . ' 00:00', // No events after this date.
+							'value' 	=> apply_filters('eab-collection-date_range_start', "{$year}-{$start_month}-{$start_day} 00:00"),
 							'compare' 	=> '>=',
 							'type' 		=> 'DATETIME'
 						),

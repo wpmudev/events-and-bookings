@@ -34,7 +34,16 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			}
 			
 			if ( $this->args['end_date'] ) {
+			    $start_date = create_function( '', 'return "' . date('Y-m-d', $this->args['date'] ) .' 00:00";');
+			    $end_date = create_function( '', 'return "' . date('Y-m-d', $this->args['end_date'] ) . ' 23:59";');
+			    
+			    add_filter('eab-collection-date_range_start', $start_date);
+			    add_filter('eab-collection-date_range_end', $end_date); 
+			    
 			    $events = Eab_CollectionFactory::get_date_range_events( $this->args['date'], $this->query );
+			    
+			    remove_filter( 'eab-collection-date_range_start', $start_date );
+			    remove_filter( 'eab-collection-date_range_end', $end_date );
 			} else {
 			    // Lookahead - depending on presence, use regular upcoming query, or poll week count
 			    if ( $this->args['lookahead'] ) {
@@ -74,7 +83,13 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 		if ( $output ) {
 			if ( $this->args['paged'] && ! ( is_multisite() && $this->args['network'] ) ) {
 			    if ( $this->args['end_date'] ) {
+				add_filter('eab-collection-date_range_start', $start_date);
+				add_filter('eab-collection-date_range_end', $end_date);
+				
 				$events_query = Eab_CollectionFactory::get_date_range( $this->args['date'], $this->query );
+				
+				remove_filter( 'eab-collection-date_range_start', $start_date );
+				remove_filter( 'eab-collection-date_range_end', $end_date );
 			    } else {
 				if ( $method ) {
 					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
@@ -85,8 +100,8 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				if ( $method ) {
 					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
 				}
-				$output .= eab_call_template( 'get_shortcode_paging', $events_query, $this->args );
 			    }
+				$output .= eab_call_template( 'get_shortcode_paging', $events_query, $this->args );
 			}
 		}
 
