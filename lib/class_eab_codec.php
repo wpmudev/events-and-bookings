@@ -59,7 +59,7 @@ abstract class Eab_Codec {
 			$relative_date = strtotime($args["relative_date"], $pivot);
 			if ($relative_date) $args['date'] = date("Y-m-d H:i:s", $relative_date);
 		}
-		if (isset($raw['date'])) {
+		if (isset($args['date'])) {
                     $args['date'] = $this->_arg_to_time($args['date']);
                 }
 		
