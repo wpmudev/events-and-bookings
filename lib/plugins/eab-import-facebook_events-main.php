@@ -43,11 +43,11 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 	public function update_schedule () {
 		return update_option($this->get_schedule_key(), eab_current_time());
 	}
-	
+
 
 	public function import () {
 		$sync_id = $this->_data->get_option('fbe_importer-fb_user');
-		if ($sync_id) $this->import_events($sync_id);
+		$this->import_events($sync_id);
 	}
 
 	public function map_to_raw_events_array ($id) {
@@ -65,7 +65,7 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 			'post_date' => date('Y-m-d H:i:s', strtotime($source['updated_time'])),
 			'post_author' => $author,
 		);
-                
+
                 return $data;
 	}
 
@@ -83,8 +83,8 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 
 		// Metadata - location
 		$venue = isset($source['location']) ? $source['location'] : false;
-		if ($venue) $meta['incsub_event_venue'] = $venue;	
-		
+		if ($venue) $meta['incsub_event_venue'] = $venue;
+
 		return $meta;
 	}
 
@@ -93,7 +93,7 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 		global $wpdb;
 		$id = esc_sql($source['id']);
                 $res = $wpdb->get_var("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key='eab_fbe_event' AND meta_value='{$id}'");
-                
+
                 return $res;
 	}
 
@@ -103,24 +103,22 @@ class Eab_Fbe_Importer_FacebookEventsImporter extends Eab_ScheduledImporter {
 
 	private function _get_request_items ($id) {
 		$token = $this->_oauth->is_authenticated();
-		if ( $token ) {    
+		if ( $token ) {
 			$api_key = $this->_data->get_option('fbe_importer-client_id');
 			$api_secret = $this->_data->get_option('fbe_importer-client_secret');
-			$fb_user = $this->_oauth->get_fb_user();
-			$sync_user = !empty($fb_user['id'])
-					? $fb_user['id']
-					: false
+			$sync_user = !empty($id)
+					? $id
+					: 'me'
 			;
-			
+
 			$fb = new Facebook\Facebook(array(
 					'app_id' => $api_key,
 					'app_secret' => $api_secret,
 			));
-			
-			$response = $fb->get('/me/events?fields=id,name,description,start_time,end_time,updated_time', $token);
+
+			$response = $fb->get('/' . $sync_user . '/events?fields=id,name,description,start_time,end_time,updated_time', $token);
 			$items = $response->getDecodedBody();
-			
-					
+
 			return !empty($items['data'])
 				? $items['data']
 				: array()
@@ -196,7 +194,7 @@ class Eab_Calendars_FacebookEventsImporter {
 		$raw_authors = get_users(array('who' => 'authors'));
 		$possible_authors = array_combine(
 			wp_list_pluck($raw_authors, 'ID'),
-			wp_list_pluck($raw_authors, 'display_name') 
+			wp_list_pluck($raw_authors, 'display_name')
 		);
 		?>
 		<div id="eab-settings-fbe_importer" class="eab-metabox postbox">
