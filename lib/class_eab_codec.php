@@ -63,7 +63,7 @@ abstract class Eab_Codec {
                     $args['date'] = $this->_arg_to_time($args['date']);
                 }
 		
-		if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
+                if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
                         $args['date'] = $accepted['date'];
                 }
 
