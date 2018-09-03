@@ -46,8 +46,18 @@ class Eab_Events_AllEventsDefault {
 		remove_filter('eab-collection-upcoming-end_timestamp', array($this, 'all_events_end')); 
 	}
 	
-	function yearly_events_start () { return date('Y') . '-01-01 00:01'; }
-	function yearly_events_end () { return date('Y') . '-12-31 23:59'; }
+	function yearly_events_start () {
+	    global $wp_query;
+	    
+	    return $wp_query->query_vars['event_year'] . '-01-01 00:01';
+	}
+	
+	function yearly_events_end () {
+	    global $wp_query;
+	    
+	    return $wp_query->query_vars['event_year'] . '-12-31 23:59';
+	}
+	
 	function unbind_yearly_replacements () {
 		remove_filter('eab-collection-upcoming-start_timestamp', array($this, 'yearly_events_start')); 
 		remove_filter('eab-collection-upcoming-end_timestamp', array($this, 'yearly_events_end')); 
