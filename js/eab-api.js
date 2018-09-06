@@ -90,7 +90,7 @@ function create_wordpress_login_popup ($action, post_id) {
 		$("body").append(
 			"<div id='eab-wordpress_login-background'></div>" +
 			"<div id='eab-wordpress_login-wrapper' class='" + $action.removeClass("active").attr("class") + "' data-post_id='" + post_id + "'>" +
-				"<div id='eab-wordpress_login-registration_wrapper' class='eab-wordpress_login-element_wrapper'>" +
+				"<div id='eab-wordpress_login-registration_wrapper' class='eab-wordpress_login-element_wrapper' style='display:none;'>" +
 					"<h4>" + l10nEabApi.wp_register + "</h4>" +
 					"<p class='eab-wordpress_login-element eab-wordpress_login-element-message'>" +
 						l10nEabApi.wp_registration_msg +
@@ -105,7 +105,7 @@ function create_wordpress_login_popup ($action, post_id) {
 							"<input type='text' id='eab-wordpress_login-registration_email' placeholder='' />" +
 					"</p>" +
 				"</div>" +
-				"<div id='eab-wordpress_login-login_wrapper' class='eab-wordpress_login-element_wrapper' style='display:none'>" +
+				"<div id='eab-wordpress_login-login_wrapper' class='eab-wordpress_login-element_wrapper'>" +
 					"<h4>" + l10nEabApi.wp_login + "</h4>" +
 					"<p class='eab-wordpress_login-element eab-wordpress_login-element-message'>" +
 						l10nEabApi.wp_login_msg +
