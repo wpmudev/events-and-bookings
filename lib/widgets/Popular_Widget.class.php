@@ -37,6 +37,7 @@ class Eab_Popular_Widget extends Eab_Widget {
 		
 		$_events = Eab_CollectionFactory::get_popular_events(array(
 			'posts_per_page' => $options['limit'],
+			'_avoid_pgp_action'    => 1, // Avoids the later pre_get_posts action for Archive pagination
 		));
 		if (is_array($_events) && count($_events) > 0) {
 		?>
