@@ -130,7 +130,7 @@ if (!(defined('EAB_SKIP_FORCED_CATEGORY_ORDERING') && EAB_SKIP_FORCED_CATEGORY_O
 // Archive sorting and pagination in default WP requests
 function _eab_dispatch_event_archives($query) {
 	if ( ! empty( $query->query['_avoid_pgp_action'] ) && 1 == $query->query['_avoid_pgp_action'] ) return;
-    if ( is_admin() || $query->is_main_query() || ! is_post_type_archive('incsub_event') ) return;
+    if ( is_admin() || ! is_post_type_archive('incsub_event') ) return;
     $data = Eab_Options::get_instance();
     if ( $pagination = $data->get_option('pagination') ) {
         $query->set( 'posts_per_page', $pagination );
