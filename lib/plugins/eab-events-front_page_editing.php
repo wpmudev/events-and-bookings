@@ -294,8 +294,9 @@ class Eab_Events_FrontPageEditing {
 		update_post_meta($post_id, 'incsub_event_paid', ($is_paid ? '1' : ''));
 		update_post_meta($post_id, 'incsub_event_fee', $fee);
 		do_action('eab-events-fpe-save_meta', $post_id, $data);
-
-		wp_set_post_terms($post_id, array((int)$data['category']), 'eab_events_category', false);
+    
+		$selected_terms = ( isset( $data['category'] ) && is_array( $data['category'] ) ) ? array_map( 'intval' , $data['category'] ) : array();
+		wp_set_post_terms( $post_id, $selected_terms, 'eab_events_category', false );
 
 		if( current_user_can($post_type->cap->publish_posts) ){
 			$message = __('Event saved and published', Eab_EventsHub::TEXT_DOMAIN);
@@ -510,12 +511,14 @@ class Eab_Events_FrontPageEditing {
 		// Categories
 		$ret .= '<div>';
 		$ret .= '<label>' . __('Category', Eab_EventsHub::TEXT_DOMAIN) . '</label>';
-		$ret .= '<br /><select id="eab-events-fpe-categories"><option value=""></option>';
-		foreach ($all_cats as $cat) {
-			$selected = in_array($cat->term_id, $event_cat_ids) ? "selected='selected'" : '';
-			$ret .= "<option value='{$cat->term_id}' {$selected}>{$cat->name}</option>";
+		if ( ! empty( $all_cats ) ) {
+			$ret .= '<div>';
+			foreach ( $all_cats as $cat ) {
+				$checked = checked( in_array($cat->term_id, $event_cat_ids) );
+				$ret .= "<label><input type='checkbox' name='eab-events-fpe-categories[]' value='{$cat->term_id}' {$checked} /> {$cat->name}</label>";
+			}
+			$ret .= '</div>';
 		}
-		$ret .= "</select>";
 		$ret .= '</div>';
 		// End Categories
 		$ret .= '</div>';
