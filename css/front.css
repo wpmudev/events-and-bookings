@@ -538,3 +538,12 @@ a.export_to_ical:after, a.export_to_gcal:after {
         padding: 5px 10px;
         margin-left: 10px;
 }
+
+#wpmudevevents-wrapper .mp_product_price {
+    font-size: 14px;
+    line-height: 1.6em;
+}
+#wpmudevevents-wrapper .mp_product_price span {
+    background: url(../img/028.png) 0px 2px no-repeat;
+    padding-left: 20px;
+}
