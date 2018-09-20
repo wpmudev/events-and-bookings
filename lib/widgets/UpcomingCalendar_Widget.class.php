@@ -136,7 +136,9 @@ class Eab_CalendarUpcoming_Widget extends Eab_Widget {
 			}
 		}
         
-        if( defined( 'EAB_UPCOMING_EVENT_FROM_TODAY' ) && EAB_UPCOMING_EVENT_FROM_TODAY ) add_filter( 'eab-collection-upcoming-start_timestamp', array( $this, 'eab_widget_start_date' ) );
+		$args['_avoid_pgp_action'] = 1; // Avoids the later pre_get_posts action for Archive pagination
+		
+		if( defined( 'EAB_UPCOMING_EVENT_FROM_TODAY' ) && EAB_UPCOMING_EVENT_FROM_TODAY ) add_filter( 'eab-collection-upcoming-start_timestamp', array( $this, 'eab_widget_start_date' ) );
 		$events = $network
 			? Eab_Network::get_upcoming_events(10)
 			: Eab_CollectionFactory::get_upcoming_events($date, $args)
