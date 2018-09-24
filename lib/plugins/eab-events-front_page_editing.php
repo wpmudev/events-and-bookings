@@ -354,9 +354,16 @@ class Eab_Events_FrontPageEditing {
 		if (!$this->_check_perms($event_id)) return false;
 		if (defined('EAB_EVENTS_FPE_ALREADY_HERE')) return $content;
 
-		$is_excerpt = array_reduce($wp_current_filter, create_function('$ret,$val', 'return $ret ? true : preg_match("/excerpt/", $val);'), false);
-		$is_head = array_reduce($wp_current_filter, create_function('$ret,$val', 'return $ret ? true : preg_match("/head/", $val);'), false);
-		$is_title = array_reduce($wp_current_filter, create_function('$ret,$val', 'return $ret ? true : preg_match("/title/", $val);'), false);
+		$is_excerpt = array_reduce($wp_current_filter, function($ret,$val) {
+			return $ret ? true : preg_match("/excerpt/", $val);
+		    }, false);
+		
+		$is_head = array_reduce($wp_current_filter, function($ret,$val) {
+			return $ret ? true : preg_match("/head/", $val);
+		    }, false);
+		$is_title = array_reduce($wp_current_filter, function($ret,$val) {
+			return $ret ? true : preg_match("/title/", $val);
+		    }, false);
 		if ($is_excerpt || $is_head || $is_title) return $content;
 
 		define('EAB_EVENTS_FPE_ALREADY_HERE', true, true);

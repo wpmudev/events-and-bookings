@@ -128,7 +128,9 @@ EOJs;
 	function get_event_prices ($price) {
 		if (is_admin()) return $price;
 		return is_array($price)
-			? join(', ', array_map(create_function('$arg', 'return $arg["label"] . ": " . $arg["fee"];'), $price))
+			? join(', ', array_map(function($arg) {
+				return $arg["label"] . ": " . $arg["fee"];
+			    }, $price))
 			: $price
 		;
 	}

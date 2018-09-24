@@ -206,11 +206,21 @@ class Eab_Events_CountdownforNextEvent {
 		//$events = Eab_CollectionFactory::get_upcoming_events($now, $query);
 
 		$future_peeking_method = false;
-		if (!empty($args['weeks']) && is_numeric($args['weeks'])) $future_peeking_method = create_function('', 'return ' . (int)$args['weeks'] . ';');
+		if (!empty($args['weeks']) && is_numeric($args['weeks'])) {
+		    $future_peeking_method = true;
+		}
 
-		if (!empty($future_peeking_method)) add_filter('eab-collection-upcoming_weeks-week_number', $future_peeking_method);
+		if ($future_peeking_method) {
+		    add_filter('eab-collection-upcoming_weeks-week_number', function($future_peeking_method, $args) {
+			return $args['weeks'];
+		    });
+		}
 		$events = Eab_CollectionFactory::get_upcoming_weeks_events($now, $query);
-		if (!empty($future_peeking_method)) remove_filter('eab-collection-upcoming_weeks-week_number', $future_peeking_method);
+		if ($future_peeking_method) {
+		    remove_filter('eab-collection-upcoming_weeks-week_number', function($future_peeking_method, $args) {
+			return $args['weeks'];
+		    });
+		}
 		
 		$ret = array();
 		foreach ($events as $event) {

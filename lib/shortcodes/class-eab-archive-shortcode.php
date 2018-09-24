@@ -26,27 +26,33 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			$events = Eab_Network::get_archive_events( 30 );
 		} else {
 			$order_method = $this->args['order']
-				? create_function( '', 'return "' . $this->args['order'] . '";' )
+				? true
 				: false;
 
 			if ( $order_method ) {
-				add_filter( 'eab-collection-date_ordering_direction', $order_method );
+				add_filter( 'eab-collection-date_ordering_direction', function($order_method) {
+				    return $this->args['order'];
+				});
 			}
 
 			// Lookahead - depending on presence, use regular upcoming query, or poll week count
 			if ( $this->args['lookahead'] ) {
 				$method = $this->args['weeks']
-					? create_function( '', 'return ' . $this->args['weeks'] . ';' )
+					? true
 					: false;
 
 				if ( $method ) {
-					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					add_filter( 'eab-collection-upcoming_weeks-week_number', function($method) {
+					    return $this->args['weeks'];
+					});
 				}
 
 				$events = Eab_CollectionFactory::get_upcoming_weeks_events( $this->args['date'], $this->query );
 
 				if ( $method ) {
-					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					remove_filter( 'eab-collection-upcoming_weeks-week_number', function($method) {
+					    return $this->args['weeks'];
+					});
 				}
 			} else {
 				// No lookahead, get the full month only
@@ -70,13 +76,17 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 		if ( $output ) {
 			if ( $this->args['paged'] && ! ( is_multisite() && $this->args['network'] ) ) {
 				if ( $method ) {
-					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					add_filter( 'eab-collection-upcoming_weeks-week_number', function($method) {
+					    return $this->args['weeks'];
+					});
 				}
 				$events_query = $this->args['lookahead']
 					? Eab_CollectionFactory::get_upcoming_weeks( $this->args['date'], $this->query )
 					: Eab_CollectionFactory::get_upcoming( $this->args['date'] , $this->query);
 				if ( $method ) {
-					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					remove_filter( 'eab-collection-upcoming_weeks-week_number', function($method) {
+					    return $this->args['weeks'];
+					});
 				}
 				$output .= eab_call_template( 'get_shortcode_paging', $events_query, $this->args );
 			}

@@ -58,11 +58,13 @@ class Eab_Shortcodes extends Eab_Codec {
 
 		$query 							= $this->_to_query_args($args);
 
-		$order_method 					= $args['order']
-					? create_function('', 'return "' . $args['order'] . '";')
+		$order_method = $args['order']
+					? true
 					: false ;
 		if ( $order_method ) {
-			add_filter( 'eab-collection-date_ordering_direction', $order_method );
+			add_filter( 'eab-collection-date_ordering_direction', function($order_method, $args) {
+					    return $args['order'];
+					});
 		}
 
 		$maps = array();
@@ -70,22 +72,28 @@ class Eab_Shortcodes extends Eab_Codec {
 			// Lookahead - depending on presence, use regular upcoming query, or poll week count
 			if ( $args['lookahead'] ) {
 				$method = $args['weeks']
-					? create_function('', 'return ' . $args['weeks'] . ';')
+					? true
 					: false;
 				;
 				if ( $method ) {
-					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					add_filter( 'eab-collection-upcoming_weeks-week_number', function($method, $args) {
+					    return $args['weeks'];
+					});
 				}
 				$events = Eab_CollectionFactory::get_upcoming_weeks( $args['date'], $query );
 				if ( $method ) {
-					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					remove_filter( 'eab-collection-upcoming_weeks-week_number', function($method, $args) {
+					    return $args['weeks'];
+					});
 				}
 			} else {
 				// No lookahead, get the full month only
 				$events = Eab_CollectionFactory::get_upcoming( $args['date'], $query );
 			}
 			if ( $order_method ) {
-				remove_filter( 'eab-collection-date_ordering_direction', $order_method );
+				remove_filter( 'eab-collection-date_ordering_direction', function($order_method, $args) {
+					    return $args['order'];
+					});
 			}
 
 			$model 		= new AgmMapModel;
@@ -114,18 +122,30 @@ class Eab_Shortcodes extends Eab_Codec {
 		} else {
 			if ( $args['lookahead'] ) {
 				$method = $args['weeks']
-					? create_function('', 'return ' . $args['weeks'] . ';')
+					? true
 					: false;
 				;
-				if ($method) add_filter('eab-collection-upcoming_weeks-week_number', $method);
+				if ($method) {
+				    add_filter('eab-collection-upcoming_weeks-week_number', function($method, $args) {
+					    return $args['weeks'];
+					});
+				}
 				$events = Eab_CollectionFactory::get_upcoming_weeks_events($args['date'], $query);
-				if ($method) remove_filter('eab-collection-upcoming_weeks-week_number', $method);
+				if ($method) {
+				    remove_filter('eab-collection-upcoming_weeks-week_number', function($method, $args) {
+					    return $args['weeks'];
+					});
+				}
 			} else {
 				// No lookahead, get the full month only
 				$events = Eab_CollectionFactory::get_upcoming_events($args['date'], $query);
 
 			}
-			if ($order_method) remove_filter('eab-collection-date_ordering_direction', $order_method);
+			if ($order_method) {
+			    remove_filter('eab-collection-date_ordering_direction', function($order_method, $args) {
+					    return $args['order'];
+					});
+			}
 
 			$open_only = $this->_arg_to_bool($args['open_only']);
 			foreach ($events as $event) {
@@ -348,10 +368,14 @@ class Eab_Shortcodes extends Eab_Codec {
 		$query = $this->_to_query_args($args);
 
 		$order_method = $args['order']
-			? create_function('', 'return "' . $args['order'] . '";')
+			? true
 			: false
 		;
-		if ($order_method) add_filter('eab-collection-date_ordering_direction', $order_method);
+		if ($order_method) {
+		    add_filter('eab-collection-date_ordering_direction', function($order_method, $args) {
+			return $args['order'];
+		    });
+		}
 
 		$events = Eab_CollectionFactory::get_expired_events($query);
 
