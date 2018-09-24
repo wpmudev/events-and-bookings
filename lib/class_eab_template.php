@@ -71,7 +71,9 @@ class Eab_Template {
 			$new_content .= self::get_payment_forms($event);
 			$new_content .= '</div>';
 		} elseif ( $event->is_premium() && $event->user_paid() ) {
+                        $new_content .= '<div id="wpmudevevents-payment">';
 			$new_content .= __( 'You already paid for this event', Eab_EventsHub::TEXT_DOMAIN );
+                        $new_content .= '</div>';
 		} elseif ( $paypal_processing ) {
 			$new_content .= '<div id="wpmudevevents-payment">';
 			$new_content .= __( 'Your payment is being processed. This may take a few minutes to show here.', Eab_EventsHub::TEXT_DOMAIN ) . ' ';
