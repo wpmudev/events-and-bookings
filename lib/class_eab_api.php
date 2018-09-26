@@ -116,7 +116,7 @@ class Eab_Api {
 		)));
 		if (!$this->_data->get_option('facebook-no_init')) {
 			if (defined('EAB_INTERNAL_FLAG__FB_INIT_ADDED')) return false;
-			add_action('wp_footer', function() {
+			add_action('wp_footer', function($this) {
 			    echo sprintf(
 				    '<div id="fb-root"></div><script type="text/javascript">
 				    window.fbAsyncInit = function() {

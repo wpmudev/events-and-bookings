@@ -486,7 +486,7 @@ class Eab_EventsHub {
 			$style 		= $style_path ? EAB_PLUGIN_URL . "default-templates/{$eab_type}/events.css" : $style;
 		}
 		if ( $style ) { 
-			add_action( 'wp_head', function() {
+			add_action( 'wp_head', function($style) {
 			    return wp_enqueue_style('eab-events', $style);
 			});
 		}
@@ -571,7 +571,7 @@ class Eab_EventsHub {
 			$style 		= $style_path ? EAB_PLUGIN_URL . "default-templates/{$eab_type}/events.css" : $style;
 		}
 		if ( $style ) { 
-			add_action( 'wp_head', function() {
+			add_action( 'wp_head', function($style) {
 			    return wp_enqueue_style('eab-events', $style);
 			});
 		}
