@@ -159,6 +159,115 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 
 
 /**
+ * events time-restricted collection (Date Range) implementation.
+ * 
+ */
+class Eab_DateRangeCollection extends Eab_TimedCollection {
+
+	public function __construct ($timestamp=false, $args=array()) {
+		Eab_Filter::start_date_ordering_set_up();
+		add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));
+		parent::__construct($timestamp, $args);
+		Eab_Filter::start_date_ordering_tear_down();
+	}
+
+	public function propagate_direction_filter ($direction) {
+		return apply_filters('eab-collection-date_ordering_direction', $direction);
+	}
+
+	public function build_query_args ($args) {
+		$forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
+		if (!isset($args['incsub_event'])) { // If not single
+			$forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
+		}
+		$forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
+
+		if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;
+		
+		$args = array_merge(
+			$args,
+			array(
+			 	'post_type' => 'incsub_event',
+			 	'post_status' => array('publish', Eab_EventModel::RECURRENCE_STATUS),
+				'suppress_filters' => false,
+				'meta_query' => array(
+					array(
+		    			'key' => 'incsub_event_start',
+					'value' => apply_filters('eab-collection-date_range_end', date('Y-m', eab_current_time()) . '-01 23:59'),
+		    			'compare' => '<',
+		    			'type' => 'DATETIME'
+					),
+					array(
+		    			'key' => 'incsub_event_end',
+					'value' => apply_filters('eab-collection-date_range_start', date('Y-m-d', eab_current_time()) . ' 00:00'),
+		    			'compare' => '>=',
+		    			'type' => 'DATETIME'
+					),
+					array(
+						'key' => 'incsub_event_status',
+						'value' => $forbidden_statuses,
+						'compare' => 'NOT IN',
+					),
+				),
+			)
+		);
+		return $args;
+	}
+}
+
+class Eab_DateRangeArchiveCollection extends Eab_TimedCollection {
+	
+		public function __construct ($timestamp=false, $args=array()) {
+			Eab_Filter::start_date_ordering_set_up();
+			add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));
+			parent::__construct($timestamp, $args);
+			Eab_Filter::start_date_ordering_tear_down();
+		}
+	
+		public function propagate_direction_filter ($direction) {
+			return apply_filters('eab-collection-date_ordering_direction', $direction);
+		}
+	
+		public function build_query_args ($args) {
+		    $forbidden_statuses = array(Eab_EventModel::STATUS_CLOSED);
+		    if (!isset($args['incsub_event'])) { // If not single
+			    $forbidden_statuses[] = Eab_EventModel::STATUS_EXPIRED;
+		    }
+		    $forbidden_statuses = apply_filters('eab-collection-forbidden_statuses', $forbidden_statuses);
+
+		    if (!isset($args['posts_per_page'])) $args['posts_per_page'] = -1;
+
+			$args = array_merge(
+				$args,
+				array(
+					 'post_type' 		=> 'incsub_event',
+					 'post_status' 		=> array('publish', Eab_EventModel::RECURRENCE_STATUS),
+					'suppress_filters' 	=> false,
+					'meta_query' 		=> array(
+						array(
+							'key' 		=> 'incsub_event_start',
+							'value' 	=> apply_filters('eab-collection-date_range_end', date('Y-m', eab_current_time()) . '-01 23:59'),
+							'compare' 	=> '<',
+							'type' 		=> 'DATETIME'
+						),
+						array(
+							'key' 		=> 'incsub_event_end',
+							'value' 	=> apply_filters('eab-collection-date_range_start', date('Y-m-d', eab_current_time()) . ' 00:00'),
+							'compare' 	=> '>=',
+							'type' 		=> 'DATETIME'
+						),
+						array(
+							'key' 	=> 'incsub_event_status',
+							'value' => Eab_EventModel::STATUS_ARCHIVED,
+						),
+					)
+				)
+			);
+			return $args;
+		}
+	}
+
+/**
  * Upcoming events time-restricted collection (5 weeks period) implementation.
  * @author: Hakan Evin
  */
@@ -467,6 +576,29 @@ class Eab_ArchivedRecurringChildrenCollection extends Eab_AllRecurringChildrenCo
 class Eab_CollectionFactory {
 
 	private function __construct () {}
+
+	/**
+	 * events date range factory method
+	 * @return array Eab_DateRangeCollection instance
+	 */
+	public static function get_date_range ($timestamp=false, $args=array()) {
+		$me = new Eab_DateRangeCollection($timestamp, $args);
+		return $me->to_query();
+	}
+
+	/**
+	 * events date range factory method
+	 * @return array date range events list
+	 */
+	public static function get_date_range_events ($timestamp=false, $args=array()) {
+		$me = new Eab_DateRangeCollection($timestamp, $args);
+		return $me->to_collection();
+	}
+
+	public static function get_date_range_archive_events ($timestamp=false, $args=array()) {
+		$me = new Eab_DateRangeArchiveCollection($timestamp, $args);
+		return $me->to_collection();
+	}
 
 	/**
 	 * Upcoming events query factory method

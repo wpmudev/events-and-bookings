@@ -32,25 +32,39 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			if ( $order_method ) {
 				add_filter( 'eab-collection-date_ordering_direction', $order_method );
 			}
+			
+			if ( $this->args['end_date'] ) {
+			    $start = !empty($this->args['date']) ? $this->args['date'] : eab_current_time();
+			    $start_date = create_function( '', 'return "' . date('Y-m-d', $start) .' 00:00";');
+			    $end_date = create_function( '', 'return "' . date('Y-m-d', $this->args['end_date']) . ' 23:59";');
+			    
+			    add_filter('eab-collection-date_range_start', $start_date);
+			    add_filter('eab-collection-date_range_end', $end_date); 
 
-			// Lookahead - depending on presence, use regular upcoming query, or poll week count
-			if ( $this->args['lookahead'] ) {
-				$method = $this->args['weeks']
-					? create_function( '', 'return ' . $this->args['weeks'] . ';' )
-					: false;
-
-				if ( $method ) {
-					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
-				}
-
-				$events = Eab_CollectionFactory::get_upcoming_weeks_events( $this->args['date'], $this->query );
-
-				if ( $method ) {
-					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
-				}
+			    $events = Eab_CollectionFactory::get_date_range_events( $start, $this->query );
+			    
+			    remove_filter( 'eab-collection-date_range_start', $start_date );
+			    remove_filter( 'eab-collection-date_range_end', $end_date );
 			} else {
-				// No lookahead, get the full month only
-				$events = Eab_CollectionFactory::get_upcoming_events( $this->args['date'], $this->query );
+			    // Lookahead - depending on presence, use regular upcoming query, or poll week count
+			    if ( $this->args['lookahead'] ) {
+				    $method = $this->args['weeks']
+					    ? create_function( '', 'return ' . $this->args['weeks'] . ';' )
+					    : false;
+
+				    if ( $method ) {
+					    add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+				    }
+
+				    $events = Eab_CollectionFactory::get_upcoming_weeks_events( $this->args['date'], $this->query );
+
+				    if ( $method ) {
+					    remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+				    }
+			    } else {
+				    // No lookahead, get the full month only
+				    $events = Eab_CollectionFactory::get_upcoming_events( $this->args['date'], $this->query );
+			    }
 			}
 			if ( $order_method ) {
 				remove_filter( 'eab-collection-date_ordering_direction', $order_method );
@@ -69,6 +83,15 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 
 		if ( $output ) {
 			if ( $this->args['paged'] && ! ( is_multisite() && $this->args['network'] ) ) {
+			    if ( $this->args['end_date'] ) {
+				add_filter('eab-collection-date_range_start', $start_date);
+				add_filter('eab-collection-date_range_end', $end_date);
+				
+				$events_query = Eab_CollectionFactory::get_date_range( $start, $this->query );
+				
+				remove_filter( 'eab-collection-date_range_start', $start_date );
+				remove_filter( 'eab-collection-date_range_end', $end_date );
+			    } else {
 				if ( $method ) {
 					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
 				}
@@ -78,6 +101,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				if ( $method ) {
 					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
 				}
+			    }
 				$output .= eab_call_template( 'get_shortcode_paging', $events_query, $this->args );
 			}
 		}
