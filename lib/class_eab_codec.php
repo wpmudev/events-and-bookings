@@ -118,6 +118,8 @@ abstract class Eab_Codec {
 		    }
 		}
 
+		if (isset($raw['day_only'])) $args['day_only'] = $this->_arg_to_bool($args['day_only']);
+
 		return $args;
 	}
 

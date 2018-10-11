@@ -1491,12 +1491,14 @@ class Eab_EventsHub {
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/Upcoming_Widget.class.php';
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/UpcomingCalendar_Widget.class.php';
 		require_once EAB_PLUGIN_DIR . 'lib/widgets/EAB_Month_Navigation.php';
+		require_once EAB_PLUGIN_DIR . 'lib/widgets/Daily_Widget.class.php';
 
 		register_widget( 'Eab_Attendees_Widget' );
 		register_widget( 'Eab_Popular_Widget' );
 		register_widget( 'Eab_Upcoming_Widget' );
 		register_widget( 'Eab_CalendarUpcoming_Widget' );
 		register_widget( 'Eab_Month_Navigation_Widget' );
+		register_widget( 'Eab_Daily_Widget' );
     }
 
 	/**
