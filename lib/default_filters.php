@@ -142,6 +142,28 @@ function _eab_dispatch_event_archives($query) {
 add_action('pre_get_posts', '_eab_dispatch_event_archives', 1);
 // End Archive sorting and pagination in default WP requests
 
+// Exclude expired posts from eab_events_category archive pages
+function _eab_hide_past_events_from_archive_pages( $query ) {
+
+	if ( is_tax( 'eab_events_category' ) && $query->is_main_query() ) {
+	
+		$meta_query = array(
+             array(
+                'key' 		=> 'incsub_event_start',
+                'value' 	=> gmdate( 'Y-m-d H:i:s' ),
+                'compare' 	=>'>=',
+             ),
+		);
+
+		$query->set('meta_query',$meta_query);
+
+	}
+
+}
+
+add_action( 'pre_get_posts', '_eab_hide_past_events_from_archive_pages', 10 );
+// End Exclude expired posts from eab_events_category archive pages
+
 function eab_ordering_date_ordering_direction_cb() {
 	return 'DESC';
 }
