@@ -145,7 +145,7 @@ add_action('pre_get_posts', '_eab_dispatch_event_archives', 1);
 // Exclude expired posts from eab_events_category archive pages
 function _eab_hide_past_events_from_archive_pages( $query ) {
 
-	if ( is_tax( 'eab_events_category' ) && $query->is_main_query() ) {
+	if ( is_tax( 'eab_events_category' ) && $query->is_main_query() && ! is_admin() ) {
 	
 		$meta_query = array(
              array(
