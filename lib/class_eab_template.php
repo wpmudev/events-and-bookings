@@ -19,7 +19,7 @@ class Eab_Template {
 		
 		$new_content .= '<div class="event ' . self::get_status_class($event) . '" itemscope itemtype="http://schema.org/Event">';
 
-		if( !empty( $content['with_thumbnail'] ) && $content['with_thumbnail'] == 'yes' ) {
+		if( !empty( $content['with_thumbnail'] ) && ($content['with_thumbnail'] == 'yes' || true == $content['with_thumbnail']) ) {
 			$new_content .= '<div class="event_sc_thumb">';
 			$new_content .= get_the_post_thumbnail( $event->get_id() );
 			$new_content .= '</div>';
