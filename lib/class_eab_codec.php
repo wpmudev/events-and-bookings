@@ -66,7 +66,7 @@ abstract class Eab_Codec {
                 if(isset($raw['show_old']) && $this->_arg_to_bool($raw['show_old'])) {
                         $args['date'] = $accepted['date'];
                 }
-
+		
 		if (isset($raw['lookahead'])) $args['lookahead'] = $this->_arg_to_bool($args['lookahead']);
 		if (isset($raw['weeks'])) $args['weeks'] = $this->_arg_to_int($args['weeks']);
 
