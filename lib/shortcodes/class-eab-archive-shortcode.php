@@ -22,6 +22,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 		$method = false;
 
 		$events = array();
+		
 		if ( is_multisite() && $this->args['network'] ) {
 			$events = Eab_Network::get_archive_events( 30 );
 		} else {
@@ -32,8 +33,8 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			if ( $order_method ) {
 				add_filter( 'eab-collection-date_ordering_direction', $order_method );
 			}
-			
-			if ( $this->args['end_date'] ) {
+
+                        if ( $this->args['end_date'] ) {
 			    $start = !empty($this->args['date']) ? $this->args['date'] : eab_current_time();
 			    $start_date = create_function( '', 'return "' . date('Y-m-d', $start) .' 00:00";');
 			    $end_date = create_function( '', 'return "' . date('Y-m-d', $this->args['end_date']) . ' 23:59";');
@@ -45,6 +46,17 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			    
 			    remove_filter( 'eab-collection-date_range_start', $start_date );
 			    remove_filter( 'eab-collection-date_range_end', $end_date );
+                        }
+
+			if ( $this->args['day_only']) {
+			    $date = !empty($this->args['date']) ? $this->args['date'] : eab_current_time();
+			    $ddate = create_function( '', 'return "' . date('Y-m-d', $date) .'";');
+			    
+			    add_filter('eab-collection-daily_events_date', $ddate);
+
+			    $events = Eab_CollectionFactory::get_daily_events( $date, $this->query );
+			    
+			    remove_filter( 'eab-collection-daily_events_date', $ddate );
 			} else {
 			    // Lookahead - depending on presence, use regular upcoming query, or poll week count
 			    if ( $this->args['lookahead'] ) {
@@ -91,6 +103,13 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				
 				remove_filter( 'eab-collection-date_range_start', $start_date );
 				remove_filter( 'eab-collection-date_range_end', $end_date );
+                            }
+			    if ($this->args['day_only']) {
+				add_filter('eab-collection-daily_events_date', $ddate);
+				
+				$events_query = Eab_CollectionFactory::get_daily( $date, $this->query );
+
+				remove_filter( 'eab-collection-daily_events_date', $ddate );
 			    } else {
 				if ( $method ) {
 					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
