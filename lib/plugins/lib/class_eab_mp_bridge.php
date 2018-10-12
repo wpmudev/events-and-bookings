@@ -575,10 +575,6 @@ class Eab_MP_Bridge {
 			$eab->recount_bookings( $event_id );
 		}
 		
-	function save_settings ($options) {
-		$options['payment-ppvp-category'] = isset( $_POST['eab_event-payment-ppvp-category'] ) ? $_POST['eab_event-payment-ppvp-category'] : '';
-		return $options;
-	}
 	
 	// Sets the order status to `order_received`
 	public function cancel_event_order( $event = null, $user_id = null ) {
