@@ -338,7 +338,12 @@ class Eab_MP_Bridge {
 	 * Returns related Product instead of standard payment forms for appropriate events.
 	 */
 	function add_event_product_to_cart($event_id, $user_id) {
-		if (!$this->_is_mp_present()) return;
+		if ( 
+			! $this->_is_mp_present() || 
+			! apply_filters( 'incsub_event_add_event_product_to_cart', true, $event_id, $user_id ) )
+		{
+			return;
+		}
 		
 		$event = new Eab_EventModel(get_post($event_id));
 		$recurring = $event->is_recurring_child();

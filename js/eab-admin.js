@@ -11,10 +11,12 @@ jQuery(function() {
 		"defaultDate": new Date(),
 		"firstDay": parseInt(eab_event_localized.start_of_week, 10) ? parseInt(eab_event_localized.start_of_week, 10) : 0
 	});
-	jQuery( ".incsub_event_time_picker" ).timepicker({
-		showNowButton: true,
-		showDeselectButton: true,
-		showCloseButton: true,
+	jQuery( 'body' ).on( 'focus', '.incsub_event_time_picker', function() {
+		$( this ).timepicker({
+			showNowButton: true,
+			showDeselectButton: true,
+			showCloseButton: true,
+		});
 	});
 	//}
 
