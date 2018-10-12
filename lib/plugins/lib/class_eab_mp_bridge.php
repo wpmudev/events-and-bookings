@@ -40,6 +40,9 @@ class Eab_MP_Bridge {
 		// Archiving
 		add_action('eab-scheduler-event_archived', array($this, 'archived_event_mp_cleanup'));
                 add_action( 'eab-rsvps-button-no', array( &$this, 'eab_mp_variation_check' ), 99, 2 );
+                
+        // When cancelling a paid Booking of an Event, we need to cancel the order too
+		add_action( 'eab-rsvp_before_cancel_payment', array( $this, 'cancel_event_order' ), 10, 2 );
 	}
 
 	/**
@@ -575,4 +578,35 @@ class Eab_MP_Bridge {
 			do_action( 'incsub_event_booking_no', $event_id, get_current_user_id() );
 			$eab->recount_bookings( $event_id );
 		}
+		
+	// Sets the order status to `order_received`
+	public function cancel_event_order( $event = null, $user_id = null ) {
+
+		if ( is_null( $event ) || ! $event instanceof Eab_EventModel || is_null( $user_id ) ) {
+			return false;
+		}
+
+		$booking_id 		= $event->get_user_booking_id( $user_id );
+		$booking_meta 		= unserialize( $event->get_booking_paid( $booking_id ) );
+		$error_msg          = __( 'The order status could not be updated due to unexpected error. Please try again.', Eab_EventsHub::TEXT_DOMAIN );
+
+		// If no order id set, then no need to do anything here
+		if ( ! isset( $booking_meta['order_id'] ) ) {
+			return true;
+		}
+
+		$order_id = (int) $booking_meta['order_id'];
+		
+		$result           = wp_update_post( array(
+			'ID'          => $order_id,
+			'post_status' => 'order_received',
+		), true );
+
+		if ( is_wp_error( $result ) ) {
+			wp_die( $error_msg );
+		}
+
+		return true;
+
+	}
 }
