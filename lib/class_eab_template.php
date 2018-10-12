@@ -21,7 +21,7 @@ class Eab_Template {
 
 		if( !empty( $content['with_thumbnail'] ) && ($content['with_thumbnail'] == 'yes' || true == $content['with_thumbnail']) ) {
 			$new_content .= '<div class="event_sc_thumb">';
-			$new_content .= get_the_post_thumbnail( $event->get_id() );
+			$new_content .= get_the_post_thumbnail( $event->get_id(), $content['thumbnail_size'] );
 			$new_content .= '</div>';
 		}
 
