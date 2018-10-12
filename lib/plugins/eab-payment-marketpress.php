@@ -35,8 +35,6 @@ class Eab_Payments_PaymentViaProducts {
 		add_action('eab-settings-after_payment_settings', array($this, 'show_settings'));
 		add_filter('eab-settings-before_save', array($this, 'save_settings'));
 		
-		// When cancelling a paid Booking of an Event, we need to cancel the order too
-		add_action( 'eab-rsvp_before_cancel_payment', array( $this, 'cancel_event_order' ), 10, 2 );
 	}
 
 	/**
