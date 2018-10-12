@@ -1090,6 +1090,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	}
 
 	public function cancel_attendance ($user_id=false) {
+	
 		$user_id = (int)$this->_to_user_id($user_id);
 		if ( ! $user_id ) return false;
 
@@ -1121,7 +1122,6 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	
 	public function cancel_payment( $user_id = false ) {
 
-		$user_id = (int)$this->_to_user_id( $user_id );
 		if ( ! $user_id ) return false;
 
 		global $wpdb;
