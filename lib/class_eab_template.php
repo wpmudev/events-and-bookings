@@ -340,6 +340,12 @@ class Eab_Template {
 			$content .= '<div class="eab-guest-actions"><a href="#delete-attendance" class="eab-guest-delete_attendance" data-eab-user_id="' . $booking->user_id . '" data-eab-event_id="' . $event->get_id() . '">' .
 				__('Delete attendance entirely', Eab_EventsHub::TEXT_DOMAIN) .
 			'</a></div>';
+
+			$list_event_date = date( 'Y-m-d h:i a', strtotime( get_post_meta( $booking->event_id, 'incsub_event_start', true ) ) );
+
+			if ( ! empty( $list_event_date ) && 'recurrent' === get_post_status( $booking->event_id ) ) {
+				$content .= '<span class="eab-event-recurring-date-information">' . $list_event_date . '</span>';
+			}
 			$content = apply_filters('eab-event-booking_metabox_content', $content, $booking->user_id);
 			$content .= '</div>'; // .eab-guest
 			$content .= '</li>';
