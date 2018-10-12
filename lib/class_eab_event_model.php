@@ -1091,11 +1091,49 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 
 	public function cancel_attendance ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
-		if (!$user_id) return false;
-		if ($this->is_premium() && $this->user_paid()) return false; // Can't edit attendance for paid premium events
+		if ( ! $user_id ) return false;
+
+		// Optional via filter
+		// Can't edit attendance for paid premium events
+		if ( $this->user_paid( $user_id ) ) {
+
+			if ( 
+				apply_filters( 'eab-rsvp_forbid-cancel-paid', false, $this, $user_id ) && 
+				$this->is_premium()
+			) {
+
+				return false;
+			}
+
+			// If it is paid we need to remove payment too
+			// In case we need to keep the payment, use the `eab-rsvp_can-cancel-payment` filter
+			if( 
+				apply_filters( 'eab-rsvp_can-cancel-payment', true, $this, $user_id ) && 
+				! $this->cancel_payment( $user_id ) ) {
+					return false;
+			}
+
+		}
+		
+		global $wpdb;
+		return $wpdb->query($wpdb->prepare("UPDATE " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " SET status='no' WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));	
+	}
+	
+	public function cancel_payment( $user_id = false ) {
+
+		$user_id = (int)$this->_to_user_id( $user_id );
+		if ( ! $user_id ) return false;
 
 		global $wpdb;
-		return $wpdb->query($wpdb->prepare("UPDATE " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " SET status='no' WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
+		$booking_id = $this->get_user_booking_id( $user_id );
+		$meta_table = Eab_EventsHub::tablename( Eab_EventsHub::BOOKING_META_TABLE );
+		$query = $wpdb->prepare( "DELETE FROM {$meta_table} WHERE booking_id = %d AND meta_key = 'booking_transaction_key'", $booking_id );		
+
+		// Used for MarketPress Integration
+		do_action( 'eab-rsvp_before_cancel_payment', $this, $user_id );
+
+		return $wpdb->query( $query );
+
 	}
 
 	public function delete_attendance ($user_id=false) {
