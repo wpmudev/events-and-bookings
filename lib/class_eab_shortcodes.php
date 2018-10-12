@@ -294,7 +294,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'override_styles' 	=> false,
 			'override_scripts' 	=> false,
 			'with_thumbnail' 	=> false,
-			'thumbnail_size'	=> false
+			'thumbnail_size'	=> false,
 			'end_date'		=> false,
 			'day_only'		=> false,
 		));
