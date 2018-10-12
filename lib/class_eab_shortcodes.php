@@ -214,7 +214,7 @@ class Eab_Shortcodes extends Eab_Codec {
 			'show_old' => false,
 			'excerpt_length' => 55,
 		));
-
+		
 		if (!empty($_GET['date'])) {
 			$date = strtotime($_GET['date']);
 			if ($date) $args['date'] = $date;
@@ -294,7 +294,9 @@ class Eab_Shortcodes extends Eab_Codec {
 			'override_styles' 	=> false,
 			'override_scripts' 	=> false,
 			'with_thumbnail' 	=> false,
-			'thumbnail_size'	=> false
+			'thumbnail_size'	=> false,
+			'end_date'		=> false,
+			'day_only'		=> false,
 		));
 
 		$shortcode = new Eab_Archive_Shortcode( $args );
@@ -323,6 +325,8 @@ class Eab_Shortcodes extends Eab_Codec {
 				'thumbnail_size' => array('help' => __('Set thumbnail size (\'thumbnail\', \'medium\', \'full\' or \'150,150\'', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string'),
 				'override_styles' => array('help' => __('Toggle default styles usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 				'override_scripts' => array('help' => __('Toggle default scripts usage', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
+				'end_date' => array('help' => __('Ending date (YYYY-MM-DD)', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'string:date'),
+				'day_only' => array('help' => __('Toggle display current days events only', Eab_EventsHub::TEXT_DOMAIN), 'type' => 'boolean'),
 			),
 			'advanced_arguments' => array('template', 'override_scripts', 'override_styles'),
 		);
