@@ -1090,15 +1090,7 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 	}
 
 	public function cancel_attendance ($user_id=false) {
-		$user_id = (int)$this->_to_user_id($user_id);
-		if (!$user_id) return false;
-		if ($this->is_premium() && $this->user_paid()) return false; // Can't edit attendance for paid premium events
 
-		global $wpdb;
-		return $wpdb->query($wpdb->prepare("UPDATE " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " SET status='no' WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
-	}
-
-	public function delete_attendance ($user_id=false) {
 		$user_id = (int)$this->_to_user_id($user_id);
         if ( ! $user_id ) return false;
 
@@ -1126,9 +1118,8 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 		
 		global $wpdb;
 		return $wpdb->query($wpdb->prepare("UPDATE " . Eab_EventsHub::tablename(Eab_EventsHub::BOOKING_TABLE) . " SET status='no' WHERE event_id = %d AND user_id = %d LIMIT 1;", $this->get_id(), $user_id));
-
+		
 	}
-	
 	
 	public function cancel_payment( $user_id = false ) {
 
@@ -1147,6 +1138,22 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 
  	}
 
+	public function delete_attendance ($user_id=false) {
+
+		if ( ! $user_id ) return false;
+
+		global $wpdb;
+		$booking_id = $this->get_user_booking_id( $user_id );
+		$meta_table = Eab_EventsHub::tablename( Eab_EventsHub::BOOKING_META_TABLE );
+		$query = $wpdb->prepare( "DELETE FROM {$meta_table} WHERE booking_id = %d AND meta_key = 'booking_transaction_key'", $booking_id );		
+
+		// Used for MarketPress Integration
+		do_action( 'eab-rsvp_before_cancel_payment', $this, $user_id );
+
+		return $wpdb->query( $query );	
+
+	}
+	
 	public function add_attendance ($user_id, $status) {
 		$user_id = (int)$this->_to_user_id($user_id);
 		if (!$user_id) return false;
