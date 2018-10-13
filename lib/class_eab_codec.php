@@ -15,6 +15,10 @@ abstract class Eab_Codec {
 		false, 'false', 'no', 'off', '0'
 	);
 
+	private $_thumbnail_sizes = array(
+		'thumbnail', 'large', 'medium-large', 'medium', 'full'
+	)
+
 	protected function _arg_to_bool ($val) {
 		return in_array($val, $this->_positive_values, true);
 	}
@@ -103,18 +107,17 @@ abstract class Eab_Codec {
 			$args['template'] = $_template;
 		}
 
+		if (isset($raw['with_thumbnail'])) $args['with_thumbnail'] = $this->_arg_to_bool($args['with_thumbnail']);
+
 		$args['thumbnail_size'] = 'post-thumbnail';
-		if (isset($raw['with_thumbnail']) && isset($raw['thumbnail_size'])) {
-		    $args['thumbnail_size'] = 'post-thumbnail';
-		    
-		    $allowed_thumbsize = array('thumbnail', 'medium', 'full');
-		    if(in_array($raw['thumbnail_size'], $allowed_thumbsize)) {
-			$args['thumbnail_size'] = $raw['thumbnail_size'];
+		if ($args['with_thumbnail'] && isset($raw['thumbnail_size'])) {
+		    if(in_array($raw['thumbnail_size'], $this->_thumbnail_sizes)) {
+				$args['thumbnail_size'] = $raw['thumbnail_size'];
 		    } else {
-			if(strpos($raw['thumbnail_size'], ',')) {
-			    $thumbsize = explode(',', $raw['thumbnail_size']);
-			    $args['thumbnail_size'] = array($thumbsize[0], $thumbsize[1]);
-			}
+				if(strpos($raw['thumbnail_size'], ',')) {
+			    	$thumbsize = explode(',', $raw['thumbnail_size']);
+			    	$args['thumbnail_size'] = array($thumbsize[0], $thumbsize[1]);
+				}
 		    }
 		}
 
