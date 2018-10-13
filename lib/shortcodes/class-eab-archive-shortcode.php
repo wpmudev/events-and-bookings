@@ -34,7 +34,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 				add_filter( 'eab-collection-date_ordering_direction', $order_method );
 			}
 
-                        if ( $this->args['end_date'] ) {
+            if ( $this->args['end_date'] ) {
 			    $start = !empty($this->args['date']) ? $this->args['date'] : eab_current_time();
 			    $start_date = create_function( '', 'return "' . date('Y-m-d', $start) .' 00:00";');
 			    $end_date = create_function( '', 'return "' . date('Y-m-d', $this->args['end_date']) . ' 23:59";');
@@ -46,9 +46,7 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 			    
 			    remove_filter( 'eab-collection-date_range_start', $start_date );
 			    remove_filter( 'eab-collection-date_range_end', $end_date );
-                        }
-
-			if ( $this->args['day_only']) {
+            } elseif ( $this->args['day_only']) {
 			    $date = !empty($this->args['date']) ? $this->args['date'] : eab_current_time();
 			    $ddate = create_function( '', 'return "' . date('Y-m-d', $date) .'";');
 			    
@@ -96,30 +94,29 @@ class Eab_Archive_Shortcode extends Eab_Codec {
 		if ( $output ) {
 			if ( $this->args['paged'] && ! ( is_multisite() && $this->args['network'] ) ) {
 			    if ( $this->args['end_date'] ) {
-				add_filter('eab-collection-date_range_start', $start_date);
-				add_filter('eab-collection-date_range_end', $end_date);
+					add_filter('eab-collection-date_range_start', $start_date);
+					add_filter('eab-collection-date_range_end', $end_date);
 				
-				$events_query = Eab_CollectionFactory::get_date_range( $start, $this->query );
+					$events_query = Eab_CollectionFactory::get_date_range( $start, $this->query );
 				
-				remove_filter( 'eab-collection-date_range_start', $start_date );
-				remove_filter( 'eab-collection-date_range_end', $end_date );
-                            }
-			    if ($this->args['day_only']) {
-				add_filter('eab-collection-daily_events_date', $ddate);
+					remove_filter( 'eab-collection-date_range_start', $start_date );
+					remove_filter( 'eab-collection-date_range_end', $end_date );
+                } elseif ($this->args['day_only']) {
+					add_filter('eab-collection-daily_events_date', $ddate);
 				
-				$events_query = Eab_CollectionFactory::get_daily( $date, $this->query );
+					$events_query = Eab_CollectionFactory::get_daily( $date, $this->query );
 
-				remove_filter( 'eab-collection-daily_events_date', $ddate );
+					remove_filter( 'eab-collection-daily_events_date', $ddate );
 			    } else {
-				if ( $method ) {
-					add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
-				}
-				$events_query = $this->args['lookahead']
-					? Eab_CollectionFactory::get_upcoming_weeks( $this->args['date'], $this->query )
-					: Eab_CollectionFactory::get_upcoming( $this->args['date'] , $this->query);
-				if ( $method ) {
-					remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
-				}
+					if ( $method ) {
+						add_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					}
+					$events_query = $this->args['lookahead']
+						? Eab_CollectionFactory::get_upcoming_weeks( $this->args['date'], $this->query )
+						: Eab_CollectionFactory::get_upcoming( $this->args['date'] , $this->query);
+					if ( $method ) {
+						remove_filter( 'eab-collection-upcoming_weeks-week_number', $method );
+					}
 			    }
 				$output .= eab_call_template( 'get_shortcode_paging', $events_query, $this->args );
 			}
