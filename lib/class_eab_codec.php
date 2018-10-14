@@ -17,7 +17,7 @@ abstract class Eab_Codec {
 
 	private $_thumbnail_sizes = array(
 		'thumbnail', 'large', 'medium-large', 'medium', 'full'
-	)
+	);
 
 	protected function _arg_to_bool ($val) {
 		return in_array($val, $this->_positive_values, true);
