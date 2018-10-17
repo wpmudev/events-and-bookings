@@ -59,7 +59,7 @@ class Eab_Popular_Widget extends Eab_Widget {
 					}
 			    ?>
 				<li>
-					<a href="<?php print get_permalink($_event->get_id()); ?>" class="<?php print ($_event->get_id() == $post->ID)?'current':''; ?>" >
+					<a href="<?php print get_permalink($_event->get_id()); ?>" class="<?php print ($post instanceof WP_Post && $_event->get_id() == $post->ID) ? 'current' : 'not_current'; ?>" >
 						<?php if ($options['thumbnail'] && $thumbnail) { ?>
 							<img src="<?php echo $thumbnail; ?>" /><br />
 						<?php } ?>
