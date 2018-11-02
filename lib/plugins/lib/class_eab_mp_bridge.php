@@ -6,6 +6,9 @@
 class Eab_MP_Bridge {
 
 	private $_data;
+	
+	// The Attribute title that will hold the date variations for recurring events
+	const VARIATION_NAME = 'Event Variation';
 
 	private function __construct () {
 		$this->_data = Eab_Options::get_instance();
@@ -23,8 +26,8 @@ class Eab_MP_Bridge {
 
 		// Display
 		add_filter('eab-event-payment_forms', array($this, 'process_event_payment_forms'), 10, 2);
-                add_action('incsub_event_booking_yes', array($this, 'add_event_product_to_cart'), 10, 2);
-                add_action('incsub_event_booking_maybe', array($this, 'add_event_product_to_cart'), 10, 2);
+        add_action('incsub_event_booking_yes', array($this, 'add_event_product_to_cart'), 10, 2);
+        add_action('incsub_event_booking_maybe', array($this, 'add_event_product_to_cart'), 10, 2);
 		add_filter('eab-events-event_details-price', array($this, 'show_product_price'), 10, 2);
 
 		// Regular Events+ product selection
@@ -36,6 +39,9 @@ class Eab_MP_Bridge {
 		// Recurring events
 		add_action('eab-events-recurring_instances-deleted', array($this, 'thrash_old_product_variations')); // Thrash old variations
 		add_action('eab-events-recurrent_event_child-save_meta', array($this, 'save_event_product_variations')); // Spawn variations
+		
+        // Create the Product variations for the Recurring Event dates
+		add_action( 'eab-events-spawn_recurring_instances-after', array( $this, 'save_recurring_child_event_product_variations' ), 10, 2 );
 
 		// Archiving
 		add_action('eab-scheduler-event_archived', array($this, 'archived_event_mp_cleanup'));
@@ -122,11 +128,31 @@ class Eab_MP_Bridge {
 	/**
 	 * Returns properly formatted product price for Event on the front end.
 	 */
-	function show_product_price ($price, $event_id) {
-		if (!$this->_is_mp_present()) return $price;
+	function show_product_price ( $price, $event_id ) {
+
+		if ( ! $this->_is_mp_present() ){
+			return $price;
+		}
+		
+		$linked_product_id = get_post_meta($event_id, 'eab_product_id', true);
+
+		if ( ! $linked_product_id ) {
+			return $price;
+		}
+
+		return mp_product_price( false, $linked_product_id, false );
+
+		/*
+		* Since the `eab_product_id` meta contains the Product Variation for the Recurring Event Date,
+		* we don't need to separate recurring events from regular ones. So commenting out
+		* the following part and added the part above this comment
+		*/
+
+		/*
 
 		$event = new Eab_EventModel(get_post($event_id));
 		$parent_event_id = $event->is_recurring_child();
+
 		if (!$parent_event_id) {
 			$linked_product_id = get_post_meta($event_id, 'eab_product_id', true);
 			if (!$linked_product_id) return $price;
@@ -153,24 +179,26 @@ class Eab_MP_Bridge {
 
 			$raw_price = MP_Product::get_variation_meta($variation_id, 'regular_price');
 			if (!$raw_price) return $price;
-/*
-			$product = new MP_Product($linked_product_id);
-			if ($product->on_sale()) {
+			
 
-			}
+			//$product = new MP_Product($linked_product_id);
+			//if ($product->on_sale()) {
+
+			//}
 
 			// Sales test
-			$is_sale = MP_Product::get_variation_meta($variation_id, 'price');
-			if ($is_sale) {
-				$sales = maybe_unserialize(get_post_meta($linked_product_id, 'mp_sale_price', true));
-				if (!empty($sales) && !empty($sales[$price_id])) $raw_price = $sales[$price_id];
-			}
+			//$is_sale = MP_Product::get_variation_meta($variation_id, 'price');
+			//if ($is_sale) {
+			//	$sales = maybe_unserialize(get_post_meta($linked_product_id, 'mp_sale_price', true));
+			//	if (!empty($sales) && !empty($sales[$price_id])) $raw_price = $sales[$price_id];
+			//}
 			// End sales test
-*/
+
 
 			return apply_filters('mp_product/display_price', '<span class="mp_product_price">' . mp_format_currency('', $raw_price) . '</span>', $raw_price, $linked_product_id);
 		}
 		return $price; // This won't happen, but whatever
+		*/
 	}
 
 	/**
@@ -296,13 +324,18 @@ class Eab_MP_Bridge {
 		}
 
 
-		update_post_meta($product_id, 'mp_var_name', $meta);
-		update_post_meta($product_id, 'mp_sku', $sku);
-		update_post_meta($product_id, 'mp_price', $price);
+		update_post_meta( $product_id, 'mp_var_name', $meta );
+		update_post_meta( $product_id, 'mp_sku', $sku );
+		update_post_meta( $product_id, 'mp_price', $price );
+		update_post_meta( $product_id, 'has_variations', true );
 
 		do_action('eab-mp-variation-meta', $product_id, $max, $instance_id, $event->is_recurring_child(), $unset_first);
-
+        
+        /*
 		// Let's get the variations going
+		// Actually this will re-create variations for Parent Product for each recurrent Event created.
+		// It causes resource usage when it could be avaided, as on each run it deletes previous variations.
+		// It also makes it hard to set proper Product Variation to Recurring Event
 		if (class_exists('MP_Installer')) {
 
 			// Clean up all the variations first
@@ -320,6 +353,146 @@ class Eab_MP_Bridge {
 			$mpi = MP_Installer::get_instance();
 			$mpi->product_variations_transition($product_id, 'external');
 		}
+		*/
+	}
+	
+	public function save_recurring_child_event_product_variations( $old_post_ids, $new_post_ids ) {
+
+		if ( ! empty( $new_post_ids ) && class_exists( 'MP_Installer' ) ) {
+
+			$product_id 		= false;
+			$parent_id 			= false;
+			$cleared_variations	= false;
+
+			foreach ( $new_post_ids as $event_id ) {
+
+				if ( ! $parent_id ) {
+					$parent_id 			= get_post( $event_id )->post_parent;
+					$product_id 		= get_post_meta( $parent_id, 'eab_product_id', true );
+				}
+
+				if ( ! $parent_id || ! $product_id ) {
+					continue;
+				}
+
+				if ( ! $cleared_variations ) {
+					// Clean up all the variations first
+					$query 			= new WP_Query(array(
+						'post_type'			=> apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+						'posts_per_page' 	=> -1,
+						'post_parent' 		=> $product_id
+					));
+
+					if (!empty($query->posts)) foreach ($query->posts as $variation) {
+						wp_delete_post($variation->ID, true);
+					}
+
+					$cleared_variations = true;
+
+				}
+
+				if ( $product_id ) {
+
+					$atts = array(
+						'event_id' 				=> $event_id,
+						'parent_product_id' 	=> $product_id
+					);
+
+					self::create_product_variation( $atts );
+
+				}				
+
+			}
+
+		}
+
+	}
+
+
+	public static function create_product_variation( $atts ) {
+
+		$variation_tax 		= MP_Products_Screen::maybe_create_attribute( 'product_attr_' . self::VARIATION_NAME, self::VARIATION_NAME );
+		$product_id 		= (int) $atts['parent_product_id'];
+		$event_id 			= (int) $atts['event_id'];
+		$event 				= new Eab_EventModel( get_post( $event_id ) );
+		$variation_term 	= date_i18n( get_option( "date_format" ), $event->get_start_timestamp() );
+		$tid 				= null;
+
+		// Craete the Variation ( Product )
+		$product_title   	= get_the_title( $product_id );
+		$product_content 	= get_the_content( $product_id );
+		$variation_args 	= array(
+			'post_title'   => $product_title,
+			'post_content' => $product_content,
+			'post_status'  => 'publish',
+			'post_type'    => MP_Product::get_variations_post_type(),
+			'post_parent'  => $product_id,
+		);  
+		$variation_id = wp_insert_post( $variation_args );
+
+		// Add meta to new Variation
+		$meta = get_post_meta( $product_id );
+
+		foreach ( $meta as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$meta[ $key ] = $value[0];
+			}
+		}
+
+
+		$variation_metas = array(
+			'name'                       => $variation_term, //mp_get_post_value( 'post_title' ),
+			'sku'                        => $meta['sku'],
+			'inventory_tracking'         => $meta['inventory_tracking'],
+			'inv_out_of_stock_purchase'  => 0,
+			'file_url'                   => $meta['file_url'],
+			'external_url'               => $meta['external_url'],
+			'regular_price'              => $meta['regular_price'],
+			'sale_price_amount'          => $meta['sale_price'],
+			'has_sale'                   => $meta['has_sale'],
+			'special_tax_rate'           => $meta['special_tax_rate'],
+			'description'                => $product_content,
+			'sale_price_start_date'      => '',
+			'sale_price_end_date'        => '',
+			'sale_price'                 => '', //array - to do
+			'weight'                     => '', //array - to do
+			'weight_pounds'              => '',
+			'weight_ounces'              => '',
+			'charge_shipping'            => $meta['charge_shipping'],
+			'charge_tax'                 => $meta['charge_tax'],
+			'weight_extra_shipping_cost' => $meta['weight_extra_shipping_cost'],
+		);
+
+		/* Add default post metas for variation */
+		foreach ( $variation_metas as $meta_key => $meta_value ) {
+			update_post_meta( $variation_id, $meta_key, sanitize_text_field( $meta_value ) );
+		}
+
+		/* Set parent thumbnail as default thumbnail for the variation */
+		$post_thumbnail = get_post_thumbnail_id( $product_id );
+		$variation_thumbnail = get_post_thumbnail_id( $variation_id );
+		if ( is_numeric( $post_thumbnail ) && ! is_numeric( $variation_thumbnail ) ) {
+			update_post_meta( $variation_id, 'mp_product_images', $post_thumbnail );
+			set_post_thumbnail( $variation_id, $post_thumbnail );
+		}
+
+		$slug = sanitize_title( $variation_term );
+
+		if ( ! term_exists( $slug, $variation_tax ) ) {
+			$tid = wp_insert_term( $variation_term, $variation_tax, array(
+				'slug' => $slug,
+			) );			
+		}
+		else {
+			$tid = get_term_by( 'slug', $slug, $variation_tax, ARRAY_A );
+		}
+
+		if ( ! is_null( $tid ) ) {
+			wp_set_post_terms( $variation_id, $tid['term_id'], $variation_tax, true );
+		}
+
+		update_post_meta( $event_id, 'eab_product_id', $variation_id );
+
 	}
 
 	/**
@@ -341,6 +514,7 @@ class Eab_MP_Bridge {
 	 * Returns related Product instead of standard payment forms for appropriate events.
 	 */
 	function add_event_product_to_cart($event_id, $user_id) {
+
 		if ( 
 			! $this->_is_mp_present() || 
 			! apply_filters( 'incsub_event_add_event_product_to_cart', true, $event_id, $user_id ) )
@@ -349,9 +523,14 @@ class Eab_MP_Bridge {
 		}
 		
 		$event = new Eab_EventModel(get_post($event_id));
-		$recurring = $event->is_recurring_child();
-		$product_id = false;
+		$recurring = $event->is_recurring_child();		
 
+		/* 
+		* Now recurring event have the same post meta as regular events, eab_product_id, where they store the Variation Product id for tha event date
+		*/
+		/*
+		$product_id = false;
+		
 		if ($recurring) {
 			$parent_product_id = get_post_meta($recurring, 'eab_product_id', true);
 			$query = new WP_Query(array(
@@ -367,6 +546,26 @@ class Eab_MP_Bridge {
 			$product_id = !empty($query->posts[0]) ? $query->posts[0] : false;
 		} else {
 			$product_id = get_post_meta($event_id, 'eab_product_id', true);
+		}
+		*/
+		
+		$product_id = get_post_meta($event_id, 'eab_product_id', true);
+
+		if ( ! $product_id && $recurring ) {
+
+			$parent_product_id = get_post_meta( $recurring, 'eab_product_id', true );
+			$query = new WP_Query( array(
+				'post_type'	=> apply_filters( 'mp_product_variation_post_type', 'mp_product_variation' ),
+				'posts_per_page' => 1,
+				'post_parent' => $parent_product_id,
+				'meta_query' => array( array(
+					'key' => 'sku',
+					'value' => $event_id
+				)),
+				'fields' => 'ids'
+			));
+
+			$product_id = ! empty( $query->posts[0] ) ? $query->posts[0] : false;
 		}
 
 		if (!$product_id) return;

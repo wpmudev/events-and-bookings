@@ -646,11 +646,14 @@ class Eab_EventModel extends WpmuDev_DatedVenuePremiumModel {
 				do_action('eab-events-recurrent_event_child-save_meta', $post_id);
 			}
 		}
-
+        
+        $new_post_ids = $this->_get_recurring_children_ids();
+        
 		if ($old_post_ids) {
-			$new_post_ids = $this->_get_recurring_children_ids();
 			$this->_remap_bookings($old_post_ids, $new_post_ids);
 		}
+		
+		do_action( 'eab-events-spawn_recurring_instances-after', $old_post_ids, $new_post_ids );
 	}
 
 	protected function _remap_bookings ($old, $new) {
