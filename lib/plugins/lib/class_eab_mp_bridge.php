@@ -94,7 +94,9 @@ class Eab_MP_Bridge {
 				'fields' => 'ids'
 			));
 			if (!empty($query->posts)) foreach ($query->posts as $variation) {
+                            if(isset($variation->ID)) {
 				wp_delete_post($variation->ID, false);
+                            }
 			}
 
 		} else {
@@ -241,7 +243,9 @@ class Eab_MP_Bridge {
 			'fields' => 'ids'
 		));
 		if (!empty($query->posts)) foreach ($query->posts as $variation) {
+                    if(isset($variation->ID)) {
 			wp_delete_post($variation->ID, true);
+                    }
 		}
 
 		// Add initial product price, so we have something to work with
@@ -312,7 +316,9 @@ class Eab_MP_Bridge {
 				'post_parent' => $product_id
 			));
 			if (!empty($query->posts)) foreach ($query->posts as $variation) {
+                            if(isset($variation->ID)) {
 				wp_delete_post($variation->ID, true);
+                            }
 			}
 
 
