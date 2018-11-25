@@ -738,7 +738,7 @@ class Eab_EventsHub {
 					$content .= '<div class="misc-eab-section eab-start-section"><label for="incsub_event_start_'.$key.'">';
 					$content .= sprintf( __('%sStart%s', self::TEXT_DOMAIN ), '<span>', '</span>' ).'</label>';
 					$content .= '<input type="text" name="incsub_event_start['.$key.']" id="incsub_event_start_'.$key.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="'.date('Y-m-d', $start).'" size="10" readonly/> ';
-					$content .= '<input type="text" name="incsub_event_start_time['.$key.']" id="incsub_event_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_start_time" value="'.date('H:i', $start).'" size="3" readonly/>';
+					$content .= '<input type="text" name="incsub_event_start_time['.$key.']" id="incsub_event_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_start_time" value="'.date('H:i', $start).'" size="3" style="position: relative; z-index:999;" readonly/>';
 					$content .= ' <input type="checkbox" name="incsub_event_no_start_time['.$key.']" id="incsub_event_no_start_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_no_start_time" value="1" ' . $no_start . ' />';
 					$content .= ' <label for="incsub_event_no_start_time_'.$key.'">' . __( 'No start time', self::TEXT_DOMAIN ) . '</label>';
 					$content .= '</div>';
