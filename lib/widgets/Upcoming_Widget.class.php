@@ -72,7 +72,7 @@ class Eab_Upcoming_Widget extends Eab_Widget {
 					$excerpt = eab_call_template('util_words_limit', $_event->get_excerpt_or_fallback(), $words);
 				}
 				echo '<li>';
-				echo '<a href="' . get_permalink($_event->get_id()) . '" class="' . ($_event->get_id() == $post->ID ? 'current' : '') . '" >' .
+				echo '<a href="' . get_permalink($_event->get_id()) . '" class="' . ($post instanceof WP_Post && $_event->get_id() == $post->ID ? 'current' : 'not_current') . '" >' .
 					($options['thumbnail'] && $thumbnail
 						? '<img src="' . $thumbnail . '" /><br />'
 						: ''
