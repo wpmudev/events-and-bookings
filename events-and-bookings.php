@@ -1546,10 +1546,17 @@ class Eab_EventsHub {
 
 }
 
+// Don't do session_start this when saving php files from WP editor
+if ( 
+	! wp_doing_ajax() && 
+	! isset( $_POST['newcontent'] ) && 
+	! ( function_exists( 'get_current_sceen' ) && 'theme-editor' == get_current_sceen()->id )
+) {
+	$sess_id = session_id();
+	if ( empty( $sess_id ) ) {
+		@session_start();
+	}
 
-$sess_id = session_id();
-if ( empty( $sess_id ) ) {
-	@session_start();
 }
 
 function eab_autoshow_map_off ( $opts ) {
