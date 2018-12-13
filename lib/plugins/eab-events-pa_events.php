@@ -25,14 +25,14 @@ class Eab_Events_Pae {
 		add_filter('eab-events-fpe-add_meta', array($this, 'add_fpe_meta_box'), 10, 2);
 		add_action('eab-events-fpe-save_meta', array($this, 'save_fpe_meta'), 10, 2);
 		
-		add_filter('eab-rsvps-rsvp_form', array($this, 'handle_rsvp_form'));
+		add_filter('eab-rsvps-rsvp_form', array($this, 'handle_rsvp_form'), 10, 2);
 	}
 	
-	function handle_rsvp_form ($content) {
-		global $post;
-		$post_id = (int)@$post->ID;
-		$is_pae = (int)get_post_meta($post_id, 'eab_public_announcement', true);
+	function handle_rsvp_form ( $content, $event ) {
+		
+		$is_pae = ( int )get_post_meta( $event->get_id(), 'eab_public_announcement', true );
 		return $is_pae ? false : $content;
+
 	}
 	
 	function add_meta_box ($box) {
