@@ -759,7 +759,7 @@ class Eab_EventsHub {
 			    $content .= '<div class="misc-eab-section eab-start-section"><label class="eab-inline-label" for="incsub_event_start_'.$i.'">';
 			    $content .= sprintf( __( '%sStart%s', self::TEXT_DOMAIN ), '<span>', '</span>' ).'</label>';
 			    $content .= '<input type="text" name="incsub_event_start['.$i.']" id="incsub_event_start_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_start" value="" size="10" readonly/> ';
-			    $content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_start_time" value="" size="3" readonly/>';
+			    $content .= '<input type="text" name="incsub_event_start_time['.$i.']" id="incsub_event_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_start_time" value="" size="3" style="position: relative; z-index:999;" readonly/>';
 				$content .= ' <input type="checkbox" name="incsub_event_no_start_time['.$i.']" id="incsub_event_no_start_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_no_start_time" value="1" />';
 				$content .= ' <label for="incsub_event_no_start_time_'.$i.'">' . __( 'No start time', self::TEXT_DOMAIN ) . '</label>';
 			    $content .= '</div>';
