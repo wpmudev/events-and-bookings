@@ -4,8 +4,26 @@ Author: WPMU DEV
 Changelog:
 ----------------------------------------------------------------------
 
-1.9.9
+1.9.9 - 2019-01-07
+----------------------------------------------------------------------
 - Fixed: Facebook import
+- Added: Time option in Front End editing
+- Fixed: Calendar jump months
+- Fixed: Accurate hours in time picker
+- Fixed: Recurring Events dates, somethimes set to January 1970
+- Fixed: Pagination not following option fron settings
+- Fixed: Time picker for recurring events doesn't allow to choose time before save
+- Fixed: Not showing events in next month if event start in previous month
+- Fixed: MarketPress Integration Bug with Payment
+- Fixed: Trying to get property of non-object with CoursePress
+- Fixed: Automatically disable RSVP for Announcement (only) events
+- Fixed: Expired events still displayed in category archives
+- Fixed: Events+ user event creation not working - front page editing
+- Fixed: Popup for Time entry, incorrect layering
+- Fixed: File editor stops working when I enable events+ plugin
+- Added: RSVPs and MarketPress - Paid events can now be deleted
+- Fixed: Events+ shortcode no longer displaying event data
+- Fixed: "You haven't paid for this event" issue for Recurring Events with MarketPress add-on
 
 
 1.9.8 - 2017-11-21
