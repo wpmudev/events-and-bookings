@@ -746,7 +746,7 @@ class Eab_EventsHub {
 					$content .= '<div class="misc-eab-section"><label for="incsub_event_end_'.$key.'">';
 					$content .= sprintf( __('%sEnd%s', self::TEXT_DOMAIN ), '<span>', '</span>' ).'</label>';
 					$content .= '<input type="text" name="incsub_event_end['.$key.']" id="incsub_event_end_'.$key.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="'.date('Y-m-d', $end).'" size="10" readonly/> ';
-					$content .= '<input type="text" name="incsub_event_end_time['.$key.']" id="incsub_event_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_end_time" value="'.date('H:i', $end).'" size="3" readonly/>';
+					$content .= '<input type="text" name="incsub_event_end_time['.$key.']" id="incsub_event_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_end_time" value="'.date('H:i', $end).'" size="3" style="position: relative; z-index:999;" readonly/>';
 					$content .= ' <input type="checkbox" name="incsub_event_no_end_time['.$key.']" id="incsub_event_no_end_time_'.$key.'" class="incsub_event incsub_event_time incsub_event_no_end_time" value="1" ' . $no_end . ' />';
 					$content .= ' <label for="incsub_event_no_end_time_'.$key.'">' . __( 'No end time', self::TEXT_DOMAIN ) . '</label>';
 					$content .= '</div>';
@@ -767,7 +767,7 @@ class Eab_EventsHub {
 			    $content .= '<div class="misc-eab-section"><label class="eab-inline-label" for="incsub_event_end_'.$i.'">';
 			    $content .= sprintf( __('%sEnd%s', self::TEXT_DOMAIN ), '<span>', '</span>' ).'</label>';
 			    $content .= '<input type="text" name="incsub_event_end['.$i.']" id="incsub_event_end_'.$i.'" class="incsub_event_picker incsub_event incsub_event_date incsub_event_end" value="" size="10" readonly/> ';
-			    $content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_end_time" value="" size="3" readonly/>';
+			    $content .= '<input type="text" name="incsub_event_end_time['.$i.']" id="incsub_event_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_time_picker incsub_event_end_time" value="" size="3" style="position: relative; z-index:999;" readonly/>';
 				$content .= ' <input type="checkbox" name="incsub_event_no_end_time['.$i.']" id="incsub_event_no_end_time_'.$i.'" class="incsub_event incsub_event_time incsub_event_no_end_time" value="1" />';
 				$content .= ' <label for="incsub_event_no_end_time_'.$i.'">' . __( 'No end time', self::TEXT_DOMAIN ) . '</label>';
 			    $content .= '</div>';
