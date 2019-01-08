@@ -378,7 +378,7 @@ class Eab_Events_Membership2_Integration {
 
 			foreach ( $data as $membership_id => $membership ) {
 				// Skip this membership if it does not have a custom price.
-				if ( empty( $membership['has_price'] ) ) { continue; }
+				if ( isset($membership['has_price']) && (empty( $membership['has_price'] ) || 0 == $membership['has_price'] ) ) { continue; }
 
 				if ( $user->has_membership( $membership_id ) ) {
 					// The member has subscribed to this membership.
@@ -434,7 +434,7 @@ class Eab_Events_Membership2_Integration {
 			$item = wp_parse_args( $item, $defaults );
 
 			if ( $calc_has_price ) {
-				$item['has_price'] = '' != $item['price'] ? 1 : 0;
+				$item['has_price'] = !empty($item['price']) ? 1 : 0;
 			} else {
 				$item['has_price'] = $item['has_price'] ? 1 : 0;
 			}
