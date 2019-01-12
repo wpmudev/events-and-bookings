@@ -123,7 +123,7 @@ function create_wordpress_login_popup ($action, post_id) {
 						"<a href='"+ l10nEabApi.wp_lost_pw_url +"'>" + l10nEabApi.wp_lost_pw_text + "</a>" +
 					"</p>" +
 				"</div>" +
-				"<div id='eab-wordpress_login-mode_toggle'><a href='#' data-on='" + l10nEabApi.wp_toggle_on + "' data-off='" + l10nEabApi.wp_toggle_off + "'>" + l10nEabApi.wp_toggle_on + "</a></div>" +
+				"<div id='eab-wordpress_login-mode_toggle'><a href='#' data-on='" + l10nEabApi.wp_toggle_on + "' data-off='" + l10nEabApi.wp_toggle_off + "'>" + l10nEabApi.wp_toggle_off + "</a></div>" +
 				"<div id='eab-wordpress_login-command_wrapper'>" +
 					"<input type='button' id='eab-wordpress_login-command-ok' value='" + l10nEabApi.wp_submit + "' />" +
 					"<input type='button' id='eab-wordpress_login-command-cancel' value='" + l10nEabApi.wp_cancel + "' />" +
