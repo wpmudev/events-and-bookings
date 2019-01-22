@@ -129,21 +129,15 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 		$args = array_merge(
 			$args,
 			array(
-			 	'post_type' => 'incsub_event',
-			 	'post_status' => array('publish', Eab_EventModel::RECURRENCE_STATUS),
+				'post_type' => 'incsub_event',
+				'post_status' => array( 'publish', Eab_EventModel::RECURRENCE_STATUS ),
 				'suppress_filters' => false,
 				'meta_query' => array(
 					array(
-		    			'key' => 'incsub_event_start',
-		    			'value' => apply_filters('eab-collection-upcoming-end_timestamp', "{$end_year}-{$end_month}-01 00:00"),
-		    			'compare' => '<',
-		    			'type' => 'DATETIME'
-					),
-					array(
-		    			'key' => 'incsub_event_end',
-		    			'value' => apply_filters('eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-{$start_day} 00:00"),
-		    			'compare' => '>=',
-		    			'type' => 'DATETIME'
+						'key'     => 'incsub_event_start',
+						'value'   => apply_filters( 'eab-collection-upcoming-start_timestamp', "{$year}-{$start_month}-01 00:00" ),
+						'compare' => '>=',
+						'type'    => 'DATETIME',
 					),
 					array(
 						'key' => 'incsub_event_status',
