@@ -220,8 +220,8 @@ class Eab_Shortcodes extends Eab_Codec {
 			if ($date) $args['date'] = $date;
 		}
 
-		if( ! $args['show_old'] ){
-			add_filter( 'eab-collection/hide_old', '__return_true' );
+		if( $args['show_old'] ){
+			add_filter( 'eab-collection/hide_old', '__return_false' );
 		}
 
 		$query = $this->_to_query_args($args);
