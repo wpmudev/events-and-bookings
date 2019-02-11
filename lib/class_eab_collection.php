@@ -94,10 +94,16 @@ class Eab_UpcomingCollection extends Eab_TimedCollection {
 
 	public function build_query_args ($args) {
 		
-		$hide_old = apply_filters( 'eab-collection/hide_old', false );
+		$hide_old = apply_filters( 'eab-collection/hide_old', true );
 		$time = $this->get_timestamp();
+		
 		if( $hide_old ){
-			$time = time();
+			$current_month = date( 'm' );
+			$calendar_month = date( 'm', $time );
+
+			if ( $current_month >= $calendar_month ){
+				$time = time();	
+			}			
 		}
 
 		$year = (int)date('Y', $time);
