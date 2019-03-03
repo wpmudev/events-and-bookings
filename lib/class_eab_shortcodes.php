@@ -192,7 +192,7 @@ class Eab_Shortcodes extends Eab_Codec {
 	function process_calendar_shortcode ($args=array(), $content=false) {
 		$args = $this->_preparse_arguments($args, array(
 			'network' => false,
-			'date' => current_time( 'mysql' ), // Calendar shortcode uses Y-m date format on paged.
+			'date' => strtotime(date('Y-m')), // Calendar shortcode uses Y-m date format on paged.
 			'relative_date' => false,
 		// Query arguments
 			'category' => false, // ID or slug
