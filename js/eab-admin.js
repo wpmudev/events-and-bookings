@@ -1,5 +1,5 @@
 
-jQuery(function() {
+jQuery(function($) {
         /**
          * Commenting the following if as datepicker doesn't work in mobile
          */
