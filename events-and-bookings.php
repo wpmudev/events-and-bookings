@@ -1564,7 +1564,7 @@ function eab_autoshow_map_off ( $opts ) {
 	return $opts;
 }
 
-define( 'EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ), true );
+define( 'EAB_PLUGIN_BASENAME', basename( dirname( __FILE__ ) ) );
 define( 'EAB_PLUGIN_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 define( 'EAB_PLUGIN_URL', trailingslashit( plugin_dir_url( __FILE__ ) ) );
 
@@ -1575,10 +1575,10 @@ if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
 
 
 if ( !defined( 'EAB_OLD_EVENTS_EXPIRY_LIMIT' ) ) {
-	define( 'EAB_OLD_EVENTS_EXPIRY_LIMIT', 100, true );
+	define( 'EAB_OLD_EVENTS_EXPIRY_LIMIT', 100 );
 }
 if ( !defined( 'EAB_MAX_UPCOMING_EVENTS' ) ) {
-	define( 'EAB_MAX_UPCOMING_EVENTS', 500, true );
+	define( 'EAB_MAX_UPCOMING_EVENTS', 500 );
 }
 
 require_once EAB_PLUGIN_DIR . 'lib/class_eab_error_reporter.php';

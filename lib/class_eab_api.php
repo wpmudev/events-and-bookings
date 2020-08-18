@@ -139,7 +139,7 @@ class Eab_Api {
 				$this->_data->get_option('facebook-app_id')
 			) .
 			"';"));
-			define('EAB_INTERNAL_FLAG__FB_INIT_ADDED', true, true);
+			define('EAB_INTERNAL_FLAG__FB_INIT_ADDED', true);
 		}
     }
 

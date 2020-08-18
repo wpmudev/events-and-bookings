@@ -342,7 +342,7 @@ class Eab_Events_FrontPageEditing {
 		if (!$this->_check_perms($event_id)) return false;
 		if (defined('EAB_EVENTS_FPE_ALREADY_HERE')) return $content;
 
-		define('EAB_EVENTS_FPE_ALREADY_HERE', true, true);
+		define('EAB_EVENTS_FPE_ALREADY_HERE', true);
 		return $this->_edit_event_form($event_id); // ... and YAY! for not being able to return wp_editor >.<
 	}
 
@@ -359,7 +359,7 @@ class Eab_Events_FrontPageEditing {
 		$is_title = array_reduce($wp_current_filter, create_function('$ret,$val', 'return $ret ? true : preg_match("/title/", $val);'), false);
 		if ($is_excerpt || $is_head || $is_title) return $content;
 
-		define('EAB_EVENTS_FPE_ALREADY_HERE', true, true);
+		define('EAB_EVENTS_FPE_ALREADY_HERE', true);
 		return $this->_edit_event_form($event_id); // ... and YAY! for not being able to return wp_editor >.<
 	}
 

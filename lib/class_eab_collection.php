@@ -282,7 +282,7 @@ class Eab_UpcomingWeeksCollection extends Eab_TimedCollection {
 	const WEEK_COUNT = 5;
 
 	public function __construct ($timestamp=false, $args=array()) {
-		if (!defined('EAB_COLLECTION_UPCOMING_WEEKS_COUNT')) define('EAB_COLLECTION_UPCOMING_WEEKS_COUNT', self::WEEK_COUNT, true);
+		if (!defined('EAB_COLLECTION_UPCOMING_WEEKS_COUNT')) define('EAB_COLLECTION_UPCOMING_WEEKS_COUNT', self::WEEK_COUNT);
 
 		Eab_Filter::start_date_ordering_set_up();
 		add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));
@@ -346,7 +346,7 @@ class Eab_UpcomingWeeksArchiveCollection extends Eab_TimedCollection {
 		const WEEK_COUNT = 5;
 	
 		public function __construct ($timestamp=false, $args=array()) {
-			if (!defined('EAB_COLLECTION_UPCOMING_WEEKS_COUNT')) define('EAB_COLLECTION_UPCOMING_WEEKS_COUNT', self::WEEK_COUNT, true);
+			if (!defined('EAB_COLLECTION_UPCOMING_WEEKS_COUNT')) define('EAB_COLLECTION_UPCOMING_WEEKS_COUNT', self::WEEK_COUNT);
 	
 			Eab_Filter::start_date_ordering_set_up();
 			add_filter('eab-ordering-date_ordering_direction', array($this, 'propagate_direction_filter'));

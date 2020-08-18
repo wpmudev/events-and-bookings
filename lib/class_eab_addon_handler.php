@@ -5,7 +5,7 @@
 class Eab_AddonHandler {
 
 	private function __construct () {
-		define( 'EAB_PLUGIN_ADDONS_DIR', EAB_PLUGIN_DIR . 'lib/plugins', true );
+		define( 'EAB_PLUGIN_ADDONS_DIR', EAB_PLUGIN_DIR . 'lib/plugins' );
 		$this->_load_active_plugins();
 	}
 
